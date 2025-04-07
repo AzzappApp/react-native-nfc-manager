@@ -1,8 +1,9 @@
 import { type Contact } from 'expo-contacts';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, Platform, View } from 'react-native';
+import { Linking, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
@@ -10,13 +11,14 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { ContactDetailsModal_webCard$data } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -89,6 +91,12 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   const birthday = details.dates?.find(date => date.label === 'birthday');
 
   const onShare = async () => ShareContact(details);
+  const appearance = useColorScheme();
+
+  const { width: screenWidth } = useScreenDimensions();
+
+  const backgroundWidth = screenWidth + 40;
+  const backgroundImageUrl = avatar || details.webCard?.coverMedia?.thumbnail;
 
   return (
     <Container style={styles.container}>
@@ -99,6 +107,38 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
         <Icon icon="share" size={24} style={styles.shareIcon} />
       </PressableNative>
       <View style={styles.content}>
+        {backgroundImageUrl ? (
+          <View
+            style={[
+              styles.avatarBackgroundContainer,
+              {
+                width: backgroundWidth,
+              },
+            ]}
+          >
+            <Image
+              source={backgroundImageUrl}
+              style={styles.avatarBackground}
+              blurRadius={9.2}
+              contentFit="cover"
+            />
+            <LinearGradient
+              colors={[
+                appearance === 'dark'
+                  ? 'rgba(0, 0, 0, 0)'
+                  : 'rgba(255, 255, 255, 0.5)',
+                appearance === 'dark' ? colors.grey1000 : colors.white,
+              ]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={[
+                styles.avatarBackgroundGradient,
+                { width: backgroundWidth },
+              ]}
+            />
+          </View>
+        ) : undefined}
+
         <View style={styles.avatarContainer}>
           <View style={[styles.avatar, styles.avatarWrapper]}>
             {avatar ? (
@@ -361,6 +401,18 @@ const stylesheet = createStyleSheet(appearance => ({
     borderRadius: AVATAR_WIDTH / 2,
     ...shadow({ appearance, direction: 'bottom' }),
   },
+  avatarBackgroundContainer: {
+    top: -20,
+    position: 'absolute',
+    height: 387,
+  },
+  avatarBackground: {
+    flex: 1,
+  },
+  avatarBackgroundGradient: {
+    position: 'absolute',
+    height: 387,
+  },
   avatarWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -398,7 +450,7 @@ const HEADER = 300;
 export type ContactDetails = Contact & {
   createdAt: Date;
   profileId?: string;
-  webCard?: CoverRenderer_webCard$key | null;
+  webCard?: ContactDetailsModal_webCard$data | null;
 };
 
 export default ContactDetailsBody;
