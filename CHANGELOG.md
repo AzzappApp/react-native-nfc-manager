@@ -1,3 +1,8 @@
+## 1.9.2-canary.23
+
+* **feat:**  - change stats displayed to include from scanner stat ([#8319](https://github.com/AzzappApp/azzapp/pull/8319))
+* **fix:**  - add blured contactimage in background of contact screen ([#8330](https://github.com/AzzappApp/azzapp/pull/8330))
+
 ## 1.9.2-canary.22
 
 
