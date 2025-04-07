@@ -6,7 +6,7 @@ const APPLE_TEAM_ID = process.env.APPLE_TEAM_ID!;
 const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID!;
 const APPLE_KEY_ID = process.env.APPLE_KEY_ID!;
 
-export async function generateAppleClientSecret() {
+async function generateAppleClientSecret() {
   const now = Math.floor(Date.now() / 1000);
 
   const privateKey = await importPKCS8(APPLE_PRIVATE_KEY, 'ES256');
