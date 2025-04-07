@@ -1,3 +1,7 @@
+## 1.9.2-canary.24
+
+* **fix:**  - **oauth:** apple token generation
+
 ## 1.9.2-canary.23
 
 * **feat:**  - change stats displayed to include from scanner stat ([#8319](https://github.com/AzzappApp/azzapp/pull/8319))
