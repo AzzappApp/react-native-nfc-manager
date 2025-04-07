@@ -1,3 +1,7 @@
+## 1.9.2-rc.19
+
+* **fix:**  - **payment:** [#8216](https://github.com/AzzappApp/azzapp/pull/8216) use isPremium flag ([#8321](https://github.com/AzzappApp/azzapp/pull/8321))
+
 ## 1.9.2-rc.18
 
 * **fix:**  - ast replace and do not update when no text change ([#8310](https://github.com/AzzappApp/azzapp/pull/8310))
