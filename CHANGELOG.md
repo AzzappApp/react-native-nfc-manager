@@ -1,3 +1,7 @@
+## 1.9.2-canary.19
+
+
+
 ## 1.9.2-canary.18
 
 * **build:**  - upgrade deps ([#8313](https://github.com/AzzappApp/azzapp/pull/8313))
