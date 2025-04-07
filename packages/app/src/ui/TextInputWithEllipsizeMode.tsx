@@ -96,6 +96,7 @@ const TextInputWithEllipsizeMode = ({
             styles.inputText,
             {
               opacity: !isFocused ? 1 : 0,
+              borderWidth: 0,
             },
           ]}
         >
