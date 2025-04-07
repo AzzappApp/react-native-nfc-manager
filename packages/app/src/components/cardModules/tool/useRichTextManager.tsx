@@ -128,6 +128,10 @@ const useRichTextManager = ({
       let newAST = textAndSelection.ast;
       const textLengthChange = newText.length - previousText.current.length;
 
+      if (getRawTextFromRichText(textAndSelection.ast) === newText) {
+        // we receive the same text than the already used
+        return;
+      }
       /**
        * user already have a selected range
        */

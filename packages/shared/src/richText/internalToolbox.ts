@@ -110,7 +110,7 @@ export const splitRichTextAST = (
               type: 'text',
               start: node.start,
               end: index,
-              value: node.value?.substring(0, index - node.start),
+              value: node.value?.substring(0, index - node.start) || '',
             }
           : undefined,
       second:
@@ -119,10 +119,9 @@ export const splitRichTextAST = (
               type: 'text',
               start: index,
               end: node.end,
-              value: node.value?.substring(
-                index - node.start,
-                node.value.length,
-              ),
+              value:
+                node.value?.substring(index - node.start, node.value.length) ||
+                '',
             }
           : undefined,
     };

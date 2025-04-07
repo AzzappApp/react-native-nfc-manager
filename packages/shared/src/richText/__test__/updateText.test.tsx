@@ -78,4 +78,9 @@ describe('RichText: updateText', () => {
     const result = updateTextInRichText(ast, 3, 6, '');
     testResult(result, '<b>ab<i>c</i>g</b>');
   });
+  test('identical update', () => {
+    const ast = parseHTMLToRichText('<-3>a</-3>a');
+    const result = updateTextInRichText(ast, 0, 1, 'a');
+    testResult(result, 'aa');
+  });
 });
