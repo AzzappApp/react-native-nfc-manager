@@ -80,10 +80,9 @@ const HomeBottomSheetPanel = ({
   const user = useFragment(
     graphql`
       fragment HomeBottomSheetPanel_user on User {
+        isPremium
         userSubscription {
-          status
           issuer
-          id
         }
       }
     `,
@@ -240,7 +239,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        user?.userSubscription?.status !== 'active' && ENABLE_MULTI_USER
+        !user?.isPremium && ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'plus',
@@ -284,8 +283,8 @@ const HomeBottomSheetPanel = ({
             close();
           },
         },
-        user?.userSubscription?.status === 'active' &&
-        user.userSubscription.issuer !== 'web' &&
+        user?.isPremium &&
+        user.userSubscription?.issuer !== 'web' &&
         ENABLE_MULTI_USER
           ? {
               type: 'row',
@@ -440,7 +439,7 @@ const HomeBottomSheetPanel = ({
       onShare,
       profile,
       user?.userSubscription?.issuer,
-      user?.userSubscription?.status,
+      user?.isPremium,
     ],
   );
 
