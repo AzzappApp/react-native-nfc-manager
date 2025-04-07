@@ -3,8 +3,8 @@ import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 
 export const contactSchema = z
   .object({
-    scanUsed: z.boolean().default(false),
-    notify: z.boolean().default(false),
+    scanUsed: z.boolean(),
+    notify: z.boolean(),
     firstName: z.string().nullable().optional(),
     lastName: z.string().nullable().optional(),
     title: z.string().nullable().optional(),

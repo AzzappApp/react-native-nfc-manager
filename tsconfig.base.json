@@ -13,7 +13,6 @@
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "resolvePackageJsonExports": true,
     "resolveJsonModule": true,
     "incremental": true,
     "noErrorTruncation": true,

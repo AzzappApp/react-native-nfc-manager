@@ -16,21 +16,15 @@ import PressableOpacity from '#ui/PressableOpacity';
 import Select from '#ui/Select';
 import SelectList from '#ui/SelectList';
 import Text from '#ui/Text';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
-import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { SelectListItemInfo } from '#ui/SelectList';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { multiUserAddFormSchema } from './MultiUserAddModal';
 import type { CountryCode } from 'libphonenumber-js';
 import type { Control } from 'react-hook-form';
+import type { z } from 'zod';
 
-export type MultiUserAddFormValues = ContactCardFormValues & {
-  selectedContact: {
-    countryCodeOrEmail: CountryCode | 'email';
-    value: string;
-  };
-  role: ProfileRole;
-  contactCard: ContactCard;
-};
+export type MultiUserAddFormValues = z.infer<typeof multiUserAddFormSchema>;
 
 type MultiUserAddFormProps = {
   contacts: Array<{
@@ -155,10 +149,10 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         )}
         <EmailOrPhoneInput
           input={
-            selectedContact || {
+            (selectedContact || {
               countryCodeOrEmail: 'email',
               value: '',
-            }
+            }) as EmailPhoneInput
           }
           onChange={setSelectedContact}
           hasError={error != null}

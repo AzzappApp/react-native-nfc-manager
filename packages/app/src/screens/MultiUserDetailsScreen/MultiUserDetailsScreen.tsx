@@ -50,7 +50,6 @@ import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import { multiUserDetailsSchema } from './MultiUserDetailsSchema';
-import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardEditFormFragment_profile$key } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { MultiUserDetailsScreen_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailsScreen_RemoveUserMutation.graphql';
@@ -60,13 +59,10 @@ import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserDetailRoute } from '#routes';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { CountryCode } from 'libphonenumber-js';
-
 import type { Control } from 'react-hook-form';
+import type { z } from 'zod';
 
-export type MultiUserDetailFormValues = ContactCardFormValues & {
-  role: ProfileRole;
-  selectedContact: EmailPhoneInput | null;
-};
+export type MultiUserDetailFormValues = z.infer<typeof multiUserDetailsSchema>;
 
 const MultiUserDetailsScreen = ({
   preloadedQuery,

@@ -56,7 +56,7 @@ import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 
-const multiUserAddFormSchema = baseUserDetailsSchema.extend({
+export const multiUserAddFormSchema = baseUserDetailsSchema.extend({
   selectedContact: z
     .object({
       countryCodeOrEmail: z.string(),
@@ -463,7 +463,7 @@ const MultiUserAddModal = (
           selectedContact.countryCodeOrEmail !== 'email'
             ? parsePhoneNumberWithError(
                 selectedContact.value,
-                selectedContact.countryCodeOrEmail,
+                selectedContact.countryCodeOrEmail as CountryCode,
               ).formatInternational()
             : undefined;
 

@@ -81,7 +81,7 @@ PODS:
   - EXImageLoader (5.0.0):
     - ExpoModulesCore
     - React-Core
-  - Expo (52.0.42):
+  - Expo (52.0.44):
     - ExpoModulesCore
   - ExpoAppleAuthentication (7.1.3):
     - ExpoModulesCore
@@ -98,8 +98,6 @@ PODS:
   - ExpoFileSystem (18.0.12):
     - ExpoModulesCore
   - ExpoFont (13.0.4):
-    - ExpoModulesCore
-  - ExpoHaptics (14.0.1):
     - ExpoModulesCore
   - ExpoImage (2.0.7):
     - ExpoModulesCore
@@ -290,8 +288,8 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
-  - PurchasesHybridCommon (13.26.0):
-    - RevenueCat (= 5.20.0)
+  - PurchasesHybridCommon (13.26.1):
+    - RevenueCat (= 5.20.2)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1742,7 +1740,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-skia (1.11.8):
+  - react-native-skia (1.12.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2079,7 +2077,7 @@ PODS:
     - React-logger (= 0.77.2)
     - React-perflogger (= 0.77.2)
     - React-utils (= 0.77.2)
-  - RevenueCat (5.20.0)
+  - RevenueCat (5.20.2)
   - RNBootSplash (6.3.4):
     - DoubleConversion
     - glog
@@ -2241,8 +2239,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPurchases (8.9.1):
-    - PurchasesHybridCommon (= 13.26.0)
+  - RNPurchases (8.9.3):
+    - PurchasesHybridCommon (= 13.26.1)
     - React-Core
   - RNReactNativeHapticFeedback (2.3.3):
     - DoubleConversion
@@ -2560,7 +2558,6 @@ DEPENDENCIES:
   - ExpoCrypto (from `../../../node_modules/expo-crypto/ios`)
   - ExpoFileSystem (from `../../../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../../../node_modules/expo-font/ios`)
-  - ExpoHaptics (from `../../../node_modules/expo-haptics/ios`)
   - ExpoImage (from `../../../node_modules/expo-image/ios`)
   - ExpoImageManipulator (from `../../../node_modules/expo-image-manipulator/ios`)
   - ExpoKeepAwake (from `../../../node_modules/expo-keep-awake/ios`)
@@ -2743,8 +2740,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-file-system/ios"
   ExpoFont:
     :path: "../../../node_modules/expo-font/ios"
-  ExpoHaptics:
-    :path: "../../../node_modules/expo-haptics/ios"
   ExpoImage:
     :path: "../../../node_modules/expo-image/ios"
   ExpoImageManipulator:
@@ -2976,7 +2971,7 @@ SPEC CHECKSUMS:
   EXAV: 4c41f0a6ae54a0b96597abc90e37962ab2ee0d85
   EXConstants: fcfc75800824ac2d5c592b5bc74130bad17b146b
   EXImageLoader: e5da974e25b13585c196b658a440720c075482d5
-  Expo: e8f11c8e0290deca7be9254569e23f884b95a777
+  Expo: 75e002fc29a18a72aa3db967b41b29c2b206875d
   ExpoAppleAuthentication: 52631ed9dcb71c65712a447bbb9a5667bb8fcf0c
   ExpoAsset: 48386d40d53a8c1738929b3ed509bcad595b5516
   ExpoBlur: 392c1207f71d0ecf22371621c1fbd44ba84d9742
@@ -2985,7 +2980,6 @@ SPEC CHECKSUMS:
   ExpoCrypto: e97e864c8d7b9ce4a000bca45dddb93544a1b2b4
   ExpoFileSystem: 42d363d3b96f9afab980dcef60d5657a4443c655
   ExpoFont: f354e926f8feae5e831ec8087f36652b44a0b188
-  ExpoHaptics: 8d199b2f33245ea85289ff6c954c7ee7c00a5b5d
   ExpoImage: d840b256050f4428d2942bc2b6e9251f9e0d7021
   ExpoImageManipulator: 4aca9cc1d84e31f62a7e8075c19026d3ad62f852
   ExpoKeepAwake: b0171a73665bfcefcfcc311742a72a956e6aa680
@@ -3018,7 +3012,7 @@ SPEC CHECKSUMS:
   lottie-react-native: 28e5b80459ee6723917995556657e54b98bb16bc
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  PurchasesHybridCommon: fa166fc8b385cf80f581f923c91d8ccffe5dd7f8
+  PurchasesHybridCommon: aeebb5b2a956514f8f3ebde2a1574e07d2164ae8
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 85b72250b63cfb54f29ca96ceb108cb9ef3c2079
   RCTRequired: 567cb8f5d42b990331bfd93faad1d8999b1c1736
@@ -3060,8 +3054,8 @@ SPEC CHECKSUMS:
   react-native-passkit: 3979317a86e60cc9288eeffab27da37d62d15160
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
   react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
-  react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
-  react-native-skottie-template-player: 95854ca527f4c0cc16e2f14ff5258303360980b7
+  react-native-skia: fb6fbe6585b5ed77fab9efb04f16e6f007ad6915
+  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
   react-native-webview: 5095dd03fc98a529e44a6bb81aed21062b5f879e
   React-nativeconfig: ecf4dc92c40b97e2b3f0c619938f78bfd6507b08
   React-NativeModulesApple: f457bbfb30fb3bc41979b1a87b99d292d7340d39
@@ -3092,7 +3086,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: f334cebc0beed0a72490492e978007082c03d533
   ReactCodegen: 00a2b2a721bbd0805100f1f63fcae650fc03630b
   ReactCommon: 7763e59534d58e15f8f22121cdfe319040e08888
-  RevenueCat: e47ff90dfd271fde155a4befe48e8fc02e8281e4
+  RevenueCat: 9af6740f8629097fcacda9b3cb6b927319c53a26
   RNBootSplash: 540e4bfcfe3a9c0a2fe5b3d28d5efe0458f8e7cb
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
@@ -3104,7 +3098,7 @@ SPEC CHECKSUMS:
   RNKeychain: 455cc7002480eac3d24f67b4329ec80c7d901edc
   RNLocalize: 7ed277415799ab5a8931b77fd2124c4749822e8a
   RNPermissions: 0f2ea503cb886cd6c7191bcefeb733467dae824c
-  RNPurchases: 1afc4f036744aa0591d05d7ebc2c99c2048ac477
+  RNPurchases: 647a3b5c6b01f44f35a9943e8a8cec1757596ab6
   RNReactNativeHapticFeedback: 66c6b0cf19f5d9dae8be36b2336e1fe2a2e42566
   RNReactNativeSharedGroupPreferences: d4869af3c7757405b6b5ac633d0ef5f9886a9be7
   RNReanimated: 6cd556bc7a436ced2b3d47d1ab23536b9b27212d

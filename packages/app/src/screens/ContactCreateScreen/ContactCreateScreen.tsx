@@ -114,6 +114,7 @@ const ContactCreateScreen = ({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       notify: true,
+      scanUsed: false,
     },
   });
 
