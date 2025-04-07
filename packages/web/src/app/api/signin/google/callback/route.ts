@@ -6,7 +6,6 @@ const googleSigninCallback = oauthSigninCallback({
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
   redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/google/callback`,
   csrfSecret: new TextEncoder().encode(process.env.GOOGLE_TOKEN_SECRET),
-  profileURL: 'https://www.googleapis.com/oauth2/v1/userinfo',
 });
 
 export { googleSigninCallback as GET };

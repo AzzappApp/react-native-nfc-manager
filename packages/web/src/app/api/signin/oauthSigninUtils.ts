@@ -1,5 +1,6 @@
 import cuid2 from '@paralleldrive/cuid2';
 import { jwtVerify, SignJWT } from 'jose';
+import { jwtDecode } from 'jwt-decode';
 import { NextResponse } from 'next/server';
 import {
   createFreeSubscriptionForBetaAndroidPeriod,
@@ -13,6 +14,17 @@ import ERRORS from '@azzapp/shared/errors';
 import { retrieveSigninInfos, type SigninInfos } from '#helpers/auth';
 import type { Profile, User } from '@azzapp/data';
 import type { NextRequest } from 'next/server';
+
+type OpenIdProfile = {
+  email: string;
+  email_verified: boolean;
+  name: string;
+  picture: string;
+  given_name: string;
+  family_name: string;
+  // linkedIn profileUrl
+  locale: { language: string };
+};
 
 export const oauthSignin =
   ({
@@ -34,7 +46,7 @@ export const oauthSignin =
   }) =>
   async (req: NextRequest) => {
     let platform = req.nextUrl.searchParams.get('platform');
-    if (platform !== 'android' && platform !== 'ios') {
+    if (platform !== 'android' && platform !== 'ios' && platform !== 'web') {
       platform = 'ios';
     }
     const url = new URL(authorizeURL);
@@ -49,6 +61,9 @@ export const oauthSignin =
     url.searchParams.append('state', csrfToken);
     url.searchParams.append('scope', scope ?? 'profile email openid');
     url.searchParams.append('access_type', 'online');
+    if (clientId === process.env.APPLE_CLIENT_ID) {
+      url.searchParams.append('response_mode', 'form_post');
+    }
 
     if (errorCallback) {
       url.searchParams.append('error_callback', errorCallback);
@@ -61,7 +76,18 @@ export const oauthSignin =
     return NextResponse.redirect(url.toString(), { status: 302 });
   };
 
-const redirectToApp = (data: SigninInfos | { error: string }) => {
+const redirectToApp = (
+  data: SigninInfos | { error: string },
+  platform?: string | null,
+) => {
+  if (platform === 'web') {
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_USER_MGMT_URL}/api/oAuthSignin?data=${JSON.stringify(data)}`,
+      {
+        status: 302,
+      },
+    );
+  }
   const appScheme =
     process.env.NEXT_PUBLIC_PLATFORM === 'development'
       ? 'azzapp-dev'
@@ -87,10 +113,10 @@ export const oauthSigninCallback =
   }: {
     tokenURL: string;
     clientId: string;
-    clientSecret: string;
+    clientSecret: string | (() => Promise<string>);
     redirectURI: string;
     csrfSecret: Uint8Array;
-    profileURL: string;
+    profileURL?: string;
   }) =>
   async (request: NextRequest) => {
     const code = request.nextUrl.searchParams.get('code');
@@ -110,13 +136,17 @@ export const oauthSigninCallback =
     }
 
     let accessToken: string;
+    let id_token: string;
     try {
       const params = new URLSearchParams({
         grant_type: 'authorization_code',
         code,
         redirect_uri: redirectURI,
         client_id: clientId,
-        client_secret: clientSecret,
+        client_secret:
+          typeof clientSecret === 'string'
+            ? clientSecret
+            : await clientSecret(),
       });
 
       const response = await fetch(tokenURL, {
@@ -128,32 +158,37 @@ export const oauthSigninCallback =
       });
       const data = await response.json();
       accessToken = data.access_token;
+      id_token = data.id_token;
     } catch (error) {
       console.error(error);
-      return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+      return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
     if (!accessToken) {
-      return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+      return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
 
-    let googleProfile: any;
+    let connectProfile: OpenIdProfile | null;
     try {
-      googleProfile = await fetch(profileURL, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }).then(res => res.json());
+      if (profileURL) {
+        connectProfile = await fetch(profileURL, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }).then(res => res.json());
+      } else {
+        connectProfile = await jwtDecode(id_token);
+      }
     } catch (error) {
       console.error(error);
-      return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+      return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
-    if (!googleProfile) {
-      return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+    if (!connectProfile) {
+      return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
 
-    const email: string = googleProfile.email;
+    const email: string = connectProfile.email;
     if (!email) {
-      return redirectToApp({ error: 'LinkedIn email is required' });
+      return redirectToApp({ error: 'LinkedIn email is required' }, platform);
     }
 
     let user: User;
@@ -162,10 +197,10 @@ export const oauthSigninCallback =
       [user, profile] = await transaction(
         async (): Promise<[User, Profile | null]> => {
           const userContactData = {
-            firstName: googleProfile.given_name,
-            lastName: googleProfile.family_name,
-            email: googleProfile.email,
-            avatarUrl: googleProfile.picture,
+            firstName: connectProfile.given_name,
+            lastName: connectProfile.family_name,
+            email: connectProfile.email,
+            avatarUrl: connectProfile.picture,
           };
 
           let user = await getUserByEmail(email);
@@ -186,7 +221,7 @@ export const oauthSigninCallback =
                 ...userContactData,
               },
               emailConfirmed: true,
-              locale: user.locale ?? googleProfile.locale?.language ?? null,
+              locale: user.locale ?? connectProfile.locale?.language ?? null,
             };
             await updateUser(user.id, updates);
             user = {
@@ -206,7 +241,7 @@ export const oauthSigninCallback =
               email,
               phoneNumber: null,
               password: null,
-              locale: googleProfile.locale?.language ?? null,
+              locale: connectProfile.locale?.language ?? null,
               roles: null,
               termsOfUseAcceptedVersion: null,
               termsOfUseAcceptedAt: null,
@@ -247,7 +282,7 @@ export const oauthSigninCallback =
       );
     } catch (error) {
       console.error(error);
-      return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+      return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
 
     let signinInfos: SigninInfos;
@@ -255,12 +290,12 @@ export const oauthSigninCallback =
       signinInfos = await retrieveSigninInfos(user, profile);
     } catch (error) {
       if (error instanceof Error && error.message === 'User deleted') {
-        return redirectToApp({ error: ERRORS.FORBIDDEN });
+        return redirectToApp({ error: ERRORS.FORBIDDEN }, platform);
       } else {
         console.error(error);
-        return redirectToApp({ error: ERRORS.INVALID_REQUEST });
+        return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
       }
     }
 
-    return redirectToApp(signinInfos);
+    return redirectToApp(signinInfos, platform);
   };

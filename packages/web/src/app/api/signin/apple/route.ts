@@ -16,6 +16,7 @@ import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
+import { oauthSignin } from '../oauthSigninUtils';
 import type { Profile, User } from '@azzapp/data';
 import type { JWTPayload } from 'jose';
 
@@ -171,6 +172,17 @@ const appleSignin = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withPluginsRoute(appleSignin) });
+const appleWebSignin = oauthSignin({
+  authorizeURL: 'https://appleid.apple.com/auth/authorize',
+  redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/apple/callback`,
+  clientId: process.env.APPLE_CLIENT_ID!,
+  csrfSecret: new TextEncoder().encode(process.env.APPLE_TOKEN_SECRET),
+  scope: 'name email',
+});
+
+export const { POST, OPTIONS, GET } = cors({
+  POST: withPluginsRoute(appleSignin),
+  GET: appleWebSignin,
+});
 
 export const runtime = 'nodejs';
