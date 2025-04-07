@@ -1,3 +1,7 @@
+## 1.9.2-canary.17
+
+* **fix:**  - remove expo-device ([#8311](https://github.com/AzzappApp/azzapp/pull/8311))
+
 ## 1.9.2-canary.16
 
 * **fix:**  - filter out invalid numbers (whatsapp use case) ([#8301](https://github.com/AzzappApp/azzapp/pull/8301))
