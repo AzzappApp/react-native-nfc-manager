@@ -8,13 +8,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Dimensions,
-  Platform,
-  View,
-  StyleSheet,
-  useWindowDimensions,
-} from 'react-native';
+import { Dimensions, Platform, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
@@ -29,6 +23,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors } from '#theme';
 import {
   useDidAppear,
   useRouter,
@@ -36,6 +31,7 @@ import {
 } from '#components/NativeRouter';
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   profileInfoHasAdminRight,
   profileInfoHasEditorRight,
@@ -76,6 +72,7 @@ export const WebCardScreen = ({
   WebCardScreenByIdQuery | WebCardScreenByUserNameQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
+  const styles = useStyleSheet(styleSheet);
 
   useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
 
@@ -511,7 +508,7 @@ export default relayScreen(WebCardScreen, {
   fetchPolicy: 'store-and-network',
 });
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: { flex: 1 },
   front: {
     flex: 1,
@@ -532,5 +529,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
-});
+}));
