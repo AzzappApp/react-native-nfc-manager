@@ -1,3 +1,8 @@
+## 1.9.2-canary.18
+
+* **build:**  - upgrade deps ([#8313](https://github.com/AzzappApp/azzapp/pull/8313))
+* **fix:**  - do not force saveToFile ([#8316](https://github.com/AzzappApp/azzapp/pull/8316))
+
 ## 1.9.2-canary.17
 
 * **fix:**  - remove expo-device ([#8311](https://github.com/AzzappApp/azzapp/pull/8311))
