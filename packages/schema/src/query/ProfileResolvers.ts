@@ -134,6 +134,15 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     }
     return profile.nbContactCardScans;
   },
+  nbContactsImportFromScan: async profile => {
+    if (
+      !profileIsAssociatedToCurrentUser(profile) &&
+      !(await hasWebCardProfileRight(profile.webCardId))
+    ) {
+      return 0;
+    }
+    return profile.nbContactsImportFromScan;
+  },
   nbShareBacks: async profile => {
     if (
       !profileIsAssociatedToCurrentUser(profile) &&

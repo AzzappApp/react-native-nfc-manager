@@ -167,6 +167,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         lastContactCardUpdate: creationDate,
         nbContactCardScans: 0,
         nbShareBacks: 0,
+        nbContactsImportFromScan: 0,
         promotedAsOwner: false,
         createdAt: creationDate,
         inviteSent: !!sendInvite,

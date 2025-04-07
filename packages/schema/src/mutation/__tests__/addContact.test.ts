@@ -1,6 +1,11 @@
 import { GraphQLError } from 'graphql';
 
-import { createContact, getContactByProfiles } from '@azzapp/data';
+import {
+  createContact,
+  getContactByProfiles,
+  incrementContactsImportFromScan,
+  incrementImportFromScan,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
@@ -18,6 +23,8 @@ jest.mock('@azzapp/data', () => ({
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateContact: jest.fn(),
+  incrementContactsImportFromScan: jest.fn(),
+  incrementImportFromScan: jest.fn(),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -174,6 +181,8 @@ describe('addContact Mutation', () => {
         title: 'CEO',
       }),
     });
+    expect(incrementContactsImportFromScan).not.toHaveBeenCalled();
+    expect(incrementImportFromScan).not.toHaveBeenCalled();
   });
 
   test('should validate subscription if scan is used', async () => {
@@ -207,6 +216,8 @@ describe('addContact Mutation', () => {
     expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
       action: 'ADD_CONTACT_WITH_SCAN',
     });
+    expect(incrementContactsImportFromScan).toHaveBeenCalled();
+    expect(incrementImportFromScan).toHaveBeenCalled();
   });
 
   test('should send email notification if notify is true', async () => {

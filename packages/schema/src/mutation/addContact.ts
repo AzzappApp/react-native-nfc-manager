@@ -5,6 +5,8 @@ import {
   checkMedias,
   createContact,
   getContactByProfiles,
+  incrementContactsImportFromScan,
+  incrementImportFromScan,
   incrementShareBacks,
   incrementShareBacksTotal,
   referencesMedias,
@@ -97,6 +99,8 @@ const addContact: MutationResolvers['addContact'] = async (
     await validateCurrentSubscription(userId, {
       action: 'ADD_CONTACT_WITH_SCAN',
     });
+    await incrementContactsImportFromScan(profileId);
+    await incrementImportFromScan(profileId, true);
   }
 
   if (input.withShareBack && input.profileId) {

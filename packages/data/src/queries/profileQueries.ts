@@ -251,6 +251,20 @@ export const incrementContactCardTotalScans = async (profileId: string) => {
  *
  * @param profileId - The id of the profile
  */
+export const incrementContactsImportFromScan = async (profileId: string) => {
+  await db()
+    .update(ProfileTable)
+    .set({
+      nbContactsImportFromScan: sql`${ProfileTable.nbContactsImportFromScan} + 1`,
+    })
+    .where(eq(ProfileTable.id, profileId));
+};
+
+/**
+ * Increment the number of contact card scans for a profile
+ *
+ * @param profileId - The id of the profile
+ */
 export const incrementShareBacksTotal = async (profileId: string) => {
   await db()
     .update(ProfileTable)

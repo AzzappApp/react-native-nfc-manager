@@ -189,18 +189,6 @@ const BarChartLegend = ({
 const CHART_BAR_SEPARATOR = 2;
 const NB_DATE_DISPLAYED = 6;
 
-export type StatsData = {
-  contactCardScans: number;
-  webCardViews: number;
-  shareBacks: number;
-  likes: number;
-};
-
-export type StatsDataGroup = {
-  day: string;
-  data: StatsData[];
-};
-
 const stylesheet = createVariantsStyleSheet(() => ({
   default: {
     textDate: {

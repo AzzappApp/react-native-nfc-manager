@@ -568,6 +568,10 @@ export const ProfileTable = cols.table(
       .$onUpdate(() => new Date()),
 
     nbContactCardScans: cols.int('nbContactCardScans').default(0).notNull(),
+    nbContactsImportFromScan: cols
+      .int('nbContactsImportFromScan')
+      .default(0)
+      .notNull(),
     nbShareBacks: cols.int('nbShareBacks').default(0).notNull(),
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
@@ -604,6 +608,10 @@ export const ProfileStatisticTable = cols.table(
     day: cols.date('day').notNull(),
     contactCardScans: cols.int('contactCardScans').default(0).notNull(),
     shareBacks: cols.int('shareBacks').default(0).notNull(),
+    contactsImportFromScan: cols
+      .int('contactsImportFromScan')
+      .default(0)
+      .notNull(),
   },
   table => {
     return {

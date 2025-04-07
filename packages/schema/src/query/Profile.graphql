@@ -25,6 +25,10 @@ type Profile implements Node {
   """
   nbNewContacts: Int!
   """
+  the number of new contact imported from photo scan
+  """
+  nbContactsImportFromScan: Int
+  """
   The related user
   """
   user: User

@@ -46,21 +46,21 @@ const HomeStatistics = ({
         id
         webCard {
           id
-          nbLikes
           nbWebCardViews
           userName
           statsSummary {
             day
             webCardViews
-            likes
           }
         }
         nbContactCardScans
+        nbContactsImportFromScan
         nbShareBacks
         statsSummary {
           day
           contactCardScans
           shareBacks
+          contactsImportFromScan
         }
       }
     `,
@@ -106,8 +106,8 @@ const HomeStatistics = ({
         webCardViews: normalizeArray(
           webCardStatsByDay.map(stats => stats?.webCardViews ?? 0),
         ),
-        likes: normalizeArray(
-          webCardStatsByDay.map(stats => stats?.likes ?? 0),
+        contactsImportFromScan: normalizeArray(
+          profileStatsByDays.map(stats => stats?.contactsImportFromScan ?? 0),
         ),
         shareBacks: normalizeArray(
           profileStatsByDays.map(stats => stats?.shareBacks ?? 0),
@@ -184,18 +184,25 @@ const HomeStatistics = ({
     });
   });
 
-  const totalLikes = useIndexInterpolation(
-    currentIndexProfileSharedValue,
-    concat(0, profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
-    0,
-  );
-  const totalLikesLabel = useDerivedValue(() => format(totalLikes.value));
   const totalScans = useIndexInterpolation(
     currentIndexProfileSharedValue,
     concat(0, profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
     0,
   );
   const totalScansLabel = useDerivedValue(() => format(totalScans.value));
+
+  const totalContactsImportFromScan = useIndexInterpolation(
+    currentIndexProfileSharedValue,
+    concat(
+      0,
+      profiles?.map(profile => profile.nbContactsImportFromScan ?? 0) ?? [],
+    ),
+    0,
+  );
+  const totalContactsImportFromScanLabel = useDerivedValue(() =>
+    format(totalContactsImportFromScan.value),
+  );
+
   const totalViews = useIndexInterpolation(
     currentIndexProfileSharedValue,
     concat(
@@ -261,58 +268,41 @@ const HomeStatistics = ({
         overScrollMode="never"
       >
         <StatisticItems
-          value={totalViewsLabel}
-          title={intl.formatMessage(
-            {
-              defaultMessage: 'Webcard{azzappA} Views',
-              description: 'Home statistics - webcardView label',
-            },
-            {
-              azzappA: (
-                <Text style={styles.icon} variant="azzapp">
-                  a
-                </Text>
-              ),
-            },
-          )}
+          value={totalScansLabel}
+          title={intl.formatMessage({
+            defaultMessage: 'Contact shares',
+            description: 'Home statistics - Contact shares label',
+          })}
           scrollIndex={scrollIndexOffset}
           index={0}
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalScansLabel}
-          title={intl.formatMessage(
-            {
-              defaultMessage: 'Contact card{azzappA} views',
-              description: 'Home statistics - Contact card views label',
-            },
-            {
-              azzappA: (
-                <Text variant="azzapp" style={styles.icon}>
-                  a
-                </Text>
-              ),
-            },
-          )}
+          value={totalShareBacksLabel}
+          title={intl.formatMessage({
+            defaultMessage: 'Contacts received',
+            description: 'Home statistics - Contacts received label',
+          })}
           scrollIndex={scrollIndexOffset}
           index={1}
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalShareBacksLabel}
+          value={totalViewsLabel}
           title={intl.formatMessage({
-            defaultMessage: 'ShareBacks',
-            description: 'Home statistics - Share backs label',
+            defaultMessage: 'Profile views',
+            description: 'Home statistics - Profile views label',
           })}
           scrollIndex={scrollIndexOffset}
           index={2}
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalLikesLabel}
+          value={totalContactsImportFromScanLabel}
           title={intl.formatMessage({
-            defaultMessage: 'Total Likes',
-            description: 'Home statistics - Total Likes',
+            defaultMessage: 'Scans',
+            description:
+              'Home statistics - Total Contacts imported from scan label',
           })}
           scrollIndex={scrollIndexOffset}
           index={3}
@@ -440,10 +430,10 @@ const stylesheet = createStyleSheet(() => ({
 }));
 
 const STATISTICS_ORDER = [
-  'webCardViews',
   'contactCardScans',
   'shareBacks',
-  'likes',
+  'webCardViews',
+  'contactsImportFromScan',
 ] as const;
 
 export const format = (value: number) => {

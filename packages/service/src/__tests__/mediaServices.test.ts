@@ -34,6 +34,7 @@ const mockProfile: Profile = {
   createdAt: new Date(),
   lastContactCardUpdate: new Date(),
   nbContactCardScans: 0,
+  nbContactsImportFromScan: 0,
   nbShareBacks: 0,
   deleted: false,
   deletedAt: null,
