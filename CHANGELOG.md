@@ -1,3 +1,7 @@
+## 1.9.2-rc.20
+
+* **fix:**  - Apple pass - set correct url
+
 ## 1.9.2-rc.19
 
 * **fix:**  - **payment:** [#8216](https://github.com/AzzappApp/azzapp/pull/8216) use isPremium flag ([#8321](https://github.com/AzzappApp/azzapp/pull/8321))

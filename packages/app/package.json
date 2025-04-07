@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "1.9.2-rc.19",
+  "version": "1.9.2-rc.20",
   "scripts": {
     "lint": "eslint .",
     "test": "jest",
