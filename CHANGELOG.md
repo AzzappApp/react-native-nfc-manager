@@ -1,3 +1,8 @@
+## 1.9.2-rc.25
+
+* **fix:**  - **contactCard:** [#8193](https://github.com/AzzappApp/azzapp/pull/8193) open tooltip sooner ([#8382](https://github.com/AzzappApp/azzapp/pull/8382))
+* **fix:**  - **shakeShare:** [#8380](https://github.com/AzzappApp/azzapp/pull/8380) avoid reopening ([#8381](https://github.com/AzzappApp/azzapp/pull/8381))
+
 ## 1.9.2-rc.24
 
 * **fix:**  - ensure the list is scrollable ([#8366](https://github.com/AzzappApp/azzapp/pull/8366))
