@@ -351,7 +351,7 @@ __metadata:
     "@react-native/babel-preset": "npm:^0.77.1"
     "@react-native/metro-config": "npm:^0.77.1"
     "@react-native/typescript-config": "npm:^0.77.1"
-    "@reeq/react-native-passkit": "npm:^0.1.3"
+    "@reeq/react-native-passkit": "patch:@reeq/react-native-passkit@npm%3A0.1.3#~/.yarn/patches/@reeq-react-native-passkit-npm-0.1.3-587260733c.patch"
     "@sentry/core": "npm:^9.11.0"
     "@sentry/react-native": "npm:^6.10.0"
     "@sentry/types": "npm:^9.11.0"
@@ -10987,13 +10987,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reeq/react-native-passkit@npm:^0.1.3":
+"@reeq/react-native-passkit@npm:0.1.3":
   version: 0.1.3
   resolution: "@reeq/react-native-passkit@npm:0.1.3"
   peerDependencies:
     react: "*"
     react-native: "*"
   checksum: 10/1d35f6675ff6a70a49eb2c9bc5148ad6e8bfed66852fea0dcce9d22695128c7cf1bc89517e3d64c0906014b881952f887e7249318adca221d3f5fafb9404d3ab
+  languageName: node
+  linkType: hard
+
+"@reeq/react-native-passkit@patch:@reeq/react-native-passkit@npm%3A0.1.3#~/.yarn/patches/@reeq-react-native-passkit-npm-0.1.3-587260733c.patch":
+  version: 0.1.3
+  resolution: "@reeq/react-native-passkit@patch:@reeq/react-native-passkit@npm%3A0.1.3#~/.yarn/patches/@reeq-react-native-passkit-npm-0.1.3-587260733c.patch::version=0.1.3&hash=ec3b43"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/454184aae2feca0b9a588f69f54bb264d732b32b36ca579e21163e256ee3d08b66b5978374ff19069abacec61e6c7e532906edbf43c8a222bfa2d6d4c38657a7
   languageName: node
   linkType: hard
 

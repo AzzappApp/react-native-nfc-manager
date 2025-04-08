@@ -215,33 +215,36 @@ const OauthButtonsBar = ({
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
         {Platform.OS === 'ios' && (
-          <PressableNative
-            style={[styles.button, { backgroundColor: '#000' }]}
-            onPress={onAppleSignUp}
-          >
-            <Image
-              source={require('./assets/apple.png')}
-              style={{ width: 25, height: 31, objectFit: 'contain' }}
-            />
+          <PressableNative onPress={onAppleSignUp}>
+            <View style={[styles.button, { backgroundColor: '#000' }]}>
+              <Image
+                source={require('./assets/apple.png')}
+                style={styles.oauthLogoApple}
+              />
+            </View>
           </PressableNative>
         )}
         <PressableNative
           style={styles.button}
           onPress={() => onOpenIdSignUp('linkedin')}
         >
-          <Image
-            source={require('./assets/linkedin.png')}
-            style={{ width: 32, objectFit: 'contain' }}
-          />
+          <View style={styles.button}>
+            <Image
+              source={require('./assets/linkedin.png')}
+              style={styles.oauthLogo}
+            />
+          </View>
         </PressableNative>
         <PressableNative
           style={styles.button}
           onPress={() => onOpenIdSignUp('google')}
         >
-          <Image
-            source={require('./assets/google.png')}
-            style={{ width: 31, objectFit: 'contain' }}
-          />
+          <View style={styles.button}>
+            <Image
+              source={require('./assets/google.png')}
+              style={styles.oauthLogo}
+            />
+          </View>
         </PressableNative>
       </View>
       <View style={styles.separatorContainer}>
@@ -297,4 +300,6 @@ const styleSheet = createStyleSheet(appearance => ({
   or: {
     color: colors.grey400,
   },
+  oauthLogo: { width: 32, objectFit: 'contain' },
+  oauthLogoApple: { width: 25, height: 31, objectFit: 'contain' },
 }));

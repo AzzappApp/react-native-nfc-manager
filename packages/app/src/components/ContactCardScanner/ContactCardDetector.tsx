@@ -442,7 +442,7 @@ const ContactCardDetector = ({
             video={false}
             androidPreviewViewType="surface-view"
             outputOrientation="device"
-            codeScanner={!createContactCard ? codeScanner : undefined}
+            codeScanner={createContactCard ? undefined : codeScanner}
           />
         ) : (
           <View

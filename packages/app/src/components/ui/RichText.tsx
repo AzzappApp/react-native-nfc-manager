@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { MODULE_TEXT_FONTS_VARIANTS_OBJECT } from '@azzapp/shared/fontHelpers';
 import {
@@ -25,7 +26,7 @@ export const defaultFontSize = 16;
 export const defaultTextFontSize = 16;
 export const defaultTitleFontSize = 34;
 
-export const RichTextFromAST = ({
+const RichTextFromASTComponent = ({
   node,
   fontSize,
   style = {},
@@ -133,6 +134,8 @@ export const RichTextFromAST = ({
   return <></>;
 };
 
+export const RichTextFromAST = memo(RichTextFromASTComponent);
+
 type RichTextProps =
   | {
       style?: TextStyle | TextStyle[];
@@ -147,7 +150,7 @@ type RichTextProps =
       forceFontResizeValue?: number;
     };
 
-export const RichText = ({
+const RichTextComponent = ({
   style = {},
   fontSize,
   forceFontResizeValue,
@@ -167,3 +170,5 @@ export const RichText = ({
     </Text>
   );
 };
+
+export const RichText = memo(RichTextComponent);

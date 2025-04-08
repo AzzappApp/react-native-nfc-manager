@@ -120,7 +120,6 @@ function SelectList<ItemT>({
       style={style}
       scrollEnabled
       overScrollMode="always"
-      nestedScrollEnabled
       {...props}
     />
   );

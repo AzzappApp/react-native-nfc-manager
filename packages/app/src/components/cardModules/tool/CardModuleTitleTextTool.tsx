@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import useBoolean from '#hooks/useBoolean';
@@ -9,6 +8,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import PressableOpacity from '#ui/PressableOpacity';
 import RichTextButtons, {
   textButtons,
   titleButtons,
@@ -135,14 +135,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           })}
           style={styles.header}
           rightElement={
-            <TouchableOpacity onPress={onDismiss} style={styles.doneButton}>
+            <PressableOpacity onPress={onDismiss} style={styles.doneButton}>
               <Text variant="button" style={{ color: colors.white }}>
                 <FormattedMessage
                   defaultMessage="Done"
                   description="CardModuleTitleTextTool - Done header button label"
                 />
               </Text>
-            </TouchableOpacity>
+            </PressableOpacity>
           }
         />
         <View style={styles.container}>
