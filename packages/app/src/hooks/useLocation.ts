@@ -14,9 +14,15 @@ export const useCurrentLocation = () => {
         return;
       }
 
-      const currentLocation = await Location.getLastKnownPositionAsync({
+      let currentLocation = await Location.getLastKnownPositionAsync({
         requiredAccuracy: 100, //100m
+        maxAge: 1000 * 60 * 10, // 10 minutes
       });
+      if (!currentLocation) {
+        currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.LocationAccuracy.Balanced,
+        });
+      }
       let address = null;
       if (currentLocation) {
         address = await Location.reverseGeocodeAsync(currentLocation.coords);
