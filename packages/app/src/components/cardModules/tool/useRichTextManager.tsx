@@ -107,11 +107,18 @@ const useRichTextManager = ({
             selection.current.end,
           )
         : [];
-    setTextAndSelection(newAst => ({
-      ast: newAst.ast,
-      selection: selection.current,
-      selectedTag,
-    }));
+    setTextAndSelection(newAst => {
+      if (
+        newAst.selection?.end !== selection.current.end ||
+        newAst.selection?.start !== selection.current.start
+      ) {
+        return {
+          ast: newAst.ast,
+          selection: selection.current,
+          selectedTag,
+        };
+      } else return newAst;
+    });
   };
   /**
    * call back received when text content change.
