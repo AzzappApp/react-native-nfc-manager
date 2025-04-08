@@ -1,3 +1,7 @@
+## 1.9.2-rc.23
+
+* **fix:**  - **android:** [#8344](https://github.com/AzzappApp/azzapp/pull/8344) issues on pressable with gesture handler ([#8364](https://github.com/AzzappApp/azzapp/pull/8364))
+
 ## 1.9.2-rc.22
 
 * **fix:**  - reduce number of refresh with memo ([#8355](https://github.com/AzzappApp/azzapp/pull/8355))
