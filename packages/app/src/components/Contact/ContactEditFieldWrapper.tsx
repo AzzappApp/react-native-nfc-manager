@@ -153,11 +153,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               onPress={onPressDelete}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative
-                style={styles.labelSelector}
-                onPress={open}
-                useRNPressable
-              >
+              <PressableNative style={styles.labelSelector} onPress={open}>
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,

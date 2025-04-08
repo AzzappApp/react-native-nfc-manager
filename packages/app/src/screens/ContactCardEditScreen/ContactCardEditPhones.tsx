@@ -67,7 +67,6 @@ const ContactCardEditModalPhones = ({
               selected: true,
             })
           }
-          useRNPressable
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
           <Text variant="smallbold">

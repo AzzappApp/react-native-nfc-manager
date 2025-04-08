@@ -10,7 +10,6 @@ export type PressableNativeProps = PressableOpacityProps & {
   animationDuration?: number;
   easing?: Easing;
   ripple?: PressableAndroidRippleConfig;
-  useRNPressable?: boolean; // Use RN Pressable instead of GestureHandler (only for Android - to be removed once RN Pressable)
 };
 
 const PressableNative = (
