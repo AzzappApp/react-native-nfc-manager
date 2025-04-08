@@ -1,3 +1,14 @@
+## 1.9.2-rc.24
+
+* **fix:**  - ensure the list is scrollable ([#8366](https://github.com/AzzappApp/azzapp/pull/8366))
+* **fix:**  - **shakeAndShare:** [#8360](https://github.com/AzzappApp/azzapp/pull/8360) add delay to avoid closing on opening ([#8374](https://github.com/AzzappApp/azzapp/pull/8374))
+* **fix:**  - **contact:** [#8361](https://github.com/AzzappApp/azzapp/pull/8361) don’t activate code scanner on contact creation ([#8377](https://github.com/AzzappApp/azzapp/pull/8377))
+* **fix:**  - **android:** [#8359](https://github.com/AzzappApp/azzapp/pull/8359) wrong tooltip position ([#8375](https://github.com/AzzappApp/azzapp/pull/8375))
+* **fix:**  - **oauth:** [#8354](https://github.com/AzzappApp/azzapp/pull/8354) add shadow and replace cut google icon ([#8371](https://github.com/AzzappApp/azzapp/pull/8371))
+* **fix:**  - **android:** [#8357](https://github.com/AzzappApp/azzapp/pull/8357) get current location when no last known position available ([#8369](https://github.com/AzzappApp/azzapp/pull/8369))
+* **fix:**  - **android:** [#8351](https://github.com/AzzappApp/azzapp/pull/8351) remove shadow on popup ([#8368](https://github.com/AzzappApp/azzapp/pull/8368))
+* **fix:**  - **Android:** remove pressable surcharge ([#8376](https://github.com/AzzappApp/azzapp/pull/8376))
+
 ## 1.9.2-rc.23
 
 * **fix:**  - **android:** [#8344](https://github.com/AzzappApp/azzapp/pull/8344) issues on pressable with gesture handler ([#8364](https://github.com/AzzappApp/azzapp/pull/8364))
