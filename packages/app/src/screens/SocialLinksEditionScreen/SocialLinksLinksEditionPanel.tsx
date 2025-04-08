@@ -87,6 +87,8 @@ const SocialLinksLinksEditionPanel = ({
 
   useEffect(() => {
     if (initialLinks.length !== sortableLinks.length) {
+      // refresh links locally only when number of link has changed
+      // to avoid re-rendering the list when the order is changed
       setSortableLinks(initialLinks.sort((a, b) => a.position - b.position));
     }
   }, [initialLinks, sortableLinks.length]);
@@ -108,9 +110,6 @@ const SocialLinksLinksEditionPanel = ({
 
   const onDeleteLink = useCallback(
     (item: SocialLinkItem) => {
-      setSortableLinks(links =>
-        links.filter(l => l?.position !== item.position),
-      );
       onChangeOrder(sortableLinks.filter(l => l?.position !== item.position));
     },
     [sortableLinks, onChangeOrder],
@@ -156,6 +155,7 @@ const SocialLinksLinksEditionPanel = ({
         showsHorizontalScrollIndicator={false}
       >
         <Sortable.Grid
+          key={sortableLinks.length}
           scrollableRef={scrollableRef}
           rows={1}
           rowHeight={ITEM_HEIGHT}
