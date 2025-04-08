@@ -136,6 +136,7 @@ Get your QR code scanned to share both contact details and digital profile."
       <Tooltip
         from={tooltips['profileEdit']?.ref}
         placement={Placement.TOP}
+        offset={Platform.OS === 'ios' ? -10 : 30}
         header={
           <FormattedMessage
             defaultMessage="Customize your WebCard"
@@ -155,6 +156,7 @@ Get your QR code scanned to share both contact details and digital profile."
       <Tooltip
         from={tooltips['profileMulti']?.ref}
         placement={Placement.TOP}
+        offset={Platform.OS === 'ios' ? -10 : 30}
         header={
           <FormattedMessage
             defaultMessage="Multi-user"
