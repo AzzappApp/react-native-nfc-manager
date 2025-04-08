@@ -173,7 +173,7 @@ const TitleTextRenderer = ({
               key={index}
               className={cn(
                 styles.text,
-                webCardTextFontsMap[cardStyle.fontFamily].className,
+                webCardTextFontsMap[cardStyle.fontFamily]?.className,
               )}
               style={{
                 color: swapColor(cardModuleColor?.text, colorPalette),
