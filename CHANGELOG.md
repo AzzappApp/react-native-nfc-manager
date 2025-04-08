@@ -1,3 +1,7 @@
+## 1.9.2-rc.22
+
+* **fix:**  - reduce number of refresh with memo ([#8355](https://github.com/AzzappApp/azzapp/pull/8355))
+
 ## 1.9.2-rc.21
 
 * **fix:**  - **pass:** [#8338](https://github.com/AzzappApp/azzapp/pull/8338) pass in wallet is not presented ([#8348](https://github.com/AzzappApp/azzapp/pull/8348))
