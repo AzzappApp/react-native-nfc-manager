@@ -1,3 +1,7 @@
+## 1.9.2-rc.26
+
+* **fix:**  - **webCard:** [#8378](https://github.com/AzzappApp/azzapp/pull/8378) don’t crash when fontFamily is missing ([#8379](https://github.com/AzzappApp/azzapp/pull/8379))
+
 ## 1.9.2-rc.25
 
 * **fix:**  - **contactCard:** [#8193](https://github.com/AzzappApp/azzapp/pull/8193) open tooltip sooner ([#8382](https://github.com/AzzappApp/azzapp/pull/8382))
