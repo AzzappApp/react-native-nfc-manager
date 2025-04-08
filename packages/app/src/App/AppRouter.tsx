@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import { useThrottledCallback } from 'use-debounce';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -172,7 +173,9 @@ const MainRouter = () => {
     }
   }, [router]);
 
-  useShakeDetector(toggleShakeShare);
+  const throttledCallback = useThrottledCallback(toggleShakeShare, 3000);
+
+  useShakeDetector(throttledCallback);
 
   return (
     <RouterProvider value={router}>
