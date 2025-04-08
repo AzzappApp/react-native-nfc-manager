@@ -5,7 +5,7 @@ import {
   useReducer,
   forwardRef,
 } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DELETE_BUTTON_WIDTH } from '#helpers/contactHelpers';
@@ -118,10 +118,16 @@ const FormDeleteFieldOverlay = (
         ref={ref}
         bottomOffset={30}
         scrollEnabled={!state.rect}
-        contentContainerStyle={{ paddingBottom: bottom }}
         {...props}
       >
-        {children}
+        <View
+          style={{
+            pointerEvents: state.rect ? 'none' : 'auto',
+            paddingBottom: bottom,
+          }}
+        >
+          {children}
+        </View>
         {state.rect && (
           <Pressable style={StyleSheet.absoluteFill} onPress={onPress} />
         )}

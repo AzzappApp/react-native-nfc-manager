@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -10,6 +11,7 @@ import {
   type PressableAndroidRippleConfig,
   type View,
 } from 'react-native';
+import { Pressable as RNPressable } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import type { GenericTouchableProps } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchableProps';
@@ -22,14 +24,22 @@ type PressableNativeProps = GenericTouchableProps & {
   animationDuration?: number;
   ripple?: PressableAndroidRippleConfig;
   onDoublePress?: () => void;
+  useRNPressable?: boolean; // Use RN Pressable instead of GestureHandler (only for Android - to be removed once RN Pressable)
 };
 
 const PressableNative = (
-  { ripple, onDoublePress, ...props }: PressableNativeProps,
+  {
+    ripple,
+    onDoublePress,
+    onPress: onPressProp,
+    useRNPressable,
+    ...props
+  }: PressableNativeProps,
   ref: ForwardedRef<View>,
 ) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [width, setWidth] = useState(0);
+
   const androidRipple = ripple ?? { borderless: false, color: colors.grey400 };
   const shallHandleWidth = !androidRipple.radius && androidRipple.borderless;
 
@@ -47,14 +57,7 @@ const PressableNative = (
     androidRipple.radius = Math.round(androidRipple.radius);
   }
 
-  const pressableProps = {
-    ref,
-    android_ripple: androidRipple,
-    onLayout,
-    ...props,
-  } as const;
-
-  const onPress = () => {
+  const onPress = useCallback(() => {
     if (timer.current && onDoublePress) {
       clearTimeout(timer.current);
       timer.current = null;
@@ -62,19 +65,30 @@ const PressableNative = (
     } else if (onDoublePress) {
       timer.current = setTimeout(() => {
         timer.current = null;
-        props.onPress?.();
+        onPressProp?.();
       }, TIMEOUT);
     } else {
-      props.onPress?.();
+      onPressProp?.();
     }
-  };
+  }, [onDoublePress, onPressProp]);
+
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  });
+  }, []);
 
-  return <Pressable onPress={onPress} {...pressableProps} />;
+  const Component = useRNPressable ? RNPressable : Pressable;
+
+  return (
+    <Component
+      ref={ref}
+      android_ripple={androidRipple}
+      onLayout={onLayout}
+      onPress={onPress}
+      {...props}
+    />
+  );
 };
 
 export default forwardRef(PressableNative);

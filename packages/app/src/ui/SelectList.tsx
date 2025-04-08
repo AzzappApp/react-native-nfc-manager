@@ -120,7 +120,6 @@ function SelectList<ItemT>({
       style={style}
       scrollEnabled
       overScrollMode="always"
-      nestedScrollEnabled
       {...props}
     />
   );
@@ -197,6 +196,7 @@ function SelectListItem<ItemT>({
           (selectedItemContainerStyle ?? styles.selectedItemContainer),
       ]}
       onPress={onPress}
+      useRNPressable
     >
       {renderItem?.({ item, isSelected, index }) ?? (
         <Text variant="button" style={styles.defaultItemRenderer}>

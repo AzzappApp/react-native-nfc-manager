@@ -61,6 +61,7 @@ const CommonInformationPhones = ({
               countryCode: locales[0].countryCode,
             })
           }
+          useRNPressable
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
           <Text variant="smallbold">

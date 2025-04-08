@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
@@ -8,6 +8,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { useDebouncedCallback } from 'use-debounce';
 import { colors } from '#theme';
 import {
   DELETE_BUTTON_WIDTH,
@@ -98,11 +99,9 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 
   const styles = useStyleSheet(stylesheet);
 
-  // compute max height of the bottomSheet (2/3 of screen)
   const { height: screenHeight } = useScreenDimensions();
   const insets = useScreenInsets();
-  const visibleHeight = screenHeight - insets.top - insets.bottom;
-  const maxHeight = (visibleHeight * 2) / 3;
+  const maxHeight = (screenHeight * 2) / 3;
 
   // estimate size of the bottomSheet
   const expectedHeight =
@@ -112,9 +111,27 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
     insets.bottom; // max height is 2/3 of screen size
 
   const useFlatList = expectedHeight > maxHeight;
-  const bottomSheetHeight = useFlatList
-    ? Math.min(expectedHeight, maxHeight)
-    : undefined;
+
+  const onPressDelete = useCallback(() => {
+    deleteMode.value = !deleteMode.value;
+    if (layout) {
+      openDeleteButton(layout);
+    }
+  }, [deleteMode, layout, openDeleteButton]);
+
+  const snapPoints = useMemo(
+    () => [useFlatList ? '66%' : expectedHeight],
+    [useFlatList, expectedHeight],
+  );
+
+  const onItemSelected = useDebouncedCallback(
+    (item: { key: string }, onChange: (value: string) => void) => {
+      close();
+      onChangeLabel?.(item.key);
+      onChange(item.key);
+    },
+    250,
+  );
 
   return (
     <>
@@ -132,16 +149,15 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             <IconButton
               variant="icon"
               icon="delete_filled"
-              iconStyle={{ tintColor: colors.red400 }}
-              onPress={() => {
-                deleteMode.value = !deleteMode.value;
-                if (layout) {
-                  openDeleteButton(layout);
-                }
-              }}
+              iconStyle={styles.icon}
+              onPress={onPressDelete}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative style={styles.labelSelector} onPress={open}>
+              <PressableNative
+                style={styles.labelSelector}
+                onPress={open}
+                useRNPressable
+              >
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,
@@ -189,8 +205,9 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           visible={visible}
           onDismiss={close}
           style={styles.bottomSheetStyle}
-          height={bottomSheetHeight}
+          snapPoints={snapPoints}
           dismissKeyboardOnOpening
+          enableDynamicSizing={false}
         >
           <Controller
             name={labelKey}
@@ -199,11 +216,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               <SelectList
                 keyExtractor={item => item.key}
                 data={labelValues}
-                onItemSelected={item => {
-                  onChange(item.key);
-                  onChangeLabel?.(item.key);
-                  close();
-                }}
+                onItemSelected={item => onItemSelected(item, onChange)}
                 selectedItemKey={value as string}
                 labelField="value"
                 useFlatList={useFlatList}
@@ -217,6 +230,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
+  icon: { tintColor: colors.red400 },
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
