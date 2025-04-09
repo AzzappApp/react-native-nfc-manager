@@ -1,3 +1,8 @@
+## 1.9.2-rc.30
+
+* **fix:**  - **modules:** [#8388](https://github.com/AzzappApp/azzapp/pull/8388) put back pressable from gesture handler ([#8398](https://github.com/AzzappApp/azzapp/pull/8398))
+* **fix:**  - **webCard:** [#8395](https://github.com/AzzappApp/azzapp/pull/8395) lighten media overlay ([#8401](https://github.com/AzzappApp/azzapp/pull/8401))
+
 ## 1.9.2-rc.29
 
 
