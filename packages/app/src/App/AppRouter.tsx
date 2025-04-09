@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -40,7 +41,6 @@ import SnapshotFadeTransitionAnimator from './SnapshotFadeTransitionAnimator';
 import useRoutingAnalyticsLog from './useRoutingAnalyticsLog';
 import useSentryRoutingInstrumentation from './useSentryRoutingInstrumentation';
 import type { AppRouterQuery } from '#relayArtifacts/AppRouterQuery.graphql';
-const { useDebounceCallback } = require('#hooks/useDebounceCallback');
 
 const AppRouter = () => {
   const authenticated = useIsAuthenticated();
