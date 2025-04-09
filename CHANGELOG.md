@@ -1,3 +1,7 @@
+## 1.9.2-rc.29
+
+
+
 ## 1.9.2-rc.28
 
 * **fix:**  - **shakeShare:** [#8402](https://github.com/AzzappApp/azzapp/pull/8402) debounce opening ([#8403](https://github.com/AzzappApp/azzapp/pull/8403))
