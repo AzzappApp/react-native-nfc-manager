@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as Sentry from '@sentry/react-native';
 import {
   drawAsImageFromPicture,
   createPicture,
@@ -15,6 +16,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View, StyleSheet } from 'react-native';
+import {
+  Image as ImageCompressor,
+  getImageMetaData,
+} from 'react-native-compressor';
 import { getLocales } from 'react-native-localize';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
@@ -236,9 +241,10 @@ const ContactCardCreateScreen = ({
         setProgressIndicator(Observable.from(0));
 
         const fileName = getFileName(avatar.uri);
+        const compressedFileUri = await ImageCompressor.compress(avatar.uri);
         const file: any = {
           name: fileName,
-          uri: avatar.uri,
+          uri: compressedFileUri,
           type: mime.lookup(fileName) || 'image/jpeg',
         };
 
@@ -247,14 +253,40 @@ const ContactCardCreateScreen = ({
           target: 'avatar',
         });
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else if (!avatar?.local && avatar?.uri) {
+        try {
+          const compressedFileUri = await ImageCompressor.compress(avatar.uri, {
+            output: 'jpg',
+          });
+          const fileName = getFileName(compressedFileUri);
+          const file: any = {
+            name: fileName,
+            uri: compressedFileUri,
+            type: 'image/jpeg',
+          };
+
+          const { uploadURL, uploadParameters } = await uploadSign({
+            kind: 'image',
+            target: 'avatar',
+          });
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }
 
       logo = webCardKind === 'business' ? logo : null;
-
+      let logoWidth = 0;
+      let logoHeight = 0;
       if (logo?.uri) {
         const fileName = getFileName(logo.uri);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri);
+        const metaData = await getImageMetaData(compressedFileUri);
+        logoHeight = metaData.ImageHeight;
+        logoWidth = metaData.ImageWidth;
         const file: any = {
           name: fileName,
           uri: logo.uri,
@@ -270,8 +302,6 @@ const ContactCardCreateScreen = ({
         uploads.push(null);
       }
 
-      const logoWidth = logo?.width ?? 0;
-      const logoHeight = logo?.height ?? 0;
       //create the coverId
       if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
         const logoTextureInfo = NativeTextureLoader.loadImage(logo.uri, {

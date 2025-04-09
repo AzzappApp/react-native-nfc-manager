@@ -35,7 +35,6 @@ const TabBarMenuItem = ({
       style={[styles.pressable, animatedStyle, style]}
       onPress={onPress}
       accessibilityRole="tab"
-      android_ripple={{ color: selectedBackgroundColor, borderless: false }}
       disabled={disabled}
     >
       {icon && (

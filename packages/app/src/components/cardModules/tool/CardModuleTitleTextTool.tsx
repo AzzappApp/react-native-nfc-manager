@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, StyleSheet, View } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
-import { colors } from '#theme';
+import { StyleSheet, View } from 'react-native';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
-import DefaultPressableOpacity from '#ui/PressableOpacity';
 import RichTextButtons, {
   textButtons,
   titleButtons,
@@ -19,12 +16,10 @@ import {
   DEFAULT_CARD_MODULE_TEXT,
   DEFAULT_CARD_MODULE_TITLE,
 } from '../CardModuleBottomBar';
+import CardModuleToolHeaderButton from './CardModuleToolHeaderButton';
 import useRichTextManager from './useRichTextManager';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleData } from '../CardModuleBottomBar';
-import type { PropsWithChildren } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { PressableProps } from 'react-native-gesture-handler';
 
 type CardModuleMediaTextToolProps<T extends ModuleKindAndVariant> = {
   module: T;
@@ -32,33 +27,6 @@ type CardModuleMediaTextToolProps<T extends ModuleKindAndVariant> = {
   onUpdate: (param: CardModuleData) => void;
   openTextEdition: boolean;
 };
-
-//needs to be a pressable from gesture handler (hidden here to avoid other use)
-const PressableOpacity =
-  Platform.OS === 'android'
-    ? ({
-        activeOpacity = 0.2,
-        style,
-        children,
-        ...rest
-      }: PropsWithChildren<
-        PressableProps & {
-          activeOpacity?: number;
-          style?: StyleProp<ViewStyle>;
-        }
-      >) => {
-        return (
-          <Pressable
-            style={({ pressed }) => {
-              return [style, { opacity: pressed ? activeOpacity : 1 }];
-            }}
-            {...rest}
-          >
-            {children}
-          </Pressable>
-        );
-      }
-    : DefaultPressableOpacity;
 
 const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   module,
@@ -168,14 +136,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           })}
           style={styles.header}
           rightElement={
-            <PressableOpacity onPress={onDismiss} style={styles.doneButton}>
-              <Text variant="button" style={styles.doneButtonText}>
-                <FormattedMessage
-                  defaultMessage="Done"
-                  description="CardModuleTitleTextTool - Done header button label"
-                />
-              </Text>
-            </PressableOpacity>
+            <CardModuleToolHeaderButton
+              onPress={onDismiss}
+              label={intl.formatMessage({
+                defaultMessage: 'Done',
+                description:
+                  'CardModuleMediaTitleTextTool - Done header button label',
+              })}
+            />
           }
         />
         <View style={styles.container}>
@@ -227,17 +195,6 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
 export default CardModuleMediaTextTool;
 
 const styles = StyleSheet.create({
-  doneButton: {
-    width: 74,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 0,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',
@@ -251,5 +208,4 @@ const styles = StyleSheet.create({
     marginTop: 10,
     verticalAlign: 'top',
   },
-  doneButtonText: { color: colors.white },
 });

@@ -36,6 +36,7 @@ import {
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import { useCoverUpload } from './CoverUploadContext';
+import type { useSaveCoverColorsMutation } from '#relayArtifacts/useSaveCoverColorsMutation.graphql';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverEditorState,
@@ -91,6 +92,27 @@ const useSaveCover = (
     }
   `);
 
+  const [commitSaveCardColors] = useMutation<useSaveCoverColorsMutation>(
+    graphql`
+      mutation useSaveCoverColorsMutation(
+        $webCardId: ID!
+        $input: CardColorsInput!
+      ) {
+        saveCardColors(webCardId: $webCardId, input: $input) {
+          webCard {
+            id
+            cardColors {
+              dark
+              light
+              primary
+              otherColors
+            }
+          }
+        }
+      }
+    `,
+  );
+
   const save = useCallback(async () => {
     if (!webCardId) {
       throw new Error('Cannot save cover without a webCardId');
@@ -145,6 +167,22 @@ const useSaveCover = (
         });
         addLocalCachedMediaFile(public_id, 'image', thumbnail);
       }
+
+      await new Promise<void>((resolve, reject) => {
+        commitSaveCardColors({
+          variables: {
+            webCardId,
+            input: coverEditorState.cardColors,
+          },
+          onCompleted() {
+            resolve();
+          },
+          onError(error) {
+            Sentry.captureException(error);
+            reject(error);
+          },
+        });
+      });
     } catch (e) {
       Sentry.captureException(e);
     }
@@ -232,7 +270,7 @@ const useSaveCover = (
     });
     setSavingStatus('complete');
     setExportProgressIndicator(null);
-  }, [commit, coverEditorState, startUpload, webCardId]);
+  }, [commit, commitSaveCardColors, coverEditorState, startUpload, webCardId]);
 
   const reset = useCallback(() => {
     setSavingStatus(null);

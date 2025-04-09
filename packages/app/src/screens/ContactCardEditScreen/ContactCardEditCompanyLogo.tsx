@@ -134,25 +134,12 @@ const ContactCardEditCompanyLogo = ({
       height: number;
       width: number;
     }) => {
-      let localPath = imageLocalUrl.get(id);
-      const exportWidth = width;
-      const exportHeight = height;
-
-      if (!localPath) {
-        localPath = await saveTransformedImageToFile({
-          uri,
-          resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.PNG,
-          quality: 95,
-        });
-        imageLocalUrl.set(id, localPath);
-      }
       field.onChange({
         local: true,
         id,
-        uri: localPath,
-        width: exportWidth,
-        height: exportHeight,
+        uri,
+        width,
+        height,
       });
     },
     [field],

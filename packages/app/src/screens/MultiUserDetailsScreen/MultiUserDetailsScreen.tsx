@@ -9,6 +9,7 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -175,9 +176,10 @@ const MultiUserDetailsScreen = ({
 
       if (avatar?.local && avatar.uri) {
         const fileName = getFileName(avatar.uri);
+        const compressedFileUri = await ImageCompressor.compress(avatar.uri);
         const file: any = {
           name: fileName,
-          uri: avatar.uri,
+          uri: compressedFileUri,
           type: mime.lookup(fileName) || 'image/jpeg',
         };
 
@@ -192,9 +194,10 @@ const MultiUserDetailsScreen = ({
 
       if (logo?.local && logo.uri) {
         const fileName = getFileName(logo.uri);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri);
         const file: any = {
           name: fileName,
-          uri: logo.uri,
+          uri: compressedFileUri,
           type: mime.lookup(fileName) || 'image/jpeg',
         };
 

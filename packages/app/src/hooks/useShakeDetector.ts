@@ -7,7 +7,6 @@ import {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
-import useLatestCallback from './useLatestCallback';
 
 // This code is transposed from https://github.com/facebook/react-native/blob/184b295a019e2af6712d34276c741e0dae78f798/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.java#L45
 const GRAVITY_EARTH = 9.80665;
@@ -21,7 +20,7 @@ const atLeastRequiredForce = (a: number) => {
 
 export const useShakeDetector = (callback: () => void, activated = true) => {
   const lastShakeTimestamp = useSharedValue(0);
-  const lastCallbackTimestamp = useSharedValue(0); // ⬅️ nouveau
+  const lastCallbackTimestamp = useSharedValue(0);
   const numShakes = useSharedValue(0);
   const accelX = useSharedValue(0);
   const accelY = useSharedValue(0);
@@ -47,8 +46,6 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
     [lastShakeTimestamp, numShakes],
   );
 
-  const callbackRef = useLatestCallback(callback);
-
   const maybeDispatchShake = useCallback(
     (timestamp: number) => {
       'worklet';
@@ -60,14 +57,14 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
       if (numShakes.value >= 8) {
         reset();
         lastCallbackTimestamp.value = timestamp;
-        runOnJS(callbackRef)();
+        runOnJS(callback)();
       }
 
       if (timestamp - lastShakeTimestamp.value > 3000) {
         reset();
       }
     },
-    [callbackRef, lastShakeTimestamp, lastCallbackTimestamp, numShakes, reset],
+    [callback, lastShakeTimestamp, lastCallbackTimestamp, numShakes, reset],
   );
 
   const sensorValue = useDerivedValue(() => {
@@ -105,7 +102,8 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
   const resetCoolDown = useCallback(() => {
     'worklet';
     lastCallbackTimestamp.value = 0;
-  }, [lastCallbackTimestamp]);
+    reset();
+  }, [lastCallbackTimestamp, reset]);
 
   return resetCoolDown;
 };

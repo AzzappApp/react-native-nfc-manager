@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { useDebouncedCallback } from 'use-debounce';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -166,32 +165,22 @@ const MainRouter = () => {
 
   const shakeAndShareOpened = useRef(false);
   const toggleShakeShare = useCallback(() => {
-    if (router.getCurrentRoute()?.route === 'SHAKE_AND_SHARE') {
+    if (shakeAndShareOpened.current) {
       router.back();
     } else {
-      shakeAndShareOpened.current = true;
       router.push({
         route: 'SHAKE_AND_SHARE',
       });
     }
   }, [router]);
 
-  const debouncedToggleShakeShare = useDebouncedCallback(
-    toggleShakeShare,
-    500,
-    {
-      leading: true,
-    },
-  );
-
-  const resetCoolDown = useShakeDetector(debouncedToggleShakeShare);
+  const resetCoolDown = useShakeDetector(toggleShakeShare);
 
   useEffect(() => {
-    router.addRouteDidChangeListener(() => {
-      if (
-        shakeAndShareOpened.current &&
-        router.getCurrentRoute()?.route !== 'SHAKE_AND_SHARE'
-      ) {
+    router.addRouteDidChangeListener(route => {
+      if (route.route === 'SHAKE_AND_SHARE') {
+        shakeAndShareOpened.current = true;
+      } else if (shakeAndShareOpened.current) {
         shakeAndShareOpened.current = false;
         resetCoolDown();
       }
