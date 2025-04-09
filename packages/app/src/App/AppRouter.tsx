@@ -4,10 +4,10 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { useDebouncedCallback } from 'use-debounce';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -163,21 +163,31 @@ const MainRouter = () => {
   useRoutingAnalyticsLog(router);
   useDeepLink(router);
 
+  const shakeAndShareOpened = useRef(false);
   const toggleShakeShare = useCallback(() => {
     if (router.getCurrentRoute()?.route === 'SHAKE_AND_SHARE') {
       router.back();
     } else {
+      shakeAndShareOpened.current = true;
       router.push({
         route: 'SHAKE_AND_SHARE',
       });
     }
   }, [router]);
 
-  const debouncedCallback = useDebouncedCallback(toggleShakeShare, 3000, {
-    leading: true,
-  });
+  const resetCoolDown = useShakeDetector(toggleShakeShare);
 
-  useShakeDetector(debouncedCallback);
+  useEffect(() => {
+    router.addRouteDidChangeListener(() => {
+      if (
+        shakeAndShareOpened.current &&
+        router.getCurrentRoute()?.route !== 'SHAKE_AND_SHARE'
+      ) {
+        shakeAndShareOpened.current = false;
+        resetCoolDown();
+      }
+    });
+  }, [resetCoolDown, router]);
 
   return (
     <RouterProvider value={router}>
