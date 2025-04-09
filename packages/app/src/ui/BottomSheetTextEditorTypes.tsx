@@ -17,5 +17,6 @@ export type SelectionType = {
 export type TextAndSelection = {
   ast: RichTextASTNode;
   selection?: SelectionType;
+  forceSelection?: boolean;
   selectedTag: RichTextASTNodeType[];
 };
