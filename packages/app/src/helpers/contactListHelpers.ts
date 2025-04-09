@@ -183,4 +183,10 @@ export type ContactDetails = Contact & {
   createdAt: Date;
   profileId?: string;
   webCard?: ContactDetailsModal_webCard$key | null;
+  meetingPlace?: {
+    city: string | null;
+    country: string | null;
+    region: string | null;
+    subregion: string | null;
+  } | null;
 };

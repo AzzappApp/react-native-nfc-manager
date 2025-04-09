@@ -8,11 +8,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon, { SocialIcon } from '#ui/Icon';
@@ -63,7 +63,6 @@ const ContactDetailItem = ({
 };
 
 const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
-  const { bottom } = useScreenInsets();
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
@@ -98,91 +97,124 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   const backgroundWidth = screenWidth + 40;
   const backgroundImageUrl = avatar || details.webCard?.coverMedia?.thumbnail;
 
+  const meetingPlace = details.meetingPlace
+    ? getFriendlyNameFromLocation(details.meetingPlace)
+    : undefined;
+  const meetingDate = details.createdAt
+    ? new Date(details.createdAt).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : undefined;
+
   return (
     <Container style={styles.container}>
-      <PressableNative style={styles.close} onPress={onClose}>
-        <Icon icon="close" size={24} />
-      </PressableNative>
-      <PressableNative style={styles.share} onPress={onShare}>
-        <Icon icon="share" size={24} style={styles.shareIcon} />
-      </PressableNative>
-      <View style={styles.content}>
-        {backgroundImageUrl ? (
-          <View
-            style={[
-              styles.avatarBackgroundContainer,
-              {
-                width: backgroundWidth,
-              },
-            ]}
-          >
-            <Image
-              source={backgroundImageUrl}
-              style={styles.avatarBackground}
-              blurRadius={9.2}
-              contentFit="cover"
-            />
-            <LinearGradient
-              colors={[
-                appearance === 'dark'
-                  ? 'rgba(0, 0, 0, 0)'
-                  : 'rgba(255, 255, 255, 0.5)',
-                appearance === 'dark' ? colors.grey1000 : colors.white,
-              ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={[
-                styles.avatarBackgroundGradient,
-                { width: backgroundWidth },
-              ]}
-            />
-          </View>
-        ) : undefined}
-
-        <View style={styles.avatarContainer}>
-          <View style={[styles.avatar, styles.avatarWrapper]}>
-            {avatar ? (
-              <Image source={avatar} style={styles.avatar} />
-            ) : details.webCard ? (
-              <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
-            ) : (
-              <Text style={styles.initials}>
-                {details.firstName?.substring(0, 1)}
-                {details.lastName?.substring(0, 1)}
-                {!details.firstName &&
-                  !details.lastName &&
-                  details.company?.substring(0, 1)}
-              </Text>
-            )}
-          </View>
-        </View>
-        <Text variant="large" style={styles.name}>
-          {details.firstName} {details.lastName}
-        </Text>
-        {details.company && (
-          <Text style={styles.company}>{details.company}</Text>
-        )}
-        {details.jobTitle && <Text style={styles.job}>{details.jobTitle}</Text>}
-        <View style={styles.saveContainer}>
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: "Save to my phone's contacts",
-              description: 'ContactDetailsModal - Button to save contact',
-            })}
-            style={styles.save}
-            onPress={onSave}
-          />
-        </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
+      {backgroundImageUrl ? (
+        <View
+          style={[
+            styles.avatarBackgroundContainer,
             {
-              paddingBottom: bottom + HEADER,
+              width: backgroundWidth,
             },
-            styles.scroll,
           ]}
         >
+          <Image
+            source={backgroundImageUrl}
+            style={styles.avatarBackground}
+            blurRadius={9.2}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={[
+              appearance === 'dark'
+                ? 'rgba(0, 0, 0, 0)'
+                : 'rgba(255, 255, 255, 0.5)',
+              appearance === 'dark' ? colors.grey1000 : colors.white,
+            ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={[
+              styles.avatarBackgroundGradient,
+              { width: backgroundWidth },
+            ]}
+          />
+        </View>
+      ) : undefined}
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scroll]}
+      >
+        <View style={styles.content}>
+          <PressableNative style={styles.close} onPress={onClose}>
+            <Icon icon="close" size={24} />
+          </PressableNative>
+          <PressableNative style={styles.share} onPress={onShare}>
+            <Icon icon="share" size={24} style={styles.shareIcon} />
+          </PressableNative>
+          <View style={styles.avatarContainer}>
+            <View style={[styles.avatar, styles.avatarWrapper]}>
+              {avatar ? (
+                <Image source={avatar} style={styles.avatar} />
+              ) : details.webCard ? (
+                <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
+              ) : (
+                <Text style={styles.initials}>
+                  {details.firstName?.substring(0, 1)}
+                  {details.lastName?.substring(0, 1)}
+                  {!details.firstName &&
+                    !details.lastName &&
+                    details.company?.substring(0, 1)}
+                </Text>
+              )}
+            </View>
+          </View>
+          <Text variant="large" style={styles.name}>
+            {details.firstName} {details.lastName}
+          </Text>
+          {details.company && (
+            <Text style={styles.company}>{details.company}</Text>
+          )}
+          {details.jobTitle && (
+            <Text style={styles.job}>{details.jobTitle}</Text>
+          )}
+          <View style={styles.saveContainer}>
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: "Save to my phone's contacts",
+                description: 'ContactDetailsModal - Button to save contact',
+              })}
+              style={styles.save}
+              onPress={onSave}
+            />
+          </View>
+          {meetingDate && (
+            <Text variant="small" style={{ color: colors.grey200 }}>
+              {meetingPlace
+                ? intl.formatMessage(
+                    {
+                      defaultMessage: 'Connected in {location} on {date}',
+                      description:
+                        'ContactDetailsModal - Connected label with location and date',
+                    },
+                    {
+                      location: meetingPlace,
+                      date: meetingDate,
+                    },
+                  )
+                : intl.formatMessage(
+                    {
+                      defaultMessage: 'Connected on {date}',
+                      description:
+                        'ContactDetailsModal - Connected label with date',
+                    },
+                    {
+                      date: meetingDate,
+                    },
+                  )}
+            </Text>
+          )}
           {details.phoneNumbers?.map((phoneNumber, index) => (
             <ContactDetailItem
               key={'phone' + index + '' + phoneNumber.number}
@@ -308,8 +340,8 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             })}
             content={date}
           />
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </Container>
   );
 };
@@ -334,7 +366,7 @@ const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     position: 'relative',
-    backgroundColor: appearance === 'dark' ? colors.grey1000 : 'white',
+    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.white,
   },
   close: {
     position: 'absolute',
@@ -373,7 +405,7 @@ const stylesheet = createStyleSheet(appearance => ({
   saveContainer: {
     paddingHorizontal: 20,
     width: '100%',
-    marginBottom: 10,
+    paddingBottom: 10,
   },
   save: {
     marginTop: 20,
@@ -445,12 +477,16 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-const HEADER = 300;
-
 export type ContactDetails = Contact & {
   createdAt: Date;
   profileId?: string;
   webCard?: ContactDetailsModal_webCard$data | null;
+  meetingPlace?: {
+    city: string | null;
+    country: string | null;
+    region: string | null;
+    subregion: string | null;
+  } | null;
 };
 
 export default ContactDetailsBody;

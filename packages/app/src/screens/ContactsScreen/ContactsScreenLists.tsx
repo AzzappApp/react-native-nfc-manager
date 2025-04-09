@@ -427,6 +427,7 @@ const ContactsScreenLists = ({
         webCard: contact.contactProfile?.webCard?.cardIsPublished
           ? contact.contactProfile?.webCard
           : null,
+        meetingPlace: contact.meetingPlace,
       });
     },
     [contactsPermissionStatus, localContacts],
