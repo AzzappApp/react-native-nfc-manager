@@ -1,3 +1,8 @@
+## 1.9.2-rc.33
+
+* **fix:**  - **Android:** reenable ripple
+* **fix:**  - **shakeAndShare:** [#8410](https://github.com/AzzappApp/azzapp/pull/8410) don’t open twice screen ([#8424](https://github.com/AzzappApp/azzapp/pull/8424))
+
 ## 1.9.2-rc.32
 
 * **fix:**  - **auth:** [#8411](https://github.com/AzzappApp/azzapp/pull/8411) replace modal with bottom sheet on cookie consent ([#8420](https://github.com/AzzappApp/azzapp/pull/8420))
