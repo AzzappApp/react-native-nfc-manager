@@ -11,7 +11,6 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header from '#ui/Header';
-import HeaderButton from '#ui/HeaderButton';
 import RichTextButtons, {
   textButtons,
   titleButtons,
@@ -21,6 +20,7 @@ import {
   DEFAULT_CARD_MODULE_TEXT,
   DEFAULT_CARD_MODULE_TITLE,
 } from '../CardModuleBottomBar';
+import CardModuleToolHeaderButton from './CardModuleToolHeaderButton';
 import useRichTextManager from './useRichTextManager';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleMedia } from '../cardModuleEditorType';
@@ -203,14 +203,13 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             }
             style={styles.header}
             rightElement={
-              <HeaderButton
+              <CardModuleToolHeaderButton
                 onPress={onDone}
                 label={intl.formatMessage({
                   defaultMessage: 'Done',
                   description:
                     'CardModuleMediaTextTool - Done header button label',
                 })}
-                style={styles.headerButton}
               />
             }
           />
@@ -351,9 +350,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: { marginBottom: 15, paddingHorizontal: 0 },
-  headerButton: {
-    pointerEvents: 'box-only',
-  },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
   textStyle: {
