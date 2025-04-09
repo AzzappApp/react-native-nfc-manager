@@ -270,7 +270,7 @@ const useSaveCover = (
     });
     setSavingStatus('complete');
     setExportProgressIndicator(null);
-  }, [commit, coverEditorState, startUpload, webCardId]);
+  }, [commit, commitSaveCardColors, coverEditorState, startUpload, webCardId]);
 
   const reset = useCallback(() => {
     setSavingStatus(null);
