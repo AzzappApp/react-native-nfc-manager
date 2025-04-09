@@ -198,12 +198,12 @@ const AppearanceSliderContainer = ({
       webCardViewMode === 'edit' ? 'normal' : inViewport ? 'high' : 'normal',
     [inViewport, webCardViewMode],
   );
-  const { setMedia } = useFullScreenOverlayContext(media);
+  const setMedia = useFullScreenOverlayContext();
 
   return (
     <View style={{ width: displayDimension.width }} onLayout={onLayout}>
       <Animated.View style={imageContainerStyle}>
-        <Pressable style={styles.flex} onPress={setMedia}>
+        <Pressable style={styles.flex} onPress={() => setMedia(media)}>
           <CardModuleMediaSelector
             media={media}
             dimension={displayDimension}

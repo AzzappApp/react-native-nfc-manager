@@ -1,10 +1,5 @@
 import { Suspense, memo, useCallback, useRef } from 'react';
-import {
-  useWindowDimensions,
-  View,
-  StyleSheet,
-  Animated as RNAnimated,
-} from 'react-native';
+import { View, StyleSheet, Animated as RNAnimated } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   type DerivedValue,
@@ -17,6 +12,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import WebCardBackgroundPreview from '#components/WebCardBackgroundPreview';
 import { FullScreenOverlay } from '#components/WebCardPreviewFullScreenOverlay';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import WebCardEditScreen from '#screens/WebCardEditScreen/WebCardEditScreen';
@@ -151,7 +147,7 @@ const WebCardScreenContent = ({
     webCard.cardColors?.light ??
     colors.white;
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useScreenDimensions();
 
   const onMomentumScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
