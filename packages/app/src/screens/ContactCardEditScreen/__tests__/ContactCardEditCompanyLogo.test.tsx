@@ -154,7 +154,7 @@ describe('ContactCardEditCompanyLogo', () => {
     await waitFor(() => {
       expect(getValues().logo).toEqual({
         id: '1',
-        uri: 'mock_local_path',
+        uri: 'mock_logo_uri_1',
         width: 1280,
         height: 1280,
         local: true,
