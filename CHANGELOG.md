@@ -1,3 +1,9 @@
+## 1.9.2-rc.31
+
+* **fix:**  - **android:** [#8388](https://github.com/AzzappApp/azzapp/pull/8388) set specific header button on card module tools ([#8414](https://github.com/AzzappApp/azzapp/pull/8414))
+* **fix:**  - **CoverEdition:** update colors before upload ([#8416](https://github.com/AzzappApp/azzapp/pull/8416))
+* **fix:**  - **HomeScreen:** do not redirect to cover edition for uploading cover ([#8413](https://github.com/AzzappApp/azzapp/pull/8413))
+
 ## 1.9.2-rc.30
 
 * **fix:**  - **modules:** [#8388](https://github.com/AzzappApp/azzapp/pull/8388) put back pressable from gesture handler ([#8398](https://github.com/AzzappApp/azzapp/pull/8398))
