@@ -176,9 +176,13 @@ const MainRouter = () => {
     }
   }, [router]);
 
-  const debouncedToggleShakeShare = useDebounceCallback(toggleShakeShare, 500, {
-    leading: true,
-  });
+  const debouncedToggleShakeShare = useDebouncedCallback(
+    toggleShakeShare,
+    500,
+    {
+      leading: true,
+    },
+  );
 
   const resetCoolDown = useShakeDetector(debouncedToggleShakeShare);
 
