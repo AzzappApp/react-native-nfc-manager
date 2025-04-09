@@ -40,6 +40,7 @@ import SnapshotFadeTransitionAnimator from './SnapshotFadeTransitionAnimator';
 import useRoutingAnalyticsLog from './useRoutingAnalyticsLog';
 import useSentryRoutingInstrumentation from './useSentryRoutingInstrumentation';
 import type { AppRouterQuery } from '#relayArtifacts/AppRouterQuery.graphql';
+const { useDebounceCallback } = require('#hooks/useDebounceCallback');
 
 const AppRouter = () => {
   const authenticated = useIsAuthenticated();
@@ -175,7 +176,11 @@ const MainRouter = () => {
     }
   }, [router]);
 
-  const resetCoolDown = useShakeDetector(toggleShakeShare);
+  const debouncedToggleShakeShare = useDebounceCallback(toggleShakeShare, 500, {
+    leading: true,
+  });
+
+  const resetCoolDown = useShakeDetector(debouncedToggleShakeShare);
 
   useEffect(() => {
     router.addRouteDidChangeListener(() => {
