@@ -1,3 +1,8 @@
+## 1.9.2-rc.32
+
+* **fix:**  - **auth:** [#8411](https://github.com/AzzappApp/azzapp/pull/8411) replace modal with bottom sheet on cookie consent ([#8420](https://github.com/AzzappApp/azzapp/pull/8420))
+* **perf:**  - **android:** [#8412](https://github.com/AzzappApp/azzapp/pull/8412) too much work on logo selection ([#8418](https://github.com/AzzappApp/azzapp/pull/8418))
+
 ## 1.9.2-rc.31
 
 * **fix:**  - **android:** [#8388](https://github.com/AzzappApp/azzapp/pull/8388) set specific header button on card module tools ([#8414](https://github.com/AzzappApp/azzapp/pull/8414))
