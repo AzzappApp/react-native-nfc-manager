@@ -1,3 +1,8 @@
+## 1.9.2-rc.35
+
+* **fix:**  - missed schema update on contact card
+* **fix:**  - **oauth:** [#8422](https://github.com/AzzappApp/azzapp/pull/8422) download avatar with filesystem ([#8427](https://github.com/AzzappApp/azzapp/pull/8427))
+
 ## 1.9.2-rc.34
 
 * **fix:**  - **shakeAndShare:** [#8410](https://github.com/AzzappApp/azzapp/pull/8410) reset shake and share on opening route ([#8426](https://github.com/AzzappApp/azzapp/pull/8426))
