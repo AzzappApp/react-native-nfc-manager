@@ -1,15 +1,13 @@
 import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
-import { forwardRef, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { defaultFontSize, RichTextFromAST } from '#components/ui/RichText';
 
 import TextInput from './TextInput';
 import type { TextAndSelection } from './BottomSheetTextEditorTypes';
-import type { ForwardedRef } from 'react';
 import type {
   TextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
-  TextInput as NativeTextInput,
 } from 'react-native';
 
 export type BottomSheetTextEditorProps = Pick<
@@ -27,17 +25,14 @@ export type BottomSheetTextEditorProps = Pick<
  * A wrapper around TextInput that adds Azzapp's default styling.
  *
  */
-const BottomSheetTextEditor = (
-  {
-    onFocus,
-    onBlur,
-    onChangeText,
-    textAndSelection,
-    onSelectionChange,
-    ...props
-  }: BottomSheetTextEditorProps,
-  ref: ForwardedRef<NativeTextInput>,
-) => {
+const BottomSheetTextEditor = ({
+  onFocus,
+  onBlur,
+  onChangeText,
+  textAndSelection,
+  onSelectionChange,
+  ...props
+}: BottomSheetTextEditorProps) => {
   //this should always be accessible, if not we will create an custom component for bottomSheet custom text input
   const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
 
@@ -63,12 +58,13 @@ const BottomSheetTextEditor = (
   return (
     <TextInput
       {...props}
-      ref={ref}
       onFocus={onFocusInner}
       onBlur={onBlurInner}
       onSelectionChange={onSelectionChange}
       onChangeText={onChangeText}
-      selection={textAndSelection.selection}
+      selection={
+        textAndSelection.forceSelection ? textAndSelection.selection : undefined
+      }
       testID="BottomSheetTextEditorId"
     >
       <RichTextFromAST
@@ -80,4 +76,4 @@ const BottomSheetTextEditor = (
   );
 };
 
-export default forwardRef(BottomSheetTextEditor);
+export default memo(BottomSheetTextEditor);

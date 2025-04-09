@@ -66,7 +66,7 @@ const ParallaxText = ({
                   className={cn(
                     styles.textItem,
                     commonStyles.text,
-                    webCardTextFontsMap[cardStyle.fontFamily].className,
+                    webCardTextFontsMap[cardStyle.fontFamily]?.className,
                   )}
                 >
                   <RichText

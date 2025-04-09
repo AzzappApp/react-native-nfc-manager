@@ -123,7 +123,7 @@ const AlternationRender = async ({
                     <p
                       className={cn(
                         commonStyles.text,
-                        webCardTextFontsMap[cardStyle.fontFamily].className,
+                        webCardTextFontsMap[cardStyle.fontFamily]?.className,
                       )}
                       style={{
                         color: swapColor(cardModuleColor?.text, colorPalette),

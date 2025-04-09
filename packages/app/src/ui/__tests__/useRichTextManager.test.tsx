@@ -10,7 +10,11 @@ import type {
 describe('BottomSheetTextEditor component', () => {
   test('simple value', () => {
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: 'abc', setText: () => {} }),
+      useRichTextManager({
+        id: 'ploup',
+        defaultValue: 'abc',
+        setText: () => {},
+      }),
     );
     expect(generateHTMLFromRichText(result.current.textAndSelection.ast)).toBe(
       'abc',
@@ -18,7 +22,11 @@ describe('BottomSheetTextEditor component', () => {
   });
   test('simple value with bold', () => {
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText: () => {} }),
+      useRichTextManager({
+        id: 'ploup',
+        defaultValue: '<b>abc</b>',
+        setText: () => {},
+      }),
     );
     expect(generateHTMLFromRichText(result.current.textAndSelection.ast)).toBe(
       '<b>abc</b>',
@@ -27,7 +35,7 @@ describe('BottomSheetTextEditor component', () => {
   test('change text call setText', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onChangeText('test');
@@ -37,7 +45,7 @@ describe('BottomSheetTextEditor component', () => {
   test('append text', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onChangeText('abcd');
@@ -48,7 +56,7 @@ describe('BottomSheetTextEditor component', () => {
   test('remove text', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onChangeText('ab');
@@ -58,7 +66,7 @@ describe('BottomSheetTextEditor component', () => {
   test('clean text', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onChangeText('');
@@ -68,7 +76,7 @@ describe('BottomSheetTextEditor component', () => {
   test('select and add a tag', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onSelectionChange({
@@ -82,7 +90,7 @@ describe('BottomSheetTextEditor component', () => {
   test('copy/past', async () => {
     const setText = jest.fn();
     const { result } = renderHook(() =>
-      useRichTextManager({ defaultValue: '<b>abc</b>', setText }),
+      useRichTextManager({ id: 'ploup', defaultValue: '<b>abc</b>', setText }),
     );
     act(() => {
       result.current.onSelectionChange({

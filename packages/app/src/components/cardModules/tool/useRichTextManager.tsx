@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   applyFormattingOnRichText,
   getTagsInSelectionFromRichText,
@@ -26,6 +26,7 @@ import type {
 } from 'react-native';
 
 type useRichTextManagerProps = {
+  id: string;
   defaultValue?: string;
   setText: (arg: string) => void;
 };
@@ -41,6 +42,7 @@ type useRichTextManagerResult = {
 const DEBUG_EDITOR = false;
 
 const useRichTextManager = ({
+  id,
   defaultValue,
   setText,
 }: useRichTextManagerProps): useRichTextManagerResult => {
@@ -50,6 +52,22 @@ const useRichTextManager = ({
       selectedTag: [],
     }),
   );
+  // Sometime we receive 2 text change before the previous one is applied (Then the state is updated)
+  // The ref is used to ensure we always have the last known AST
+  const previousAST = useRef(textAndSelection.ast);
+
+  const previousId = useRef<string>(id);
+  useEffect(() => {
+    if (previousId.current === id) {
+      return;
+    }
+    previousId.current = id;
+    previousAST.current = parseHTMLToRichText(defaultValue || '');
+    setTextAndSelection({
+      ast: previousAST.current,
+      selectedTag: [],
+    });
+  }, [defaultValue, id]);
 
   const selection = useRef<SelectionType>({
     start: textAndSelection.ast.end,
@@ -67,7 +85,7 @@ const useRichTextManager = ({
    */
   const onApplyTagPress = (tag: RichTextASTTags) => {
     const formattedAST = applyFormattingOnRichText(
-      textAndSelection.ast,
+      previousAST.current,
       selection.current?.start ?? textAndSelection.ast.end,
       selection.current?.end ?? textAndSelection.ast.end,
       tag,
@@ -84,9 +102,11 @@ const useRichTextManager = ({
             selection.current.end,
           )
         : [];
+    previousAST.current = formattedAST;
     setTextAndSelection({
-      ast: formattedAST!,
+      ast: formattedAST,
       selection: selection.current,
+      forceSelection: true,
       selectedTag,
     });
     setText(formattedAST ? generateHTMLFromRichText(formattedAST) : '');
@@ -132,10 +152,10 @@ const useRichTextManager = ({
       };
 
       let newSelection;
-      let newAST = textAndSelection.ast;
+      let newAST = previousAST.current;
       const textLengthChange = newText.length - previousText.current.length;
 
-      if (getRawTextFromRichText(textAndSelection.ast) === newText) {
+      if (getRawTextFromRichText(newAST) === newText) {
         // we receive the same text than the already used
         return;
       }
@@ -151,7 +171,7 @@ const useRichTextManager = ({
             _selection.end + textLengthChange,
           );
           newAST = updateTextInRichText(
-            textAndSelection.ast,
+            newAST,
             _selection.start,
             _selection.end,
             changedText,
@@ -247,6 +267,16 @@ const useRichTextManager = ({
           );
       }
       previousText.current = newText;
+
+      if (newSelection.start > newText.length) {
+        newSelection.start = newText.length;
+      }
+      if (newSelection.end > newText.length) {
+        newSelection.end = newText.length;
+      }
+      selection.current = newSelection;
+      previousAST.current = newAST;
+
       setTextAndSelection({
         ast: newAST,
         selection: newSelection,
@@ -254,7 +284,7 @@ const useRichTextManager = ({
       });
       setText(newAST ? generateHTMLFromRichText(newAST) : '');
     },
-    [setText, textAndSelection.ast],
+    [setText],
   );
 
   return { onApplyTagPress, onSelectionChange, onChangeText, textAndSelection };

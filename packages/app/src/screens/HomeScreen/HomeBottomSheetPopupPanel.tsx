@@ -119,10 +119,10 @@ const HomeBottomSheetPopupPanel = ({
   const { openTooltips } = useTooltipContext();
 
   const resetPopupState = useCallback(() => {
+    openTooltips(['profileEdit']);
     setCurrentPage(0);
     setError(undefined);
     setNewUserName('');
-    openTooltips(['profileEdit']);
   }, [openTooltips]);
 
   const userNameAlreadyExistsError = intl.formatMessage(

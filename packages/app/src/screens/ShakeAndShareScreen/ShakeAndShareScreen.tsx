@@ -11,7 +11,7 @@ import {
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useCallback, useEffect } from 'react';
+import { startTransition, Suspense, useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   ActivityIndicator,
@@ -35,7 +35,6 @@ import AddToWalletButton from '#components/AddToWalletButton';
 import ContactCardExportVcf from '#components/ContactCardExportVcf';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import Skeleton from '#components/Skeleton';
 import ToastUi from '#components/Toast';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -199,7 +198,7 @@ const ShakeAndShareScreen = ({
         <ScrollView style={styles.contentContainer}>
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
-              <Suspense fallback={<Skeleton style={styles.canvas} />}>
+              <Suspense>
                 <QRCode profile={node?.profile} />
               </Suspense>
             </View>
@@ -401,21 +400,23 @@ const QRCode = ({
   const { location, address } = currentLocation ?? {};
 
   useEffect(() => {
-    refetch({
-      location: location
-        ? {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }
-        : null,
-      address: address
-        ? {
-            country: address.country,
-            city: address.city,
-            subregion: address.subregion,
-            region: address.region,
-          }
-        : null,
+    startTransition(() => {
+      refetch({
+        location: location
+          ? {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }
+          : null,
+        address: address
+          ? {
+              country: address.country,
+              city: address.city,
+              subregion: address.subregion,
+              region: address.region,
+            }
+          : null,
+      });
     });
   }, [address, location, refetch]);
 

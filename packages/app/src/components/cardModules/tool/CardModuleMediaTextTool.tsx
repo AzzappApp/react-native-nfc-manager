@@ -63,6 +63,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     onChangeText: onTextChangeText,
     textAndSelection: textTextAndSelection,
   } = useRichTextManager({
+    id: `text-${index}`,
     defaultValue:
       cardModuleMedia.text === DEFAULT_CARD_MODULE_TEXT
         ? ''
@@ -76,6 +77,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     onChangeText: onTitleChangeText,
     textAndSelection: titleTextAndSelection,
   } = useRichTextManager({
+    id: `title-${index}`,
     defaultValue:
       cardModuleMedia.title === DEFAULT_CARD_MODULE_TITLE
         ? ''
