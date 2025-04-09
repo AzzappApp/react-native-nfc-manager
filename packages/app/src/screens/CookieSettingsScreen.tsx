@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Modal, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -187,7 +187,6 @@ const CookieSettingsScreen = ({
   }, [consents, onSave]);
 
   const insets = useScreenInsets();
-  const windowDimensions = useScreenDimensions();
 
   return (
     <Container style={[styles.container, { paddingTop: insets.top }]}>
@@ -310,37 +309,33 @@ const CookieSettingsScreen = ({
           loading={inFlight}
         />
       </ScrollView>
-      <Modal
-        transparent
-        animationType="fade"
+      <BottomSheetModal
         visible={showModal}
-        onRequestClose={onInformationClose}
+        onDismiss={onInformationClose}
+        variant="modal"
       >
-        <View style={[styles.modal, windowDimensions]}>
-          <View style={styles.modalBackground} />
-          <View style={styles.modalContent}>
-            <Header
-              leftElement={
-                <IconButton
-                  icon="close"
-                  variant="icon"
-                  onPress={onInformationClose}
-                />
-              }
-              middleElement={
-                <Text variant="large">
-                  {displayedInformation &&
-                    cookieDescriptions[displayedInformation].title}
-                </Text>
-              }
-            />
-            <Text variant="medium">
-              {displayedInformation &&
-                cookieDescriptions[displayedInformation].text}
-            </Text>
-          </View>
+        <View style={styles.modalContent}>
+          <Header
+            leftElement={
+              <IconButton
+                icon="close"
+                variant="icon"
+                onPress={onInformationClose}
+              />
+            }
+            middleElement={
+              <Text variant="large">
+                {displayedInformation &&
+                  cookieDescriptions[displayedInformation].title}
+              </Text>
+            }
+          />
+          <Text variant="medium">
+            {displayedInformation &&
+              cookieDescriptions[displayedInformation].text}
+          </Text>
         </View>
-      </Modal>
+      </BottomSheetModal>
     </Container>
   );
 };
@@ -376,19 +371,8 @@ const styles = StyleSheet.create({
     color: colors.grey300,
     textAlign: 'right',
   },
-  modal: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  modalBackground: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: colors.black,
-    opacity: 0.5,
-  },
   modalContent: {
     backgroundColor: colors.white,
-    padding: 20,
-    margin: 20,
-    borderRadius: 20,
-    zIndex: 1,
+    paddingHorizontal: 20,
   },
 });
