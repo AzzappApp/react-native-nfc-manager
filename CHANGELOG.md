@@ -1,3 +1,9 @@
+## 1.9.2-rc.27
+
+* **fix:**  - **shakeAndShare:** [#8383](https://github.com/AzzappApp/azzapp/pull/8383) properly fix long shake ([#8387](https://github.com/AzzappApp/azzapp/pull/8387))
+* **fix:**  - **authent:** [#7718](https://github.com/AzzappApp/azzapp/pull/7718) review confirmation code screen ([#8394](https://github.com/AzzappApp/azzapp/pull/8394))
+* **fix:**  - **ModuleEdition:** reset rich text editor state when changing item ([#8393](https://github.com/AzzappApp/azzapp/pull/8393))
+
 ## 1.9.2-rc.26
 
 * **fix:**  - **webCard:** [#8378](https://github.com/AzzappApp/azzapp/pull/8378) don’t crash when fontFamily is missing ([#8379](https://github.com/AzzappApp/azzapp/pull/8379))
