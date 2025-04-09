@@ -244,10 +244,10 @@ const SlideshowItem = ({
   });
 
   const { media } = cardModuleMedia;
-  const { setMedia } = useFullScreenOverlayContext(media);
+  const setMedia = useFullScreenOverlayContext();
 
   return (
-    <Pressable style={styles.flex} onPress={setMedia}>
+    <Pressable style={styles.flex} onPress={() => setMedia(media)}>
       <Animated.View style={[styles.imageContainer, animatedStyle]}>
         <CardModuleMediaSelector
           media={media}

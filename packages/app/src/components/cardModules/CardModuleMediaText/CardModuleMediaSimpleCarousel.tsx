@@ -252,7 +252,7 @@ const SimpleCarouselItemComponent = ({
   webCardViewMode,
   dimension,
 }: SimpleCarouselItemProps) => {
-  const { setMedia } = useFullScreenOverlayContext(cardModuleMedia.media);
+  const setMedia = useFullScreenOverlayContext();
 
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -282,7 +282,7 @@ const SimpleCarouselItemComponent = ({
         }}
       >
         <Pressable
-          onPress={setMedia}
+          onPress={() => setMedia(cardModuleMedia.media)}
           style={{
             width: mediaWidth,
             height: mediaHeight,

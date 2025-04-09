@@ -136,7 +136,7 @@ const AlternationItem = ({
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
 
-  const openLink = () => {
+  const openLink = useCallback(() => {
     if (moduleEditing) {
       setEditableItemIndex?.(index);
     } else if (!moduleEditing && cardModuleMedia.link?.url) {
@@ -144,7 +144,7 @@ const AlternationItem = ({
     } else {
       Linking.openURL('https://web.azzapp.com/explanation');
     }
-  };
+  }, [cardModuleMedia.link?.url, index, moduleEditing, setEditableItemIndex]);
 
   return (
     <CardModulePressableTool

@@ -1,10 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
 import Icon from '#ui/Icon';
@@ -18,15 +14,13 @@ type FullScreenOverlayContextProps = {
   width: number;
   height: number;
 };
-export const FullScreenOverlayContext = createContext({
-  setMedia: (_: CardModuleSourceMedia) => {},
-});
+export const FullScreenOverlayContext = createContext(
+  (_: CardModuleSourceMedia | null) => {},
+);
 
 // helper to manage context call
-export const useFullScreenOverlayContext = (media: CardModuleSourceMedia) => {
-  const { setMedia } = useContext(FullScreenOverlayContext);
-  return { setMedia: () => setMedia(media) };
-};
+export const useFullScreenOverlayContext = () =>
+  useContext(FullScreenOverlayContext);
 
 /**
  * This component is used to display the overlay when user click on a content
@@ -39,29 +33,16 @@ export const FullScreenOverlay = ({
   height,
 }: FullScreenOverlayContextProps) => {
   const [media, setMedia] = useState<CardModuleSourceMedia | null>(null);
-  const [visibilityState, setVisibilityState] = useState(false);
-
-  const valueMemo = useMemo(
-    () => ({
-      setMedia: (arg: CardModuleSourceMedia | null) => {
-        setMedia(arg);
-        setVisibilityState(true);
-      },
-    }),
-    [],
-  );
 
   return (
-    <FullScreenOverlayContext.Provider value={valueMemo}>
+    <FullScreenOverlayContext.Provider value={setMedia}>
+      {children}
       <FullScreenMediaOverlay
         media={media}
         webCard={webCard}
-        visibilityState={visibilityState}
-        setVisibilityState={setVisibilityState}
         width={width}
         height={height}
       />
-      {children}
     </FullScreenOverlayContext.Provider>
   );
 };
@@ -69,8 +50,6 @@ export const FullScreenOverlay = ({
 type FullScreenMediaOverlayProps = {
   media: CardModuleSourceMedia | null;
   webCard?: WebCardPreviewFullScreenOverlay_webCard$key;
-  visibilityState: boolean;
-  setVisibilityState: (arg: boolean) => void;
   width: number;
   height: number;
 };
@@ -81,14 +60,11 @@ type FullScreenMediaOverlayProps = {
 const FullScreenMediaOverlay = ({
   media,
   webCard: webCardKey,
-  visibilityState,
-  setVisibilityState,
   width,
   height,
 }: FullScreenMediaOverlayProps) => {
-  const onPress = () => {
-    setVisibilityState(false);
-  };
+  const setMedia = useFullScreenOverlayContext();
+
   const webCard = useFragment(
     graphql`
       fragment WebCardPreviewFullScreenOverlay_webCard on WebCard {
@@ -108,36 +84,29 @@ const FullScreenMediaOverlay = ({
     fullscreenWidth = fullscreenHeight * aspectRatio;
   }
 
-  // manage display animation
-  const opacity = useSharedValue(0);
-  useEffect(() => {
-    opacity.value = withTiming(visibilityState ? 1 : 0, { duration: 300 });
-  }, [opacity, visibilityState]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+  const clearMedia = useCallback(() => {
+    setMedia(null);
+  }, [setMedia]);
 
   if (!media) return undefined;
   return (
     <Animated.View
-      style={[
-        {
-          flex: 1,
-          position: 'absolute',
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          height,
-          width,
-          zIndex: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-          pointerEvents: visibilityState ? 'auto' : 'none',
-        },
-        animatedStyle,
-      ]}
+      style={{
+        flex: 1,
+        position: 'absolute',
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        height,
+        width,
+        zIndex: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        pointerEvents: media ? 'auto' : 'none',
+      }}
+      entering={FadeIn.duration(300)}
+      exiting={FadeOut.duration(300)}
     >
       <Pressable
-        onPress={onPress}
+        onPress={clearMedia}
         style={{
           height,
           width,
