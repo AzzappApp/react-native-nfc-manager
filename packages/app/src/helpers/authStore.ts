@@ -9,6 +9,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
 import { logSignIn } from './analytics';
 import { addGlobalEventListener } from './globalEvents';
+import { cleanOfflineVCardData } from './offlineVCard';
 
 /**
  * this module is used to manage the auth tokens and auth related state
@@ -184,6 +185,7 @@ export const init = async () => {
   addGlobalEventListener('SIGN_OUT', async () => {
     authTokens = null;
     storage.delete(MMKVS_PROFILE_INFOS);
+    cleanOfflineVCardData();
     clearRecentSearch();
     encryptedStorage.clearAll();
   });

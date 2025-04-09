@@ -11,9 +11,13 @@ import type {
  * this module is used to manage Offline VCards
  */
 
-export const storage = new MMKV();
+const offlineVCardStorage = new MMKV();
 
 const VCardDataKey = 'vcardData';
+
+export const cleanOfflineVCardData = () => {
+  offlineVCardStorage.delete(VCardDataKey);
+};
 
 export const useSaveOfflineVCard = (
   profilesKey: OfflineVCardScreen_profiles$key | null | undefined,
@@ -22,7 +26,10 @@ export const useSaveOfflineVCard = (
   const profiles = useFragment(OfflineVCardScreenProfilesFragment, profilesKey);
   useEffect(() => {
     if (profiles) {
-      storage.set(VCardDataKey, JSON.stringify({ isPremium, profiles }));
+      offlineVCardStorage.set(
+        VCardDataKey,
+        JSON.stringify({ isPremium, profiles }),
+      );
     }
   }, [isPremium, profiles]);
 };
@@ -33,6 +40,6 @@ export const getOfflineVCard = ():
       profiles: OfflineVCardScreen_profiles$data;
     }
   | undefined => {
-  const data = storage.getString(VCardDataKey);
+  const data = offlineVCardStorage.getString(VCardDataKey);
   return data ? JSON.parse(data) : undefined;
 };
