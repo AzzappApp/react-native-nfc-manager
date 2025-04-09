@@ -149,7 +149,7 @@ const CardModuleMediaSlideshow = ({
     handleScrollToOffset(0, false);
   }, [itemWidth]);
 
-  const  setMedia  = useContext(FullScreenOverlayContext);
+  const setMedia = useContext(FullScreenOverlayContext);
 
   const openMedia = (index: number) => {
     setMedia(cardModuleMedias[index]?.media);
