@@ -1,14 +1,16 @@
 import { useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from './Text';
 import { styleSheetData as textInputStyleSheet } from './TextInput';
+import TextInputWithPrefix from './TextInputWithPrefix';
 import type {
   TextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
   ViewStyle,
+  TextInput,
 } from 'react-native';
 
 export type TextInputWithEllipsizeModeProps = Pick<
@@ -27,6 +29,7 @@ export type TextInputWithEllipsizeModeProps = Pick<
    * Whether the input is in error state
    */
   isErrored?: boolean;
+  prefix?: string;
 };
 
 /**
@@ -40,6 +43,7 @@ const TextInputWithEllipsizeMode = ({
   onFocus,
   onBlur,
   style,
+  prefix,
   ...props
 }: TextInputWithEllipsizeModeProps) => {
   //#region hooks
@@ -65,7 +69,7 @@ const TextInputWithEllipsizeMode = ({
 
   return (
     <View style={style as ViewStyle}>
-      <TextInput
+      <TextInputWithPrefix
         testID="nativeInputText"
         ref={nativeTextInputRef}
         selectionColor={colors.primary400}
@@ -74,13 +78,14 @@ const TextInputWithEllipsizeMode = ({
         onFocus={onFocusInner}
         onBlur={onBlurInner}
         allowFontScaling={false}
-        style={[
-          styles.input,
+        style={styles.input}
+        inputStyle={[
           style,
           isFocused && styles.focused,
           isErrored && styles.errored,
           !isFocused ? { color: 'transparent' } : undefined,
         ]}
+        prefix={prefix}
       />
       {!isFocused ? (
         <Text

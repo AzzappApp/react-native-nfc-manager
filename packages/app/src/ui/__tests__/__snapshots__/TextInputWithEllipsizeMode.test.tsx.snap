@@ -2,12 +2,7 @@
 
 exports[`TextInputWithEllipsizeMode component change text value 1`] = `
 <View>
-  <TextInput
-    allowFontScaling={false}
-    onBlur={[Function]}
-    onFocus={[Function]}
-    placeholderTextColor="#A1A1A5"
-    selectionColor="#FF502E"
+  <View
     style={
       [
         {
@@ -23,17 +18,54 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
           "paddingHorizontal": 15,
           "paddingVertical": 3,
         },
-        undefined,
         false,
         undefined,
         {
-          "color": "transparent",
+          "alignItems": "center",
+          "flexDirection": "row",
+        },
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
         },
       ]
     }
-    testID="nativeInputText"
-    value="test"
-  />
+  >
+    <TextInput
+      allowFontScaling={false}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#A1A1A5"
+      selectionColor="#FF502E"
+      style={
+        [
+          {
+            "color": "#0E1216",
+            "flex": 1,
+          },
+          [
+            undefined,
+            false,
+            undefined,
+            {
+              "color": "transparent",
+            },
+          ],
+        ]
+      }
+      testID="nativeInputText"
+      value="test"
+    />
+  </View>
   <Text
     accessible={true}
     allowFontScaling={false}
@@ -85,12 +117,7 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
 
 exports[`TextInputWithEllipsizeMode component with value 1`] = `
 <View>
-  <TextInput
-    allowFontScaling={false}
-    onBlur={[Function]}
-    onFocus={[Function]}
-    placeholderTextColor="#A1A1A5"
-    selectionColor="#FF502E"
+  <View
     style={
       [
         {
@@ -106,17 +133,54 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
           "paddingHorizontal": 15,
           "paddingVertical": 3,
         },
-        undefined,
         false,
         undefined,
         {
-          "color": "transparent",
+          "alignItems": "center",
+          "flexDirection": "row",
+        },
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
         },
       ]
     }
-    testID="nativeInputText"
-    value="test"
-  />
+  >
+    <TextInput
+      allowFontScaling={false}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#A1A1A5"
+      selectionColor="#FF502E"
+      style={
+        [
+          {
+            "color": "#0E1216",
+            "flex": 1,
+          },
+          [
+            undefined,
+            false,
+            undefined,
+            {
+              "color": "transparent",
+            },
+          ],
+        ]
+      }
+      testID="nativeInputText"
+      value="test"
+    />
+  </View>
   <Text
     accessible={true}
     allowFontScaling={false}
@@ -168,12 +232,7 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
 
 exports[`TextInputWithEllipsizeMode empty component 1`] = `
 <View>
-  <TextInput
-    allowFontScaling={false}
-    onBlur={[Function]}
-    onFocus={[Function]}
-    placeholderTextColor="#A1A1A5"
-    selectionColor="#FF502E"
+  <View
     style={
       [
         {
@@ -189,16 +248,53 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
           "paddingHorizontal": 15,
           "paddingVertical": 3,
         },
-        undefined,
         false,
         undefined,
         {
-          "color": "transparent",
+          "alignItems": "center",
+          "flexDirection": "row",
+        },
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
         },
       ]
     }
-    testID="nativeInputText"
-  />
+  >
+    <TextInput
+      allowFontScaling={false}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#A1A1A5"
+      selectionColor="#FF502E"
+      style={
+        [
+          {
+            "color": "#0E1216",
+            "flex": 1,
+          },
+          [
+            undefined,
+            false,
+            undefined,
+            {
+              "color": "transparent",
+            },
+          ],
+        ]
+      }
+      testID="nativeInputText"
+    />
+  </View>
   <Text
     accessible={true}
     allowFontScaling={false}
