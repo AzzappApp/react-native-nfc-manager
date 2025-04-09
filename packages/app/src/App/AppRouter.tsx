@@ -165,10 +165,9 @@ const MainRouter = () => {
 
   const shakeAndShareOpened = useRef(false);
   const toggleShakeShare = useCallback(() => {
-    if (router.getCurrentRoute()?.route === 'SHAKE_AND_SHARE') {
+    if (shakeAndShareOpened.current) {
       router.back();
-    } else if (!shakeAndShareOpened.current) {
-      shakeAndShareOpened.current = true;
+    } else {
       router.push({
         route: 'SHAKE_AND_SHARE',
       });
@@ -178,13 +177,12 @@ const MainRouter = () => {
   const resetCoolDown = useShakeDetector(toggleShakeShare);
 
   useEffect(() => {
-    router.addRouteDidChangeListener(() => {
-      if (
-        shakeAndShareOpened.current &&
-        router.getCurrentRoute()?.route !== 'SHAKE_AND_SHARE'
-      ) {
-        resetCoolDown();
+    router.addRouteDidChangeListener(route => {
+      if (route.route === 'SHAKE_AND_SHARE') {
+        shakeAndShareOpened.current = true;
+      } else if (shakeAndShareOpened.current) {
         shakeAndShareOpened.current = false;
+        resetCoolDown();
       }
     });
   }, [resetCoolDown, router]);
