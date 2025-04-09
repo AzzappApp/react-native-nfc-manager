@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   applyFormattingOnRichText,
   getTagsInSelectionFromRichText,
@@ -26,6 +26,7 @@ import type {
 } from 'react-native';
 
 type useRichTextManagerProps = {
+  id: string;
   defaultValue?: string;
   setText: (arg: string) => void;
 };
@@ -41,6 +42,7 @@ type useRichTextManagerResult = {
 const DEBUG_EDITOR = false;
 
 const useRichTextManager = ({
+  id,
   defaultValue,
   setText,
 }: useRichTextManagerProps): useRichTextManagerResult => {
@@ -50,6 +52,18 @@ const useRichTextManager = ({
       selectedTag: [],
     }),
   );
+
+  const previousId = useRef<string>(id);
+  useEffect(() => {
+    if (previousId.current === id) {
+      return;
+    }
+    previousId.current = id;
+    setTextAndSelection({
+      ast: parseHTMLToRichText(defaultValue || ''),
+      selectedTag: [],
+    });
+  }, [defaultValue, id]);
 
   const selection = useRef<SelectionType>({
     start: textAndSelection.ast.end,
