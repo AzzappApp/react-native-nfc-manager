@@ -1,3 +1,7 @@
+## 1.9.2-rc.28
+
+* **fix:**  - **shakeShare:** [#8402](https://github.com/AzzappApp/azzapp/pull/8402) debounce opening ([#8403](https://github.com/AzzappApp/azzapp/pull/8403))
+
 ## 1.9.2-rc.27
 
 * **fix:**  - **shakeAndShare:** [#8383](https://github.com/AzzappApp/azzapp/pull/8383) properly fix long shake ([#8387](https://github.com/AzzappApp/azzapp/pull/8387))
