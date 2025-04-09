@@ -1,3 +1,8 @@
+## 1.9.2-canary.27
+
+* **fix:**  - add meeting place and update scrollView behavior ([#8336](https://github.com/AzzappApp/azzapp/pull/8336))
+* **fix:**  - **offlineData:** [#8358](https://github.com/AzzappApp/azzapp/pull/8358) clean of logout ([#8390](https://github.com/AzzappApp/azzapp/pull/8390))
+
 ## 1.9.2-canary.26
 
 * **fix:**  - **oauth:** apple token generation
