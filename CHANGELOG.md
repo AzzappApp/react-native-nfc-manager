@@ -1,3 +1,8 @@
+## 1.9.2-rc.37
+
+* **fix:**  - keep logo in png
+* **fix:**  - center home menu
+
 ## 1.9.2-rc.36
 
 * **fix:**  - home display

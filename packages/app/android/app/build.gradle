@@ -88,8 +88,8 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10902036
-        versionName "1.9.2-rc.36"
+        versionCode 10902037
+        versionName "1.9.2-rc.37"
         manifestPlaceholders = [APP_SCHEME: "$System.env.APP_SCHEME"]
     }
 
