@@ -1,3 +1,7 @@
+## 1.9.2-rc.36
+
+* **fix:**  - home display
+
 ## 1.9.2-rc.35
 
 * **fix:**  - missed schema update on contact card
