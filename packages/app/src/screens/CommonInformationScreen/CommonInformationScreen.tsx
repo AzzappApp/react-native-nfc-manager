@@ -1,11 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { Image as ImageCompressor } from 'react-native-compressor';
-import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -20,9 +17,8 @@ import {
 } from '#components/NativeRouter';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getFileName } from '#helpers/fileHelpers';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
-import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { prepareLogoForUpload } from '#helpers/imageHelpers';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
   parseContactCardPhoneNumber,
@@ -147,29 +143,11 @@ export const CommonInformationScreen = ({
   const [showImagePicker, setShowImagePicker] = useState(false);
 
   const onImagePickerFinished = useCallback(
-    async ({
-      uri,
-      width,
-      editionParameters,
-      filter,
-      aspectRatio,
-    }: ImagePickerResult) => {
-      const exportWidth = width;
-      const exportHeight = exportWidth / aspectRatio;
-      const mimeType =
-        mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
-      const localPath = await saveTransformedImageToFile({
-        uri,
-        resolution: { width: exportWidth, height: exportHeight },
-        format: mimeType,
-        quality: 95,
-        filter,
-        editionParameters,
-      });
+    async ({ uri }: ImagePickerResult) => {
       field.onChange({
         local: true,
-        id: localPath,
-        uri: localPath,
+        id: uri,
+        uri,
       });
       setShowImagePicker(false);
     },
@@ -227,21 +205,8 @@ export const CommonInformationScreen = ({
       if (logo?.local && logo.uri) {
         setProgressIndicator(Observable.from(0));
 
-        const fileName = getFileName(logo.uri);
-        const mimeType = mime.lookup(fileName);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
-        });
-        const file: any = {
-          name: fileName,
-          uri: compressedFileUri,
-          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
-        };
-
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'logo',
-        });
+        const { file, uploadURL, uploadParameters } =
+          await prepareLogoForUpload(logo.uri);
         const { progress: uploadProgress, promise: uploadPromise } =
           uploadMedia(file, uploadURL, uploadParameters);
         setProgressIndicator(

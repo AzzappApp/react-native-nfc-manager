@@ -3,8 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { Image as ImageCompressor } from 'react-native-compressor';
-import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -12,7 +10,6 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
-import { Observable } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { PAYMENT_IS_ENABLED } from '#Config';
@@ -21,9 +18,12 @@ import {
   useRouter,
   ScreenModal,
 } from '#components/NativeRouter';
-import { getFileName } from '#helpers/fileHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
-import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
   parseContactCardPhoneNumber,
@@ -47,6 +47,7 @@ import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEdit
 import type { ContactCardEditRoute } from '#routes';
 import type { ContactCardFormValues } from './ContactCardSchema';
 import type { CountryCode } from 'libphonenumber-js';
+import type { Observable } from 'relay-runtime';
 
 const contactCardEditScreenQuery = graphql`
   query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
@@ -143,43 +144,17 @@ const ContactCardEditScreen = ({
     const uploads = [];
 
     if (avatar?.local && avatar.uri) {
-      setProgressIndicator(Observable.from(0));
-
-      const fileName = getFileName(avatar.uri);
-      const compressedFileUri = await ImageCompressor.compress(avatar.uri);
-      const file: any = {
-        name: fileName,
-        uri: compressedFileUri,
-        type: mime.lookup(fileName) || 'image/jpeg',
-      };
-
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'avatar',
-      });
+      const { file, uploadURL, uploadParameters } =
+        await prepareAvatarForUpload(avatar.uri);
       uploads.push(uploadMedia(file, uploadURL, uploadParameters));
     } else {
       uploads.push(null);
     }
 
     if (logo?.local && logo.uri) {
-      setProgressIndicator(Observable.from(0));
-
-      const fileName = getFileName(logo.uri);
-      const mimeType = mime.lookup(fileName);
-      const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-        output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
-      });
-      const file: any = {
-        name: fileName,
-        uri: compressedFileUri,
-        type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
-      };
-
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'logo',
-      });
+      const { file, uploadURL, uploadParameters } = await prepareLogoForUpload(
+        logo.uri,
+      );
       uploads.push(uploadMedia(file, uploadURL, uploadParameters));
     } else {
       uploads.push(null);

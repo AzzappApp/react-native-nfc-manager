@@ -9,8 +9,6 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from 'react-native';
-import { Image as ImageCompressor } from 'react-native-compressor';
-import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -28,10 +26,13 @@ import ProfileStatisticsChart, {
 } from '#components/ProfileStatisticsChart';
 import { contactCardFormFragment } from '#fragments/ContactCardEditFormFragment';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getFileName } from '#helpers/fileHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
-import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
   parsePhoneNumber,
@@ -175,39 +176,16 @@ const MultiUserDetailsScreen = ({
       const uploads = [];
 
       if (avatar?.local && avatar.uri) {
-        const fileName = getFileName(avatar.uri);
-        const compressedFileUri = await ImageCompressor.compress(avatar.uri);
-        const file: any = {
-          name: fileName,
-          uri: compressedFileUri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
-
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'avatar',
-        });
+        const { file, uploadURL, uploadParameters } =
+          await prepareAvatarForUpload(avatar.uri);
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } else {
         uploads.push(null);
       }
 
       if (logo?.local && logo.uri) {
-        const fileName = getFileName(logo.uri);
-        const mimeType = mime.lookup(fileName);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
-        });
-        const file: any = {
-          name: fileName,
-          uri: compressedFileUri,
-          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
-        };
-
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'logo',
-        });
+        const { file, uploadURL, uploadParameters } =
+          await prepareLogoForUpload(logo.uri);
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } else {
         uploads.push(null);
