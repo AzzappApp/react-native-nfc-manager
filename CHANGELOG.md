@@ -1,3 +1,7 @@
+## 1.9.2-canary.34
+
+* **fix:**  - replace bottomSheet for contact detail by a screen ([#8245](https://github.com/AzzappApp/azzapp/pull/8245))
+
 ## 1.9.2-canary.33
 
 * **fix:**  - keep logo in png
