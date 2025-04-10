@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
+  createId,
   createProfile,
   createUser,
   getProfileByUserAndWebCard,
@@ -8,6 +9,7 @@ import {
   referencesMedias,
   transaction,
   updateProfile,
+  updateUser,
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
@@ -79,9 +81,12 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   if (!owner || !user || !webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  if (webCard.cardIsPublished) {
-    await validateCurrentSubscription(owner.id, webCard.isMultiUser ? 1 : 2); //add owner
-  }
+
+  await validateCurrentSubscription(owner.id, {
+    webCardIsPublished: webCard.cardIsPublished,
+    action: 'UPDATE_MULTI_USER',
+    addedSeats: webCard.isMultiUser ? 1 : 2,
+  }); //add owner
 
   try {
     const { avatarId, logoId } = invited.contactCard ?? {};
@@ -106,6 +111,27 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
           email: invited.email,
           phoneNumber,
           invited: true,
+        });
+      } else if (existingUser && existingUser.deleted) {
+        if (existingUser.deletedBy !== existingUser.id) {
+          throw new GraphQLError(ERRORS.USER_IS_BLOCKED);
+        }
+
+        userId = await transaction(async () => {
+          const userId = createId();
+          await updateUser(existingUser.id, {
+            appleId: null,
+            email: null,
+            phoneNumber: null,
+            replacedBy: userId,
+          });
+          await createUser({
+            id: userId,
+            email: invited.email,
+            phoneNumber,
+            invited: true,
+          });
+          return userId;
         });
       } else {
         userId = existingUser.id;
@@ -184,9 +210,10 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       const locale = guessLocale(existingUser?.locale ?? user.locale);
       if (webCard.userName) {
         await sendPushNotification(existingUser.id, {
-          type: 'multiuser_invitation',
+          notification: {
+            type: 'multiuser_invitation',
+          },
           mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
           localeParams: { userName: webCard.userName },
           locale,
         });

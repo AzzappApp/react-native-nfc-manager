@@ -8,7 +8,11 @@ import {
   createId,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { invalidatePost, invalidateWebCard } from '#externals';
+import {
+  invalidatePost,
+  invalidateWebCard,
+  notifyWebCardUsers,
+} from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -32,7 +36,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
   },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  await checkWebCardProfileEditorRight(webCardId);
+  const profile = await checkWebCardProfileEditorRight(webCardId);
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -66,10 +70,13 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverId: createId(),
         coverIsPredefined: coverIsPredefined || false,
         coverIsLogoPredefined: false,
+        updatedAt: new Date(),
       };
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
+
+    notifyWebCardUsers(webCard, profile.userId);
 
     await notifyRelatedWalletPasses(webCardId, true);
 

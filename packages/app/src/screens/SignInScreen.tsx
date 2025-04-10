@@ -15,12 +15,15 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import OauthButtonsBar from '#components/OauthButtonsBar';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
+import useBoolean from '#hooks/useBoolean';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
+import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import Button from '#ui/Button';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
@@ -83,7 +86,7 @@ const SignInScreen = () => {
       ).catch(() => {});
       setClearPassword(true);
 
-      if (signedIn.issuer) {
+      if ('issuer' in signedIn) {
         router.push({
           route: 'CONFIRM_REGISTRATION',
           params: {
@@ -161,6 +164,9 @@ const SignInScreen = () => {
     setClearPassword(false);
   });
 
+  const [oauthLoading, setOauthIsLoading, setOauthIsNotLoading] =
+    useBoolean(false);
+
   const { height } = useScreenDimensions();
   const [panelHeight, setPanelHeight] = useState(height - 353);
   const onLayout = useCallback(
@@ -210,6 +216,12 @@ const SignInScreen = () => {
                 description="Signin Screen - Log in title"
               />
             </Text>
+          </View>
+          <View style={styles.buttonBarContainer}>
+            <OauthButtonsBar
+              onLoadingStart={setOauthIsLoading}
+              onLoadingEnd={setOauthIsNotLoading}
+            />
           </View>
           <View style={[styles.form, { marginBottom: insets.bottom }]}>
             <EmailOrPhoneInput
@@ -339,6 +351,12 @@ const SignInScreen = () => {
               </PressableOpacity>
             </View>
           </View>
+          {oauthLoading && (
+            <AzzappLogoLoader
+              backgroundOpacity={0.5}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
         </View>
       </Animated.View>
     </View>
@@ -381,7 +399,6 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   form: {
     paddingHorizontal: 20,
-    paddingTop: 20,
     gap: 20,
   },
   content: {
@@ -413,5 +430,8 @@ const stylesheet = createStyleSheet(appearance => ({
   header: {
     alignItems: 'center',
     paddingVertical: 10,
+  },
+  buttonBarContainer: {
+    paddingHorizontal: 20,
   },
 }));

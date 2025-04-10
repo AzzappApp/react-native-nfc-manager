@@ -7,5 +7,6 @@ module.exports = {
   moduleNameMapper: {
     '#(.*)': '<rootDir>/src/$1',
     '@azzapp/shared/(.*)': '<rootDir>/../shared/src/$1',
+    '@azzapp/service/(.*)': '<rootDir>/../service/src/$1',
   },
 };

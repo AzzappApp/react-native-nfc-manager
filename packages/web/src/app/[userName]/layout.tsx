@@ -99,6 +99,7 @@ const RootLayout = async ({
 
          `}
         </Script>
+        <div id="portal" />
       </body>
       <AxiomWebVitals />
     </html>

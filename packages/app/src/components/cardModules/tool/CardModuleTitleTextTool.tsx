@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { colors } from '#theme';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
-import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import RichTextButtons, {
+  textButtons,
+  titleButtons,
+} from '#ui/RichTextButtons';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
   DEFAULT_CARD_MODULE_TITLE,
 } from '../CardModuleBottomBar';
+import CardModuleToolHeaderButton from './CardModuleToolHeaderButton';
+import useRichTextManager from './useRichTextManager';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleData } from '../CardModuleBottomBar';
 
@@ -44,10 +47,42 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [text, setText] = useState(cardModuleTitleText?.text);
   const [title, setTitle] = useState(cardModuleTitleText?.title);
 
-  useEffect(() => {
-    setText(cardModuleTitleText?.text);
-    setTitle(cardModuleTitleText?.title);
-  }, [cardModuleTitleText]);
+  const [focusedInput, setFocusedInput] = useState<'text' | 'title'>('title');
+
+  //#endregion
+  const onTextFocus = () => {
+    setFocusedInput('text');
+  };
+  const onTitleFocus = () => {
+    setFocusedInput('title');
+  };
+  const {
+    onApplyTagPress: onTextApplyTagPress,
+    onSelectionChange: onTextSelectionChange,
+    onChangeText: onTextChangeText,
+    textAndSelection: textTextAndSelection,
+  } = useRichTextManager({
+    id: `text`,
+    defaultValue:
+      cardModuleTitleText?.text === DEFAULT_CARD_MODULE_TEXT
+        ? ''
+        : cardModuleTitleText?.text,
+    setText,
+  });
+
+  const {
+    onApplyTagPress: onTitleApplyTagPress,
+    onSelectionChange: onTitleSelectionChange,
+    onChangeText: onTitleChangeText,
+    textAndSelection: titleTextAndSelection,
+  } = useRichTextManager({
+    id: `title`,
+    defaultValue:
+      cardModuleTitleText?.title === DEFAULT_CARD_MODULE_TITLE
+        ? ''
+        : cardModuleTitleText?.title,
+    setText: setTitle,
+  });
 
   // onDismiss call when the popup dismiss in order to save
   const onDismiss = () => {
@@ -61,6 +96,12 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   };
 
   const { top: topInset } = useScreenInsets();
+
+  const onApplyTagPress =
+    focusedInput === 'text' ? onTextApplyTagPress : onTitleApplyTagPress;
+
+  const textAndSelectionInner =
+    focusedInput === 'text' ? textTextAndSelection : titleTextAndSelection;
 
   return (
     <>
@@ -95,14 +136,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           })}
           style={styles.header}
           rightElement={
-            <TouchableOpacity onPress={onDismiss} style={styles.doneButton}>
-              <Text variant="button" style={{ color: colors.white }}>
-                <FormattedMessage
-                  defaultMessage="Done"
-                  description="CardModuleTitleTextTool - Done header button label"
-                />
-              </Text>
-            </TouchableOpacity>
+            <CardModuleToolHeaderButton
+              onPress={onDismiss}
+              label={intl.formatMessage({
+                defaultMessage: 'Done',
+                description:
+                  'CardModuleMediaTitleTextTool - Done header button label',
+              })}
+            />
           }
         />
         <View style={styles.container}>
@@ -112,15 +153,17 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description="CardModuleMediaTextTool - Title and text"
             />
           </Text>
-          <BottomSheetTextInput
+          <BottomSheetTextEditor
             multiline
             placeholder={intl.formatMessage({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title === DEFAULT_CARD_MODULE_TITLE ? '' : title}
-            onChangeText={setTitle}
+            onChangeText={onTitleChangeText}
             style={styles.titleStyle}
+            onSelectionChange={onTitleSelectionChange}
+            onFocus={onTitleFocus}
+            textAndSelection={titleTextAndSelection}
           />
           <BottomSheetTextEditor
             multiline
@@ -129,9 +172,19 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text === DEFAULT_CARD_MODULE_TEXT ? '' : text}
-            onChangeText={setText}
             style={styles.textStyle}
+            onChangeText={onTextChangeText}
+            onSelectionChange={onTextSelectionChange}
+            onFocus={onTextFocus}
+            textAndSelection={textTextAndSelection}
+          />
+          <RichTextButtons
+            onPress={onApplyTagPress}
+            textAndSelection={textAndSelectionInner}
+            isFocused
+            enabledButtons={
+              focusedInput === 'title' ? titleButtons : textButtons
+            }
           />
         </View>
       </BottomSheetModal>
@@ -142,17 +195,6 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
 export default CardModuleMediaTextTool;
 
 const styles = StyleSheet.create({
-  doneButton: {
-    width: 74,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 0,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',

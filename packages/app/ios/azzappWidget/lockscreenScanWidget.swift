@@ -24,7 +24,7 @@ struct LockScreenScanWidget: Widget {
 
 struct LockScreenScanWidgetView: View {
     var entry: ScanProvider.Entry
-
+    let scheme = Bundle.main.infoDictionary?["AZZAPP_SCHEME"] as? String  ?? "azzapp"
     var body: some View {
         ZStack {
           Image("scan") // Use a system image for testing
@@ -32,7 +32,7 @@ struct LockScreenScanWidgetView: View {
              .scaledToFit()
              .frame(width: 40, height: 40)
         }
-       .widgetURL(URL(string: "azzapp://scan")) // Custom URL scheme to open the app on a special page, our 3 build target use the same url-scheme
+       .widgetURL(URL(string: "\(scheme)://scan")) // Custom URL scheme to open the app on a special page, our 3 build target use the same url-scheme
     }
 }
 

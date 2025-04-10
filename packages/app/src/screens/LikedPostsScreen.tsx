@@ -19,7 +19,6 @@ const likedPostsScreenQuery = graphql`
   query LikedPostsScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       ...LikedPostsScreen_profile @arguments(viewerWebCardId: $webCardId)
-      ...PostList_viewerWebCard
     }
   }
 `;
@@ -120,7 +119,6 @@ const LikedPostsScreen = ({
         refreshing={refreshing}
         onEndReached={onEndReached}
         onRefresh={onRefresh}
-        viewerWebCard={webCard}
       />
     </SafeAreaView>
   );

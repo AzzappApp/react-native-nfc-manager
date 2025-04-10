@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { graphql, useFragment } from 'react-relay';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -13,23 +14,35 @@ import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
+import type { AccountDetailsPasswordForm_currentUser$key } from '#relayArtifacts/AccountDetailsPasswordForm_currentUser.graphql';
 import type { GraphQLError } from 'graphql';
 import type { TextInput } from 'react-native';
-
-const passwordFormSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().regex(REGEX_PWD),
-});
-
-type PasswordForm = z.infer<typeof passwordFormSchema>;
 
 const AccountDetailsPasswordForm = ({
   visible,
   toggleBottomSheet,
+  user: userKey,
 }: {
   visible: boolean;
   toggleBottomSheet: () => void;
+  user: AccountDetailsPasswordForm_currentUser$key;
 }) => {
+  const user = useFragment(
+    graphql`
+      fragment AccountDetailsPasswordForm_currentUser on User {
+        hasPassword
+      }
+    `,
+    userKey,
+  );
+
+  const passwordFormSchema = z.object({
+    currentPassword: z.string().min(user.hasPassword ? 1 : 0),
+    newPassword: z.string().regex(REGEX_PWD),
+  });
+
+  type PasswordForm = z.infer<typeof passwordFormSchema>;
+
   const {
     control,
     handleSubmit,
@@ -63,6 +76,7 @@ const AccountDetailsPasswordForm = ({
         },
       },
       onCompleted: () => {
+        toggleBottomSheet();
         Toast.show({
           type: 'success',
           position: 'bottom',
@@ -70,7 +84,6 @@ const AccountDetailsPasswordForm = ({
             defaultMessage: 'Password changed successfully',
             description: 'Toast success message when updating password',
           }),
-          onHide: toggleBottomSheet,
         });
       },
       onError: error => {
@@ -135,44 +148,46 @@ const AccountDetailsPasswordForm = ({
         })}
       />
       <View style={styles.container}>
-        <Controller
-          control={control}
-          name="currentPassword"
-          render={({
-            field: { onChange, onBlur, value },
-            formState: { errors },
-          }) => (
-            <View style={styles.field}>
-              <View style={styles.input}>
-                <Text variant="medium">
-                  <FormattedMessage
-                    defaultMessage="Current password"
-                    description="Account Details - Change password form - current password label"
+        {user.hasPassword && (
+          <Controller
+            control={control}
+            name="currentPassword"
+            render={({
+              field: { onChange, onBlur, value },
+              formState: { errors },
+            }) => (
+              <View style={styles.field}>
+                <View style={styles.input}>
+                  <Text variant="medium">
+                    <FormattedMessage
+                      defaultMessage="Current password"
+                      description="Account Details - Change password form - current password label"
+                    />
+                  </Text>
+                  <SecuredTextInput
+                    value={value}
+                    onChangeText={onChange}
+                    testID="currentPasswordInput"
+                    onBlur={onBlur}
+                    isErrored={errors.currentPassword != null}
+                    onSubmitEditing={() => newPasswordRef.current?.focus()}
+                    blurOnSubmit={false}
+                    returnKeyType="next"
+                    autoFocus
                   />
-                </Text>
-                <SecuredTextInput
-                  value={value}
-                  onChangeText={onChange}
-                  testID="currentPasswordInput"
-                  onBlur={onBlur}
-                  isErrored={errors.currentPassword != null}
-                  onSubmitEditing={() => newPasswordRef.current?.focus()}
-                  blurOnSubmit={false}
-                  returnKeyType="next"
-                  autoFocus
-                />
+                </View>
+                {errors.currentPassword ? (
+                  <Text variant="error">
+                    <FormattedMessage
+                      defaultMessage="Please enter your current password"
+                      description="Error message when no current password is provided"
+                    />
+                  </Text>
+                ) : null}
               </View>
-              {errors.currentPassword ? (
-                <Text variant="error">
-                  <FormattedMessage
-                    defaultMessage="Please enter your current password"
-                    description="Error message when no current password is provided"
-                  />
-                </Text>
-              ) : null}
-            </View>
-          )}
-        />
+            )}
+          />
+        )}
         <Controller
           control={control}
           name="newPassword"

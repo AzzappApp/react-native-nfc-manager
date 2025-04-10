@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/payment",
-  "version": "1.8.24",
+  "version": "1.9.3",
   "private": true,
   "exports": {
     ".": {
@@ -41,6 +41,6 @@
     "@types/ms": "^0.7.34",
     "eslint": "^9.17.0",
     "openapi-typescript": "^7.5.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }

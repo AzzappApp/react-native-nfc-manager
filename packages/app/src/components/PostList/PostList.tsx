@@ -5,28 +5,32 @@ import { Alert, Dimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostRenderer from '#components/PostList/PostRenderer';
 import EmptyContent from '#components/ui/EmptyContent';
+import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import { PostListContext } from './PostListsContext';
+import type { ScrollableToOffset } from '#helpers/types';
 import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
-import type { PostList_viewerProfile$key } from '#relayArtifacts/PostList_viewerProfile.graphql';
-import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
-import type { ViewProps, ViewToken } from 'react-native';
+import type { MutableRefObject } from 'react';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ViewProps,
+  ViewToken,
+} from 'react-native';
 
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  viewerWebCard?: PostList_viewerWebCard$key | null;
-  profile?: PostList_viewerProfile$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -37,6 +41,13 @@ type PostListProps = ViewProps & {
   showUnpublished?: boolean;
   firstItemVideoTime?: number | null;
   onPostDeleted?: () => void;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  scrollableRef?: ScrollableToOffset;
 };
 
 const viewabilityConfig = {
@@ -49,8 +60,6 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 const PostList = ({
   posts: postKey,
   author: authorKey,
-  viewerWebCard: viewerWebCardKey,
-  profile: profileKey,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -60,6 +69,9 @@ const PostList = ({
   showUnpublished = false,
   firstItemVideoTime,
   onPostDeleted,
+  onScroll,
+  ListHeaderComponent,
+  scrollableRef,
   ...props
 }: PostListProps) => {
   const profileInfos = useProfileInfos();
@@ -89,26 +101,6 @@ const PostList = ({
 
   const intl = useIntl();
 
-  const viewerWebCard = useFragment(
-    graphql`
-      fragment PostList_viewerWebCard on WebCard {
-        id
-        cardIsPublished
-      }
-    `,
-    viewerWebCardKey ?? null,
-  );
-
-  const viewerProfile = useFragment(
-    graphql`
-      fragment PostList_viewerProfile on Profile {
-        id
-        invited
-      }
-    `,
-    profileKey ?? null,
-  );
-
   const author = useFragment(
     graphql`
       fragment PostList_author on WebCard {
@@ -119,8 +111,9 @@ const PostList = ({
   );
 
   const postActionEnabled = useMemo(() => {
-    if (viewerWebCard?.cardIsPublished != null) {
-      if (!viewerProfile?.invited) {
+    const authState = getAuthState();
+    if (authState.profileInfos?.cardIsPublished) {
+      if (!authState.profileInfos?.invited) {
         //card is not published. We can do action only
         // if we are the owner and we are displaying his own list of post (author is provided)
         if (
@@ -130,21 +123,17 @@ const PostList = ({
         ) {
           return true;
         }
-        return !!viewerWebCard?.cardIsPublished;
+        return !!authState.profileInfos?.cardIsPublished;
       }
       return false;
     } else {
       return false;
     }
-  }, [
-    author?.id,
-    profileInfos,
-    viewerProfile?.invited,
-    viewerWebCard?.cardIsPublished,
-  ]);
+  }, [author?.id, profileInfos]);
 
   const onActionDisabled = useCallback(() => {
-    if (!viewerWebCard?.cardIsPublished) {
+    const authState = getAuthState();
+    if (!authState.profileInfos?.cardIsPublished) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Unpublished WebCard.',
@@ -169,7 +158,7 @@ const PostList = ({
       );
     }
 
-    if (viewerProfile?.invited) {
+    if (authState.profileInfos?.invited) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Invitation pending.',
@@ -193,7 +182,7 @@ const PostList = ({
         ],
       );
     }
-  }, [intl, viewerProfile?.invited, viewerWebCard?.cardIsPublished]);
+  }, [intl]);
 
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;
@@ -312,35 +301,6 @@ const PostList = ({
     [loading],
   );
 
-  const insets = useScreenInsets();
-  const ListEmptyComponent = useMemo(
-    () => (
-      <View
-        style={{
-          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <EmptyContent
-          message={
-            <FormattedMessage
-              defaultMessage="No posts yet"
-              description="Empty post list message title"
-            />
-          }
-          description={
-            <FormattedMessage
-              defaultMessage="Seems like there is no post on this feed..."
-              description="Empty post list message content"
-            />
-          }
-        />
-      </View>
-    ),
-    [insets.bottom, insets.top],
-  );
-
   useEffect(() => {
     if (posts.length > 0) {
       const item = [
@@ -356,22 +316,53 @@ const PostList = ({
   return (
     <PostListContext.Provider value={visiblePostIds}>
       <FlashList
+        ref={scrollableRef as MutableRefObject<FlashList<any>>}
+        onScroll={onScroll}
         keyExtractor={keyExtractor}
         data={posts}
         renderItem={renderItem}
         onEndReached={onEndReached}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={ListFooterComponent}
         estimatedItemSize={300}
         onViewableItemsChanged={onViewableItemsChanged}
         onEndReachedThreshold={1}
         extraData={extraData}
         viewabilityConfig={viewabilityConfig}
-        ListEmptyComponent={ListEmptyComponent}
+        ListEmptyComponent={<PostListEmpty />}
         {...props}
       />
     </PostListContext.Provider>
+  );
+};
+
+const PostListEmpty = () => {
+  const insets = useScreenInsets();
+  return (
+    <View
+      style={{
+        height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No posts yet"
+            description="Empty post list message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like there is no post on this feed..."
+            description="Empty post list message content"
+          />
+        }
+      />
+    </View>
   );
 };
 

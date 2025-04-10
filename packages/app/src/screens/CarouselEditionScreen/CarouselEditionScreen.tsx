@@ -13,7 +13,6 @@ import {
   getCarouselDefaultColors,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker from '#components/ImagePicker';
 import {
@@ -109,13 +108,14 @@ const CarouselEditionScreen = ({
       fragment CarouselEditionScreen_profile on Profile {
         webCard {
           id
-          cardIsPublished
           coverBackgroundColor
-          isPremium
           cardColors {
             primary
             light
             dark
+          }
+          subscription {
+            issuer
           }
           cardStyle {
             borderColor
@@ -128,9 +128,6 @@ const CarouselEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
-          }
-          cardModules {
-            id
           }
           ...WebCardColorPicker_webCard
           ...CarouselEditionBorderPanel_webCard
@@ -232,9 +229,6 @@ const CarouselEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (carousel ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -356,20 +350,6 @@ const CarouselEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'carousel',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     setProgressIndicator(Observable.from(0));
 
     const { images, ...rest } = value;
@@ -486,9 +466,6 @@ const CarouselEditionScreen = ({
   }, [
     canSave,
     profile.webCard?.id,
-    profile.webCard?.cardIsPublished,
-    profile.webCard?.isPremium,
-    cardModulesCount,
     value,
     commit,
     carousel?.id,
@@ -523,7 +500,6 @@ const CarouselEditionScreen = ({
               description: 'Image carousel screen title',
             })}
             kind="carousel"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, View } from 'react-native';
 import {
@@ -8,6 +10,7 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import Toast from 'react-native-toast-message';
+import * as z from 'zod';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
@@ -24,6 +27,12 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ConfirmRegistrationRoute } from '#routes';
 
+const CELL_COUNT = 6;
+
+const codeFieldSchema = z.object({
+  code: z.string().length(CELL_COUNT),
+});
+
 const ConfirmRegistrationScreen = ({
   route: { params },
 }: NativeScreenProps<ConfirmRegistrationRoute>) => {
@@ -32,23 +41,34 @@ const ConfirmRegistrationScreen = ({
   const insets = useScreenInsets();
   const router = useRouter();
 
-  const [code, setCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    value: code,
-    setValue: setCode,
-  });
-
   const isEmail = isValidEmail(params.issuer);
 
-  const navigateToSignup = () => {
+  const navigateToSignup = useCallback(() => {
     router.replace({ route: 'SIGN_UP' });
-  };
+  }, [router]);
 
-  const onSubmit = async () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting, isValid },
+    setValue,
+  } = useForm({
+    defaultValues: {
+      code: '',
+    },
+    resolver: zodResolver(codeFieldSchema),
+    reValidateMode: 'onChange',
+  });
+
+  const currentCode = useWatch({ control, name: 'code' });
+  const ref = useBlurOnFulfill({ value: currentCode, cellCount: CELL_COUNT });
+
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    setValue: (text: string) => setValue('code', text),
+  });
+
+  const onSubmit = handleSubmit(async ({ code }: { code: string }) => {
     try {
-      setIsSubmitting(true);
       const tokens = await confirmRegistration({
         issuer: params.issuer,
         token: code,
@@ -91,8 +111,7 @@ const ConfirmRegistrationScreen = ({
         visibilityTime: 5000,
       });
     }
-    setIsSubmitting(false);
-  };
+  });
 
   return (
     <Container style={styles.flex}>
@@ -141,31 +160,37 @@ const ConfirmRegistrationScreen = ({
               </>
             )}
           </View>
-          <CodeField
-            ref={ref}
-            {...props}
-            value={code}
-            onChangeText={setCode}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            autoComplete={Platform.select({
-              android: 'sms-otp' as const,
-              default: 'one-time-code' as const,
-            })}
-            caretHidden={code !== ''}
-            textInputStyle={styles.textInputStyle}
-            renderCell={({ index, symbol, isFocused }) => (
-              <View
-                key={index}
-                style={[styles.cell, isFocused && styles.focusCell]}
-                onLayout={getCellOnLayoutHandler(index)}
-              >
-                <Text variant="large">
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              </View>
+          <Controller
+            control={control}
+            name="code"
+            render={({ field: { value, onChange } }) => (
+              <CodeField
+                ref={ref}
+                {...props}
+                value={value}
+                onChangeText={onChange}
+                cellCount={CELL_COUNT}
+                rootStyle={styles.codeFieldRoot}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                autoComplete={Platform.select({
+                  android: 'sms-otp' as const,
+                  default: 'one-time-code' as const,
+                })}
+                caretHidden={value !== ''}
+                textInputStyle={styles.textInputStyle}
+                renderCell={({ index, symbol, isFocused }) => (
+                  <View
+                    key={index}
+                    style={[styles.cell, isFocused && styles.focusCell]}
+                    onLayout={getCellOnLayoutHandler(index)}
+                  >
+                    <Text variant="large">
+                      {symbol || (isFocused ? <Cursor /> : null)}
+                    </Text>
+                  </View>
+                )}
+              />
             )}
           />
           <Button
@@ -180,7 +205,7 @@ const ConfirmRegistrationScreen = ({
             })}
             style={styles.button}
             onPress={onSubmit}
-            disabled={!(code.length === CELL_COUNT)}
+            disabled={!isValid}
             loading={isSubmitting}
           />
         </View>
@@ -206,7 +231,6 @@ const ConfirmRegistrationScreen = ({
     </Container>
   );
 };
-const CELL_COUNT = 6;
 
 const styleSheet = createStyleSheet(appearance => ({
   inner: {

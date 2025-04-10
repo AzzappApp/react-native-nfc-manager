@@ -3,7 +3,7 @@ import { RichText } from '../RichText';
 
 describe('RichText ui component', () => {
   test('simple snapshot', () => {
-    render(<RichText text="abc" />);
+    render(<RichText text="abc" fontSize={10} />);
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={{}}
@@ -23,29 +23,20 @@ describe('RichText ui component', () => {
   });
   test('simple snapshot with styles', () => {
     render(
-      <RichText
-        text="abc"
-        style={[{ fontSize: 20 }, { textAlign: 'center' }]}
-      />,
+      <RichText text="abc" style={{ textAlign: 'center' }} fontSize={20} />,
     );
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={
-          [
-            {
-              "fontSize": 20,
-            },
-            {
-              "textAlign": "center",
-            },
-          ]
+          {
+            "textAlign": "center",
+          }
         }
       >
         <Text
           style={
             [
               {
-                "fontSize": 20,
                 "textAlign": "center",
               },
               {},
@@ -59,7 +50,7 @@ describe('RichText ui component', () => {
   });
 
   test('simple snapshot with bold', () => {
-    render(<RichText text="<b>abc</b>" />);
+    render(<RichText text="<b>abc</b>" fontSize={10} />);
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={{}}
@@ -80,8 +71,8 @@ describe('RichText ui component', () => {
     `);
   });
   test('snapshot after append text', async () => {
-    const component = render(<RichText text="<b>abc</b>" />);
-    component.rerender(<RichText text="<b>abc</b>c" />);
+    const component = render(<RichText text="<b>abc</b>" fontSize={10} />);
+    component.rerender(<RichText text="<b>abc</b>c" fontSize={10} />);
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={{}}
@@ -113,8 +104,8 @@ describe('RichText ui component', () => {
   });
 
   test('snapshot after remove text', async () => {
-    const component = render(<RichText text="<b>abc</b>" />);
-    component.rerender(<RichText text="<b>ab</b>" />);
+    const component = render(<RichText text="<b>abc</b>" fontSize={10} />);
+    component.rerender(<RichText text="<b>ab</b>" fontSize={10} />);
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={{}}
@@ -136,8 +127,8 @@ describe('RichText ui component', () => {
   });
 
   test('snapshot after clean text', async () => {
-    const component = render(<RichText text="<b>abc</b>" />);
-    component.rerender(<RichText text="" />);
+    const component = render(<RichText text="<b>abc</b>" fontSize={10} />);
+    component.rerender(<RichText text="" fontSize={10} />);
     expect(screen.toJSON()).toMatchInlineSnapshot(`
       <Text
         style={{}}

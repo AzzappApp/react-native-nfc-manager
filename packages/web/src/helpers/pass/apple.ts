@@ -12,15 +12,10 @@ import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
 import icon2x from '@azzapp/web/public/pass/ICON_PADDING_15@2x.png';
 import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
 import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
-import { buildCoverImageUrl } from '#helpers/cover';
 import type { WebCard } from '@azzapp/data';
 
 const getCoverUrl = (webCard: WebCard, size: number) =>
-  buildCoverImageUrl(webCard, {
-    width: size,
-    height: size,
-    crop: 'lpad',
-  });
+  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
 
 export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
 

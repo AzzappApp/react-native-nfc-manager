@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
 import { getMediasByIds, type Profile, type WebCard } from '@azzapp/data';
+import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
+import { sendEmail, sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
@@ -13,8 +15,6 @@ import {
   buildUserUrlWithContactCard,
 } from '@azzapp/shared/urlHelpers';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
-import { buildAvatarUrl } from './avatar';
-import { sendEmail, sendTemplateEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
 import type { Locale } from '@azzapp/i18n';
@@ -267,7 +267,12 @@ export const notifyUsers = async (
               ),
             };
 
-            const avatarUrl = await buildAvatarUrl(profile, webCard);
+            const avatarUrl = await buildAvatarUrl(
+              profile,
+              webCard,
+              false,
+              false,
+            );
             if (avatarUrl) {
               const data = await fetch(avatarUrl);
               const blob = await data.arrayBuffer();

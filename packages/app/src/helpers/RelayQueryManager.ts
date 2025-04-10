@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
 import { getAuthState } from './authStore';
-import {
-  addEnvironmentListener,
-  getRelayEnvironment,
-} from './relayEnvironment';
+import { getRelayEnvironment } from './relayEnvironment';
 import type { ProfileInfos } from './authStore';
 import type {
   FetchPolicy,
@@ -79,21 +76,8 @@ const addListener = (screenId: string, listener: () => void) => {
   };
 };
 
-/**
- * Initialize the query manager
- */
-export const init = () => {
-  addEnvironmentListener(kind => {
-    switch (kind) {
-      case 'reset':
-        resetQueries();
-        break;
-    }
-  });
-};
-
 let resetTimeout: any = null;
-const resetQueries = () => {
+export const resetQueries = () => {
   clearTimeout(resetTimeout);
   // avoid some race conditions
   resetTimeout = setTimeout(() => {

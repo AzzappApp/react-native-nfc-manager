@@ -71,6 +71,35 @@ export const getImageURLForSize = ({
 };
 
 /**
+ * Helpers used to create cloudinary url for a round image given cloudinary id and size parameters
+ *
+ * @param id the id of the cloudinary file
+ * @param width the desired image width
+ * @param height the desired height
+ * @param pixelRatio the desired pixeld density - default 1
+ * @returns the url of a transformed image
+ */
+
+export const getRoundImageURLForSize = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  format,
+}: UrLForSizeParam) => {
+  assetNotRN('getImageURLForSize');
+  let transforms = resizeTransforms(
+    width,
+    height,
+    pixelRatio,
+    pregeneratedSizes,
+  );
+  transforms += ',r_max';
+  return assembleCloudinaryUrl(id, 'image', transforms, format ?? 'avif');
+};
+
+/**
  * Helpers used to create a video url from a cloudinary id
  *
  * @param id the id of the cloudinary file

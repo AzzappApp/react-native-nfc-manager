@@ -1,4 +1,5 @@
 import { compressToEncodedURIComponent } from 'lz-string';
+import { isDefined } from './isDefined';
 /**
  * Builds a user URL from a user name.
  */
@@ -49,9 +50,23 @@ export function buildUserUrlWithContactCard(
   userName: string,
   serializedContactCard: string,
   signature: string,
+  geolocation?: {
+    location?: {
+      latitude: number;
+      longitude: number;
+    } | null;
+    address?: {
+      city?: string | null;
+      country?: string | null;
+      subregion?: string | null;
+      region?: string | null;
+    } | null;
+  },
 ) {
   const compressedData = compressToEncodedURIComponent(
-    JSON.stringify([serializedContactCard, signature]),
+    JSON.stringify(
+      [serializedContactCard, signature, geolocation].filter(isDefined),
+    ),
   );
 
   return `${buildUserUrl(userName)}?c=${compressedData}`;

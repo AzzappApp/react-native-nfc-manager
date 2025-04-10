@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { toGlobalId } from 'graphql-relay';
 import {
   deleteUnusedAccounts,
   getProfilesByIds,
@@ -61,7 +62,9 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
       }
     });
 
-    return allProfiles ? [] : profilesToDelete.map(profile => profile.id);
+    return allProfiles
+      ? []
+      : profilesToDelete.map(profile => toGlobalId('Profile', profile.id));
   };
 
 export default removeUsersFromWebCard;

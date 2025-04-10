@@ -493,6 +493,7 @@ export const webCardTextFontsMap: Record<WebcardTextFonts, NextFont> = {
   CormorantGaramond_Regular,
   Archivo_Light,
   Inter_Regular,
+  CormorantGaramond_Bold,
 };
 
 export const webCardTextFontsVariantsMap: Record<WebcardTextFonts, NextFont> = {

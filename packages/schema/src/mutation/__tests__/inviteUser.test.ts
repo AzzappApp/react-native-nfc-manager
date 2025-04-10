@@ -4,6 +4,7 @@ import {
   createUser,
   getProfileByUserAndWebCard,
   getUserByEmailPhoneNumber,
+  updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
@@ -28,6 +29,8 @@ jest.mock('@azzapp/data', () => ({
   transaction: jest.fn(callback => callback()),
   updateProfile: jest.fn(),
   updateWebCard: jest.fn(),
+  updateUser: jest.fn(),
+  createId: jest.fn(() => 'new-id'),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -260,5 +263,63 @@ describe('inviteUserMutation', () => {
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS));
+  });
+
+  test('should recreate deleted user and update old user as replaced', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-123');
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue({
+      ...mockWebCard,
+      isMultiUser: true,
+    });
+    (webCardOwnerLoader.load as jest.Mock).mockResolvedValue(mockOwner);
+    (userLoader.load as jest.Mock).mockResolvedValue({ id: 'user-1' });
+    (getUserByEmailPhoneNumber as jest.Mock).mockResolvedValue({
+      id: 'deleted-user-1',
+      email: 'deleted@example.com',
+      deleted: true,
+      deletedBy: 'deleted-user-1',
+    });
+    (createUser as jest.Mock).mockResolvedValue('new-user-1');
+    (createProfile as jest.Mock).mockResolvedValue('new-profile-123');
+    (getProfileByUserAndWebCard as jest.Mock).mockResolvedValue(null);
+
+    const result = await inviteUserMutation(
+      {},
+      {
+        profileId: 'global-profile-123',
+        invited: {
+          email: 'deleted@example.com',
+          profileRole: 'user',
+          contactCard: {},
+        },
+        sendInvite: false,
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(createUser).toHaveBeenCalledWith({
+      id: 'new-id',
+      email: 'deleted@example.com',
+      phoneNumber: undefined,
+      invited: true,
+    });
+
+    expect(updateUser).toHaveBeenCalledWith('deleted-user-1', {
+      appleId: null,
+      email: null,
+      phoneNumber: null,
+      replacedBy: 'new-id',
+    });
+
+    expect(result).toEqual({
+      profile: expect.objectContaining({
+        id: 'new-profile-123',
+        userId: 'new-id',
+        profileRole: 'user',
+      }),
+    });
   });
 });

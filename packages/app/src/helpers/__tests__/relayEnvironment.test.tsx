@@ -43,19 +43,14 @@ describe('relayEnvironment', () => {
   });
 
   test('the environment should be recreated when the user log out', () => {
-    const environmentListener = jest.fn();
-    relayEnvironment.addEnvironmentListener(environmentListener);
-
     const environment = relayEnvironment.getRelayEnvironment();
     dispatchAuthState({ authenticated: true, profileInfos: null });
-    expect(environmentListener).not.toHaveBeenCalled();
     expect(relayEnvironment.getRelayEnvironment()).toBe(environment);
 
     dispatchAuthState({ authenticated: false, profileInfos: null });
     const newEnvironment = relayEnvironment.getRelayEnvironment();
     expect(newEnvironment).not.toBe(null);
     expect(newEnvironment).not.toBe(environment);
-    expect(environmentListener).toHaveBeenCalledTimes(1);
   });
 
   describe('Network', () => {

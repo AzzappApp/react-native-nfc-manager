@@ -34,18 +34,12 @@ import type { PostRoute } from '#routes';
 import type { ForwardedRef } from 'react';
 
 const postScreenQuery = graphql`
-  query PostScreenQuery($postId: ID!, $webCardId: ID!, $profileId: ID!) {
+  query PostScreenQuery($postId: ID!, $webCardId: ID!) {
     post: node(id: $postId) {
       id
       ...PostList_posts
         @arguments(includeAuthor: true, viewerWebCardId: $webCardId)
       ...PostScreenFragment_relatedPosts @arguments(viewerWebCardId: $webCardId)
-    }
-    webCard: node(id: $webCardId) {
-      ...PostList_viewerWebCard
-    }
-    profile: node(id: $profileId) {
-      ...PostList_viewerProfile
     }
   }
 `;
@@ -63,10 +57,7 @@ const PostScreen = ({
     router.back();
   };
 
-  const { post, webCard, profile } = usePreloadedQuery(
-    postScreenQuery,
-    preloadedQuery,
-  );
+  const { post } = usePreloadedQuery(postScreenQuery, preloadedQuery);
 
   const ready = useDidAppear();
 
@@ -123,7 +114,7 @@ const PostScreen = ({
           />
         }
       />
-      {!post || !webCard || !profile ? (
+      {!post ? (
         <View style={styles.noPostContainer}>
           <Text variant="large">
             <FormattedMessage
@@ -145,8 +136,6 @@ const PostScreen = ({
           <PostList
             canPlay={ready && hasFocus}
             posts={posts}
-            viewerWebCard={webCard}
-            profile={profile}
             onEndReached={onEndReached}
             loading={loading}
             firstItemVideoTime={videoTime}
@@ -202,7 +191,6 @@ export default relayScreen(PostScreen, {
   getVariables: ({ postId }, profileInfos) => ({
     postId,
     webCardId: profileInfos?.webCardId ?? '',
-    profileId: profileInfos?.profileId ?? '',
   }),
 });
 

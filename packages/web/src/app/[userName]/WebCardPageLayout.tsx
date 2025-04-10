@@ -9,8 +9,10 @@ import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import { displayName } from '#helpers/contactCardHelpers';
 import DisplayWebCard from './WebCard';
 import WebCardPreview from './WebCardPreview';
+import type { VerifySignToken } from '#app/api/verifySign/route';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { JwtPayload } from 'jwt-decode';
 import type { PropsWithChildren } from 'react';
 
@@ -23,6 +25,7 @@ type WebCardPageLayoutProps = PropsWithChildren<{
   userName: string;
   color: string | null;
   isAzzappPlus: boolean;
+  cardStyle: CardStyle;
 }>;
 
 const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
@@ -35,6 +38,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
     lastModuleBackgroundColor,
     color,
     isAzzappPlus,
+    cardStyle,
   } = props;
   const searchParams = useSearchParams();
   const isShareBack = !!searchParams.get('c') || !!searchParams.get('token');
@@ -53,14 +57,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
 
   const shareBackModal = useRef<ModalActions>(null);
 
-  type DownloadVCardJwtPayload = JwtPayload & {
-    userId: string;
-    avatarUrl?: string;
-    isMultiUser: boolean;
-    firstName?: string;
-    lastName?: string;
-    company?: string;
-  };
+  type DownloadVCardJwtPayload = JwtPayload & VerifySignToken;
 
   const handleCloseDownloadVCard = useCallback(
     ({ token }: { token?: string }) => {
@@ -71,7 +68,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
             userId: tokenDecoded.userId,
             webcardId: webCard?.id,
             avatarUrl: tokenDecoded.avatarUrl ?? '',
-            isMultiUser: tokenDecoded.isMultiUser,
+            isMultiUser: !!tokenDecoded.isMultiUser,
             token,
             firstName: tokenDecoded.firstName ?? '',
             lastName: tokenDecoded.lastName ?? '',
@@ -147,6 +144,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
           handleCloseDownloadVCard={handleCloseDownloadVCard}
           isShareBack={isShareBack}
           isAzzappPlus={isAzzappPlus}
+          cardStyle={cardStyle}
         >
           {children}
         </DisplayWebCard>

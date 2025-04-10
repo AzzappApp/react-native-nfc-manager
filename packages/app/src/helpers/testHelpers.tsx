@@ -5,6 +5,7 @@ import { IntlProvider } from 'react-intl';
 
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ContextUploadProvider } from '#components/CoverEditor/CoverUploadContext';
 import { RouterProvider, useNativeRouter } from '#components/NativeRouter';
 import type { NativeRouter, RouterInit } from '#components/NativeRouter';
 import type { RenderResult } from '@testing-library/react-native';
@@ -42,14 +43,16 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <RouterProvider value={router}>
       <BottomSheetModalProvider>
-        <IntlProvider
-          textComponent={Text}
-          locale="fr"
-          defaultLocale="fr"
-          messages={{}}
-        >
-          <SafeAreaProvider>{children}</SafeAreaProvider>
-        </IntlProvider>
+        <ContextUploadProvider>
+          <IntlProvider
+            textComponent={Text}
+            locale="fr"
+            defaultLocale="fr"
+            messages={{}}
+          >
+            <SafeAreaProvider>{children}</SafeAreaProvider>
+          </IntlProvider>
+        </ContextUploadProvider>
       </BottomSheetModalProvider>
     </RouterProvider>
   );

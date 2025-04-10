@@ -14,6 +14,7 @@ import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
 import CoverRendererPreviewDesktop from './CoverRendererPreviewDesktop';
 import WebCardBackgroundPreview from './WebCardBackgroundPreview';
+import { FullScreenOverlay } from './WebCardPreviewFullScreenOverlay';
 import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { CardModuleDimension } from './cardModules/cardModuleEditorType';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
@@ -84,6 +85,7 @@ const WebCardPreview = ({
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         coverBackgroundColor
+        ...WebCardPreviewFullScreenOverlay_webCard
       }
     `,
     webCardKey,
@@ -155,54 +157,60 @@ const WebCardPreview = ({
           ],
         }}
       >
-        <Animated.ScrollView
-          style={[
-            styles.webCardContainer,
-            style,
-            { backgroundColor: swapColor(lastSectionColor, cardColors) },
-          ]}
-          contentOffset={contentOffset}
-          contentContainerStyle={{
-            paddingBottom: contentPaddingBottom / scale,
-          }}
-          onScroll={onScroll}
-          scrollEventThrottle={16}
+        <FullScreenOverlay
+          webCard={webCard}
+          width={webCardWidth}
+          height={webCardHeight}
         >
-          <View ref={contentRef}>
-            <WebCardBackgroundPreview
-              webCard={webCard}
-              overrideCardStyle={cardStyle}
-              overrideLastModule={cardModules.at(-1)}
-              style={styles.webCardBackground}
-            />
-            {viewMode === 'desktop' ? (
-              <CoverRendererPreviewDesktop
+          <Animated.ScrollView
+            style={[
+              styles.webCardContainer,
+              style,
+              { backgroundColor: swapColor(lastSectionColor, cardColors) },
+            ]}
+            contentOffset={contentOffset}
+            contentContainerStyle={{
+              paddingBottom: contentPaddingBottom / scale,
+            }}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+          >
+            <View ref={contentRef}>
+              <WebCardBackgroundPreview
                 webCard={webCard}
-                firstModule={cardModules.length ? cardModules[0] : undefined}
-                videoEnabled
+                overrideCardStyle={cardStyle}
+                overrideLastModule={cardModules.at(-1)}
+                style={styles.webCardBackground}
               />
-            ) : (
-              <CoverRenderer
-                webCard={webCard}
-                width={windowWidth}
-                large
-                canPlay
-              />
-            )}
-            {cardModules.map((module, index) => (
-              <CardModule
-                module={module}
-                key={index}
-                cardColors={cardColors}
-                cardStyle={cardStyle}
-                viewMode={viewMode}
-                coverBackgroundColor={webCard.coverBackgroundColor}
-                scrollPosition={scrollPosition}
-                dimension={{ width: webCardWidth, height: webCardHeight }}
-              />
-            ))}
-          </View>
-        </Animated.ScrollView>
+              {viewMode === 'desktop' ? (
+                <CoverRendererPreviewDesktop
+                  webCard={webCard}
+                  firstModule={cardModules.length ? cardModules[0] : undefined}
+                  videoEnabled
+                />
+              ) : (
+                <CoverRenderer
+                  webCard={webCard}
+                  width={windowWidth}
+                  large
+                  canPlay
+                />
+              )}
+              {cardModules.map((module, index) => (
+                <CardModule
+                  module={module}
+                  key={index}
+                  cardColors={cardColors}
+                  cardStyle={cardStyle}
+                  viewMode={viewMode}
+                  coverBackgroundColor={webCard.coverBackgroundColor}
+                  scrollPosition={scrollPosition}
+                  dimension={{ width: webCardWidth, height: webCardHeight }}
+                />
+              ))}
+            </View>
+          </Animated.ScrollView>
+        </FullScreenOverlay>
       </View>
     </View>
   );

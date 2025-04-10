@@ -1,14 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import {
+  graphql,
+  useFragment,
+  useMutation,
+  usePreloadedQuery,
+} from 'react-relay';
 import { Observable } from 'relay-runtime';
+import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import {
   preventModalDismiss,
   useRouter,
@@ -19,7 +26,7 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
@@ -30,10 +37,12 @@ import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
+import { contactCardFormFragment } from '../../fragments/ContactCardEditFormFragment';
 import ContactCardEditForm from './ContactCardEditForm';
 import { contactCardSchema } from './ContactCardSchema';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactCardEditFormFragment_profile$key } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardEditRoute } from '#routes';
 import type { ContactCardFormValues } from './ContactCardSchema';
@@ -43,79 +52,8 @@ const contactCardEditScreenQuery = graphql`
   query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
-        id
-        webCard {
-          userName
-          isMultiUser
-          commonInformation {
-            company
-            addresses {
-              address
-              label
-            }
-            emails {
-              label
-              address
-            }
-            phoneNumbers {
-              label
-              number
-            }
-            urls {
-              address
-            }
-            socials {
-              label
-              url
-            }
-          }
-          logo {
-            id
-            uri: uri(width: 180, pixelRatio: $pixelRatio)
-          }
-        }
-        contactCard {
-          firstName
-          lastName
-          title
-          company
-          emails {
-            label
-            address
-            selected
-          }
-          phoneNumbers {
-            label
-            number
-            selected
-          }
-          urls {
-            address
-            selected
-          }
-          addresses {
-            address
-            label
-            selected
-          }
-          birthday {
-            birthday
-            selected
-          }
-          socials {
-            url
-            label
-            selected
-          }
-        }
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-        }
+        ...ContactCardEditFormFragment_profile
+          @arguments(pixelRatio: $pixelRatio)
       }
     }
   }
@@ -131,13 +69,16 @@ const ContactCardEditScreen = ({
 
   const profile = node?.profile;
 
-  const { id, contactCard, webCard, avatar, logo } = profile ?? {
-    id: null,
-    contactCard: null,
-    webCard: null,
-    avatar: null,
-    logo: null,
-  };
+  const {
+    contactCard,
+    avatar,
+    logo,
+    webCard,
+    id: profileId,
+  } = useFragment(
+    contactCardFormFragment,
+    profile as ContactCardEditFormFragment_profile$key,
+  );
 
   const [commit, loading] = useMutation(graphql`
     mutation ContactCardEditScreenMutation(
@@ -148,54 +89,12 @@ const ContactCardEditScreen = ({
     ) {
       saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
-          id
-          contactCardUrl
-          contactCard {
-            firstName
-            lastName
-            title
-            company
-            emails {
-              label
-              address
-              selected
-            }
-            phoneNumbers {
-              label
-              number
-              selected
-            }
-            urls {
-              address
-              selected
-            }
-            addresses {
-              address
-              label
-              selected
-            }
-            birthday {
-              birthday
-              selected
-            }
-            socials {
-              url
-              label
-              selected
-            }
-          }
+          ...ContactCardEditFormFragment_profile
+            @arguments(pixelRatio: $pixelRatio)
           contactCardUrl
           contactCardQrCode(width: $width)
           lastContactCardUpdate
           createdAt
-          avatar {
-            id
-            uri: uri(width: 112, pixelRatio: $pixelRatio)
-          }
-          logo {
-            id
-            uri: uri(width: 180, pixelRatio: $pixelRatio)
-          }
         }
       }
     }
@@ -203,27 +102,37 @@ const ContactCardEditScreen = ({
 
   const intl = useIntl();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<ContactCardFormValues>({
-    mode: 'onBlur',
-    shouldFocusError: true,
-    resolver: zodResolver(contactCardSchema),
-    defaultValues: {
+  const defaultValues = useMemo(() => {
+    return {
       ...contactCard,
       company: contactCard?.company ?? '',
       emails: contactCard?.emails?.map(m => ({ ...m })) ?? [],
-      phoneNumbers: contactCard?.phoneNumbers?.map(parsePhoneNumber) ?? [],
+      phoneNumbers:
+        contactCard?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
       urls: contactCard?.urls?.map(p => ({ ...p })) ?? [],
       addresses: contactCard?.addresses?.map(p => ({ ...p })) ?? [],
       birthday: contactCard?.birthday,
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
-      logo,
-    },
+      logo: webCard?.isMultiUser ? webCard?.logo || logo : logo,
+    };
+  }, [avatar, contactCard, logo, webCard?.isMultiUser, webCard?.logo]);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<ContactCardFormValues>({
+    mode: 'onBlur',
+    shouldFocusError: true,
+    resolver: zodResolver(contactCardSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
@@ -257,11 +166,14 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(logo.uri);
-      const compressedFileUri = await ImageCompressor.compress(logo.uri);
+      const mimeType = mime.lookup(fileName);
+      const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+        output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
+      });
       const file: any = {
         name: fileName,
         uri: compressedFileUri,
-        type: mime.lookup(fileName) || 'image/jpeg',
+        type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
       };
 
       const { uploadURL, uploadParameters } = await uploadSign({
@@ -294,9 +206,16 @@ const ContactCardEditScreen = ({
     const logoId =
       logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+    if (avatar?.local) {
+      addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+    }
+    if (logo?.local) {
+      addLocalCachedMediaFile(logoId, 'image', logo.uri);
+    }
+
     commit({
       variables: {
-        profileId: id,
+        profileId,
         contactCard: {
           ...data,
           emails: data.emails?.filter(email => email.address),
@@ -314,38 +233,23 @@ const ContactCardEditScreen = ({
           birthday: data.birthday,
           socials: data.socials?.filter(social => social.url),
           avatarId,
-          logoId,
+          logoId: !webCard?.isMultiUser || !webCard?.logo ? logoId : undefined,
         },
         pixelRatio: CappedPixelRatio(),
         width: QRCodeWidth(),
       },
       onCompleted: () => {
-        if (avatarId && avatar?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${avatarId}`,
-            'image',
-            avatar.uri,
-          );
-          // FIXME why not logoId ???
-        }
-        if (logo && logo?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${logoId}`,
-            'image',
-            logo.uri,
-          );
-        }
-
+        setProgressIndicator(null);
         router.back();
       },
       updater: store => {
-        if (id) {
+        if (profileId) {
           const user = store.getRoot().getLinkedRecord('currentUser');
           const profiles = user?.getLinkedRecords('profiles');
 
           if (profiles) {
             const profile = profiles?.find(
-              profile => profile.getDataID() === id,
+              profile => profile.getDataID() === profileId,
             );
 
             if (profile) {
@@ -358,7 +262,23 @@ const ContactCardEditScreen = ({
         }
       },
       onError: e => {
+        setProgressIndicator(null);
         console.error(e);
+        if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+          if (PAYMENT_IS_ENABLED) {
+            router.push({ route: 'USER_PAY_WALL' });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'You can’t create such type of contact cards.',
+                description:
+                  'Error toast message when user tries to create a premium contact card on android without a subscription',
+              }),
+            });
+          }
+          return;
+        }
         Toast.show({
           type: 'error',
           text1: intl.formatMessage(
@@ -416,7 +336,7 @@ const ContactCardEditScreen = ({
           }
         />
 
-        {webCard && <ContactCardEditForm webCard={webCard} control={control} />}
+        <ContactCardEditForm webCard={webCard} control={control} />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}

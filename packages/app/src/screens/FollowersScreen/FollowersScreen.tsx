@@ -4,11 +4,11 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
-import SafeAreaView from '#ui/SafeAreaView';
 import SearchBar from '#ui/SearchBar';
 import FollowersScreenList from './FollowersScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -34,36 +34,35 @@ const FollowersScreen = ({
   const { webCard } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const router = useRouter();
+  const { top } = useScreenInsets();
 
   return (
-    <Container style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              iconSize={28}
-              onPress={router.back}
-              style={styles.back}
-            />
-          }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Followers',
-            description: 'Title of the screen listing followers',
-          })}
-        />
-        <View style={styles.header}>
-          <SearchBar onChangeText={setSearchValue} value={searchValue} />
-        </View>
-        <Suspense fallback={<LoadingView />}>
-          <FollowersScreenList
-            isPublic={!webCard?.cardIsPrivate}
-            currentWebCardId={webCard?.id ?? ''}
-            webCard={webCard ?? null}
-            searchValue={searchValue}
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        leftElement={
+          <IconButton
+            icon="arrow_left"
+            iconSize={28}
+            onPress={router.back}
+            style={styles.back}
           />
-        </Suspense>
-      </SafeAreaView>
+        }
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Followers',
+          description: 'Title of the screen listing followers',
+        })}
+      />
+      <View style={styles.header}>
+        <SearchBar onChangeText={setSearchValue} value={searchValue} />
+      </View>
+      <Suspense fallback={<LoadingView />}>
+        <FollowersScreenList
+          isPublic={!webCard?.cardIsPrivate}
+          currentWebCardId={webCard?.id ?? ''}
+          webCard={webCard ?? null}
+          searchValue={searchValue}
+        />
+      </Suspense>
     </Container>
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import { FormattedMessage, useIntl } from 'react-intl';
-import { colors } from '@azzapp/shared/colorsHelpers';
 import { Button } from '#ui';
 import styles from './CopySignatureButton.css';
 import renderFullEmailSignature from './renderFullEmailSignature';
@@ -39,10 +38,9 @@ const CopySignatureButton = ({
             saveContactURL,
           })
         : renderSaveMyContactButton({
-            primaryColor: colors.white,
+            primaryColor: '#000',
             saveContactMessage,
             saveContactURL,
-            border: true,
           });
     await navigator.clipboard.write([
       new ClipboardItem({

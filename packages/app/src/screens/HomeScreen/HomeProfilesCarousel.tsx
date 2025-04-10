@@ -23,6 +23,7 @@ import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
+import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
@@ -159,6 +160,12 @@ const HomeProfilesCarousel = (
       // new profile has been created (typically from invitation).
       // scroll to the same selected profile.
       setSelectedIndex(index + 1);
+      const timeout = setTimeout(() => {
+        scrollToIndex(index + 1, false);
+      }, 100);
+      return () => {
+        clearTimeout(timeout);
+      };
     } else {
       // profile has been removed,
       // scroll to previous available profile.
@@ -418,6 +425,12 @@ const ItemRenderComponent = ({
   const isMultiUser =
     profile.webCard?.isMultiUser || profile.webCard?.webCardKind === 'business';
 
+  const { coverUploadingData } = useCoverUpload();
+
+  const isPredefined =
+    coverUploadingData?.webCardId !== profile.webCard?.id &&
+    profile.webCard?.coverIsPredefined;
+
   return (
     <>
       <Pressable
@@ -455,7 +468,7 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            {profile.webCard?.coverIsPredefined ? (
+            {isPredefined ? (
               <PressableScaleHighlight
                 style={containerStyle}
                 onLongPress={openWebcardModal}

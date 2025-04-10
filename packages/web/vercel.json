@@ -29,5 +29,22 @@
       "source": "/",
       "destination": "https://web.azzapp.com/"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "api.dev.azzapp.com" }],
+      "destination": "https://dev.azzapp.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "api.staging.azzapp.com" }],
+      "destination": "https://staging.azzapp.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "api.azzapp.com" }],
+      "destination": "https://azzapp.com/api/$1"
+    }
   ]
 }

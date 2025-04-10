@@ -30,24 +30,19 @@ import CoverTemplateTagSelector, {
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CoverTemplateSelectionScreenBody_listProfile$key } from '#relayArtifacts/CoverTemplateSelectionScreenBody_listProfile.graphql';
 import type { CoverTemplateSelectionScreenBody_profile$key } from '#relayArtifacts/CoverTemplateSelectionScreenBody_profile.graphql';
-import type { CoverTemplateSelectionScreenPremiumIndicator_currentUser$key } from '#relayArtifacts/CoverTemplateSelectionScreenPremiumIndicator_currentUser.graphql';
-import type { CoverTemplateSelectionScreenPremiumIndicator_profile$key } from '#relayArtifacts/CoverTemplateSelectionScreenPremiumIndicator_profile.graphql';
 import type { CoverTemplateSelectionScreenQuery } from '#relayArtifacts/CoverTemplateSelectionScreenQuery.graphql';
 import type { CoverTemplateSelectionRoute } from '#routes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 
 const query = graphql`
   query CoverTemplateSelectionScreenQuery($profileId: ID!) {
-    currentUser {
-      ...CoverTemplateSelectionScreenPremiumIndicator_currentUser
-    }
     profile: node(id: $profileId) {
       ...CoverTemplateSelectionScreenBody_profile
-      ...CoverTemplateSelectionScreenPremiumIndicator_profile
       ... on Profile {
         webCard {
           webCardKind
           cardIsPublished
+          isPremium
         }
         invited
       }
@@ -67,8 +62,10 @@ const CoverTemplateSelectionScreen = ({
     router.back();
   }, [router]);
 
-  const { profile, currentUser } =
-    usePreloadedQuery<CoverTemplateSelectionScreenQuery>(query, preloadedQuery);
+  const { profile } = usePreloadedQuery<CoverTemplateSelectionScreenQuery>(
+    query,
+    preloadedQuery,
+  );
 
   useEffect(() => {
     if (profile?.invited) {
@@ -122,10 +119,18 @@ const CoverTemplateSelectionScreen = ({
                   description: 'Cover Template Selection Screen - screen title',
                 })}
               </Text>
-              <CoverTemplateSelectionScreenPremiumIndicator
-                currentUser={currentUser}
-                profile={profile}
-              />
+              {!profile?.webCard?.isPremium && (
+                <View style={styles.proContainer}>
+                  <Text variant="medium" style={styles.proText}>
+                    <FormattedMessage
+                      defaultMessage="azzapp+ WebCard{azzappA}"
+                      values={{ azzappA: <Text variant="azzapp">a</Text> }}
+                      description="Cover creation with pro template"
+                    />
+                  </Text>
+                  <PremiumIndicator isRequired />
+                </View>
+              )}
             </View>
           )
         }
@@ -153,49 +158,6 @@ const CoverTemplateSelectionScreen = ({
         )}
       </Suspense>
     </Container>
-  );
-};
-
-const CoverTemplateSelectionScreenPremiumIndicator = ({
-  currentUser: currentUserKey,
-  profile: profileKey,
-}: {
-  currentUser: CoverTemplateSelectionScreenPremiumIndicator_currentUser$key | null;
-  profile: CoverTemplateSelectionScreenPremiumIndicator_profile$key | null;
-}) => {
-  const currentUser = useFragment(
-    graphql`
-      fragment CoverTemplateSelectionScreenPremiumIndicator_currentUser on User {
-        isPremium
-      }
-    `,
-    currentUserKey,
-  );
-
-  const profile = useFragment(
-    graphql`
-      fragment CoverTemplateSelectionScreenPremiumIndicator_profile on Profile {
-        webCard {
-          isPremium
-        }
-      }
-    `,
-    profileKey,
-  );
-
-  const styles = useStyleSheet(stylesheet);
-
-  return currentUser?.isPremium || profile?.webCard?.isPremium ? null : (
-    <View style={styles.proContainer}>
-      <Text variant="medium" style={styles.proText}>
-        <FormattedMessage
-          defaultMessage="azzapp+ WebCard{azzappA}"
-          values={{ azzappA: <Text variant="azzapp">a</Text> }}
-          description="Cover creation with pro template"
-        />
-      </Text>
-      <PremiumIndicator isRequired />
-    </View>
   );
 };
 

@@ -11,14 +11,13 @@ import client from '#client';
 import {
   calculateAmount,
   calculateAmountForSeats,
-  calculateAzzappPlusPrice,
   calculateNextPaymentIntervalInMinutes,
   calculateTaxes,
   generateRebillFailRule,
-  getAzzappPlusPrice,
   getPricePerSeat,
   MONTHLY_RECURRENCE,
   YEARLY_RECURRENCE,
+  REBILL_MANAGER_REBILL_DURATION,
 } from '#helpers';
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
@@ -63,12 +62,8 @@ const calculateSubscriptionUpdate = async (
       existingSubscription.subscriptionPlan,
     );
 
-    const azzappPlusPrice = calculateAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
     const { amount: taxes, rate } = await calculateTaxes(
-      amountForSeats + azzappPlusPrice,
+      amountForSeats,
       existingSubscription.subscriberCountryCode ?? undefined,
       existingSubscription.subscriberVatNumber ?? undefined,
     );
@@ -77,12 +72,8 @@ const calculateSubscriptionUpdate = async (
       firstPayment: null,
       firstPaymentNbMonths: null,
       recurringCost: {
-        amount: amountForSeats + azzappPlusPrice,
+        amount: amountForSeats,
         amountForSeats,
-        azzappPlusPerMonth: getAzzappPlusPrice(
-          existingSubscription.subscriptionPlan,
-        ),
-        amountAzzappPlus: azzappPlusPrice,
         pricePerSeat: getPricePerSeat(existingSubscription.subscriptionPlan),
         taxes,
         taxRate: rate,
@@ -109,18 +100,9 @@ const calculateSubscriptionUpdate = async (
         Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
     );
 
-    const azzappPlusPrice = calculateAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
-    const azzappPlusPriceForTheRestOfTheYear = Math.floor(
-      (azzappPlusPrice * intervalInMonths) /
-        Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
-    );
-
     const { amount: taxesForTheRestOfTheYear, rate: rateForTheRestOfTheYear } =
       await calculateTaxes(
-        amountForSeatsForTheRestOfTheYear + azzappPlusPriceForTheRestOfTheYear,
+        amountForSeatsForTheRestOfTheYear,
         existingSubscription.subscriberCountryCode ?? undefined,
         existingSubscription.subscriberVatNumber ?? undefined,
       );
@@ -131,38 +113,28 @@ const calculateSubscriptionUpdate = async (
     );
 
     const { amount: taxes, rate } = await calculateTaxes(
-      amountForSeats + azzappPlusPrice,
+      amountForSeats,
       existingSubscription.subscriberCountryCode ?? undefined,
       existingSubscription.subscriberVatNumber ?? undefined,
     );
 
     const pricePerSeat = getPricePerSeat(existingSubscription.subscriptionPlan);
 
-    const azzappPlusPerMonth = getAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
     return {
       firstPayment:
         intervalInMonths > 0
           ? {
-              amount:
-                amountForSeatsForTheRestOfTheYear +
-                azzappPlusPriceForTheRestOfTheYear,
+              amount: amountForSeatsForTheRestOfTheYear,
               amountForSeats: amountForSeatsForTheRestOfTheYear,
               taxes: taxesForTheRestOfTheYear,
               taxRate: rateForTheRestOfTheYear,
-              amountAzzappPlus: azzappPlusPriceForTheRestOfTheYear,
-              azzappPlusPerMonth,
               pricePerSeat,
             }
           : undefined,
       firstPaymentNbMonths: intervalInMonths > 0 ? intervalInMonths : 0,
       recurringCost: {
-        amount: amountForSeats + azzappPlusPrice,
+        amount: amountForSeats,
         amountForSeats,
-        azzappPlusPerMonth,
-        amountAzzappPlus: azzappPlusPrice,
         pricePerSeat,
         taxes,
         taxRate: rate,
@@ -281,7 +253,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
             rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
-            rebill_manager_rebill_duration_mins: `0`,
+            rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
@@ -395,7 +367,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? recurringCost.amount) + (firstPayment?.taxes ?? recurringCost.taxes)}`,
           rebill_manager_initial_duration_min: `${firstPayment ? intervalInMinutes : calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
-          rebill_manager_rebill_duration_mins: '0',
+          rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
@@ -539,7 +511,7 @@ export const upgradePlan = async (existingSubscription: UserSubscription) => {
           rebill_manager_initial_price_cnts: `${amount + taxes}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes + intervalInMinutesForPreviousSubscription}`,
           rebill_manager_rebill_price_cnts: `${amount + taxes}`,
-          rebill_manager_rebill_duration_mins: `0`,
+          rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
           rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),

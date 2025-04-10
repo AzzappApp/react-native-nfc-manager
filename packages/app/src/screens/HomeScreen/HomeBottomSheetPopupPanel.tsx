@@ -93,6 +93,9 @@ const HomeBottomSheetPopupPanel = ({
             id
             userName
           }
+          profile {
+            ...ContactCard_profile
+          }
         }
       }
     `);
@@ -116,10 +119,10 @@ const HomeBottomSheetPopupPanel = ({
   const { openTooltips } = useTooltipContext();
 
   const resetPopupState = useCallback(() => {
+    openTooltips(['profileEdit']);
     setCurrentPage(0);
     setError(undefined);
     setNewUserName('');
-    setTimeout(() => openTooltips(['profileEdit']), 1000);
   }, [openTooltips]);
 
   const userNameAlreadyExistsError = intl.formatMessage(

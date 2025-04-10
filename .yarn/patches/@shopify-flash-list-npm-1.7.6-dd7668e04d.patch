@@ -1,0 +1,37 @@
+diff --git a/package.json b/package.json
+index cad2bd7d6eebde52fca6f4d75e60c58141d30506..2bb1ec221a706df4471d5855514070556e8df3ea 100644
+--- a/package.json
++++ b/package.json
+@@ -88,6 +88,7 @@
+     "recyclerlistview": "4.2.3",
+     "tslib": "2.8.1"
+   },
++  "react-native": "src/index.ts",
+   "codegenConfig": {
+     "name": "rnflashlist",
+     "type": "components",
+diff --git a/src/FlashList.tsx b/src/FlashList.tsx
+index 0e9f071a53d113e85f3099ccf239d1f3d06361b6..9ca37a47c00480bb0e5a707e35a21e89983225e3 100644
+--- a/src/FlashList.tsx
++++ b/src/FlashList.tsx
+@@ -6,6 +6,7 @@ import {
+   NativeSyntheticEvent,
+   StyleSheet,
+   NativeScrollEvent,
++  ScrollViewComponent,
+ } from "react-native";
+ import {
+   BaseItemAnimator,
+@@ -842,6 +843,12 @@ class FlashList<T> extends React.PureComponent<
+     return this.rlvRef?.getScrollableNode?.() || null;
+   }
+ 
++  public getNativeScrollRef(): React.ElementRef<
++    typeof ScrollViewComponent
++  > | null {
++    return this.rlvRef?.getNativeScrollRef?.() || null;
++  }
++
+   /**
+    * Allows access to internal recyclerlistview. This is useful for enabling access to its public APIs.
+    * Warning: We may swap recyclerlistview for something else in the future. Use with caution.

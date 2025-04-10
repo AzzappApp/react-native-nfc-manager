@@ -1,20 +1,18 @@
 import { Video } from 'expo-av';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
-import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
@@ -25,11 +23,13 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.graphql';
 import type { OnboardingRoute } from '#routes';
 
-const WelcomeScreen = ({
+export const WelcomeScreen = ({
   hasFocus,
   preloadedQuery,
 }: RelayScreenProps<OnboardingRoute, WelcomeScreenQuery>) => {
   const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
+
+  useSetRevenueCatUserInfo(currentUser);
 
   const intl = useIntl();
 
@@ -43,10 +43,6 @@ const WelcomeScreen = ({
   }, [hasFocus]);
 
   const [showMenu, open, close] = useBoolean(false);
-
-  useEffect(() => {
-    dispatchGlobalEvent({ type: 'READY' });
-  }, []);
 
   const profileInfos = useProfileInfos();
 
@@ -64,17 +60,12 @@ const WelcomeScreen = ({
         invited: newProfile.invited,
       });
       router.replace({ route: 'HOME' });
+    } else if (currentUser?.profiles?.length === 0) {
+      onChangeWebCard(null);
     }
     profilesCountRef.current = currentUser?.profiles?.length;
   }, [currentUser, router]);
 
-  const goBackToHome = useCallback(() => {
-    if (profileInfos?.webCardId) {
-      router.replaceAll(mainRoutes(false));
-    }
-  }, [profileInfos, router]);
-
-  useFocusEffect(goBackToHome);
   const { width } = useWindowDimensions();
   const { top } = useScreenInsets();
   return profileInfos?.profileId ? (
@@ -97,7 +88,7 @@ const WelcomeScreen = ({
         source={require('../../assets/welcome/home_welcome.mp4')}
         isLooping
         isMuted
-        shouldPlay
+        shouldPlay={hasFocus}
         style={{
           width,
           height: width,
@@ -163,6 +154,7 @@ const welcomeScreenQuery = graphql`
         }
       }
       ...HomeBottomSheetPanel_user
+      ...useSetRevenueCatUserInfo_user
     }
   }
 `;

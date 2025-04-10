@@ -1,5 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
+  getProfileByUserAndWebCard,
+  getPublishedWebCardCount,
   getWebCardCountProfile,
   getWebCardPosts,
   updateWebCard,
@@ -23,21 +25,51 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     if (!webCard || !userId) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
+    if (webCard.cardIsPublished === published) {
+      return {
+        webCard,
+      };
+    }
 
     if (!webCard.coverMediaId && published) {
       throw new GraphQLError(ERRORS.MISSING_COVER);
     }
 
-    //checking if there is enough seats for the user
-    if (published && webCard.isMultiUser) {
-      const owner = await webCardOwnerLoader.load(webCardId);
-      //we first need to heck if this is an IAP subscription and enought seath
-      if (owner?.id) {
-        await validateCurrentSubscription(
-          owner.id,
-          await getWebCardCountProfile(webCardId),
-        );
-      }
+    const owner = await webCardOwnerLoader.load(webCardId);
+
+    if (!owner) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    const profile = await getProfileByUserAndWebCard(owner.id, webCardId);
+
+    if (!profile) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    if (webCard.isMultiUser) {
+      await validateCurrentSubscription(owner.id, {
+        webCardIsPublished: published,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: true,
+        webCardKind: webCard.webCardKind,
+        alreadyPublished: await getPublishedWebCardCount(owner.id),
+        addedSeats: await getWebCardCountProfile(webCardId),
+        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+        ownerContactCardHasLogo: !!profile.logoId,
+      });
+    } else {
+      await validateCurrentSubscription(owner.id, {
+        webCardIsPublished: published,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: false,
+        webCardKind: webCard.webCardKind,
+        alreadyPublished: await getPublishedWebCardCount(owner.id),
+        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+        ownerContactCardHasLogo: !!profile.logoId,
+      });
     }
 
     const updates = {

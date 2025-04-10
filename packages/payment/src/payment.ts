@@ -6,7 +6,7 @@ import {
   transaction,
   updatePayment,
   createId,
-  getUserWebSubscription,
+  getUserSubscriptions,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -16,6 +16,7 @@ import {
   calculateTaxes,
   generateRebillFailRule,
   getNextPaymentDate,
+  REBILL_MANAGER_REBILL_DURATION,
   signature,
   type SubscriptionPlan,
 } from './helpers';
@@ -73,6 +74,7 @@ export const getPaymentRequest = async (ulid: string) => {
 export const createPaymentRequest = async ({
   totalSeats,
   userId,
+  webCardId,
   locale,
   plan,
   customer,
@@ -81,6 +83,7 @@ export const createPaymentRequest = async ({
 }: {
   totalSeats: number;
   userId: string;
+  webCardId?: string;
   locale: string;
   plan: 'monthly' | 'yearly';
   redirectUrlSuccess: string;
@@ -123,6 +126,7 @@ export const createPaymentRequest = async ({
     OPERATIONTYPE: 'payment',
     EXTRADATA: JSON.stringify({
       userId,
+      webCardId,
     }),
     CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
     REDIRECTURLSUCCESS: redirectUrlSuccess,
@@ -176,9 +180,13 @@ export const createPaymentRequest = async ({
       maskedCard: '',
     });
 
-    const subscription = await getUserWebSubscription(userId);
+    const subscription = await getUserSubscriptions({
+      userIds: [userId],
+      issuers: ['web'],
+      onlyActive: true,
+    });
 
-    if (subscription && subscription.status === 'active') {
+    if (subscription.some(sub => sub.status === 'active')) {
       throw new Error('Subscription already active');
     }
     const subscriptionId = createId();
@@ -261,7 +269,7 @@ export const createSubscriptionRequest = async ({
         rebill_manager_initial_price_cnts: `${amount}`,
         rebill_manager_initial_duration_min: `${intervalInMinutes}`,
         rebill_manager_rebill_price_cnts: `${amount}`,
-        rebill_manager_rebill_duration_mins: `0`,
+        rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
         rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
         clientPaymentRequestUlid: paymentMean.id,
         rebill_manager_fail_rule: generateRebillFailRule(),

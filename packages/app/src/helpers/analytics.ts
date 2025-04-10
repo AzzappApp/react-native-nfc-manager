@@ -1,7 +1,27 @@
-import analytics from '@react-native-firebase/analytics';
+import {
+  firebase,
+  setUserId,
+  setConsent,
+  logScreenView,
+  logEvent as firebaseLogEvent,
+  logSignUp as firebaseLogSignUp,
+} from '@react-native-firebase/analytics';
 
-export function setAnalyticsUserId(profileId: string) {
-  analytics().setUserId(profileId).catch();
+export function setAnalyticsUserId(userId: string) {
+  setUserId(firebase.analytics(), userId).catch();
+}
+
+export async function setAnalyticsConsent(consents: {
+  analytics: boolean;
+  marketing: boolean;
+  functional: boolean;
+}) {
+  await setConsent(firebase.analytics(), {
+    ad_storage: consents.marketing,
+    analytics_storage: consents.analytics,
+    functional_storage: consents.functional,
+    security_storage: true,
+  });
 }
 
 /**
@@ -10,20 +30,18 @@ export function setAnalyticsUserId(profileId: string) {
  * @param {string} userId
  *
  */
-export function logSignUp(userId: string) {
-  analytics()
-    .setUserId(userId)
-    .then(() => {
-      analytics().logSignUp({ method: 'manual' });
+export async function logSignUp(userId: string) {
+  await setUserId(firebase.analytics(), userId)
+    .then(async () => {
+      await firebaseLogSignUp(firebase.analytics(), { method: 'manual' });
     })
     .catch();
 }
 
-export function logSignIn(userId: string) {
-  analytics()
-    .setUserId(userId)
-    .then(() => {
-      logEvent('sign_in', { userId });
+export async function logSignIn(userId: string) {
+  await setUserId(firebase.analytics(), userId)
+    .then(async () => {
+      await logEvent('sign_in', { userId });
     })
     .catch();
 }
@@ -37,7 +55,7 @@ export function logSignIn(userId: string) {
  * @param {{ [key: string]: any }} [params]
  */
 export async function logEvent(name: string, params?: { [key: string]: any }) {
-  analytics().logEvent(name, params);
+  await firebaseLogEvent(firebase.analytics(), name, params);
 }
 
 /**
@@ -47,7 +65,7 @@ export async function logEvent(name: string, params?: { [key: string]: any }) {
  * @param {string} screenName
  */
 export async function analyticsLogScreenEvent(screenName: string) {
-  await analytics().logScreenView({
+  await logScreenView(firebase.analytics(), {
     screen_name: screenName,
     screen_class: screenName,
   });

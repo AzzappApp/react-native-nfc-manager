@@ -169,7 +169,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       color: appearance === 'light' ? colors.white : colors.black,
     },
     disabled: {
-      backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey900,
+      backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey800,
     },
   },
   secondary: {

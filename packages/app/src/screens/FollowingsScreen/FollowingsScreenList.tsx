@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import EmptyContent from '#components/ui/EmptyContent';
 import WebCardList from '#components/WebCardList';
 import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
@@ -26,7 +28,7 @@ const FollowingsScreenList = ({
         @refetchable(queryName: "FollowingsListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 10 }
+          first: { type: Int, defaultValue: 50 }
           userName: { type: String, defaultValue: "" }
         ) {
           followings(after: $after, first: $first, userName: $userName)
@@ -46,7 +48,7 @@ const FollowingsScreenList = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext && !isRefreshing) {
-      loadNext(10);
+      loadNext(50);
     }
   }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
@@ -59,7 +61,7 @@ const FollowingsScreenList = ({
   useEffect(() => {
     // We need to refetch to see new coming followers (specially when we follow another webCard we have)
     refetch(
-      { first: 10, after: null },
+      { first: 50, after: null },
       {
         fetchPolicy: 'store-and-network',
       },
@@ -70,7 +72,7 @@ const FollowingsScreenList = ({
     if (debouncedSearch) {
       setIsRefreshing(true);
       const { dispose } = refetch(
-        { first: 10, userName: debouncedSearch, after: null },
+        { first: 50, userName: debouncedSearch, after: null },
         {
           fetchPolicy: 'store-and-network',
           onComplete() {
@@ -103,18 +105,43 @@ const FollowingsScreenList = ({
 
   return (
     <WebCardList
-      noProfileFoundLabel={intl.formatMessage({
-        defaultMessage: 'Not following anyone',
-        description:
-          'Message displayed in the followed profiles screen when the user is not following anyone',
-      })}
       users={convertToNonNullArray(
         data?.followings?.edges?.map(edge => edge?.node) ?? [],
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}
+      ListEmptyComponent={<FollowingScreenListEmpty />}
     />
   );
 };
+
+const FollowingScreenListEmpty = () => {
+  return (
+    <View style={styles.emptyScreenContainer}>
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No contact yet"
+            description="Empty following message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like you are not following anyone yet..."
+            description="Empty following list message content"
+          />
+        }
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  emptyScreenContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default FollowingsScreenList;

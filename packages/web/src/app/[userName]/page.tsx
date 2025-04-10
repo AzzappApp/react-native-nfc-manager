@@ -6,7 +6,8 @@ import {
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
   getWebCardsOwnerUsers,
-  getActiveUserSubscriptions,
+  getRedirectWebCardByUserName,
+  getUserSubscriptions,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -37,6 +38,12 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
   const webCard = await cachedGetWebCardByUserName(userName);
   if (!webCard) {
+    const redirection = await getRedirectWebCardByUserName(userName);
+
+    if (redirection.length > 0) {
+      return redirect(`/${redirection[0].toUserName}`);
+    }
+
     return notFound();
   }
 
@@ -47,7 +54,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   let isAzzappPlus = false;
   const owners = await getWebCardsOwnerUsers([webCard.id]);
   if (owners?.length && owners[0]?.id) {
-    const subscriptions = await getActiveUserSubscriptions([owners[0].id]);
+    const subscriptions = await getUserSubscriptions({
+      userIds: [owners[0].id],
+      onlyActive: true,
+    });
     isAzzappPlus = subscriptions.length > 0;
   }
 
@@ -150,6 +160,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       userName={params.userName}
       color={cardBackgroundColor}
       isAzzappPlus={isAzzappPlus}
+      cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
     >
       {modules.map(module => (
         <ModuleRenderer
@@ -173,7 +184,6 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const webCard = await cachedGetWebCardByUserName(params.userName);
-
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`
     : '';

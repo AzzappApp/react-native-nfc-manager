@@ -3,11 +3,11 @@
 import { revalidatePath } from 'next/cache';
 import {
   createSubscription,
-  getSubscriptionsOfUser,
   transaction,
   updateSubscription,
   createId,
   getSubscriptionById,
+  getUserSubscriptions,
 } from '@azzapp/data';
 import { endSubscription } from '@azzapp/payment';
 import type { UserSubscription } from '@azzapp/data';
@@ -17,7 +17,9 @@ export const setLifetimeSubscription = async (
   active: boolean,
 ) => {
   await transaction(async () => {
-    const existingLifetimeSubscription = (await getSubscriptionsOfUser(userId))
+    const existingLifetimeSubscription = (
+      await getUserSubscriptions({ userIds: [userId] })
+    )
       .filter(s => s.subscriptionPlan === 'web.lifetime')
       .at(0);
 

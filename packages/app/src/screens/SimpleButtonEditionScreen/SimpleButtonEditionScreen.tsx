@@ -12,7 +12,6 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -127,8 +126,6 @@ const SimpleButtonEditionScreen = ({
         webCard {
           coverBackgroundColor
           id
-          cardIsPublished
-          isPremium
           cardColors {
             primary
             dark
@@ -145,9 +142,6 @@ const SimpleButtonEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
-          }
-          cardModules {
-            id
           }
           ...SimpleButtonBordersEditionPanel_webCard
           ...SimpleButtonSettingsEditionPanel_webCard
@@ -253,9 +247,6 @@ const SimpleButtonEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (simpleButton ? 0 : 1);
-
   const onCancel = router.back;
 
   const handleProfileActionError = useHandleProfileActionError(
@@ -316,20 +307,6 @@ const SimpleButtonEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'simpleButton',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     const input: SaveSimpleButtonModuleInput = {
       ...value,
       moduleId: simpleButton?.id,
@@ -365,7 +342,6 @@ const SimpleButtonEditionScreen = ({
   }, [
     canSave,
     profile.webCard,
-    cardModulesCount,
     value,
     simpleButton?.id,
     fontSize,
@@ -413,7 +389,6 @@ const SimpleButtonEditionScreen = ({
               description: 'SimpleButton text screen title',
             })}
             kind="simpleButton"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

@@ -9,6 +9,7 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
+import useNotificationsEvent from '#hooks/useNotifications';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -19,8 +20,10 @@ import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
 
 import ContactScreenLists from './ContactsScreenLists';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
-import type { PreloadedQuery } from 'react-relay';
+import type { ContactsRoute } from '#routes';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
@@ -30,6 +33,7 @@ const contactsScreenQuery = graphql`
         nbContacts
         ...ContactsScreenLists_contacts
         webCard {
+          id
           ...CoverRenderer_webCard
           ...AccountHeader_webCard
         }
@@ -40,19 +44,34 @@ const contactsScreenQuery = graphql`
 
 const ContactsScreen = ({
   preloadedQuery,
-}: {
-  preloadedQuery: PreloadedQuery<ContactsScreenQuery>;
-}) => {
+  refreshQuery,
+}: RelayScreenProps<ContactsRoute, ContactsScreenQuery>) => {
   const router = useRouter();
   const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
 
   const styles = useStyleSheet(stylesheet);
 
-  const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
+  const [searchBy, setSearchBy] = useState<'date' | 'location' | 'name'>(
+    'date',
+  );
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
     useBoolean();
+
+  const onDeepLink = useCallback(
+    (notification: PushNotificationType) => {
+      if (
+        notification.type === 'shareBack' &&
+        notification.webCardId === profile?.webCard?.id
+      ) {
+        refreshQuery?.();
+      }
+    },
+    [profile?.webCard?.id, refreshQuery],
+  );
+
+  useNotificationsEvent({ onDeepLinkInApp: onDeepLink });
 
   const onCreateWithScanner = useCallback(() => {
     closeNewContactMenu();
@@ -81,7 +100,7 @@ const ContactsScreen = ({
       <Container style={styles.container}>
         {profile?.webCard && (
           <AccountHeader
-            leftIcon="close"
+            leftIcon={null}
             webCard={profile?.webCard}
             title={
               <Text variant="large">
@@ -117,12 +136,12 @@ const ContactsScreen = ({
             id="name"
             onSelect={() => setSearchBy('name')}
           />
-          {/* <RoundedMenuComponent
+          <RoundedMenuComponent
             selected={searchBy === 'location'}
-            label={'Location'}
-            id={'location'}
+            label="Location"
+            id="location"
             onSelect={() => setSearchBy('location')}
-          /> */}
+          />
         </View>
         <SearchBarStatic
           style={styles.search}
@@ -275,6 +294,8 @@ export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
+    fetchPolicy: 'store-and-network',
   }),
   fallback: ContactsScreenFallback,
+  refreshOnFocus: true,
 });

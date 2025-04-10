@@ -4,16 +4,19 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import AcceptTermsOfUseModal from '#components/AcceptTermsOfUseModal';
-import { onChangeWebCard } from '#helpers/authStore';
+import { useRouter } from '#components/NativeRouter';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
-import useNotifications from '#hooks/useNotifications';
+import useNotificationsEvent, {
+  useNotificationsManager,
+} from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useWidget from '#hooks/useWidget';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -28,25 +31,24 @@ import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { Ref } from 'react';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
-  selectListRef: Ref<CarouselSelectListHandle>;
   refreshQuery: (() => void) | undefined;
 };
 
 const HomeScreenContent = ({
   user: userKey,
-  selectListRef,
   refreshQuery,
 }: HomeScreenContentProps) => {
+  const selectListRef = useRef<CarouselSelectListHandle | null>(null);
+
   // #regions data
   const user = useFragment(
     graphql`
       fragment HomeScreenContent_user on User {
         id
-        hasAcceptedLastTermsOfUse
         profiles {
           id
           profileRole
@@ -55,6 +57,7 @@ const HomeScreenContent = ({
             id
             cardIsPublished
             userName
+            coverIsPredefined
           }
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
@@ -71,17 +74,83 @@ const HomeScreenContent = ({
     userKey,
   );
 
-  const onDeepLink = useCallback(
-    (deepLink: string) => {
-      if (deepLink === 'multiuser_invitation' || deepLink === 'shareBack') {
+  const onDeepLinkInApp = useCallback(
+    (notification: PushNotificationType) => {
+      if (notification.type === 'multiuser_invitation') {
         refreshQuery?.();
       }
     },
     [refreshQuery],
   );
 
+  const router = useRouter();
+
+  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const redirectDeepLink = useCallback(
+    (notification: PushNotificationType) => {
+      switch (notification.type) {
+        case 'shareBack':
+          router.push({
+            route: 'CONTACTS',
+          });
+          break;
+        case 'webCardUpdate':
+          router.push({
+            route: 'WEBCARD',
+            params: {
+              webCardId: notification.webCardId,
+            },
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    [router],
+  );
+
+  const onDeepLinkOpenedApp = useCallback(
+    (notification: PushNotificationType) => {
+      if ('webCardId' in notification && user.profiles) {
+        const webCardId = notification.webCardId;
+        const newProfileIndex = user.profiles.findIndex(
+          p => p.webCard?.id === webCardId,
+        );
+        const newProfile =
+          newProfileIndex >= 0 ? user.profiles[newProfileIndex] : undefined;
+
+        const { profileInfos } = getAuthState();
+
+        if (newProfile && newProfile.id !== profileInfos?.profileId) {
+          // The scroll to index is important here, even if onChangeWebCard will do it
+          // It allows to bypass the workaround to force selection of webcard after 300ms
+          selectListRef.current?.scrollToIndex(newProfileIndex + 1);
+          onChangeWebCard({
+            profileId: newProfile.id,
+            profileRole: newProfile.profileRole,
+            invited: newProfile.invited,
+            webCardId: newProfile.webCard?.id,
+            webCardUserName: newProfile.webCard?.userName,
+            cardIsPublished: newProfile.webCard?.cardIsPublished,
+            coverIsPredefined: newProfile.webCard?.coverIsPredefined,
+          });
+        }
+      }
+      redirectDeepLink(notification);
+    },
+    [redirectDeepLink, user.profiles],
+  );
+
+  useEffect(() => clearTimeout(changeWebCardTimeout.current), []);
+
   const { notificationAuthorized, requestNotificationPermission } =
-    useNotifications(onDeepLink);
+    useNotificationsManager();
+
+  useNotificationsEvent({
+    onDeepLinkInApp,
+    onDeepLinkOpenedApp,
+  });
 
   //TODO: improve the way to ask for notificatino permission, for now, we are asking for notification permission if the user has a published card
   useEffect(() => {
@@ -168,7 +237,6 @@ const HomeScreenContent = ({
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
       <Tooltips />
-      <AcceptTermsOfUseModal visible={!user.hasAcceptedLastTermsOfUse} />
     </View>
   );
 };

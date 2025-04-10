@@ -44,14 +44,18 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (countDeletedProfiles > 0) {
-    await validateCurrentSubscription(owner.id, countDeletedProfiles);
-  }
-
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (countDeletedProfiles > 0) {
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: countDeletedProfiles,
+    });
   }
 
   const { userId } = getSessionInfos();
@@ -146,9 +150,10 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
       const userToNotify = users[i].user;
       if (userToNotify && webCard.userName) {
         await sendPushNotification(userToNotify.id, {
-          type: 'multiuser_invitation',
+          notification: {
+            type: 'multiuser_invitation',
+          },
           mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
           localeParams: { userName: webCard.userName },
           locale: guessLocale(userToNotify.locale),
         });

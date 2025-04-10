@@ -20,7 +20,6 @@ import BlurredFloatingButton, {
 } from '#ui/BlurredFloatingButton';
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
-import type { WebCardScreenButtonBar_profile$key } from '#relayArtifacts/WebCardScreenButtonBar_profile.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
 import type { DerivedValue } from 'react-native-reanimated';
@@ -30,10 +29,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
    * The current displayed webCard
    */
   webCard: WebCardScreenButtonBar_webCard$key;
-  /**
-   * The current user  webCard
-   */
-  profile: WebCardScreenButtonBar_profile$key;
   /**
    * true if the webCard is the current user
    */
@@ -83,7 +78,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
  */
 const WebCardScreenButtonBar = ({
   webCard,
-  profile,
   isViewer,
   onEdit,
   onHome,
@@ -131,7 +125,6 @@ const WebCardScreenButtonBar = ({
       >
         <WebCardScreenButtonActionButton
           webCard={webCard}
-          profile={profile}
           isViewer={isViewer}
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
@@ -155,7 +148,6 @@ export default WebCardScreenButtonBar;
 
 type ProfileScreenButtonActionButtonProps = {
   webCard: WebCardScreenButtonBar_webCard$key;
-  profile: WebCardScreenButtonBar_profile$key;
   isViewer: boolean;
   isWebCardDisplayed: boolean;
   onEdit: () => void;
@@ -172,26 +164,12 @@ type ProfileScreenButtonActionButtonProps = {
 
 const WebCardScreenButtonActionButton = ({
   webCard: webCardKey,
-  profile: profileKey,
   isViewer,
   isWebCardDisplayed,
   onEdit,
   onToggleFollow,
   onShowWebcardModal,
 }: ProfileScreenButtonActionButtonProps) => {
-  const profile = useFragment(
-    graphql`
-      fragment WebCardScreenButtonBar_profile on Profile {
-        webCard {
-          id
-          cardIsPublished
-        }
-        invited
-      }
-    `,
-    profileKey,
-  );
-
   const webCard = useFragment(
     graphql`
       fragment WebCardScreenButtonBar_webCard on WebCard
@@ -236,7 +214,7 @@ const WebCardScreenButtonActionButton = ({
   };
 
   const onShowWebcardModalCallback = () => {
-    if (profile.webCard?.cardIsPublished || isViewer) {
+    if (getAuthState().profileInfos?.cardIsPublished || isViewer) {
       onShowWebcardModal();
     } else {
       showWebcardUnpublishAlert();
@@ -244,12 +222,13 @@ const WebCardScreenButtonActionButton = ({
   };
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
-    if (!profile.webCard?.cardIsPublished) {
+    const { profileInfos } = getAuthState();
+    if (!profileInfos?.cardIsPublished) {
       showWebcardUnpublishAlert();
       return;
     }
 
-    if (profile.invited) {
+    if (profileInfos?.invited) {
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
@@ -261,7 +240,7 @@ const WebCardScreenButtonActionButton = ({
       });
       return;
     }
-    const { profileInfos } = getAuthState();
+
     if (profileInfoHasEditorRight(profileInfos)) {
       if (webCard.userName) {
         onToggleFollow(webCard.id, webCard.userName, !isFollowing);

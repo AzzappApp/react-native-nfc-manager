@@ -2,7 +2,10 @@ extend type Mutation {
   addContact(
     profileId: ID!
     input: AddContactInput!
+    scanUsed: Boolean
     notify: Boolean
+    location: LocationInput
+    address: AddressInput
   ): AddContactPayload
 }
 

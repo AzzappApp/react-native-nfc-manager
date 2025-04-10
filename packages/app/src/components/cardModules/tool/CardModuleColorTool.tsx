@@ -2,7 +2,7 @@ import { useIntl } from 'react-intl';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import {
-  getInitalDyptichColor,
+  getInitialDyptichColor,
   EMPTY_CARD_MODULE_COLOR,
   dyptichByModuleVariant,
 } from '#helpers/cardModuleColorsHelpers';
@@ -70,5 +70,5 @@ const CardModuleColorTool = ({
 export default CardModuleColorTool;
 
 const isVisible = (module: ModuleKindAndVariant) => {
-  return getInitalDyptichColor(module, 'light') !== EMPTY_CARD_MODULE_COLOR;
+  return getInitialDyptichColor(module, 'light') !== EMPTY_CARD_MODULE_COLOR;
 };

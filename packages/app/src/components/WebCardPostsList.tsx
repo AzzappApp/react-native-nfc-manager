@@ -3,20 +3,29 @@ import { StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostList from './PostList';
-import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
+import type { ScrollableToOffset } from '#helpers/types';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { WebCardPostsList_webCard$key } from '#relayArtifacts/WebCardPostsList_webCard.graphql';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 const WebCardPostsList = ({
-  viewerWebCard,
   webCard,
   canPlay,
   onPressAuthor,
+  onScroll,
+  ListHeaderComponent,
+  scrollableRef,
 }: {
-  viewerWebCard?: PostList_viewerWebCard$key;
   webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
   canPlay: boolean;
   onPressAuthor?: () => void;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  scrollableRef?: ScrollableToOffset;
 }) => {
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -89,8 +98,10 @@ const WebCardPostsList = ({
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       contentContainerStyle={styles.container}
-      viewerWebCard={viewerWebCard}
       showUnpublished
+      onScroll={onScroll}
+      ListHeaderComponent={ListHeaderComponent}
+      scrollableRef={scrollableRef}
     />
   );
 };

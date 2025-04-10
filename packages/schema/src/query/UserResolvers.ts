@@ -1,17 +1,16 @@
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getActivePaymentMeans,
-  getCommonWebCardProfiles,
   getUserProfilesWithWebCard,
   getUserPayments,
   countUserPayments,
-  getActiveUserSubscriptions,
   getTotalMultiUser,
   getLastTermsOfUse,
+  getSharedWebCardRelation,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsForUserLoader,
+  subscriptionsForUserLoader,
   profileByWebCardIdAndUserIdLoader,
   profileLoader,
   webCardLoader,
@@ -22,44 +21,49 @@ import { type ProtectedResolver } from '#helpers/permissionsHelpers';
 import type { UserResolvers } from '#/__generated__/types';
 import type { User as UserModel } from '@azzapp/data';
 
-const isSameUser = async (user: UserModel) => {
+const isSameUser = (user: UserModel) => {
   const { userId } = getSessionInfos();
   return userId === user.id;
 };
 
-const commonProfilesDataLoader = createSessionDataLoader(
-  'CommonProfilesDataLoader',
+const canSeeEmailOrPhoneNumberLoader = createSessionDataLoader(
+  'CanSeeEmailOrPhoneNumberLoader',
   async (keys: readonly string[]) => {
     const { userId } = getSessionInfos();
     if (!userId) {
       return keys.map(() => null);
     }
-    const profiles = await getCommonWebCardProfiles(userId, keys);
 
-    return keys.map(key => profiles[key] ?? null);
+    const relations = await getSharedWebCardRelation(userId, keys);
+
+    return keys.map(targetUserId => {
+      const rel = relations[targetUserId];
+      if (!rel) return false;
+
+      return rel.isAdminOrOwner || rel.hasSharedWithOwner;
+    });
   },
 );
 
-const hasAdminRightOnSharedWebCard = async (user: UserModel) => {
-  const profiles = (await commonProfilesDataLoader.load(user.id)) ?? [];
-  return profiles.some(
-    profileRole => profileRole === 'owner' || profileRole === 'admin',
-  );
-};
-
 export const User: ProtectedResolver<UserResolvers> = {
   id: user => user.id,
-  email(user) {
-    if (!isSameUser(user) || !hasAdminRightOnSharedWebCard(user)) {
-      return null;
+  email: async user => {
+    if (
+      isSameUser(user) ||
+      (await canSeeEmailOrPhoneNumberLoader.load(user.id))
+    ) {
+      return user.email;
     }
-    return user.email;
+    return null;
   },
-  phoneNumber(user) {
-    if (!isSameUser(user) || !hasAdminRightOnSharedWebCard(user)) {
-      return null;
+  phoneNumber: async user => {
+    if (
+      isSameUser(user) ||
+      (await canSeeEmailOrPhoneNumberLoader.load(user.id))
+    ) {
+      return user.phoneNumber;
     }
-    return user.phoneNumber;
+    return null;
   },
   publishedWebCards: () => [],
   profiles: async user => {
@@ -85,7 +89,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscriptions = await activeSubscriptionsForUserLoader.load(user.id);
+    const subscriptions = await subscriptionsForUserLoader.load(user.id);
 
     return subscriptions[0] ?? null;
   },
@@ -93,8 +97,13 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscription = await getActiveUserSubscriptions([user.id]);
-    return !!subscription.filter(sub => !!sub).length;
+    const subscription = await subscriptionsForUserLoader.load(user.id);
+    const lastSubscription = subscription.length ? subscription[0] : null;
+    return (
+      lastSubscription &&
+      (lastSubscription.status === 'active' ||
+        lastSubscription.endAt > new Date())
+    );
   },
   paymentMeans: async user => {
     return getActivePaymentMeans(user.id);
@@ -123,8 +132,32 @@ export const User: ProtectedResolver<UserResolvers> = {
     return totalSeats;
   },
   hasAcceptedLastTermsOfUse: async user => {
+    if (!user.termsOfUseAcceptedVersion) {
+      return false;
+    }
     const termsOfUse = await getLastTermsOfUse();
 
     return !termsOfUse || termsOfUse.version === user.termsOfUseAcceptedVersion;
+  },
+  userContactData: async user => {
+    return {
+      ...user.userContactData,
+      email: user.userContactData?.email
+        ? user.userContactData.email
+        : user.email,
+      phoneNumber: user.userContactData?.phoneNumber
+        ? user.userContactData.phoneNumber
+        : user.phoneNumber,
+    };
+  },
+  cookiePreferences: async user => {
+    return user.cookiePreferences;
+  },
+  hasPassword: async user => {
+    if (isSameUser(user)) {
+      return user.password !== null;
+    }
+
+    return true; // we don't have a way to check if the user has a password
   },
 };

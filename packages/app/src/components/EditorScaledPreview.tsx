@@ -12,7 +12,7 @@ import Animated, {
   useFrameCallback,
   useSharedValue,
 } from 'react-native-reanimated';
-import { colors, shadow } from '#theme';
+import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableOpacity from '#ui/PressableOpacity';
 
@@ -51,12 +51,20 @@ const EditorScaledPreview = ({
 
   useFrameCallback(() => {
     const containerSize = measure(containerRef);
-    if (containerSize) {
+    if (
+      containerSize &&
+      (containerValue.value?.height !== containerSize.height ||
+        containerValue.value?.width !== containerSize.width)
+    ) {
       containerValue.value = containerSize;
     }
 
     const moduleSize = measure(moduleRef);
-    if (moduleSize) {
+    if (
+      moduleSize &&
+      (moduleLayout.value?.height !== moduleSize.height ||
+        moduleLayout.value?.width !== moduleSize.width)
+    ) {
       moduleLayout.value = moduleSize;
     }
   });
@@ -85,7 +93,7 @@ const EditorScaledPreview = ({
     <Animated.View
       {...props}
       onLayout={onLayout}
-      style={style}
+      style={[style, styles.overflowHidden]}
       ref={containerRef}
     >
       <Animated.View
@@ -115,8 +123,8 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     width: '100%',
   },
-  previewContainer: {
-    backgroundColor: colors.white,
-    ...shadow({ appearance }),
+  previewContainer: shadow({ appearance }),
+  overflowHidden: {
+    overflow: 'hidden',
   },
 }));

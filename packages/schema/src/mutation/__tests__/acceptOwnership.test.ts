@@ -111,7 +111,10 @@ describe('acceptOwnership', () => {
     expect(userLoader.load).toHaveBeenCalledWith('user-1');
     expect(webCardLoader.load).toHaveBeenCalledWith('webcard-456');
     expect(webCardOwnerLoader.load).toHaveBeenCalledWith('webcard-456');
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-1', 3);
+    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-1', {
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: 3,
+    });
     expect(updateProfileForUserAndWebCard).toHaveBeenCalledWith(
       'owner-1',
       'webcard-456',

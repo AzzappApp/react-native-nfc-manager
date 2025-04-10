@@ -15,10 +15,8 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
-import { signInRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import {
@@ -82,10 +80,9 @@ const HomeBottomSheetPanel = ({
   const user = useFragment(
     graphql`
       fragment HomeBottomSheetPanel_user on User {
+        isPremium
         userSubscription {
-          status
           issuer
-          id
         }
       }
     `,
@@ -170,8 +167,6 @@ const HomeBottomSheetPanel = ({
 
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
-  const router = useRouter();
-
   const onDismiss = useCallback(async () => {
     if (requestedLogout) {
       setTimeout(() => {
@@ -186,10 +181,9 @@ const HomeBottomSheetPanel = ({
   }, [close, deleteFcmToken, requestedLogout]);
 
   const onLogout = useCallback(async () => {
-    router.replaceAll(signInRoutes);
     toggleRequestLogout();
     close();
-  }, [close, router, toggleRequestLogout]);
+  }, [close, toggleRequestLogout]);
 
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
@@ -245,7 +239,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        user?.userSubscription?.status !== 'active' && ENABLE_MULTI_USER
+        !user?.isPremium && ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'plus',
@@ -289,8 +283,8 @@ const HomeBottomSheetPanel = ({
             close();
           },
         },
-        user?.userSubscription?.status === 'active' &&
-        user.userSubscription.issuer !== 'web' &&
+        user?.isPremium &&
+        user.userSubscription?.issuer !== 'web' &&
         ENABLE_MULTI_USER
           ? {
               type: 'row',
@@ -417,6 +411,19 @@ const HomeBottomSheetPanel = ({
         },
         {
           type: 'row',
+          icon: 'locked',
+          text: intl.formatMessage({
+            defaultMessage: 'Privacy settings',
+            description:
+              'Privacy settings message item in Home bottom sheet panel',
+          }),
+          linkProps: {
+            route: 'COOKIE_SETTINGS',
+          },
+          onPress: close,
+        },
+        {
+          type: 'row',
           icon: 'logout',
           text: intl.formatMessage({
             defaultMessage: 'Logout',
@@ -432,7 +439,7 @@ const HomeBottomSheetPanel = ({
       onShare,
       profile,
       user?.userSubscription?.issuer,
-      user?.userSubscription?.status,
+      user?.isPremium,
     ],
   );
 

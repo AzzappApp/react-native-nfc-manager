@@ -3,25 +3,34 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
-import { useRouter } from '#components/NativeRouter';
+import { useCurrentRoute, useRouter } from '#components/NativeRouter';
+import WebCardStatHeader, {
+  WebCardStatHeaderFallback,
+} from '#components/WebCard/WebCardStatHeader';
 import ProfilePostsList from '#components/WebCardPostsList';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
+import BlurredFloatingButton from '#ui/BlurredFloatingButton';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
@@ -33,9 +42,12 @@ import MediaSuggestionsScreen, {
   MediaSuggestionsScreenFallback,
 } from './MediaSuggestionsScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ScrollableToOffset } from '#helpers/types';
 import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
+import type { WebCardStatHeader_webCard$key } from '#relayArtifacts/WebCardStatHeader_webCard.graphql';
 import type { MediaRoute } from '#routes';
 import type { ReactElement } from 'react';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';
 
@@ -57,12 +69,17 @@ const mediaScreenQuery = graphql`
           ...PostList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
-          ...PostList_viewerWebCard
+          ...WebCardStatHeader_webCard
         }
       }
     }
   }
 `;
+
+const TAB_CONTAINER_PADDING_TOP = 45;
+const resetRoute = ['CONTACTS', 'HOME'];
+
+const DEFAULT_TAB = 'SUGGESTIONS';
 
 const MediaScreen = ({
   preloadedQuery,
@@ -71,7 +88,9 @@ const MediaScreen = ({
   const { node } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
   const profile = node?.profile;
   const { top, bottom } = useScreenInsets();
-  const [tab, setTab] = useState<TAB>('SUGGESTIONS');
+  const styles = useStyleSheet(styleSheet);
+
+  const [tab, setTab] = useState<TAB>(DEFAULT_TAB);
   const onTabChange = useCallback((newTab: TAB) => {
     startTransition(() => {
       setTab(newTab);
@@ -115,10 +134,56 @@ const MediaScreen = ({
     }
   }, [router, intl]);
 
+  const scrollListOffset = useSharedValue(0);
+  const stickyPosition = 315 + TAB_CONTAINER_PADDING_TOP;
+
+  const fixedHeaderStyle = useAnimatedStyle(() => {
+    return {
+      opacity: scrollListOffset.value < stickyPosition ? 0 : 1,
+      transform: [{ translateY: top }],
+    };
+  });
+  const scrollableSuggestionRef: ScrollableToOffset = useRef(null);
+  const scrollableFollowingRef: ScrollableToOffset = useRef(null);
+  const scrollableMyPostRef: ScrollableToOffset = useRef(null);
+
+  const resetToOffset = useCallback((offset: number) => {
+    scrollableSuggestionRef.current?.scrollToOffset({
+      offset,
+      animated: false,
+    });
+    scrollableFollowingRef.current?.scrollToOffset({
+      offset,
+      animated: false,
+    });
+    scrollableMyPostRef.current?.scrollToOffset({
+      offset,
+      animated: false,
+    });
+  }, []);
+
+  useEffect(() => {
+    // reset to good position when tab change
+    resetToOffset(Math.min(scrollListOffset.value, stickyPosition));
+  }, [resetToOffset, scrollListOffset, stickyPosition, tab]);
+
+  const currentRoute = useCurrentRoute('didChange');
+  useEffect(() => {
+    // reset Screen when route change in bottom TABs
+    if (currentRoute && resetRoute.includes(currentRoute.route)) {
+      resetToOffset(0);
+      setTab(DEFAULT_TAB);
+    }
+  }, [router, currentRoute, resetToOffset]);
+
   // viewer might be briefly null when the user logs out or by switching accounts
   if (!profile || !profile.webCard || !canBrowseCommunity) {
     return null;
   }
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollListOffset.value = event.nativeEvent.contentOffset.y;
+  };
 
   const tabs: Array<{ id: TAB; element: ReactElement }> = [
     {
@@ -128,6 +193,15 @@ const MediaScreen = ({
           profile={profile}
           isCurrentTab={tab === 'SUGGESTIONS'}
           canPlay={hasFocus && tab === 'SUGGESTIONS'}
+          onScroll={onScroll}
+          ListHeaderComponent={
+            <ListHeaderComponent
+              webCard={profile.webCard}
+              tab={tab}
+              onTabChange={onTabChange}
+            />
+          }
+          scrollableRef={scrollableSuggestionRef}
         />
       ),
     },
@@ -138,8 +212,15 @@ const MediaScreen = ({
           <MediaFollowingsScreen
             webCard={profile.webCard}
             canPlay={hasFocus && tab === 'FOLLOWINGS'}
+            onScroll={onScroll}
+            scrollableRef={scrollableFollowingRef}
             ListHeaderComponent={
-              <View>
+              <>
+                <ListHeaderComponent
+                  webCard={profile.webCard}
+                  tab={tab}
+                  onTabChange={onTabChange}
+                />
                 <MediaFollowingsWebCards
                   header={
                     <Text variant="large" style={styles.coversTitleStyle}>
@@ -161,7 +242,7 @@ const MediaScreen = ({
                     description="List of latest posts of followed profiles"
                   />
                 </Text>
-              </View>
+              </>
             }
           />
         </Suspense>
@@ -170,12 +251,20 @@ const MediaScreen = ({
     {
       id: 'MY_POSTS',
       element: (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
           <Suspense>
             <ProfilePostsList
               webCard={profile.webCard}
-              viewerWebCard={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
+              onScroll={onScroll}
+              ListHeaderComponent={
+                <ListHeaderComponent
+                  webCard={profile.webCard}
+                  tab={tab}
+                  onTabChange={onTabChange}
+                />
+              }
+              scrollableRef={scrollableMyPostRef}
             />
           </Suspense>
         </View>
@@ -184,9 +273,11 @@ const MediaScreen = ({
   ];
 
   return (
-    <Container style={{ flex: 1, paddingTop: top }}>
-      <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
-      <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
+    <Container style={[styles.flex, { paddingTop: top }]}>
+      <Animated.View style={[fixedHeaderStyle, styles.fixedHeaderStyle]}>
+        <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
+      </Animated.View>
+      <TabView style={styles.flex} currentTab={tab} tabs={tabs} />
       <View
         style={{
           position: 'absolute',
@@ -195,7 +286,7 @@ const MediaScreen = ({
           width: '100%',
         }}
       >
-        <FloatingButton
+        <BlurredFloatingButton
           variant="grey"
           style={styles.createPostButton}
           onPress={onCreatePost}
@@ -206,9 +297,29 @@ const MediaScreen = ({
               description="Floating button label to create a post in the media screen"
             />
           </Text>
-        </FloatingButton>
+        </BlurredFloatingButton>
       </View>
     </Container>
+  );
+};
+
+const ListHeaderComponent = ({
+  webCard,
+  tab,
+  onTabChange,
+}: {
+  webCard: WebCardStatHeader_webCard$key;
+  tab: TAB;
+  onTabChange: (newTab: TAB) => void;
+}) => {
+  const styles = useStyleSheet(styleSheet);
+  return (
+    <View style={styles.flex}>
+      <WebCardStatHeader webCard={webCard} />
+      <View style={styles.tabBarContainerWithPadding}>
+        <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
+      </View>
+    </View>
   );
 };
 
@@ -221,11 +332,17 @@ const MediaScreenTabBar = ({
   setTab?: (tab: TAB) => void;
   disabled?: boolean;
 }) => {
+  const styles = useStyleSheet(styleSheet);
+
+  const goToSuggestion = () => setTab?.('SUGGESTIONS');
+  const goToFollowings = () => setTab?.('FOLLOWINGS');
+  const gotToMyPosts = () => setTab?.('MY_POSTS');
+
   return (
     <View style={styles.tabBarContainer} accessibilityRole="tablist">
       <Link route="SEARCH">
         <PressableNative
-          style={{ marginLeft: 25 }}
+          style={styles.search}
           hitSlop={{
             left: 10,
             right: 10,
@@ -238,12 +355,12 @@ const MediaScreenTabBar = ({
           }}
           disabled={disabled}
         >
-          <Icon icon="search" style={{ width: 28, height: 28 }} />
+          <Icon icon="search" style={styles.searchIcon} />
         </PressableNative>
       </Link>
       <TabBarMenuItem
         selected={currentTab === 'SUGGESTIONS'}
-        onPress={() => setTab?.('SUGGESTIONS')}
+        onPress={goToSuggestion}
         disabled={disabled}
       >
         <FormattedMessage
@@ -253,7 +370,7 @@ const MediaScreenTabBar = ({
       </TabBarMenuItem>
       <TabBarMenuItem
         selected={currentTab === 'FOLLOWINGS'}
-        onPress={() => setTab?.('FOLLOWINGS')}
+        onPress={goToFollowings}
         disabled={disabled}
       >
         <FormattedMessage
@@ -264,7 +381,7 @@ const MediaScreenTabBar = ({
 
       <TabBarMenuItem
         selected={currentTab === 'MY_POSTS'}
-        onPress={() => setTab?.('MY_POSTS')}
+        onPress={gotToMyPosts}
         disabled={disabled}
       >
         <FormattedMessage
@@ -278,15 +395,23 @@ const MediaScreenTabBar = ({
 
 const MediaScreenFallback = () => {
   const { top } = useScreenInsets();
+  const styles = useStyleSheet(styleSheet);
+
   return (
-    <Container style={{ flex: 1, paddingTop: top }}>
+    <Container style={[styles.flex, { paddingTop: top }]}>
+      <WebCardStatHeaderFallback />
+      <View style={styles.tabBarContainerWithPadding} />
       <MediaScreenTabBar disabled />
       <MediaSuggestionsScreenFallback />
     </Container>
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
+  flex: { flex: 1 },
+  search: { marginLeft: 25 },
+  searchIcon: { width: 28, height: 28 },
+  tabBarContainerWithPadding: { paddingTop: TAB_CONTAINER_PADDING_TOP },
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -310,7 +435,21 @@ const styles = StyleSheet.create({
   createPostButtonLabel: {
     color: colors.white,
   },
-});
+  fixedHeaderStyle: {
+    zIndex: 3,
+    position: 'absolute',
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    ...shadow({
+      appearance,
+      direction: 'bottom',
+      forceOldShadow: true,
+      color:
+        appearance === 'dark'
+          ? { r: 0, g: 0, b: 0, a: 0.4 }
+          : { r: 255, g: 255, b: 255, a: 0.9 },
+    }),
+  },
+}));
 
 export default relayScreen(MediaScreen, {
   query: mediaScreenQuery,

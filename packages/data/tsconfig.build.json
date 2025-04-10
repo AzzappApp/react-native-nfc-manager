@@ -4,7 +4,10 @@
     "noEmit": true,
     "rootDir": "./src",
     "baseUrl": "./src",
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "paths": {
+      "@azzapp/shared/*": ["../shared/src/*"]
+    }
   },
   "exclude": [
     "lib",

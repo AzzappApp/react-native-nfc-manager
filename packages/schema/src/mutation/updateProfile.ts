@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
+  getWebCardById,
   referencesMedias,
   transaction,
   updateProfile,
@@ -11,8 +12,13 @@ import {
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileByWebCardIdAndUserIdLoader, profileLoader } from '#loaders';
+import {
+  profileByWebCardIdAndUserIdLoader,
+  profileLoader,
+  webCardOwnerLoader,
+} from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 // TODO why do we duplicate the avatarId in the profile and in the contactCard?
@@ -70,6 +76,25 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const webCard = await getWebCardById(targetProfile.webCardId);
+
+  const ownerId =
+    currentProfile.profileRole === 'owner'
+      ? currentProfile.userId
+      : (await webCardOwnerLoader.load(currentProfile.webCardId))?.id;
+
+  if (!ownerId) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await validateCurrentSubscription(ownerId, {
+    action: 'UPDATE_CONTACT_CARD',
+    webCardIsPublished: !!webCard?.cardIsPublished,
+    contactCardHasCompanyName: !!contactCard?.company,
+    contactCardHasUrl: !!contactCard?.urls?.length,
+    contactCardHasLogo: !!contactCard?.logoId,
+  });
+
   const { avatarId, logoId, ...restContactCard } = contactCard || {};
   try {
     const addedMedia = [avatarId, logoId].filter(
@@ -100,6 +125,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   }
   if (avatarId) {
     updatedProfile.avatarId = avatarId;
+  }
+  if (logoId) {
+    updatedProfile.logoId = logoId;
   }
   if (contactCard) {
     updatedProfile.contactCard = {

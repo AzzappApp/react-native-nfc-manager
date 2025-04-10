@@ -31,7 +31,7 @@ const SimpleCarouselRenderer = async ({
     <SimpleCarousel
       medias={medias}
       style={{
-        paddingTop: cardStyle.gap,
+        paddingTop: Math.max(10, cardStyle?.gap || 0),
         paddingBottom: Math.max(cardStyle.gap || 20),
         zIndex: 1,
         backgroundColor: swapColor(

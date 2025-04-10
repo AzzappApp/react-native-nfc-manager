@@ -45,25 +45,6 @@ import { PageProgress } from '#ui/PageProgress';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import OfflineHeader from './OfflineHeader';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-
-type vCardData = {
-  qrcodeData: string;
-  primaryColor: string;
-  dark: string;
-  isMultiUser: boolean;
-  name: string;
-  firstName: string | null | undefined;
-  lastName: string | null | undefined;
-  title: string | null | undefined;
-  compagny: string | null | undefined;
-  isPremium: boolean;
-  id: string;
-};
-
-type renderItemProps = {
-  item: vCardData;
-};
 
 export const OfflineVCardScreenProfilesFragment = graphql`
   fragment OfflineVCardScreen_profiles on Profile @relay(plural: true) {
@@ -100,7 +81,6 @@ export const OfflineVCardScreenProfilesFragment = graphql`
         primary
         light
       }
-      isPremium
     }
     contactCard {
       firstName
@@ -175,163 +155,166 @@ export const OfflineVCardScreenRenderer = ({
   const footerSize = itemHeight + pageViewSize;
 
   const remainingHeight = windowHeight - headerSize - footerSize;
-  const remaingWidth = itemWidth;
+  const remainingWidth = itemWidth;
 
-  const qrCodeContainerSize = Math.min(remaingWidth, remainingHeight);
+  const qrCodeContainerSize = Math.min(remainingWidth, remainingHeight);
   const qrCodeSize = qrCodeContainerSize - 40;
 
   const swipableZoneHeight = qrCodeContainerSize + itemHeight + 30;
   const flatListPositionInSwipableZone = qrCodeContainerSize + 30;
 
-  const vcardList: vCardData[] = useMemo(() => {
-    const profiles = getOfflineVCard();
+  const { isPremium, vCardList } = useMemo(() => {
+    const offlineData = getOfflineVCard();
+    const { isPremium, profiles } = offlineData || {};
 
-    return (
-      profiles
-        ?.map(data => {
-          const contactCard = data.contactCard as ContactCard;
-          const webCard = data.webCard;
-          if (!webCard?.userName) {
-            return undefined;
-          }
-          if (!webCard || !webCard.cardIsPublished) return undefined;
-          const vCard = new VCard();
-          vCard.addName(
-            contactCard.lastName ?? undefined,
-            contactCard.firstName ?? undefined,
-          );
+    return {
+      isPremium: isPremium ?? null,
+      vCardList:
+        profiles
+          ?.map(data => {
+            const contactCard = data.contactCard;
+            const webCard = data.webCard;
+            if (!webCard?.userName) {
+              return undefined;
+            }
+            if (!webCard || !webCard.cardIsPublished) return undefined;
+            const vCard = new VCard();
+            vCard.addName(
+              contactCard?.lastName ?? undefined,
+              contactCard?.firstName ?? undefined,
+            );
 
-          if (contactCard.title) {
-            vCard.addJobtitle(contactCard.title);
-          }
-          if (contactCard.birthday && contactCard.birthday?.selected) {
-            vCard.addBirthday(contactCard.birthday?.birthday.toString());
-          }
-          contactCard.phoneNumbers?.forEach(number => {
-            if (number.selected)
-              vCard.addPhoneNumber(
-                number.number,
-                phoneLabelToVCardLabel(number.label) || '',
-              );
-          });
-          contactCard.emails?.forEach(email => {
-            if (email.selected)
-              vCard.addEmail(
-                email.address,
-                emailLabelToVCardLabel(email.label) || '',
-              );
-          });
-          contactCard.urls?.forEach(url => {
-            if (url.selected) vCard.addURL(url.address);
-          });
-          contactCard?.socials?.forEach(social => {
-            if (social.selected)
-              vCard.addSocial(social.url, social.label || '');
-          });
-          contactCard?.addresses?.forEach(addr => {
-            if (addr.selected)
-              vCard.addAddress(
-                undefined,
-                undefined,
-                addr.address,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                addressLabelToVCardLabel(addr.label),
-              );
-          });
-          if (webCard?.isMultiUser) {
-            webCard?.commonInformation?.phoneNumbers?.forEach(number => {
-              vCard.addPhoneNumber(
-                number.number,
-                phoneLabelToVCardLabel(number.label) || '',
-              );
+            if (contactCard?.title) {
+              vCard.addJobtitle(contactCard.title);
+            }
+            if (contactCard?.birthday && contactCard.birthday?.selected) {
+              vCard.addBirthday(contactCard.birthday?.birthday.toString());
+            }
+            contactCard?.phoneNumbers?.forEach(number => {
+              if (number.selected)
+                vCard.addPhoneNumber(
+                  number.number,
+                  phoneLabelToVCardLabel(number.label) || '',
+                );
             });
-            webCard?.commonInformation?.emails?.forEach(email => {
-              vCard.addEmail(
-                email.address,
-                emailLabelToVCardLabel(email.label) || '',
-              );
+            contactCard?.emails?.forEach(email => {
+              if (email.selected)
+                vCard.addEmail(
+                  email.address,
+                  emailLabelToVCardLabel(email.label) || '',
+                );
             });
-            webCard?.commonInformation?.urls?.forEach(url => {
-              vCard.addURL(url.address);
+            contactCard?.urls?.forEach(url => {
+              if (url.selected) vCard.addURL(url.address);
             });
-            webCard?.commonInformation?.socials?.forEach(social => {
-              vCard.addSocial(social.url, social.label || '');
+            contactCard?.socials?.forEach(social => {
+              if (social.selected)
+                vCard.addSocial(social.url, social.label || '');
             });
-            webCard?.commonInformation?.addresses?.forEach(addr => {
-              vCard.addAddress(
-                addr.address,
-                addressLabelToVCardLabel(addr.label),
-              );
+            contactCard?.addresses?.forEach(addr => {
+              if (addr.selected)
+                vCard.addAddress(
+                  undefined,
+                  undefined,
+                  addr.address,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  addressLabelToVCardLabel(addr.label),
+                );
             });
-          }
-          if (webCard?.userName) vCard.addURL(buildUserUrl(webCard?.userName));
+            if (webCard?.isMultiUser) {
+              webCard?.commonInformation?.phoneNumbers?.forEach(number => {
+                vCard.addPhoneNumber(
+                  number.number,
+                  phoneLabelToVCardLabel(number.label) || '',
+                );
+              });
+              webCard?.commonInformation?.emails?.forEach(email => {
+                vCard.addEmail(
+                  email.address,
+                  emailLabelToVCardLabel(email.label) || '',
+                );
+              });
+              webCard?.commonInformation?.urls?.forEach(url => {
+                vCard.addURL(url.address);
+              });
+              webCard?.commonInformation?.socials?.forEach(social => {
+                vCard.addSocial(social.url, social.label || '');
+              });
+              webCard?.commonInformation?.addresses?.forEach(addr => {
+                vCard.addAddress(
+                  addr.address,
+                  addressLabelToVCardLabel(addr.label),
+                );
+              });
+            }
+            if (webCard?.userName)
+              vCard.addURL(buildUserUrl(webCard?.userName));
 
-          const company =
-            webCard?.isMultiUser && webCard?.commonInformation?.company
-              ? webCard?.commonInformation?.company
-              : contactCard.company;
-          if (company) {
-            vCard.addCompany(company);
-          }
+            const company =
+              webCard?.isMultiUser && webCard?.commonInformation?.company
+                ? webCard?.commonInformation?.company
+                : contactCard?.company;
+            if (company) {
+              vCard.addCompany(company);
+            }
 
-          const qrcodeData = vCard.toString();
-          return {
-            qrcodeData,
-            primaryColor: webCard?.cardColors?.primary || '#45444b',
-            dark: webCard?.cardColors?.dark || colors.black,
-            isMultiUser: webCard?.isMultiUser,
-            name: webCard?.userName,
-            firstName: contactCard.firstName,
-            lastName: contactCard.lastName,
-            title: contactCard.title,
-            compagny: company || null,
-            isPremium: webCard?.isPremium,
-            id: webCard.id,
-          };
-        })
-        .filter(isDefined) || []
-    );
+            const qrCodeData = vCard.toString();
+            return {
+              qrCodeData,
+              primaryColor: webCard?.cardColors?.primary || '#45444b',
+              dark: webCard?.cardColors?.dark || colors.black,
+              isMultiUser: webCard?.isMultiUser,
+              name: webCard?.userName,
+              firstName: contactCard?.firstName,
+              lastName: contactCard?.lastName,
+              title: contactCard?.title,
+              company: company || null,
+              id: webCard.id,
+            };
+          })
+          .filter(isDefined) || [],
+    };
   }, []);
 
   const defaultIndex = useMemo(() => {
     if (!profileInfos?.webCardId) return 0;
-    const foundVCardId = vcardList.findIndex(
+    const foundVCardId = vCardList.findIndex(
       vcard => vcard.id === profileInfos?.webCardId,
     );
     return foundVCardId === -1 ? 0 : foundVCardId;
-  }, [profileInfos?.webCardId, vcardList]);
+  }, [profileInfos?.webCardId, vCardList]);
 
   const userNames = useMemo(
-    () => vcardList.map(({ name }) => name || ''),
-    [vcardList],
+    () => vCardList.map(({ name }) => name || ''),
+    [vCardList],
   );
 
   const gradientColors = useMemo(
     () =>
-      vcardList.length === 0
+      vCardList.length === 0
         ? [['#45444b', colors.black]]
-        : vcardList.map(({ primaryColor, dark }) => [primaryColor, dark]),
-    [vcardList],
+        : vCardList.map(({ primaryColor, dark }) => [primaryColor, dark]),
+    [vCardList],
   );
 
   const currentIndexSharedValue = useSharedValue(0);
 
   const qrCodeContainerleft = (windowWidth - qrCodeContainerSize) / 2;
 
-  const renderItem = ({ item }: renderItemProps) => {
+  const renderItem = ({ item }: { item: (typeof vCardList)[number] }) => {
     const vCard = item;
     const webCard = {
       cardColors: { primary: vCard.primaryColor },
-      commonInformation: { company: vCard.compagny || null },
+      commonInformation: { company: vCard.company || null },
       isMultiUser: vCard.isMultiUser,
       userName: vCard.name,
     };
 
     const contactCard = {
-      company: vCard.compagny || null,
+      company: vCard.company || null,
       firstName: vCard.firstName || null,
       lastName: vCard.lastName || null,
       title: vCard.title || null,
@@ -357,7 +340,7 @@ export const OfflineVCardScreenRenderer = ({
     );
   };
 
-  const keyExtractor = (webCard: vCardData) => webCard.name;
+  const keyExtractor = (vCard: { name: string }) => vCard.name;
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
@@ -383,20 +366,20 @@ export const OfflineVCardScreenRenderer = ({
     [halfMargin, itemWidth],
   );
   const snapToOffsets = useMemo(
-    () => vcardList.map((_, index) => (itemWidth + halfMargin) * index),
-    [halfMargin, itemWidth, vcardList],
+    () => vCardList.map((_, index) => (itemWidth + halfMargin) * index),
+    [halfMargin, itemWidth, vCardList],
   );
 
   const readableColors = useMemo(
     () =>
-      vcardList.length === 0
+      vCardList.length === 0
         ? [colors.white]
-        : vcardList.map(card => {
+        : vCardList.map(card => {
             return card?.primaryColor
               ? getTextColor(card?.primaryColor)
               : colors.white;
           }) || [],
-    [vcardList],
+    [vCardList],
   );
 
   const colorValue = useIndexInterpolation<string>(
@@ -404,12 +387,6 @@ export const OfflineVCardScreenRenderer = ({
     readableColors,
     colors.white,
     interpolateColor,
-  );
-
-  const isPremium = useIndexInterpolation(
-    currentIndexSharedValue,
-    vcardList.map(card => (card?.isPremium ? 1 : 0) as number),
-    0,
   );
 
   const animatedIconsColor = useAnimatedStyle(() => {
@@ -484,11 +461,11 @@ export const OfflineVCardScreenRenderer = ({
             },
           ]}
         >
-          {vcardList.length > 0 ? (
+          {vCardList.length > 0 ? (
             <Suspense fallback={null}>
               <QRCode
                 width={qrCodeSize}
-                value={vcardList[currentIndex]?.qrcodeData}
+                value={vCardList[currentIndex]?.qrCodeData}
               />
             </Suspense>
           ) : (
@@ -518,7 +495,7 @@ export const OfflineVCardScreenRenderer = ({
           }}
         >
           <Animated.FlatList
-            data={vcardList}
+            data={vCardList}
             horizontal
             renderItem={renderItem}
             keyExtractor={keyExtractor}
@@ -547,9 +524,9 @@ export const OfflineVCardScreenRenderer = ({
             { top: -flatListPositionInSwipableZone + pageViewSize / 2 },
           ]}
         >
-          {vcardList.length > 1 ? (
+          {vCardList.length > 1 ? (
             <PageProgress
-              nbPages={vcardList.length}
+              nbPages={vCardList.length}
               currentPage={currentIndex}
               appearance="dark"
             />

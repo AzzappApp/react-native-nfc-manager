@@ -63,6 +63,7 @@ const BottomSheetPopup = ({
         variant="modal"
         snapPoints={[fullScreen ? height : height / 1.25, height / 1.1]}
         keyboardBehavior="extend"
+        style={styles.container}
       >
         <Animated.View style={animatedStyle}>{children}</Animated.View>
       </BottomSheetModal>
@@ -71,5 +72,8 @@ const BottomSheetPopup = ({
 };
 const styles = StyleSheet.create({
   background: { backgroundColor: 'transparent' },
+  container: {
+    boxShadow: 'none',
+  },
 });
 export default BottomSheetPopup;

@@ -1,5 +1,5 @@
 extend type Mutation {
-  createWebCard(input: CreateWebCardInput!): CreateWebCardPayload!
+  createWebCard(input: CreateWebCardInput!): CreateWebCardPayload! @deprecated(reason: "Use createContactCard")
 }
 
 input CreateWebCardInput {

@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 const apiKey = process.env.OPENAI_API_SECRETKEY;
@@ -25,6 +26,12 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+    if (!args.config?.createContactCard) {
+      await validateCurrentSubscription(userId, {
+        action: 'USE_SCAN',
+      });
+    }
+
     try {
       const response = await fetch(
         'https://api.openai.com/v1/chat/completions',
@@ -68,7 +75,17 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
         return null;
       }
       const match = data.choices[0].message.content.match(/\{[^}]*\}/); // Extract JSON object from the response
-      return match ? businessCardSchema.parse(JSON.parse(match[0])) : null;
+      const businessCard = match
+        ? businessCardSchema.parse(JSON.parse(match[0]))
+        : null;
+      if (!businessCard) {
+        return null;
+      }
+      const cleanBusinessCard = {
+        ...businessCard,
+        emails: businessCard?.emails?.map(email => email.replaceAll(' ', '')),
+      };
+      return cleanBusinessCard;
     } catch (error) {
       Sentry.captureException(error);
     }

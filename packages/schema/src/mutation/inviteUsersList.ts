@@ -10,6 +10,9 @@ import {
   createId,
   getProfilesByWebCard,
   updateProfile,
+  getDeletedUsersByEmail,
+  createUser,
+  updateUser,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
@@ -102,7 +105,34 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       await updateWebCard(webCard.id, { isMultiUser: true });
     }
 
-    let userId;
+    const deletedUsers =
+      filtered.length > 0
+        ? await getDeletedUsersByEmail(filtered.map(f => f.email))
+        : [];
+
+    await Promise.all(
+      deletedUsers.map(async user => {
+        if (user.deletedBy !== user.id) {
+          rejected.push({
+            ...invited.find(f => f.email === user.email),
+            reason: 'userIsBlocked',
+          });
+        } else {
+          const userId = createId();
+          await updateUser(user.id, {
+            appleId: null,
+            email: null,
+            phoneNumber: null,
+            replacedBy: userId,
+          });
+          await createUser({
+            id: userId,
+            email: user.email,
+            invited: true,
+          });
+        }
+      }),
+    );
 
     await createUsers(
       filtered.map(f => ({
@@ -112,9 +142,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       })),
     );
 
-    const users = (await getUsersByEmail(filtered.map(f => f.email))).filter(
-      user => !!user,
-    );
+    const users =
+      filtered.length > 0
+        ? (await getUsersByEmail(filtered.map(f => f.email))).filter(
+            user => !!user,
+          )
+        : [];
 
     const profiles = await getProfilesByWebCard(webCard.id);
 
@@ -139,7 +172,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         profile => profile.userId === existingUser.id,
       );
 
-      userId = existingUser.id;
+      const userId = existingUser.id;
       const { displayedOnWebCard, isPrivate, avatarId, ...data } =
         invited.contactCard ?? {};
 
@@ -197,11 +230,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await validateCurrentSubscription(
-      owner.id,
-      createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
-      true,
-    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
+      alreadyAdded: true,
+    }); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });
@@ -224,9 +258,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     if (user && webCard.userName) {
       await sendPushNotification(user.id, {
-        type: 'multiuser_invitation',
+        notification: {
+          type: 'multiuser_invitation',
+        },
         mediaId: webCard.coverMediaId,
-        deepLink: 'multiuser_invitation',
         localeParams: { userName: webCard.userName },
         locale: guessLocale(user?.locale),
       });

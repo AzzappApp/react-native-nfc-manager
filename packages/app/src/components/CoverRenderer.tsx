@@ -1,5 +1,12 @@
 import { forwardRef, memo, useMemo } from 'react';
-import { Dimensions, Image, Platform, View, Text } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Platform,
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -15,7 +22,10 @@ import {
 
 import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { HOME_ICON_COVER_WIDTH } from './constants';
+import { useCoverUpload } from './CoverEditor/CoverUploadContext';
+import CoverRendererUploadingProgress from './CoverRendererUploadingProgress';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import { SocialLinkRenderer } from './SocialLinkRenderer';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
@@ -98,6 +108,7 @@ const CoverRenderer = (
   forwardRef: ForwardedRef<View>,
 ) => {
   const {
+    id: webCardId,
     cardColors,
     coverMedia,
     coverBackgroundColor,
@@ -108,70 +119,69 @@ const CoverRenderer = (
     companyName,
     companyActivityLabel,
     webCardKind,
-  } =
-    useFragment(
-      graphql`
-        fragment CoverRenderer_webCard on WebCard
-        @argumentDefinitions(
-          screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
-          pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
-          cappedPixelRatio: {
-            type: "Float!"
-            provider: "CappedPixelRatio.relayprovider"
-          }
-        ) {
+  } = useFragment(
+    graphql`
+      fragment CoverRenderer_webCard on WebCard
+      @argumentDefinitions(
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
+        id
+        cardColors {
+          primary
+          dark
+          light
+        }
+        coverIsPredefined
+        firstName
+        lastName
+        companyName
+        companyActivityLabel
+        webCardKind
+        coverBackgroundColor
+        coverMedia {
           id
-          cardColors {
-            primary
-            dark
-            light
+          __typename
+          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+          ... on MediaImage {
+            uri(width: $screenWidth, pixelRatio: $pixelRatio)
           }
-          coverIsPredefined
-          firstName
-          lastName
-          companyName
-          companyActivityLabel
-          webCardKind
-          coverBackgroundColor
-          coverMedia {
-            id
-            __typename
-            smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            ... on MediaImage {
-              uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            }
-            ... on MediaVideo {
-              uri(width: $screenWidth, pixelRatio: $pixelRatio)
-              thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-              smallThumbnail: thumbnail(
-                width: 125
-                pixelRatio: $cappedPixelRatio
-              )
-            }
-          }
-          coverDynamicLinks {
-            links {
-              link
-              position
-              socialId
-            }
-            color
-            size
-            position {
-              x
-              y
-            }
-            rotation
-            shadow
+          ... on MediaVideo {
+            uri(width: $screenWidth, pixelRatio: $pixelRatio)
+            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
           }
         }
-      `,
-      coverKey ?? null,
-    ) ?? {};
+        coverDynamicLinks {
+          links {
+            link
+            position
+            socialId
+          }
+          color
+          size
+          position {
+            x
+            y
+          }
+          rotation
+          shadow
+        }
+      }
+    `,
+    coverKey ?? null,
+  ) ?? {};
+
+  const { coverUploadingData } = useCoverUpload();
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } =
     coverMedia ?? {};
-  const isVideoMedia = __typename === 'MediaVideo';
+  const isVideoMedia =
+    coverUploadingData?.mediaKind ?? __typename === 'MediaVideo';
 
   //#region Styles and media sources
   const borderRadius: number = large ? 0 : COVER_CARD_RADIUS * width;
@@ -187,14 +197,24 @@ const CoverRenderer = (
 
   const coverSource = useMemo(
     () =>
-      mediaUri && coverMedia?.id
+      coverUploadingData && coverUploadingData.webCardId === webCardId
         ? {
-            uri: mediaUri,
+            mediaId: coverUploadingData.mediaId,
+            uri:
+              getLocalCachedMediaFile(
+                coverUploadingData.mediaId,
+                coverUploadingData.mediaKind,
+              ) ?? '',
             requestedSize,
-            mediaId: coverMedia?.id,
           }
-        : null,
-    [mediaUri, coverMedia?.id, requestedSize],
+        : mediaUri && coverMedia?.id
+          ? {
+              uri: mediaUri,
+              requestedSize,
+              mediaId: coverMedia?.id,
+            }
+          : null,
+    [coverUploadingData, webCardId, requestedSize, mediaUri, coverMedia?.id],
   );
 
   const styles = useStyleSheet(stylesheet);
@@ -377,6 +397,20 @@ const CoverRenderer = (
           </View>
         )}
       </View>
+      {!isSmallCover && coverUploadingData?.webCardId === webCardId && (
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+          ]}
+        >
+          <CoverRendererUploadingProgress />
+        </View>
+      )}
+      {/* )} */}
     </View>
   );
 };

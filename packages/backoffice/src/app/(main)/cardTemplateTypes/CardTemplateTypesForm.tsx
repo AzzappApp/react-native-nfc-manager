@@ -2,7 +2,6 @@
 
 import { PhoneIphone } from '@mui/icons-material';
 import {
-  Autocomplete,
   Box,
   Breadcrumbs,
   Button,
@@ -19,28 +18,21 @@ import { useMemo, useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type {
-  CardTemplateType,
-  LocalizationMessage,
-  WebCardCategory,
-} from '@azzapp/data';
+import type { CardTemplateType, LocalizationMessage } from '@azzapp/data';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;
-  webCardCategories: WebCardCategory[];
   saved?: boolean;
   labels: LocalizationMessage[];
 };
 
 type FormValue = CardTemplateType & {
   label: string;
-  webCardCategory: WebCardCategory;
 };
 
 const CardTemplateTypeForm = ({
   cardTemplateType,
   saved = false,
-  webCardCategories,
   labels,
 }: CardTemplateTypeFormProps) => {
   const isCreation = !cardTemplateType;
@@ -64,11 +56,6 @@ const CardTemplateTypeForm = ({
       ...cardTemplateType,
       label: label || '',
       enabled: cardTemplateType?.enabled || false,
-      webCardCategory: cardTemplateType?.webCardCategoryId
-        ? webCardCategories?.find(item => {
-            return item.id === cardTemplateType?.webCardCategoryId;
-          })
-        : undefined,
     }),
     formErrors?.fieldErrors,
     [saveCardTemplateType],
@@ -153,36 +140,6 @@ const CardTemplateTypeForm = ({
             {...fieldProps('label')}
           />
         </Box>
-        <Autocomplete
-          sx={{ width: 300 }}
-          multiple={false}
-          id="profile-categories"
-          options={webCardCategories}
-          getOptionLabel={option => {
-            const label = labels.find(item => item.key === option.id);
-            return label?.value ?? option.id;
-          }}
-          value={fieldProps('webCardCategory').value as WebCardCategory}
-          onChange={(_, value) => {
-            fieldProps('webCardCategory').onChange(value as WebCardCategory);
-          }}
-          renderInput={params => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Profile categories"
-            />
-          )}
-          renderOption={(props, option) => {
-            const label = labels.find(item => item.key === option.id);
-            return (
-              <li {...props} key={option.id}>
-                {label?.value ?? option.id}
-              </li>
-            );
-          }}
-        />
-
         <Button
           type="submit"
           variant="contained"

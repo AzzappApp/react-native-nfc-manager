@@ -4,8 +4,6 @@ import {
   getAllCardStyles,
   getAllCardTemplates,
   getCardTemplateTypes,
-  getCompanyActivities,
-  getCompanyActivityTypes,
   getCoverTemplateTags,
   getCoverTemplateTypes,
   getLocalizationMessagesByLocale,
@@ -58,16 +56,6 @@ export const GET = withPluginsRoute(
         getCardTemplateTypes().then(cardTemplateTypes =>
           cardTemplateTypes.map(
             ({ id }) => ({ id, kind: 'CardTemplateType' }) as const,
-          ),
-        ),
-        getCompanyActivities().then(companyActivity =>
-          companyActivity.map(
-            ({ id }) => ({ id, kind: 'CompanyActivity' }) as const,
-          ),
-        ),
-        getCompanyActivityTypes().then(companyActivityTypes =>
-          companyActivityTypes.map(
-            ({ id }) => ({ id, kind: 'CompanyActivityType' }) as const,
           ),
         ),
         getCoverTemplateTags().then(coverTemplateTags =>

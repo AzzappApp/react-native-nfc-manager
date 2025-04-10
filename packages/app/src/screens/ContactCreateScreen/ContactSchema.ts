@@ -3,6 +3,7 @@ import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 
 export const contactSchema = z
   .object({
+    scanUsed: z.boolean().default(false),
     notify: z.boolean().default(false),
     firstName: z.string().nullable().optional(),
     lastName: z.string().nullable().optional(),
@@ -56,8 +57,8 @@ export const contactSchema = z
       .nullable(),
   })
   .refine(
-    data => !!data.firstName || !!data.lastName,
-    'Either one of firstname or lastname should be filled in.',
+    data => !!data.firstName || !!data.lastName || !!data.company,
+    'Either one of firstname or lastname or company name should be filled in.',
   );
 
 export type ContactFormValues = z.infer<typeof contactSchema>;

@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import { useFullScreenOverlayContext } from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import useDimensions from '#hooks/useDimensions';
@@ -488,19 +489,30 @@ const SimpleCarouselItem = ({
     text?: string;
   };
 }) => {
+  const { setMedia } = useFullScreenOverlayContext(media);
+
   return (
-    <div className={styles.itemContainer}>
-      <div>
+    <div
+      className={styles.itemContainer}
+      style={{
+        width: media.width,
+      }}
+    >
+      <div
+        className={styles.imageContainer}
+        style={{ borderRadius: cardStyle.borderRadius }}
+        onClick={setMedia}
+      >
         {media.kind === 'video' ? (
           <CloudinaryVideo
             assetKind="module"
+            className={styles.media}
             media={media}
             alt="cover"
             fluid
             style={{
               objectFit: 'cover',
               width: '100%',
-              borderRadius: cardStyle.borderRadius,
             }}
             playsInline
             autoPlay
@@ -509,6 +521,7 @@ const SimpleCarouselItem = ({
           />
         ) : (
           <CloudinaryImage
+            className={styles.media}
             mediaId={media.id}
             draggable={false}
             alt="carousel"
@@ -520,7 +533,6 @@ const SimpleCarouselItem = ({
               objectFit: 'cover',
               width: '100%',
               height: '100%',
-              borderRadius: cardStyle.borderRadius,
             }}
           />
         )}
@@ -535,12 +547,16 @@ const SimpleCarouselItem = ({
           fontSize: cardStyle.titleFontSize,
         }}
       >
-        {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+        <RichText
+          fontFamily={cardStyle.titleFontFamily}
+          text={sectionData?.title ?? DEFAULT_MODULE_TITLE}
+          textFontSize={cardStyle.titleFontSize || commonStyles.titleFontSize}
+        />
       </h3>
       <p
         className={cn(
           commonStyles.text,
-          webCardTextFontsMap[cardStyle.fontFamily].className,
+          webCardTextFontsMap[cardStyle.fontFamily]?.className,
         )}
         style={{
           color: swapColor(cardModuleColor?.text, colorPalette),
@@ -550,6 +566,7 @@ const SimpleCarouselItem = ({
         <RichText
           fontFamily={cardStyle.fontFamily}
           text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+          textFontSize={cardStyle.fontSize || commonStyles.textFontSize}
         />
       </p>
     </div>

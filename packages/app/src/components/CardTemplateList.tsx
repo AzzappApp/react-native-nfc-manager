@@ -91,10 +91,6 @@ const CardTemplateList = (
             cardTemplateTypes {
               id
               label
-              webCardCategory {
-                id
-                label
-              }
             }
             webCard {
               id
@@ -356,7 +352,7 @@ const CardTemplateList = (
 
   const [search, setSearch] = useState('');
 
-  const templateTypesByWebCardCategory = useMemo(() => {
+  const templateTypes = useMemo(() => {
     return (
       cardTemplateTypes?.reduce(
         (
@@ -375,7 +371,7 @@ const CardTemplateList = (
           if (!curr) {
             return acc;
           }
-          const label = curr.webCardCategory?.label ?? '-';
+          const label = curr?.label ?? '-';
 
           const existingSection = acc.find(section => section.title === label);
 
@@ -447,7 +443,7 @@ const CardTemplateList = (
           <SelectSection
             nativeID="activities"
             accessibilityLabelledBy="activitiesLabel"
-            sections={templateTypesByWebCardCategory}
+            sections={templateTypes}
             inputLabel={selectedCardTemplateType?.title}
             selectedItemKey={selectedCardTemplateType?.id}
             keyExtractor={sectionKeyExtractor as any}

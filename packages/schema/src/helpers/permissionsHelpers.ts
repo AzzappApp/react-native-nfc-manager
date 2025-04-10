@@ -29,13 +29,18 @@ export const hasWebCardProfileRight = async (webCardId: string) => {
 
 export const checkWebCardProfileEditorRight = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  if (!!profile && !profileHasEditorRight(profile.profileRole)) {
+  if (
+    !profile ||
+    profile.invited ||
+    !profileHasEditorRight(profile.profileRole)
+  ) {
     throw new GraphQLError(ERRORS.FORBIDDEN, {
       extensions: {
         role: profile?.profileRole,
       },
     });
   }
+  return profile;
 };
 
 export const checkWebCardHasCover = async (webCardId: string) => {
@@ -47,22 +52,28 @@ export const checkWebCardHasCover = async (webCardId: string) => {
 
 export const checkWebCardProfileAdminRight = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  if (!!profile && !profileHasAdminRight(profile.profileRole)) {
+  if (
+    !profile ||
+    profile.invited ||
+    !profileHasAdminRight(profile.profileRole)
+  ) {
     throw new GraphQLError(ERRORS.FORBIDDEN, {
       extensions: {
         role: profile?.profileRole,
       },
     });
   }
+  return profile;
 };
 
 export const checkWebCardOwnerProfile = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  if (!!profile && !profileIsOwner(profile.profileRole)) {
+  if (!profile || !profileIsOwner(profile.profileRole)) {
     throw new GraphQLError(ERRORS.FORBIDDEN, {
       extensions: {
         role: profile?.profileRole,
       },
     });
   }
+  return profile;
 };

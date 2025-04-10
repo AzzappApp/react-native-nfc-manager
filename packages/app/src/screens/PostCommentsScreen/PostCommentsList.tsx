@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
+  FlatList,
   Keyboard,
   Platform,
   RefreshControl,
   StyleSheet,
   View,
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -304,59 +304,58 @@ const PostCommentsList = ({
         { paddingBottom: insets.bottom, paddingTop: insets.top },
       ]}
     >
-      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAreaView}>
-        <PostCommentsScreenHeader onClose={router.back} />
-        <FlatList
-          data={postComments}
-          renderItem={renderItem}
-          onEndReached={onEndReached}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          ListFooterComponent={ListFooterComponent}
-          onEndReachedThreshold={0.5}
-          style={styles.list}
-          refreshControl={refreshControl}
+      <PostCommentsScreenHeader onClose={router.back} />
+      <FlatList
+        data={postComments}
+        renderItem={renderItem}
+        onEndReached={onEndReached}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ListFooterComponent={ListFooterComponent}
+        onEndReachedThreshold={0.5}
+        style={styles.list}
+        refreshControl={refreshControl}
+        renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
+      />
+      <View style={styles.inputContainer}>
+        <AuthorCartouche
+          author={profile.webCard!}
+          variant="post"
+          hideUserName
+          style={{ height: 48 }}
         />
-        <View style={styles.inputContainer}>
-          <AuthorCartouche
-            author={profile.webCard!}
-            variant="post"
-            hideUserName
-            style={{ height: 48 }}
-          />
-          <Input
-            multiline
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Add a comment',
-              description: 'Post comment textarea placeholdesd',
-            })}
-            value={comment}
-            onChangeText={setComment}
-            onContentSizeChange={onContentSizeChange}
-            maxLength={MAX_COMMENT_LENGHT}
-            style={{ height: inputHeight }}
-            inputStyle={{
-              paddingTop:
-                Platform.OS === 'ios'
-                  ? inputHeight / 2 - textStyles.textField.fontSize + 1
-                  : undefined,
-            }}
-            rightElement={
-              <PressableOpacity
-                onPress={onSubmit}
-                disabled={!isNotFalsyString(comment)}
-              >
-                <Text variant="large">
-                  <FormattedMessage
-                    defaultMessage="Post"
-                    description="Post Comment screen - create comment action button"
-                  />
-                </Text>
-              </PressableOpacity>
-            }
-          />
-        </View>
-      </KeyboardAvoidingView>
+        <Input
+          multiline
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Add a comment',
+            description: 'Post comment textarea placeholdesd',
+          })}
+          value={comment}
+          onChangeText={setComment}
+          onContentSizeChange={onContentSizeChange}
+          maxLength={MAX_COMMENT_LENGHT}
+          style={{ height: inputHeight }}
+          inputStyle={{
+            paddingTop:
+              Platform.OS === 'ios'
+                ? inputHeight / 2 - textStyles.textField.fontSize + 1
+                : undefined,
+          }}
+          rightElement={
+            <PressableOpacity
+              onPress={onSubmit}
+              disabled={!isNotFalsyString(comment)}
+            >
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Post"
+                  description="Post Comment screen - create comment action button"
+                />
+              </Text>
+            </PressableOpacity>
+          }
+        />
+      </View>
     </Container>
   );
 };

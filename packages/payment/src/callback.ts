@@ -7,6 +7,8 @@ import {
   updateSubscriptionByPaymentMeanId,
   getSubscriptionById,
   getPaymentByTransactionId,
+  getWebCardById,
+  updateWebCard,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -14,14 +16,21 @@ import {
   getNextPaymentDate,
   calculateNextPaymentIntervalInMinutes,
   generateRebillFailRule,
+  REBILL_MANAGER_REBILL_DURATION,
 } from './helpers';
 import type { UserSubscription } from '@azzapp/data';
 
-export const acknowledgeFirstPayment = async (
-  paymentMeanId: string,
-  transactionId: string,
-  paymentProviderResponse?: string,
-) => {
+export const acknowledgeFirstPayment = async ({
+  paymentMeanId,
+  transactionId,
+  paymentProviderResponse,
+  webCardId,
+}: {
+  paymentMeanId: string;
+  transactionId: string;
+  paymentProviderResponse?: string;
+  webCardId?: string | null;
+}) => {
   let paymentId: string | undefined;
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
@@ -85,10 +94,11 @@ export const acknowledgeFirstPayment = async (
             body: {
               billing_description: `Subscription ${subscription.subscriptionPlan} for ${subscription.totalSeats} seats`,
               rebill_manager_initial_type: 'PAID',
-              rebill_manager_initial_price_cnts: `0`,
+              rebill_manager_initial_price_cnts: '0',
               rebill_manager_initial_duration_min: `${intervalInMinutes}`,
               rebill_manager_rebill_price_cnts: `${amount + taxes}`,
-              rebill_manager_rebill_duration_mins: `0`,
+              rebill_manager_rebill_duration_mins:
+                REBILL_MANAGER_REBILL_DURATION,
               rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
               clientPaymentRequestUlid: paymentMeanId,
               rebill_manager_fail_rule: generateRebillFailRule(),
@@ -149,6 +159,19 @@ export const acknowledgeFirstPayment = async (
         });
       }
     }
+
+    if (webCardId) {
+      const webCard = await getWebCardById(webCardId);
+      if (webCard && !webCard.cardIsPublished) {
+        await updateWebCard(webCardId, {
+          cardIsPublished: true,
+          alreadyPublished: true,
+          updatedAt: new Date(),
+          lastCardUpdate: new Date(),
+        });
+      }
+    }
+
     return { subscription, paymentId };
   }
 };

@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Platform,
-  useColorScheme,
   useWindowDimensions,
   View,
   type StyleProp,
@@ -25,7 +24,6 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
-import { openShakeShare } from './ShakeShare';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { ReactNode } from 'react';
 
@@ -93,7 +91,9 @@ const MainTabBar = ({
 
       switch (key) {
         case 'SHARE':
-          openShakeShare();
+          router.push({
+            route: 'SHAKE_AND_SHARE',
+          });
           break;
         case 'SCAN':
           router.push({
@@ -156,9 +156,7 @@ const MainTabBar = ({
     [intl, router],
   );
 
-  const appearance = useColorScheme() ?? 'light';
-
-  const currentRoute = ['HOME', 'MEDIA'][currentIndex];
+  const currentRoute = ['HOME', 'CONTACTS', 'MEDIA'][currentIndex];
 
   const tabs = useMemo(
     () =>
@@ -204,7 +202,7 @@ const MainTabBar = ({
           icon: 'community',
         },
       ] as const,
-    [intl, currentRoute, appearance],
+    [intl],
   );
   const styles = useStyleSheet(styleSheet);
 

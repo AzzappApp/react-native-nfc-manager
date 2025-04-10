@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AZZAPP_SCHEME</key>
+	<string>$(AZZAPP_SCHEME)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
@@ -10,7 +12,7 @@
 	<key>SHARED_GROUP_IDENTIFIER</key>
 	<string>$(SHARED_GROUP_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8.24</string>
+	<string>1.9.3</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 </dict>

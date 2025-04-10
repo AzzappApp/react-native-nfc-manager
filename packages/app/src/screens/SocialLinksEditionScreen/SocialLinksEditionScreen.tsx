@@ -16,7 +16,6 @@ import {
   getSocialLinksDefaultColors,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useOnFocus, useRouter } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
@@ -125,16 +124,11 @@ const SocialLinksEditionScreen = ({
         }
         webCard {
           id
-          isPremium
-          cardIsPublished
           coverBackgroundColor
           cardColors {
             primary
             light
             dark
-          }
-          cardModules {
-            id
           }
           ...SocialLinksSettingsEditionPanel_webCard
           ...ModuleEditionScreenTitle_webCard
@@ -240,9 +234,6 @@ const SocialLinksEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (socialLinks ? 0 : 1);
-
   const onCancel = router.back;
 
   const handleProfileActionError = useHandleProfileActionError(
@@ -298,20 +289,6 @@ const SocialLinksEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'socialLinks',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     const input: SaveSocialLinksModuleInput = {
       ...value,
       iconSize: iconSize.get(),
@@ -344,7 +321,6 @@ const SocialLinksEditionScreen = ({
   }, [
     canSave,
     profile.webCard,
-    cardModulesCount,
     value,
     iconSize,
     borderWidth,
@@ -417,7 +393,7 @@ const SocialLinksEditionScreen = ({
         id: 'links',
         element: (
           <SocialLinksLinksEditionPanel
-            links={links}
+            initialLinks={links}
             onChangeLinks={onLinksChange}
             onAddLink={openAddLink}
             onItemPress={onLinkItemPress}
@@ -511,7 +487,6 @@ const SocialLinksEditionScreen = ({
               description: 'SocialLinks text screen title',
             })}
             kind="socialLinks"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

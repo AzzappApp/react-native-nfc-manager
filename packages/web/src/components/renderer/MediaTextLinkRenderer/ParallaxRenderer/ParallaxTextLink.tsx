@@ -50,7 +50,13 @@ const ParallaxText = ({
                     webCardTitleFontsMap[cardStyle.titleFontFamily].className,
                   )}
                 >
-                  {mediaData?.title ?? DEFAULT_MODULE_TITLE}
+                  <RichText
+                    fontFamily={cardStyle.titleFontFamily}
+                    text={mediaData?.title ?? DEFAULT_MODULE_TITLE}
+                    textFontSize={
+                      cardStyle.titleFontSize || commonStyles.titleFontSize
+                    }
+                  />
                 </h2>
                 <p
                   style={{
@@ -60,12 +66,15 @@ const ParallaxText = ({
                   className={cn(
                     styles.textItem,
                     commonStyles.text,
-                    webCardTextFontsMap[cardStyle.fontFamily].className,
+                    webCardTextFontsMap[cardStyle.fontFamily]?.className,
                   )}
                 >
                   <RichText
                     fontFamily={cardStyle.fontFamily}
                     text={mediaData?.text ?? DEFAULT_MODULE_TEXT}
+                    textFontSize={
+                      cardStyle.fontSize || commonStyles.textFontSize
+                    }
                   />
                 </p>
               </section>

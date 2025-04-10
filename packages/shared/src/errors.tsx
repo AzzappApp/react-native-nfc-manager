@@ -140,9 +140,14 @@ const ERRORS = {
    * The webcard doesn't have cover, action cannot be done
    */
   WEBCARD_NO_COVER: 'WEBCARD_NO_COVER',
-  /**
-   * not enough seats to publish a webcard
+  /*
+   * The user does not have email adress
    */
+  USER_NO_EMAIL: 'USER_NO_EMAIL',
+  /*
+   * The user has been moderated
+   */
+  USER_IS_BLOCKED: 'USER_IS_BLOCKED',
 } as const;
 
 export default ERRORS;

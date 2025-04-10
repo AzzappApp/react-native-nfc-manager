@@ -2,6 +2,7 @@
 
 import { parseWithZod } from '@conform-to/zod';
 import * as Sentry from '@sentry/nextjs';
+import { toGlobalId } from 'graphql-relay';
 import { jwtDecode } from 'jwt-decode';
 import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { compressToEncodedURIComponent } from 'lz-string';
@@ -12,13 +13,13 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
-import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import {
@@ -27,8 +28,8 @@ import {
   shareBackVCardFilename,
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
-import type { EmailAttachment } from '#helpers/emailHelpers';
-import type { NewSharedContact } from '@azzapp/data';
+import type { VerifySignToken } from '#app/api/verifySign/route';
+import type { NewContact } from '@azzapp/data/src/schema';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';
@@ -56,13 +57,13 @@ export const processShareBackSubmission = async (
 ): Promise<SubmissionResult | null | undefined> => {
   headers();
 
-  const submission = parseWithZod(formData as ShareBackFormData, {
+  const submission = parseWithZod(formData, {
     schema: ShareBackFormSchema,
   });
 
   try {
     // decode token
-    const decodedToken = jwtDecode<JwtPayload>(token);
+    const decodedToken = jwtDecode<JwtPayload & VerifySignToken>(token);
     // verify expiration date
     if (!decodedToken.exp || decodedToken.exp < Date.now() / 1000) {
       return submission.reply({
@@ -138,13 +139,6 @@ export const processShareBackSubmission = async (
       });
     }
 
-    // @todo: wording for contact share back message
-    const shareBackBody = intl.formatMessage({
-      id: 'dMfROA',
-      defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
-      description: 'Email body for new contact share back',
-    });
-
     let phone = submission.value.phone?.number || '';
 
     try {
@@ -159,18 +153,26 @@ export const processShareBackSubmission = async (
       Sentry.captureException(e);
     }
 
-    const contactFormValue: NewSharedContact = {
-      ...(submission.payload as NewSharedContact),
+    const contactFormValue = {
+      ...submission.payload,
       phone,
     };
 
-    await saveShareBack(profile.id, contactFormValue);
+    await saveShareBack(profile.id, {
+      ...submission.payload,
+      phoneNumbers: [{ label: 'Home', number: phone }],
+      emails: [{ label: 'Main', address: submission.payload.email }],
+      meetingLocation: decodedToken.geolocation?.location,
+      meetingPlace: decodedToken.geolocation?.address,
+    } as NewContact);
 
     await sendPushNotification(profile.userId, {
-      type: 'shareBack',
+      notification: {
+        type: 'shareBack',
+        webCardId: toGlobalId('WebCard', profile.webCardId),
+      },
       mediaId: null,
       sound: 'default',
-      deepLink: 'shareBack',
       locale: guessLocale(user?.locale),
     });
 
@@ -187,8 +189,13 @@ export const processShareBackSubmission = async (
       );
 
       const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
+
       await sendTwilioSMS({
-        body: shareBackBody,
+        body: intl.formatMessage({
+          id: 'dMfROA',
+          defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
+          description: 'Email body for new contact share back',
+        }),
         to: user.phoneNumber as string,
         mediaUrl: shareBackContactVCardUrl,
       });
@@ -198,23 +205,41 @@ export const processShareBackSubmission = async (
 
       const vCardFileName = shareBackVCardFilename(submission.value);
 
-      const shareBackContactVCardAttachment = {
-        content: Buffer.from(buildVCardContact.toString()).toString('base64'),
-        filename: vCardFileName,
-        disposition: 'attachment',
-      } as EmailAttachment;
-
-      // @todo: wording for title email share back
-      await sendEmail({
-        to: user.email as string,
-        subject: intl.formatMessage({
-          id: 'ivEKQ2',
-          defaultMessage: 'New Contact ShareBack Received',
-          description: 'Email subject for new contact share back received',
-        }),
-        text: shareBackBody,
-        html: shareBackBody,
-        attachments: [shareBackContactVCardAttachment],
+      await sendTemplateEmail({
+        templateId: 'd-edcdee049b6d468cadf3ce7098bf0fe2',
+        recipients: [
+          {
+            to: user.email!,
+            dynamicTemplateData: {
+              subject: intl.formatMessage({
+                id: 'yYDi/Q',
+                defaultMessage: 'You received a new contact through azzapp.',
+                description:
+                  'Email subject for new contact share back received',
+              }),
+              title: intl.formatMessage({
+                id: 'PQ9+Ez',
+                defaultMessage: 'You have a new contact',
+                description: 'Email title for new contact share back received',
+              }),
+              body: intl.formatMessage({
+                id: 'WDHa6u',
+                defaultMessage:
+                  'You’ve received a new contact directly accessible on azzapp. Alternatively, you can also open and save the attached contact file.',
+                description: 'Email body for new contact share back',
+              }),
+            },
+          },
+        ],
+        attachments: [
+          {
+            content: Buffer.from(buildVCardContact.toString()).toString(
+              'base64',
+            ),
+            filename: vCardFileName,
+            disposition: 'attachment',
+          },
+        ],
       });
     }
 

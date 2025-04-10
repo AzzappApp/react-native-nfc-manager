@@ -12,6 +12,10 @@ import {
 import { isDefined } from '@azzapp/shared/isDefined';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+} from '#components/ui/RichText';
 import { MEMORY_SIZE } from './device';
 import { getFileName } from './fileHelpers';
 import {
@@ -282,8 +286,8 @@ export const getTitleStyle = (
 ) => {
   const textStyle: TextStyle = {
     fontFamily: 'Arial',
-    fontSize: 34,
-    lineHeight: 48,
+    fontSize: defaultTitleFontSize,
+    lineHeight: Math.floor(defaultTitleFontSize * 1.6),
     color: cardModuleColor.title,
   };
   if (cardStyle?.titleFontFamily) {
@@ -291,7 +295,7 @@ export const getTitleStyle = (
   }
   if (cardStyle?.fontSize) {
     textStyle.fontSize = cardStyle.titleFontSize;
-    textStyle.lineHeight = cardStyle.titleFontSize * 1.2;
+    textStyle.lineHeight = cardStyle.titleFontSize * 1.6;
   }
   return textStyle;
 };
@@ -309,7 +313,8 @@ export const getTextStyle = (
 ) => {
   const textStyle: TextStyle = {
     fontFamily: 'Arial',
-    fontSize: 16,
+    fontSize: defaultTextFontSize,
+    lineHeight: Math.floor(defaultTitleFontSize * 1.9),
     color: cardModuleColor.text,
   };
 
@@ -319,7 +324,7 @@ export const getTextStyle = (
   if (cardStyle?.fontSize) {
     textStyle.fontSize = cardStyle.fontSize;
   }
-  textStyle.lineHeight = textStyle.fontSize! * 1.6;
+  textStyle.lineHeight = textStyle.fontSize! * 1.9;
 
   return textStyle;
 };

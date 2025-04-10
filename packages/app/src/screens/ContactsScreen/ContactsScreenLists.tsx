@@ -4,6 +4,7 @@ import {
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { AppState, View, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { useOnContactAdded } from '#helpers/addContactHelper';
@@ -11,12 +12,18 @@ import { findLocalContact } from '#helpers/contactHelpers';
 import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
 import ContactDetailsModal from './ContactDetailsModal';
+import ContactsFilteredByLocation from './ContactsFilteredByLocation';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
+import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
+import { IsAzzappSupportedProvider } from './isWhatsappSupportedContext';
 import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
 import type {
   ContactsScreenLists_contacts$data,
@@ -35,13 +42,15 @@ export type ContactActionProps = {
 
 type ContactsScreenListsProps = {
   search: string | undefined;
-  searchBy: 'date' | 'name';
+  searchBy: 'date' | 'location' | 'name';
   profile: ContactsScreenLists_contacts$key;
+  filterBy?: string;
 };
 const ContactsScreenLists = ({
   search,
   searchBy,
   profile,
+  filterBy,
 }: ContactsScreenListsProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [localContacts, setLocalContacts] = useState<Contact[]>();
@@ -114,12 +123,16 @@ const ContactsScreenLists = ({
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"
           }
+          filterBy: { type: SearchFilter }
         ) {
+          id
+          nbContacts #keep this field to update  on the main screen after updating by pulling down #7896
           searchContacts(
             after: $after
             first: $first
             name: $name
             orderBy: $orderBy
+            filterBy: $filterBy
           ) @connection(key: "Profile_searchContacts") {
             __id
             edges {
@@ -158,6 +171,12 @@ const ContactsScreenLists = ({
                   uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                 }
                 birthday
+                meetingPlace {
+                  city
+                  region
+                  subregion
+                  country
+                }
                 contactProfile {
                   id
                   avatar {
@@ -228,7 +247,16 @@ const ContactsScreenLists = ({
       setRefreshing(true);
       refreshLocalContacts();
       refetch(
-        { name: search, orderBy: searchBy },
+        {
+          name: search,
+          orderBy: searchBy,
+          filterBy: filterBy
+            ? {
+                value: filterBy,
+                type: 'location',
+              }
+            : undefined,
+        },
         { fetchPolicy: 'store-and-network' },
       );
       setRefreshing(false);
@@ -240,6 +268,7 @@ const ContactsScreenLists = ({
     refetch,
     search,
     searchBy,
+    filterBy,
   ]);
 
   // This code is used to refresh the screen when we come back to it.
@@ -257,10 +286,19 @@ const ContactsScreenLists = ({
 
   useEffect(() => {
     refetch(
-      { name: search || undefined, orderBy: searchBy },
+      {
+        name: search || undefined,
+        orderBy: searchBy,
+        filterBy: filterBy
+          ? {
+              value: filterBy,
+              type: 'location',
+            }
+          : undefined,
+      },
       { fetchPolicy: 'store-and-network' },
     );
-  }, [search, refetch, searchBy]);
+  }, [search, refetch, searchBy, filterBy]);
 
   const [commitContactsLastView] =
     useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
@@ -281,10 +319,6 @@ const ContactsScreenLists = ({
     commitContactsLastView({
       variables: {
         profileId,
-      },
-      updater: store => {
-        const profile = store.get(profileId);
-        profile?.setValue(0, 'nbNewContacts');
       },
     });
   }, [commitContactsLastView, profileInfos, profileInfos?.profileId]);
@@ -398,6 +432,16 @@ const ContactsScreenLists = ({
     [contactsPermissionStatus, localContacts],
   );
 
+  // manage keyboard height
+  const { bottom } = useScreenInsets();
+  const keyboardHeight = useKeyboardHeight();
+  const footerStyle = useAnimatedStyle(() => {
+    const normalizedHeight = bottom + BOTTOM_MENU_HEIGHT - keyboardHeight.value;
+    return {
+      height: Math.max(normalizedHeight, keyboardHeight.value),
+    };
+  });
+
   if (
     localContacts === undefined ||
     contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED
@@ -407,45 +451,74 @@ const ContactsScreenLists = ({
   }
 
   return (
-    <View style={styles.flex}>
-      {profile && searchBy === 'name' && (
-        <ContactsScreenSearchByName
-          contacts={contacts}
-          onEndReached={onEndReached}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
+    <IsAzzappSupportedProvider>
+      <View style={styles.flex}>
+        {profile && searchBy === 'name' && (
+          <ContactsScreenSearchByName
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onShowContact={onShowContact}
+            localContacts={localContacts}
+            contactsPermissionStatus={contactsPermissionStatus}
+            showContactAction={setContactActionData}
+            listFooterComponent={<Animated.View style={footerStyle} />}
+          />
+        )}
+        {profile &&
+          searchBy === 'date' &&
+          (filterBy ? (
+            <ContactsFilteredByLocation
+              contacts={contacts}
+              onEndReached={onEndReached}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              onShowContact={onShowContact}
+              localContacts={localContacts}
+              contactsPermissionStatus={contactsPermissionStatus}
+              showContactAction={setContactActionData}
+              listFooterComponent={<Animated.View style={footerStyle} />}
+            />
+          ) : (
+            <ContactsScreenSearchByDate
+              contacts={contacts}
+              onEndReached={onEndReached}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              onShowContact={onShowContact}
+              localContacts={localContacts}
+              contactsPermissionStatus={contactsPermissionStatus}
+              showContactAction={setContactActionData}
+              listFooterComponent={<Animated.View style={footerStyle} />}
+            />
+          ))}
+        {profile && searchBy === 'location' && (
+          <ContactsScreenSearchByLocation
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onShowContact={onShowContact}
+            localContacts={localContacts}
+            contactsPermissionStatus={contactsPermissionStatus}
+            showContactAction={setContactActionData}
+            listFooterComponent={<Animated.View style={footerStyle} />}
+          />
+        )}
+        <ContactDetailsModal
+          ref={contactDetails}
           onInviteContact={onInviteContactInner}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={setContactActionData}
         />
-      )}
-      {profile && searchBy === 'date' && (
-        <ContactsScreenSearchByDate
-          contacts={contacts}
-          onEndReached={onEndReached}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
+        <ContactActionModal
+          contactActionData={contactActionData}
+          close={() => setContactActionData(undefined)}
+          onRemoveContacts={onRemoveContacts}
           onInviteContact={onInviteContactInner}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={setContactActionData}
+          onShow={onShowContact}
         />
-      )}
-      <ContactDetailsModal
-        ref={contactDetails}
-        onInviteContact={onInviteContactInner}
-      />
-      <ContactActionModal
-        contactActionData={contactActionData}
-        close={() => setContactActionData(undefined)}
-        onRemoveContacts={onRemoveContacts}
-        onInviteContact={onInviteContactInner}
-        onShow={onShowContact}
-      />
-    </View>
+      </View>
+    </IsAzzappSupportedProvider>
   );
 };
 

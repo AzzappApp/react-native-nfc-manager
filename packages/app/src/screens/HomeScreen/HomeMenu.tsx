@@ -1,10 +1,6 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
@@ -14,7 +10,6 @@ import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
-import type { DerivedValue } from 'react-native-reanimated';
 
 export type HOME_TAB = 'CONTACT_CARD' | 'MULTI_USER' | 'STATS';
 
@@ -22,30 +17,13 @@ type HomeMenuProps = {
   selected: HOME_TAB;
   user: HomeBottomPanel_user$data;
   setSelected: (section: HOME_TAB) => void;
-  newContactsOpacity: DerivedValue<number>;
-  notificationColor: DerivedValue<string>;
   minWidth: number;
 };
 
-const circleSize = 4.5;
-
-const HomeMenu = ({
-  user,
-  selected,
-  setSelected,
-  newContactsOpacity,
-  notificationColor,
-  minWidth,
-}: HomeMenuProps) => {
+const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
   const router = useRouter();
   const intl = useIntl();
   const { currentIndexProfileSharedValue } = useHomeScreenContext();
-  const circleAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      backgroundColor: notificationColor.value,
-      opacity: withTiming(newContactsOpacity.value, { duration: 300 }),
-    };
-  });
 
   const onPressMultiUser = useCallback(() => {
     const profile = user?.profiles?.[currentIndexProfileSharedValue.value - 1];
@@ -66,10 +44,7 @@ const HomeMenu = ({
   }, [currentIndexProfileSharedValue.value, intl, router, user?.profiles]);
 
   return (
-    <View
-      style={[styles.container, { width: minWidth }]}
-      accessibilityRole="tablist"
-    >
+    <View style={[styles.container, { minWidth }]} accessibilityRole="tablist">
       <TabBarMenuItem
         selected={selected === 'CONTACT_CARD'}
         onPress={() => setSelected('CONTACT_CARD')}
@@ -77,6 +52,7 @@ const HomeMenu = ({
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
         selectedLabelColor={colors.white}
+        style={styles.menuContainerStyle}
       >
         <FormattedMessage
           defaultMessage="Contact card{azzappA}"
@@ -98,6 +74,7 @@ const HomeMenu = ({
           backgroundColor={CLEAR_GRADIENT_COLOR}
           labelStyle={styles.menuLabelStyle}
           selectedLabelColor={colors.white}
+          style={styles.menuContainerStyle}
         >
           <FormattedMessage
             defaultMessage="Multi-user"
@@ -112,14 +89,13 @@ const HomeMenu = ({
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
         selectedLabelColor={colors.white}
+        style={styles.menuContainerStyle}
       >
         <FormattedMessage
           defaultMessage="Statistics"
           description="Home Screen menu - Stats"
         />
       </TabBarMenuItem>
-
-      <Animated.View style={[styles.circle, circleAnimatedStyle]} />
     </View>
   );
 };
@@ -140,17 +116,11 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     gap: 5,
     alignSelf: 'center',
+    marginHorizontal: 20,
   },
+  menuContainerStyle: { flexGrow: 1, flexShrink: 0 },
   menuLabelStyle: {
     color: colors.white,
-  },
-  circle: {
-    width: circleSize * 2,
-    height: circleSize * 2,
-    borderRadius: circleSize,
-    flex: 1,
-    top: 4,
-    right: 6,
-    position: 'absolute',
+    textOverflow: 'ellipsis',
   },
 });

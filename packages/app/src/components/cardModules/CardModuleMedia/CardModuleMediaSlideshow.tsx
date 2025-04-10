@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PixelRatio, Platform, StyleSheet } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  Pressable,
+} from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,6 +12,7 @@ import Animated, {
   Extrapolation,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
+import { useFullScreenOverlayContext } from '#components/WebCardPreviewFullScreenOverlay';
 import useBoolean from '#hooks/useBoolean';
 import useInterval from '#hooks/useInterval';
 import CardModuleMediaSelector from '../CardModuleMediaSelector';
@@ -239,18 +244,23 @@ const SlideshowItem = ({
   });
 
   const { media } = cardModuleMedia;
+  const setMedia = useFullScreenOverlayContext();
+
   return (
-    <Animated.View style={[styles.imageContainer, animatedStyle]}>
-      <CardModuleMediaSelector
-        media={media}
-        canPlay={canPlay}
-        dimension={{ width: itemWidth, height: itemWidth }}
-      />
-    </Animated.View>
+    <Pressable style={styles.flex} onPress={() => setMedia(media)}>
+      <Animated.View style={[styles.imageContainer, animatedStyle]}>
+        <CardModuleMediaSelector
+          media={media}
+          canPlay={canPlay}
+          dimension={{ width: itemWidth, height: itemWidth }}
+        />
+      </Animated.View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   container: {
     justifyContent: 'center',
     flexGrow: 0,

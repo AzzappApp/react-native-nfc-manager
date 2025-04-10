@@ -2,7 +2,11 @@ import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Pressable, View } from 'react-native';
 import { shadow } from '#theme';
-import { RichText } from '#components/ui/RichText';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+  RichText,
+} from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -132,7 +136,7 @@ const AlternationItem = ({
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
 
-  const openLink = () => {
+  const openLink = useCallback(() => {
     if (moduleEditing) {
       setEditableItemIndex?.(index);
     } else if (!moduleEditing && cardModuleMedia.link?.url) {
@@ -140,7 +144,7 @@ const AlternationItem = ({
     } else {
       Linking.openURL('https://web.azzapp.com/explanation');
     }
-  };
+  }, [cardModuleMedia.link?.url, index, moduleEditing, setEditableItemIndex]);
 
   return (
     <CardModulePressableTool
@@ -177,11 +181,15 @@ const AlternationItem = ({
             variant="large"
             style={getTitleStyle(cardStyle, cardModuleColor)}
           >
-            {cardModuleMedia.title}
+            <RichText
+              text={cardModuleMedia.title}
+              fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
+            />
           </Text>
           <RichText
             text={cardModuleMedia.text}
             style={getTextStyle(cardStyle, cardModuleColor)}
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
           />
           <View style={styles.buttonCenter}>
             <Pressable

@@ -1,9 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedRef,
+  useSharedValue,
+} from 'react-native-reanimated';
+import Sortable from 'react-native-sortables';
 import { colors } from '#theme';
-import SortableList from '#components/SortableScrollView/SortableScrollView';
 import { SocialLinkIconButton } from '#components/ui/SocialLinkIconButton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -13,13 +16,16 @@ import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
 import type { ViewProps, StyleProp, ViewStyle } from 'react-native';
-import type { PanGestureType } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture';
+import type {
+  SortableGridDragEndCallback,
+  SortableGridRenderItem,
+} from 'react-native-sortables';
 
 type SocialLinksLinksEditionPanelProps = ViewProps & {
   /**
    * The links currently set on the module
    */
-  links: SocialLinkItem[];
+  initialLinks: SocialLinkItem[];
   /**
    * A callback called when the user update the links
    */
@@ -32,11 +38,13 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
   maxLink?: number;
 };
 
+const ITEM_HEIGHT = 90;
+
 /**
  * A Panel to edit the Links of the SocialLinks edition screen
  */
 const SocialLinksLinksEditionPanel = ({
-  links,
+  initialLinks,
   onChangeLinks,
   onAddLink,
   onItemPress,
@@ -52,48 +60,53 @@ const SocialLinksLinksEditionPanel = ({
 
   const onChangeOrder = useCallback(
     (arr: SocialLinkItem[]) => {
-      const orderedList: SocialLinkItem[] = arr
-        .sort((a, b) => a.position - b.position)
-        // filter out keyId
-        .map((item, index) => ({
-          link: item.link,
-          position: index,
-          socialId: item.socialId,
-        }));
+      const orderedList: SocialLinkItem[] = arr.sort(
+        (a, b) => a.position - b.position,
+      );
       onChangeLinks(orderedList);
     },
     [onChangeLinks],
   );
 
-  const sortableLinks = links
-    .sort((a, b) => a.position - b.position)
-    .map((l, index) => {
-      return { ...l, position: index, keyId: `${l.link}${l.socialId}${index}` };
-    });
+  const onDragEnd: SortableGridDragEndCallback<SocialLinkItem> = useCallback(
+    params => {
+      onChangeOrder(
+        params.data?.map((item, index) => ({
+          link: item.link,
+          position: index,
+          socialId: item.socialId,
+        })),
+      );
+    },
+    [onChangeOrder],
+  );
 
-  const { width } = useScreenDimensions();
-  const visibleDimension = width;
+  const [sortableLinks, setSortableLinks] = useState(
+    initialLinks.sort((a, b) => a.position - b.position),
+  );
+
+  useEffect(() => {
+    if (initialLinks.length !== sortableLinks.length) {
+      // refresh links locally only when number of link has changed
+      // to avoid re-rendering the list when the order is changed
+      setSortableLinks(initialLinks.sort((a, b) => a.position - b.position));
+    }
+  }, [initialLinks, sortableLinks.length]);
+
   const { bottom } = useScreenInsets();
+  const { width: windowWidth } = useScreenDimensions();
+
+  const paddingHorizontal = windowWidth - ITEM_HEIGHT * sortableLinks.length;
+
+  const scrollEnabled = paddingHorizontal < 0;
 
   const scrollableStyle: ViewStyle = {
     overflow: 'visible',
     paddingBottom: maxLink <= 0 ? 30 : 0,
     paddingTop: maxLink <= 0 ? 30 : 0,
     maxHeight: 172 - bottom,
+    paddingStart: paddingHorizontal / 2,
   };
-
-  const onPress = useCallback(
-    (item: {
-      position: number;
-      keyId: string;
-      socialId: string;
-      link: string;
-    }) => {
-      const { keyId, ...rest } = item;
-      onItemPress(rest);
-    },
-    [onItemPress],
-  );
 
   const onDeleteLink = useCallback(
     (item: SocialLinkItem) => {
@@ -102,31 +115,27 @@ const SocialLinksLinksEditionPanel = ({
     [sortableLinks, onChangeOrder],
   );
 
-  const renderItem = useCallback(
-    (
-      item: {
-        position: number;
-        keyId: string;
-        socialId: string;
-        link: string;
-      },
-      panGesture: PanGestureType,
-    ) => {
+  const renderItem = useCallback<SortableGridRenderItem<SocialLinkItem>>(
+    ({ item }) => {
       return (
-        <GestureDetector gesture={panGesture}>
-          <View style={styles.itemContainer}>
-            <SocialLinkIconButton
-              item={item}
-              onPress={onPress}
-              showDelete
-              onDeletePress={onDeleteLink}
-            />
-          </View>
-        </GestureDetector>
+        <View style={styles.itemContainer}>
+          <SocialLinkIconButton
+            item={item}
+            onPress={onItemPress}
+            showDelete
+            onDeletePress={onDeleteLink}
+          />
+        </View>
       );
     },
-    [onDeleteLink, onPress, styles.itemContainer],
+    [onDeleteLink, onItemPress, styles.itemContainer],
   );
+
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+  const autoScrollEnabled = useSharedValue(true);
+
+  const keyExtractor = (item: SocialLinkItem) =>
+    `${item.socialId}${item.link}${item.position}`;
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -138,24 +147,35 @@ const SocialLinksLinksEditionPanel = ({
           })}
         />
       ) : undefined}
-      <SortableList
-        items={sortableLinks}
-        itemDimension={90}
-        visibleDimension={visibleDimension}
-        showsHorizontalScrollIndicator={false}
+      <Animated.ScrollView
         horizontal
-        contentContainerStyle={styles.scrollableListContainer}
         style={scrollableStyle}
-        activateAfterLongPress
-        renderItem={renderItem}
-        onChangeOrder={onChangeOrder}
-      />
+        ref={scrollableRef}
+        scrollEnabled={scrollEnabled}
+        showsHorizontalScrollIndicator={false}
+      >
+        <Sortable.Grid
+          key={sortableLinks.length}
+          scrollableRef={scrollableRef}
+          rows={1}
+          rowHeight={ITEM_HEIGHT}
+          data={sortableLinks}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          overDrag="horizontal"
+          autoScrollEnabled={autoScrollEnabled}
+          autoScrollDirection="horizontal"
+          autoScrollSpeed={5}
+          onDragEnd={onDragEnd}
+          inactiveItemOpacity={0.5}
+        />
+      </Animated.ScrollView>
       {maxLink > 0 && (
         <Text variant="medium" style={styles.linksPreviewCount}>
           <FormattedMessage
             defaultMessage="{links}/{maxLink} links"
             description="CoverEditorLinksModal - Links count"
-            values={{ links: links.length, maxLink }}
+            values={{ links: initialLinks.length, maxLink }}
           />
         </Text>
       )}
@@ -163,7 +183,7 @@ const SocialLinksLinksEditionPanel = ({
         <IconButton
           icon="add"
           onPress={onAddLink}
-          disabled={maxLink > 0 && links.length >= maxLink}
+          disabled={maxLink > 0 && initialLinks.length >= maxLink}
         />
       </View>
     </View>
@@ -183,11 +203,6 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollableListContainer: {
-    alignContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
   pressableSocialIcon: {
     paddingHorizontal: 5,
   },
@@ -196,8 +211,8 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey400 : colors.grey600,
   },
   itemContainer: {
-    width: 90,
-    height: 90,
+    width: ITEM_HEIGHT,
+    height: ITEM_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
   },

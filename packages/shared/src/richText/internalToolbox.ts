@@ -13,17 +13,20 @@ type SplitArrayResult = [RichTextASTNode[], RichTextASTNode[]];
  */
 export function deleteTagFromRichTextAST(
   node: RichTextASTNode | undefined,
-  tag: string,
+  tag: string[],
 ): RichTextASTNode | undefined {
   if (!node) return undefined;
   const newChildren = node.children?.map(child => {
-    if (child.type === tag) {
+    if (tag.includes(child.type)) {
       child.type = 'fragment';
     }
     return deleteTagFromRichTextAST(child, tag);
   });
   return simplifyRichTextAST({
-    ...node,
+    start: node.start,
+    end: node.end,
+    type: tag.includes(node.type) ? 'fragment' : node.type,
+    value: node.value,
     children: newChildren?.filter(isDefined),
   });
 }
@@ -107,7 +110,7 @@ export const splitRichTextAST = (
               type: 'text',
               start: node.start,
               end: index,
-              value: node.value?.substring(0, index - node.start),
+              value: node.value?.substring(0, index - node.start) || '',
             }
           : undefined,
       second:
@@ -116,10 +119,9 @@ export const splitRichTextAST = (
               type: 'text',
               start: index,
               end: node.end,
-              value: node.value?.substring(
-                index - node.start,
-                node.value.length,
-              ),
+              value:
+                node.value?.substring(index - node.start, node.value.length) ||
+                '',
             }
           : undefined,
     };

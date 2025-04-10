@@ -6,5 +6,6 @@ module.exports = {
   testMatch: ['<rootDir>/src/**/*.test.{js,jsx,ts,tsx}'],
   moduleNameMapper: {
     '#(.*)': '<rootDir>/../web/src/$1',
+    '@azzapp/shared/(.*)': '<rootDir>/../shared/src/$1',
   },
 };

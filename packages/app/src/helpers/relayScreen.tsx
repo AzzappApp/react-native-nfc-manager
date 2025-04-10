@@ -55,7 +55,7 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
     /**
      * The fallback component to render while the query is loading.
      */
-    fallback?: React.ComponentType<any> | null;
+    fallback?: (props: RelayScreenProps<TRoute, any>) => React.ReactNode | null;
     /**
      * The component to render when an error occurs.
      */

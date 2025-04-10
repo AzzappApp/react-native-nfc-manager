@@ -1,10 +1,14 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import Image from 'next/image';
-import { getMediasByIds, getProfileById } from '@azzapp/data';
+import { getMediasByIds, getProfileById, getUserById } from '@azzapp/data';
+import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
-import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURLForSize,
+  getRoundImageURLForSize,
+} from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import azzappFull from '#assets/images/azzapp-full.png';
@@ -74,9 +78,16 @@ const EmailSignaturePage = async ({
   }
   const contact = parseEmailSignature(contactData);
   const profile = await getProfileById(contact.profileId);
+
   if (!profile || profile.webCardId !== webCard.id) {
     return notFound();
   }
+
+  const user = await getUserById(profile.userId);
+  if (!user) {
+    return notFound();
+  }
+
   const { data: saveContactData, signature: saveContactSignature } =
     await serializeAndSignContactCard(
       webCard.userName,
@@ -90,9 +101,17 @@ const EmailSignaturePage = async ({
     webCard.isMultiUser && webCard.logoId != null
       ? webCard.logoId
       : profile.logoId;
-  const companyLogoUrl = companyLogo
-    ? getImageURLForSize({ id: companyLogo, height: 140, format: 'png' })
-    : null;
+  let companyLogoUrl: string | null = null;
+  if (companyLogo) {
+    const [companyLogoMedia] = await getMediasByIds([companyLogo]);
+    if (companyLogoMedia) {
+      companyLogoUrl = getImageURLForSize({
+        id: companyLogo,
+        width: (companyLogoMedia.width / companyLogoMedia.height) * 120,
+        format: 'png',
+      });
+    }
+  }
 
   const saveContactURL = buildUserUrlWithContactCard(
     webCard.userName,
@@ -102,12 +121,25 @@ const EmailSignaturePage = async ({
 
   const showStoreLinks = !isMobileDevice;
 
-  const intl = getServerIntl();
+  const intl = getServerIntl(
+    isSupportedLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
+  );
   const saveContactMessage = intl.formatMessage({
     defaultMessage: 'Save my contact',
     id: 'YdhsiU',
     description: 'Signature web link / save my contact',
   });
+
+  // we override the avatar with the one from the profile if it exists
+  // to transform it into a round image
+  if (contact.avatar && profile.avatarId) {
+    contact.avatar = getRoundImageURLForSize({
+      id: profile.avatarId,
+      height: 120,
+      width: 120,
+      format: 'png',
+    });
+  }
 
   return (
     <div className={styles.container}>
@@ -139,6 +171,7 @@ const EmailSignaturePage = async ({
         contact={contact}
         companyLogoUrl={companyLogoUrl}
         saveContactMessage={saveContactMessage}
+        saveContactURL={saveContactURL}
       />
       <p className={styles.description}>
         {mode === 'simple'

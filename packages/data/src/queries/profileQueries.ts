@@ -153,27 +153,6 @@ export const getUserProfilesWithWebCard = async (
 };
 
 /**
- * Retrieves an associated profiles to an user for a webCard
- * @param userId - The id of the user
- * @param webCardId - The id of the webCard
- * @returns The list of profile associated to the user
- */
-export const getProfile = async (userId: string, webCardId: string) => {
-  return db()
-    .select()
-    .from(ProfileTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
-    .where(
-      and(
-        eq(ProfileTable.userId, userId),
-        eq(ProfileTable.webCardId, webCardId),
-      ),
-    )
-    .limit(1)
-    .then(res => res.map(({ Profile }) => Profile).pop());
-};
-
-/**
  * Retrieves the owner profile by the username
  *
  * @param userName - The userName of the profile to retrieve
@@ -474,45 +453,60 @@ export const removeWebCardNonOwnerProfiles = async (webCardId: string) => {
 };
 
 /**
- * Retrieves for a user the profiles that have a common web card with the targeted users
  *
- * @param userId - The id of the user
- * @param targetUserIds - The list of targeted users
- * @returns a record with as key the target user id and as value the profile of the user
+ * @param viewerId is the id of the user who is sharing the web card
+ * @param targetUserIds  is the list of user ids to check if they have shared the web card with the owner
+ * @returns a map of user ids to a boolean indicating if they have shared the web card with the owner
  */
-export const getCommonWebCardProfiles = async (
-  userId: string,
+export const getSharedWebCardRelation = async (
+  viewerId: string,
   targetUserIds: readonly string[],
-): Promise<Record<string, string[]>> => {
-  const TargetProfileTable = alias(ProfileTable, 'TargetProfileTable');
-  return db()
+) => {
+  const TargetProfile = alias(ProfileTable, 'TargetProfile');
+
+  const rows = await db()
     .select({
-      profileRole: ProfileTable.profileRole,
-      targetUserId: TargetProfileTable.userId,
+      targetUserId: TargetProfile.userId,
+      targetProfileRole: TargetProfile.profileRole,
+      viewerProfileRole: ProfileTable.profileRole,
     })
     .from(ProfileTable)
     .innerJoin(
-      TargetProfileTable,
-      eq(ProfileTable.webCardId, TargetProfileTable.webCardId),
+      TargetProfile,
+      eq(ProfileTable.webCardId, TargetProfile.webCardId),
     )
     .where(
       and(
-        eq(ProfileTable.userId, userId),
-        inArray(TargetProfileTable.userId, targetUserIds as string[]),
-      ),
-    )
-    .then(res =>
-      res.reduce(
-        (acc, { profileRole, targetUserId }) => {
-          if (!acc[targetUserId]) {
-            acc[targetUserId] = [];
-          }
-          acc[targetUserId].push(profileRole);
-          return acc;
-        },
-        {} as Record<string, string[]>,
+        eq(ProfileTable.userId, viewerId),
+        inArray(TargetProfile.userId, targetUserIds as string[]),
+        eq(ProfileTable.deleted, false),
+        eq(TargetProfile.deleted, false),
       ),
     );
+
+  const result: Record<
+    string,
+    { hasSharedWithOwner: boolean; isAdminOrOwner: boolean }
+  > = {};
+
+  for (const { targetUserId, targetProfileRole, viewerProfileRole } of rows) {
+    if (!result[targetUserId]) {
+      result[targetUserId] = {
+        hasSharedWithOwner: false,
+        isAdminOrOwner: false,
+      };
+    }
+
+    if (targetProfileRole === 'owner') {
+      result[targetUserId].hasSharedWithOwner = true;
+    }
+
+    if (viewerProfileRole === 'owner' || viewerProfileRole === 'admin') {
+      result[targetUserId].isAdminOrOwner = true;
+    }
+  }
+
+  return result;
 };
 
 /**
@@ -520,18 +514,24 @@ export const getCommonWebCardProfiles = async (
  *
  * @param webCardId - The id of the web card
  */
-export const getNbNewContacts = async (profileId: string, date: Date) => {
-  return db()
-    .select({ count: count() })
+export const getNbNewContactsPerOwner = async (profileIds: string[]) => {
+  const res = await db()
+    .select({
+      ownerProfileId: ContactTable.ownerProfileId,
+      count: count(),
+    })
     .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id)) // Join on profile ID
     .where(
       and(
-        eq(ContactTable.ownerProfileId, profileId),
+        inArray(ProfileTable.id, [...new Set(profileIds)]), // Ensure we filter only relevant profiles
         eq(ContactTable.deleted, false),
-        gt(ContactTable.createdAt, date),
+        gt(ContactTable.createdAt, ProfileTable.lastContactViewAt), // Compare createdAt with profile's last view date
       ),
     )
-    .then(res => res[0].count);
+    .groupBy(ContactTable.ownerProfileId);
+
+  return res;
 };
 
 export const getProfilesWhereUserBIsOwner = async (
@@ -599,3 +599,35 @@ export const getProfilesWithHasGooglePass = async (webCardId: string) => {
       ),
     );
 };
+
+/**
+ * Retrieves the list of profiles associated with a web card
+ *
+ * @param webCardId - The web card id
+ * @param profileIds - The list of profile ids to filter on,
+ *  if not provided all web card users are returned
+ * @returns The list of profiles (not deleted) associated with the web card
+ */
+export const getProfilesFromWebCard = async (
+  webCardId: string,
+  profileIds?: string[],
+) =>
+  db()
+    .select({
+      id: ProfileTable.id,
+      email: UserTable.email,
+    })
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      profileIds
+        ? and(
+            eq(ProfileTable.webCardId, webCardId),
+            inArray(ProfileTable.id, profileIds),
+            ne(ProfileTable.deleted, true),
+          )
+        : and(
+            eq(ProfileTable.webCardId, webCardId),
+            ne(ProfileTable.deleted, true),
+          ),
+    );

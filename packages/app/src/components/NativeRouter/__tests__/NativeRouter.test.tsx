@@ -60,6 +60,7 @@ describe('useNativeRouter', () => {
             "state": {
               "currentIndex": 1,
               "lazy": true,
+              "screenOptions": undefined,
               "tabs": [
                 {
                   "id": "generated-id",

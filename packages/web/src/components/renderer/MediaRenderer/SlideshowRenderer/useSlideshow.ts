@@ -117,7 +117,7 @@ const useSlideshow = (
   };
 };
 
-type Slide = {
+export type Slide = {
   left: number;
   scale: number;
   opacity: number;

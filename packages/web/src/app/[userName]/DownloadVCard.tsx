@@ -79,8 +79,9 @@ const DownloadVCard = ({
     async (compressedContactCard: string) => {
       let contactData: string;
       let signature: string;
+      let geolocation: Geolocation;
       try {
-        [contactData, signature] = JSON.parse(
+        [contactData, signature, geolocation] = JSON.parse(
           decompressFromEncodedURIComponent(compressedContactCard),
         );
 
@@ -104,6 +105,7 @@ const DownloadVCard = ({
             signature,
             data: contactData,
             salt: webCard.userName,
+            geolocation,
           }),
           method: 'POST',
         });
@@ -140,7 +142,10 @@ const DownloadVCard = ({
             const fileURL = URL.createObjectURL(file);
             setFileUrl(fileURL);
 
-            updateContactCardScanCounter(contact.profileId);
+            if (step === 0) {
+              // No need to count views on other steps
+              updateContactCardScanCounter(contact.profileId);
+            }
             setToken(additionalData.token);
             setDisplayName(additionalData.displayName);
           }
@@ -150,7 +155,7 @@ const DownloadVCard = ({
         }
       }
     },
-    [webCard.userName, webCard.id, startOpen],
+    [webCard.userName, webCard.id, startOpen, step],
   );
 
   useEffect(() => {

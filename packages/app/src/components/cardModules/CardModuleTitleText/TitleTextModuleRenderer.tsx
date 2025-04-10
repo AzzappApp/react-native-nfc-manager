@@ -2,7 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { splitRichTextIntoColumns } from '@azzapp/shared/richText/stringUpdate';
-import { RichText } from '#components/ui/RichText';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+  RichText,
+} from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -112,12 +116,16 @@ const TitleTextModuleRenderer = ({
                 getTitleAlignmentStyle(variant),
               ]}
             >
-              {data.title}
+              <RichText
+                text={data.title}
+                fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
+              />
             </Text>
             <Text style={getTextAlignmentStyle(variant)}>
               <RichText
                 text={data.text}
                 style={getTextStyle(cardStyle, data.cardModuleColor)}
+                fontSize={cardStyle?.fontSize || defaultTextFontSize}
               />
             </Text>
           </View>
@@ -229,12 +237,14 @@ const TitleTextColumnRenderer = ({
           key={`titleTextModule_column_${index}`}
         >
           <RichText
-            text={column}
             style={[
               getTextStyle(cardStyle, cardModuleColor),
               getTextAlignmentStyle(variant),
             ]}
-          />
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
+          >
+            {column}
+          </RichText>
         </View>
       );
     });
@@ -248,15 +258,15 @@ const TitleTextColumnRenderer = ({
       }}
     >
       <View style={textViewContainerStyle}>
-        <Text
-          variant="large"
+        <RichText
           style={[
             getTitleStyle(cardStyle, cardModuleColor),
             getTitleAlignmentStyle(variant),
           ]}
+          fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
         >
           {title}
-        </Text>
+        </RichText>
       </View>
       {!iSplitLayout(variant) ? (
         renderTextColumn

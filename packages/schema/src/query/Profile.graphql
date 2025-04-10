@@ -61,7 +61,13 @@ type Profile implements Node {
   """
   statsSummary: [ProfileStatistic!]
 
-  contactCardQrCode(width: Int!): String!
+  contactCardQrCode(
+    width: Int!
+    location: LocationInput
+    address: AddressInput
+    dark: String
+    light: String
+  ): String!
 
   contactCardUrl: String!
 
@@ -175,6 +181,10 @@ type Profile implements Node {
     Returns the first n items from the list.
     """
     first: Int @max(value: 50)
+    """
+    The filter to apply
+    """
+    filterBy: SearchFilter
   ): ContactConnection!
 
   """
@@ -379,4 +389,14 @@ type ProfileEdge {
 enum SearchContactOrderBy {
   name
   date
+  location
+}
+
+input SearchFilter {
+  value: String!
+  type: FilterType!
+}
+
+enum FilterType {
+  location
 }

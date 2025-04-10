@@ -26,6 +26,15 @@ const image = style({
   left: 0,
   touchAction: 'none' /* Prevents zoom gestures */,
   pointerEvents: 'none' /* Disables pointer interaction */,
+  transform: 'scale(1)',
+  transition: 'transform 1s ease-in-out',
+
+  selectors: {
+    [`${item}:hover &`]: {
+      transform: 'scale(1.2)',
+      transition: 'transform 1s ease-in-out',
+    },
+  },
 });
 
 export default {

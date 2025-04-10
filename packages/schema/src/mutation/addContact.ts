@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
+import { fromGlobalId, toGlobalId } from 'graphql-relay';
 
 import {
   checkMedias,
@@ -18,12 +18,13 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Contact, ContactRow } from '@azzapp/data';
 
 const addContact: MutationResolvers['addContact'] = async (
   _,
-  { profileId: gqlProfileId, input, notify },
+  { profileId: gqlProfileId, input, notify, scanUsed, location, address },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -69,6 +70,8 @@ const addContact: MutationResolvers['addContact'] = async (
     socials: input.socials || null,
     createdAt: new Date(),
     logoId: input.logoId ?? null,
+    meetingLocation: location ?? null,
+    meetingPlace: address ?? null,
   };
 
   let contact: Contact;
@@ -88,6 +91,12 @@ const addContact: MutationResolvers['addContact'] = async (
       deletedAt: null,
       ...contactToCreate,
     };
+  }
+
+  if (scanUsed) {
+    await validateCurrentSubscription(userId, {
+      action: 'ADD_CONTACT_WITH_SCAN',
+    });
   }
 
   if (input.withShareBack && input.profileId) {
@@ -169,6 +178,8 @@ const addContact: MutationResolvers['addContact'] = async (
       deleted: false,
       urls: commonInformationToMerge.urls.concat(urls),
       socials: commonInformationToMerge.socials.concat(socials),
+      meetingLocation: location ?? null,
+      meetingPlace: address ?? null,
     };
 
     const existingShareBack = await getContactByProfiles({
@@ -200,10 +211,12 @@ const addContact: MutationResolvers['addContact'] = async (
       const userToNotify = await userLoader.load(profileToNotify?.userId);
       if (userToNotify) {
         await sendPushNotification(userToNotify.id, {
-          type: 'shareBack',
+          notification: {
+            type: 'shareBack',
+            webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
+          },
           mediaId: null,
           sound: 'default',
-          deepLink: 'shareBack',
           locale: guessLocale(userToNotify?.locale),
         });
       }

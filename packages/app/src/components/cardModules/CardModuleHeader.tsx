@@ -27,7 +27,6 @@ const CardModuleHeader = ({
   canSave,
   save,
   webCardKey,
-  cardModulesCount,
 }: CardModuleHeaderProps) => {
   // #region hook
   const { back } = useRouter();
@@ -44,7 +43,6 @@ const CardModuleHeader = ({
           <ModuleEditionScreenTitle
             label={title}
             kind={module.moduleKind}
-            moduleCount={cardModulesCount}
             webCardKey={webCardKey}
           />
           <Text variant="medium" style={styles.variantLabel}>

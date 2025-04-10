@@ -1,12 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageFormat } from '@shopify/react-native-skia';
-import { Image } from 'expo-image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
-import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
@@ -27,16 +25,17 @@ import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import LoadingScreen from '#screens/LoadingScreen';
+import ContactCardEditCompanyLogo from '#screens/ContactCardEditScreen/ContactCardEditCompanyLogo';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -67,6 +66,7 @@ const commonInformationScreenQuery = graphql`
           id
           uri(width: 180, pixelRatio: $pixelRatio)
         }
+        isPremium
         commonInformation {
           company
           emails {
@@ -125,7 +125,7 @@ export const CommonInformationScreen = ({
       ...commonInformation,
       emails: commonInformation?.emails?.map(m => ({ ...m })) ?? [],
       phoneNumbers:
-        commonInformation?.phoneNumbers?.map(parsePhoneNumber) ?? [],
+        commonInformation?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
       urls: commonInformation?.urls?.map(p => ({ ...p })) ?? [],
       addresses: commonInformation?.addresses?.map(p => ({ ...p })) ?? [],
       socials: commonInformation?.socials?.map(p => ({ ...p })) ?? [],
@@ -171,12 +171,6 @@ export const CommonInformationScreen = ({
         id: localPath,
         uri: localPath,
       });
-
-      setSize({
-        width: exportWidth,
-        height: exportHeight,
-      });
-
       setShowImagePicker(false);
     },
     [field],
@@ -195,6 +189,7 @@ export const CommonInformationScreen = ({
             id
             uri(width: 180, pixelRatio: $pixelRatio)
           }
+          isPremium
           commonInformation {
             company
             emails {
@@ -233,11 +228,14 @@ export const CommonInformationScreen = ({
         setProgressIndicator(Observable.from(0));
 
         const fileName = getFileName(logo.uri);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri);
+        const mimeType = mime.lookup(fileName);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
+        });
         const file: any = {
           name: fileName,
           uri: compressedFileUri,
-          type: mime.lookup(fileName) || 'image/jpeg',
+          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({
@@ -297,18 +295,6 @@ export const CommonInformationScreen = ({
       console.log(error);
     },
   );
-
-  const [size, setSize] = useState<
-    { width: number; height: number } | undefined
-  >(undefined);
-
-  useEffect(() => {
-    if (logo?.uri) {
-      ImageSize.getSize(logo.uri).then(({ width, height }) => {
-        setSize(size => (size ? size : { width, height }));
-      });
-    }
-  }, [logo?.uri]);
 
   const router = useRouter();
 
@@ -408,65 +394,10 @@ export const CommonInformationScreen = ({
               </View>
             )}
           />
-          <Controller
+          <ContactCardEditCompanyLogo
             control={control}
-            name="logo"
-            render={({ field: { value, onChange } }) => (
-              <View style={styles.logoField}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable
-                    onPress={() => {
-                      if (value?.uri) {
-                        onChange(null);
-                      } else {
-                        setShowImagePicker(true);
-                      }
-                    }}
-                  >
-                    <View style={styles.logoButton}>
-                      <Icon
-                        icon={value?.uri ? 'delete_filled' : 'add_filled'}
-                        style={{
-                          tintColor: value?.uri ? colors.red400 : colors.green,
-                        }}
-                      />
-                      <Text variant="smallbold">
-                        <FormattedMessage
-                          defaultMessage="Logo"
-                          description="Logo field registered for the contact card"
-                        />
-                      </Text>
-                    </View>
-                  </Pressable>
-
-                  {value?.uri && size ? (
-                    <View style={styles.logoContainer}>
-                      <Pressable
-                        style={styles.logoWrapper}
-                        onPress={() => setShowImagePicker(true)}
-                      >
-                        <Image
-                          source={{ uri: value?.uri }}
-                          style={{
-                            height: 55,
-                            width: size.width * (55 / size.height),
-                          }}
-                          contentFit="contain"
-                        />
-                      </Pressable>
-                    </View>
-                  ) : null}
-                </View>
-                <View style={styles.companyLogoDescription}>
-                  <Text variant="xsmall" style={{ color: colors.grey400 }}>
-                    <FormattedMessage
-                      defaultMessage="Company logo will be used in your email signature"
-                      description="Company logo field description"
-                    />
-                  </Text>
-                </View>
-              </View>
-            )}
+            isPremium={webCard?.isPremium}
+            isUserContactCard
           />
           <Separation />
           <CommonInformationAddresses control={control} />
@@ -512,7 +443,7 @@ const CommonInformationScreenFallback = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
-        <LoadingScreen />
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );
@@ -547,30 +478,5 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingHorizontal: 40,
   },
   fieldName: { minWidth: 100 },
-  companyLogoDescription: {
-    paddingLeft: 30,
-    paddingVertical: 10,
-  },
-  logoField: {
-    padding: 20,
-    borderColor: colors.grey50,
-    borderTopWidth: 1,
-  },
-  logoButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 7,
-  },
-  logoContainer: {
-    flex: 1,
-    paddingLeft: 65,
-    alignItems: 'flex-start',
-  },
-  logoWrapper: {
-    borderStyle: 'dashed',
-    borderWidth: 1,
-    borderColor: colors.grey100,
-    borderRadius: 5,
-  },
   ...buildContactStyleSheet(appearance),
 }));

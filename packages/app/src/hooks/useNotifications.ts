@@ -1,4 +1,4 @@
-import messaging from '@react-native-firebase/messaging';
+import * as messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
@@ -8,7 +8,9 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
+import { isSupportedNotificationType } from '@azzapp/shared/notificationHelpers';
 import { useRouter } from '#components/NativeRouter';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 import type { PermissionStatus } from 'react-native-permissions';
 import type { Environment } from 'react-relay';
 import type { MutationConfig, MutationParameters } from 'relay-runtime';
@@ -25,7 +27,7 @@ const mutationConfig = (
   });
 };
 
-const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
+export const useNotificationsManager = () => {
   const [status, setStatus] = useState<PermissionStatus>('unavailable');
 
   useEffect(() => {
@@ -72,72 +74,73 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
 
   useEffect(() => {
     if (status === 'granted' || status === 'limited') {
-      messaging()
-        .getToken()
-        .then(token => {
-          return saveTokenToDatabase(token);
-        });
+      messaging.getToken(messaging.getMessaging()).then(token => {
+        return saveTokenToDatabase(token);
+      });
       // Listen to whether the token changes
-      return messaging().onTokenRefresh(token => {
+      return messaging.onTokenRefresh(messaging.getMessaging(), token => {
         saveTokenToDatabase(token);
       });
     }
   }, [saveTokenToDatabase, status]);
 
-  const handleDeepLink = useCallback(
-    (deepLink: object | string) => {
-      if (typeof deepLink === 'string') {
-        onDeepLink?.(deepLink);
-      }
-    },
-    [onDeepLink],
-  );
+  return {
+    notificationAuthorized: status === 'granted' || status === 'limited',
+    requestNotificationPermission,
+  };
+};
 
+type DeepLinkCallbackType =
+  | ((notification: PushNotificationType) => void)
+  | null;
+
+type useNotificationsEventProp = {
+  onDeepLinkInApp?: DeepLinkCallbackType;
+  onDeepLinkOpenedApp?: DeepLinkCallbackType;
+};
+
+const useNotificationsEvent = ({
+  onDeepLinkInApp,
+  onDeepLinkOpenedApp,
+}: useNotificationsEventProp) => {
   const router = useRouter();
   useEffect(() => {
     //on opening the app in background
-    const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-      if (remoteMessage.data?.deepLink) {
-        handleDeepLink(remoteMessage.data?.deepLink);
-      }
-      // deactivate this part for now, as the wrong user is selected
-      // changing the active user does not really work when opening app with the home
-      // if (remoteMessage.data?.deepLink === 'shareBack') {
-      //   //open the router
-      //   // router.push({
-      //   //   route: 'CONTACTS',
-      //   // });
-      // }
-    });
+    const unsubscribe = messaging.onNotificationOpenedApp(
+      messaging.getMessaging(),
+      remoteMessage => {
+        if (isSupportedNotificationType(remoteMessage.data?.type)) {
+          onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
+        }
+      },
+    );
     // this is call when the app is in quit mode (kill)
-    messaging()
-      .getInitialNotification()
+    messaging
+      .getInitialNotification(messaging.getMessaging())
       .then(remoteMessage => {
         if (remoteMessage) {
-          if (remoteMessage.data?.deepLink) {
-            handleDeepLink(remoteMessage.data?.deepLink);
+          if (isSupportedNotificationType(remoteMessage.data?.type)) {
+            onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
           }
         }
       });
 
     return unsubscribe;
-  }, [handleDeepLink, router]);
+  }, [onDeepLinkInApp, onDeepLinkOpenedApp, router]);
 
   useEffect(() => {
     //on opening the app in background
-    const unsubscribe = messaging().onMessage(remoteMessage => {
-      if (remoteMessage.data?.deepLink) {
-        handleDeepLink(remoteMessage.data?.deepLink);
-      }
-    });
+    const unsubscribe = messaging.onMessage(
+      messaging.getMessaging(),
+      remoteMessage => {
+        if (isSupportedNotificationType(remoteMessage.data?.type)) {
+          onDeepLinkInApp?.(remoteMessage.data as PushNotificationType);
+        }
+      },
+    );
 
     return unsubscribe;
-  }, [handleDeepLink]);
-
-  return {
-    notificationAuthorized: status === 'granted' || status === 'limited',
-    requestNotificationPermission,
-  };
+  }, [onDeepLinkInApp]);
 };
 
 export const useDeleteNotifications = () => {
@@ -160,4 +163,4 @@ export const useDeleteNotifications = () => {
   return deleteFcmToken;
 };
 
-export default useNotifications;
+export default useNotificationsEvent;

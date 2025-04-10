@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "1.8.24",
+  "version": "1.9.3",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
@@ -13,7 +13,9 @@
     "extract:web": "formatjs extract '../web/src/**/*.ts*' '../schema/src/**/*.ts*' --out-file src/webMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
     "extract": "yarn extract:app && yarn extract:web",
     "pull": "node ./scripts/fetchMessages.js",
-    "clean": "rm -rf node_modules && rm -rf compiled"
+    "clean": "rm -rf node_modules && rm -rf compiled",
+    "merge": "node ./scripts/mergeMessages.js",
+    "purge": "node ./scripts/purgeMessages.js"
   },
   "dependencies": {
     "@formatjs/cli": "^6.6.1"

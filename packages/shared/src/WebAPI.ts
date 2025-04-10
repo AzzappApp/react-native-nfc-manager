@@ -3,6 +3,7 @@
  */
 import { fetchJSON, postFormData } from './networkHelpers';
 import type { CommonInformation } from './contactCardHelpers';
+import type { Geolocation } from './geolocationHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
@@ -31,12 +32,31 @@ const apiFetch = <ReturnType>(
 };
 
 /**
- * Respon of API call related to authentication.
+ * Response of API call related to tokens (sign in, sign up, refresh tokens).
  */
 export type TokensResponse = {
   token: string;
   refreshToken: string;
 };
+
+/**
+ * Respond of API call related to authentication with valid signed user.
+ */
+export type ValidAuthResponse = TokensResponse & {
+  userId: string;
+  profileInfos: {
+    profileRole: string;
+    profileId: string;
+    webCardId: string;
+  } | null;
+  email: string | null;
+  phoneNumber: string | null;
+};
+
+/**
+ * Response of API call related to authentication.
+ */
+export type AuthResponse = ValidAuthResponse | { issuer: string };
 
 /**
  * Parameters for the signup API call.
@@ -94,21 +114,28 @@ export type ConfirmRegistrationReponse = {
 /**
  * API call to signup a new user.
  */
-export const signup: APIMethod<
-  SignUpParams,
-  TokensResponse & {
-    userId: string;
-    profileInfos: {
-      profileRole: string;
-      profileId: string;
-      webCardId: string;
-    } | null;
-    email: string | null;
-    phoneNumber: string | null;
-    issuer?: string;
-  }
-> = (data, init) =>
+export const signup: APIMethod<SignUpParams, AuthResponse> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export type AppleSigninInParams = {
+  identityToken: string;
+  locale?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
+/**
+ * API call to signup a new user.
+ */
+export const appleSignin: APIMethod<AppleSigninInParams, ValidAuthResponse> = (
+  data,
+  init,
+) =>
+  apiFetch(`${API_ENDPOINT}/signin/apple`, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -144,20 +171,7 @@ export type SignInParams = {
 /**
  * API call to signin a user.
  */
-export const signin: APIMethod<
-  SignInParams,
-  TokensResponse & {
-    userId: string;
-    profileInfos: {
-      profileRole: string;
-      profileId: string;
-      webCardId: string;
-    } | null;
-    email: string | null;
-    phoneNumber: string | null;
-    issuer?: string;
-  }
-> = (data, init) =>
+export const signin: APIMethod<SignInParams, AuthResponse> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {
     ...init,
     method: 'POST',
@@ -283,7 +297,12 @@ export const uploadMedia = (
  * Api call to check the signature of a contact card.
  */
 export const verifySign: APIMethod<
-  { signature: string; data: string; salt: string },
+  {
+    signature: string;
+    data: string;
+    salt: string;
+    geolocation?: Geolocation;
+  },
   Pick<CommonInformation, 'socials' | 'urls'> & {
     avatarUrl?: string;
   }
@@ -316,19 +335,6 @@ export const getGoogleWalletPass: APIMethod<
   apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?webCardId=${webCardId}`, {
     ...init,
     method: 'GET',
-  });
-
-/**
- * Api call to generate a google wallet pass.
- */
-export const generateEmailSignature: APIMethod<
-  { locale: string; profileId: string; preview: string },
-  { token: string }
-> = ({ locale, profileId, preview }, init) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/generateEmailSignature`, {
-    ...init,
-    method: 'POST',
-    body: JSON.stringify({ profileId, preview }),
   });
 
 export const requestUpdateContact: APIMethod<

@@ -8,7 +8,6 @@ import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import FingerHint, {
   FINGER_HINT_HEIGHT,
@@ -133,17 +132,6 @@ const ContactCardItem = ({
     item,
   );
 
-  const router = useRouter();
-
-  const onPressContactCard = useCallback(() => {
-    const { profileInfos } = getAuthState();
-    if (profileInfos?.profileId === profile.id) {
-      router.push({
-        route: 'CONTACT_CARD',
-      });
-    }
-  }, [profile.id, router]);
-
   const showUpdateContactHint =
     profile.lastContactCardUpdate <= profile.createdAt &&
     profile.webCard?.cardIsPublished;
@@ -152,6 +140,15 @@ const ContactCardItem = ({
     () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
     [profile.webCard?.cardColors?.primary],
   );
+
+  const router = useRouter();
+
+  const openContactCard = useCallback(() => {
+    router.push({
+      route: 'SHAKE_AND_SHARE',
+    });
+  }, [router]);
+
   return (
     <View
       style={{ width, height, position: 'absolute', top: 0, left: position }}
@@ -165,7 +162,7 @@ const ContactCardItem = ({
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={onPressContactCard}>
+            <TouchableOpacity onPress={openContactCard}>
               <ContactCard
                 profile={profile}
                 height={Math.min(height, height)}
@@ -179,8 +176,8 @@ const ContactCardItem = ({
         <FingerHint
           color={readableColor === colors.black ? 'dark' : 'light'}
           style={{
-            top: height / 2 - FINGER_HINT_HEIGHT / 2,
-            left: width / 2 - FINGER_HINT_WIDTH / 2,
+            top: (95 * height) / 100 - FINGER_HINT_HEIGHT / 2,
+            left: (78 * width) / 100 - FINGER_HINT_WIDTH / 2,
           }}
         />
       )}

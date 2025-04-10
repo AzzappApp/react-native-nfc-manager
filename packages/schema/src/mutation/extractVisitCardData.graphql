@@ -1,5 +1,12 @@
 extend type Mutation {
-  extractVisitCardData(imgUrl: String!): VisitCardData
+  extractVisitCardData(
+    imgUrl: String!
+    config: ExtractVisitCardDataConfigInput
+  ): VisitCardData
+}
+
+input ExtractVisitCardDataConfigInput {
+  createContactCard: Boolean
 }
 
 type VisitCardData {

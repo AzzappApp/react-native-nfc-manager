@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
+  createFreeSubscriptionForBetaAndroidPeriod,
   createUser,
   getLastTermsOfUse,
   getProfilesByUser,
@@ -12,6 +13,7 @@ import {
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import {
   REGEX_PWD,
   formatPhoneNumber,
@@ -121,9 +123,9 @@ export const POST = withPluginsRoute(async (req: Request) => {
     if (user) {
       await transaction(async () => {
         await updateUser(user.id, {
-          email: user.email === email ? null : user.email,
-          phoneNumber:
-            user.phoneNumber === userPhoneNumber ? null : user.phoneNumber,
+          email: null,
+          phoneNumber: null,
+          appleId: null,
         });
 
         const userId = await createUser({
@@ -136,21 +138,30 @@ export const POST = withPluginsRoute(async (req: Request) => {
           termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
           hasAcceptedCommunications,
         });
+        if (req.headers.get(PLATFORM_HEADER) === 'android') {
+          await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+        }
 
         await updateUser(user.id, {
           replacedBy: userId,
         });
       });
     } else {
-      await createUser({
-        email: email ?? null,
-        phoneNumber: userPhoneNumber,
-        password: bcrypt.hashSync(password, 12),
-        locale: locale ?? null,
-        roles: null,
-        termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
-        termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
-        hasAcceptedCommunications,
+      await transaction(async () => {
+        const userId = await createUser({
+          email: email ?? null,
+          phoneNumber: userPhoneNumber,
+          password: bcrypt.hashSync(password, 12),
+          locale: locale ?? null,
+          roles: null,
+          termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+          termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+          hasAcceptedCommunications,
+        });
+
+        if (req.headers.get(PLATFORM_HEADER) === 'android') {
+          await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+        }
       });
     }
 

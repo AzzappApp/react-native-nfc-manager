@@ -283,6 +283,6 @@ const styles = StyleSheet.create({
   bottomMenuContainer: {
     position: 'absolute',
     alignItems: 'center',
-    width: '100%',
+    alignSelf: 'center',
   },
 });

@@ -25,7 +25,7 @@ describe('TabsBar', () => {
   });
 
   test('should display a list of tabs', async () => {
-    expect(screen.queryByRole('tablist')).not.toBe(null);
+    expect(screen.getByTestId('tablist')).not.toBe(null);
     const tabs = screen.queryAllByRole('tab');
     expect(tabs.length).toBe(3);
     expect(tabs.map(tab => tab.props.accessibilityLabel)).toEqual([

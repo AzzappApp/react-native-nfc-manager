@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -99,6 +100,7 @@ const PostLikesList = ({ post: postKey, style }: Props) => {
       style={style}
       keyExtractor={keyExtractor}
       getItemLayout={getItemLayout}
+      renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
     />
   );
 };

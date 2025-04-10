@@ -98,8 +98,9 @@ export const Query: QueryResolvers = {
     let i = 0;
     const profileNameAvailable = false;
 
+    const lowerCaseProfileName = profileName.toLowerCase();
     while (!profileNameAvailable && i < 1000) {
-      if (!likeUsernames.includes(`${profileName}${suffix}`)) {
+      if (!likeUsernames.includes(`${lowerCaseProfileName}${suffix}`)) {
         break;
       }
       suffix += 1;

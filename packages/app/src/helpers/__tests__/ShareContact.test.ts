@@ -20,6 +20,7 @@ describe('ShareContact', () => {
       title: '',
       urls: null,
       webCard: null,
+      meetingPlace: null,
     };
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
@@ -55,6 +56,7 @@ describe('ShareContact', () => {
       title: 'dev',
       urls: [{ url: 'https://url.com' }, { url: 'https://url2.com' }],
       webCard: null,
+      meetingPlace: null,
     } as ContactType;
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
@@ -85,6 +87,7 @@ describe('ShareContact', () => {
           day: 12,
         },
       ],
+      meetingPlace: null,
     } as ContactType;
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
@@ -107,6 +110,7 @@ describe('ShareContact', () => {
       title: '',
       urls: null,
       webCard: null,
+      meetingPlace: null,
     };
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
@@ -129,6 +133,7 @@ describe('ShareContact', () => {
       title: '',
       urls: null,
       webCard: null,
+      meetingPlace: null,
     };
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
@@ -151,6 +156,7 @@ describe('ShareContact', () => {
       title: '',
       urls: null,
       webCard: null,
+      meetingPlace: null,
     };
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();

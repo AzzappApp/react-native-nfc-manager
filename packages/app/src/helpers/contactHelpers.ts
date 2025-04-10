@@ -13,7 +13,8 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import type { ContactType } from './contactListHelpers';
+import { prefixWithHttp, type ContactType } from './contactListHelpers';
+import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
 
@@ -343,11 +344,12 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   });
 
   contact.urls?.forEach(url => {
-    if (url.url) vCard.addURL(url.url);
+    if (url.url) vCard.addURL(prefixWithHttp(url.url));
   });
 
   contact.socials?.forEach(social => {
-    if (social.url) vCard.addSocial(social.url, social.label || '');
+    if (social.url)
+      vCard.addSocial(prefixWithHttp(social.url), social.label || '');
   });
 
   contact.addresses.forEach(addr => {
@@ -365,15 +367,20 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
     }
   });
 
-  const contactImageUrl =
-    contact.contactProfile?.avatar?.uri || contact.logo?.uri;
-  const contactImageId = contact.contactProfile?.avatar?.id || contact.logo?.id;
-
-  if (contactImageUrl && contactImageUrl.startsWith('http')) {
+  const contactImageUrl = contact.avatar?.uri || contact.logo?.uri;
+  const contactImageId = contact.avatar?.id || contact.logo?.id;
+  if (contactImageId && contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
-      const file = new File(Paths.cache.uri + contactImageId);
-      if (!file.exists) {
-        await File.downloadFileAsync(contactImageUrl, file);
+      const existingFile = getLocalCachedMediaFile(contactImageId, 'image');
+      let file: File | undefined;
+      if (existingFile) {
+        file = new File(existingFile);
+      }
+      if (!file || !file.exists) {
+        file = new File(existingFile ?? Paths.cache.uri + contactImageId);
+        if (!file.exists) {
+          await File.downloadFileAsync(contactImageUrl, file);
+        }
       }
       const image = file.base64();
       if (image) {
@@ -447,4 +454,20 @@ export const buildVCardFromExpoContact = async (contact: Contact) => {
     }
   }
   return vCard;
+};
+
+export const getFriendlyNameFromLocation = (
+  meetingPlace: {
+    readonly city: string | null;
+    readonly country: string | null;
+    readonly region: string | null;
+    readonly subregion: string | null;
+  } | null,
+) => {
+  return (
+    meetingPlace?.city ||
+    meetingPlace?.subregion ||
+    meetingPlace?.region ||
+    meetingPlace?.country
+  );
 };

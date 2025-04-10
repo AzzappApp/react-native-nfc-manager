@@ -29,6 +29,7 @@ import {
   ScreenModal,
 } from '#components/NativeRouter';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
+import useCopyOfSharedValue from '#hooks/useCopyOfSharedValue';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
@@ -458,7 +459,11 @@ const CoverPreview = ({
 
   // #region Layer edition gestures handling
   /** offset of the gesture when starting the edition of a layer */
-  const gestureOffset = useSharedValue(activeLayerBounds.value);
+  const gestureOffset = useCopyOfSharedValue<{
+    bounds: SkRect;
+    rotation: number;
+  } | null>(activeLayerBounds);
+
   /**
    * Callback to handle the start of a gesture on a layer
    */

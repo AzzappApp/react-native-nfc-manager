@@ -24,11 +24,10 @@ import {
   useRelayEnvironment,
 } from 'react-relay';
 import { swap } from '@azzapp/shared/arrayHelpers';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
+import { useSuspendUntilAppear } from '#components/NativeRouter';
 import { createId } from '#helpers/idHelpers';
 import {
   isModuleVariantSupported,
@@ -126,8 +125,7 @@ const WebCardEditScreenBody = (
     cardModules,
     cardColors,
     cardStyle,
-    cardIsPublished,
-    isPremium,
+
     coverBackgroundColor,
   } = useFragment(
     graphql`
@@ -158,8 +156,6 @@ const WebCardEditScreenBody = (
           titleFontFamily
           titleFontSize
         }
-        cardIsPublished
-        isPremium
       }
     `,
     webCard,
@@ -562,25 +558,11 @@ const WebCardEditScreenBody = (
     },
     [canDuplicate, commitDuplicateModule, intl, webCardId],
   );
-  const router = useRouter();
   const onDuplicateModule = useCallback(
     (moduleId: string) => {
-      const requireSubscription = moduleCountRequiresSubscription(
-        cardModuleFiltered.length + 1,
-      );
-      if (cardIsPublished && requireSubscription && !isPremium) {
-        router.push({ route: 'USER_PAY_WALL' });
-        return;
-      }
       duplicateModules([moduleId]);
     },
-    [
-      cardIsPublished,
-      cardModuleFiltered.length,
-      duplicateModules,
-      isPremium,
-      router,
-    ],
+    [duplicateModules],
   );
   // #endregion
 

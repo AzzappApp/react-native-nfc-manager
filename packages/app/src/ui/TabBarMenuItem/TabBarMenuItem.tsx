@@ -35,7 +35,6 @@ const TabBarMenuItem = ({
       style={[styles.pressable, animatedStyle, style]}
       onPress={onPress}
       accessibilityRole="tab"
-      android_ripple={{ color: selectedBackgroundColor, borderless: false }}
       disabled={disabled}
     >
       {icon && (
@@ -47,6 +46,7 @@ const TabBarMenuItem = ({
       <Text
         style={[labelStyle, selected && { color: selectedLabelColor }]}
         variant="button"
+        numberOfLines={1}
       >
         {children}
       </Text>

@@ -40,8 +40,10 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
+    const previousUserName = webCard.userName;
+
     //avoid having the same value
-    if (webCard.userName === userName) {
+    if (previousUserName === userName) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
@@ -60,7 +62,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     );
 
     //user can change if it was never published nor updated
-    if (webCard.alreadyPublished && nextChangeDate > now) {
+    if (webCard.alreadyPublished && nextChangeDate > now && previousUserName) {
       throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY, {
         extensions: {
           alloweChangeUserNameDate: nextChangeDate,
@@ -76,19 +78,22 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     try {
       await transaction(async () => {
         await updateWebCard(webCard.id, { userName, lastUserNameUpdate: now });
-        if (webCard.alreadyPublished && webCard.userName) {
+        if (webCard.alreadyPublished && previousUserName) {
           await createRedirectWebCard({
-            fromUserName: webCard.userName,
+            fromUserName: previousUserName,
             toUserName: userName,
             expiresAt,
           });
 
-          await deleteRedirectionFromTo(userName, webCard.userName);
+          await deleteRedirectionFromTo(userName, previousUserName);
         }
       });
     } catch (error) {
       console.log(error);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
+    if (previousUserName) {
+      invalidateWebCard(previousUserName);
     }
     invalidateWebCard(userName);
     return {

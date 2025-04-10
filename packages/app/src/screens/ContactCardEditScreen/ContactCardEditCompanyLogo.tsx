@@ -1,6 +1,4 @@
-import { ImageFormat } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
@@ -13,9 +11,9 @@ import ImagePicker, {
   type ImagePickerResult,
 } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -27,7 +25,19 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Control } from 'react-hook-form';
 import type { ViewProps } from 'react-native';
 
-const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
+const ContactCardEditCompanyLogo = ({
+  control,
+  canEditLogo = true,
+  isPremium,
+  company,
+  isUserContactCard,
+}: {
+  control: Control<any>;
+  isPremium?: boolean | null;
+  canEditLogo?: boolean;
+  company?: string | null;
+  isUserContactCard?: boolean;
+}) => {
   const styles = useStyleSheet(stylesheet);
 
   const { field: fieldCompany } = useController({
@@ -50,14 +60,14 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
     }
   `);
 
-  const [searchCompany] = useDebounce(fieldCompany.value, 500);
+  const [searchCompany] = useDebounce(company || fieldCompany.value, 500);
 
   const [logos, setLogos] = useState<
     ContactCardEditCompanyLogoMutation$data['extractCompanyLogo']
   >([]);
 
   useEffect(() => {
-    if (searchCompany) {
+    if (canEditLogo && searchCompany) {
       commit({
         variables: { brand: searchCompany },
         onCompleted: data => {
@@ -68,7 +78,7 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
     } else {
       setLogos(null);
     }
-  }, [commit, searchCompany]);
+  }, [canEditLogo, commit, searchCompany]);
   const [showImagePicker, openImagePicker, closeImagePicker] =
     useBoolean(false);
 
@@ -77,29 +87,24 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
     uri: string;
     width: number;
     height: number;
-  } | null>(null);
+  } | null>(field.value);
 
   const onImagePickerFinished = useCallback(
     async ({ id, uri, width, height }: ImagePickerResult) => {
-      const { uri: localPath } = await manipulateAsync(uri, [], {
-        format: SaveFormat.JPEG,
-        compress: 1,
-      });
-
       setPickerImage({
         id,
-        uri: localPath,
+        uri,
         width,
         height,
       });
       field.onChange({
         local: true,
         id,
-        uri: localPath,
+        uri,
         width,
         height,
       });
-      imageLocalUrl.set(id, localPath);
+      imageLocalUrl.set(id, uri);
       closeImagePicker();
     },
     [closeImagePicker, field],
@@ -117,29 +122,53 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
       height: number;
       width: number;
     }) => {
-      let localPath = imageLocalUrl.get(id);
-      const exportWidth = width;
-      const exportHeight = height;
-      if (!localPath) {
-        localPath = await saveTransformedImageToFile({
-          uri,
-          resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.PNG,
-          quality: 95,
-        });
-        imageLocalUrl.set(id, localPath);
-      }
       field.onChange({
         local: true,
         id,
-        uri: localPath,
-        width: exportWidth,
-        height: exportHeight,
+        uri,
+        width,
+        height,
       });
     },
     [field],
   );
 
+  if (!canEditLogo) {
+    return (
+      <>
+        <View style={styles.logoField}>
+          <View style={styles.logoButtonContainer}>
+            <View style={styles.logoButton}>
+              <Icon icon="locked" />
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Logo"
+                  description="Logo field registered for the contact card"
+                />
+              </Text>
+            </View>
+            <View style={styles.logoContainer}>
+              <View style={styles.logoWrapper}>
+                <Image
+                  source={{ uri: field.value?.uri }}
+                  style={styles.logo}
+                  contentFit="contain"
+                />
+              </View>
+            </View>
+          </View>
+          <View style={styles.companyLogoDescription}>
+            <Text variant="xsmall" style={{ color: colors.grey400 }}>
+              <FormattedMessage
+                defaultMessage="Company logo will be used in your email signature"
+                description="Company logo field description"
+              />
+            </Text>
+          </View>
+        </View>
+      </>
+    );
+  }
   return (
     <Controller
       control={control}
@@ -148,17 +177,30 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
         return (
           <>
             <View style={[styles.field, styles.container]}>
-              <Text variant="smallbold" style={styles.fieldTitle}>
-                <FormattedMessage
-                  defaultMessage="Company’s logo"
-                  description="ContactCardCreationScreen - Compoany Logo"
+              <View style={styles.titleContainer}>
+                <Text variant="smallbold" style={styles.fieldTitle}>
+                  <FormattedMessage
+                    defaultMessage="Company’s logo"
+                    description="ContactCardCreationScreen - Company Logo"
+                  />
+                </Text>
+                <PremiumIndicator
+                  isRequired={!isPremium}
+                  color={value ? undefined : colors.grey100}
                 />
-              </Text>
+              </View>
               <Text variant="smallbold" style={styles.descriptionText}>
-                <FormattedMessage
-                  defaultMessage="We search for logos based on the information provided. Please select the logo you’d like to use for your company."
-                  description="ContactCardCreationScreen - Compoany Logo explanation"
-                />
+                {isUserContactCard ? (
+                  <FormattedMessage
+                    defaultMessage="We search for logos based on the information provided. Please select the logo you’d like to use for your company."
+                    description="ContactCardCreationScreen - Compoany Logo explanation"
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="We search for logos based on the information provided. If you don't add an avatar, this logo will be used as the contact preview."
+                    description="new contact creation screen - Compoany Logo explanation"
+                  />
+                )}
               </Text>
             </View>
             <ScrollView
@@ -269,7 +311,9 @@ const LogoComponentItem = ({
     <Pressable
       style={[
         styles.boxItem,
-        { aspectRatio: width / height },
+        width && height
+          ? { aspectRatio: width / height }
+          : styles.fallbackWidth,
         selected && styles.selected,
       ]}
       onPress={onPress}
@@ -278,7 +322,12 @@ const LogoComponentItem = ({
       <Image
         //use cache over uri to reduce request count to brandfetch external service
         source={{ uri: imageLocalUrl.get(item.id) ?? item.uri }}
-        style={[styles.itemImage, { aspectRatio: width / height }]}
+        style={[
+          styles.itemImage,
+          width && height
+            ? { aspectRatio: width / height }
+            : styles.fallbackWidth,
+        ]}
         contentFit="contain"
       />
     </Pressable>
@@ -288,14 +337,14 @@ const LogoComponentItem = ({
 const stylesheet = createStyleSheet(appearance => ({
   ...buildContactStyleSheet(appearance),
   boxItem: {
-    borderWidth: 1,
-    borderColor: colors.grey50,
     aspectRatio: 1,
-    height: 55,
-    borderRadius: 7,
+    height: 59,
+    borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: 'transparent',
   },
   descriptionText: {
     marginBottom: 15,
@@ -306,11 +355,20 @@ const stylesheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey300 : colors.grey700,
   },
   selected: {
-    borderWidth: 3,
-    height: 55,
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
-  itemImage: { flex: 1, height: 55 },
+  fallbackWidth: {
+    aspectRatio: 1,
+  },
+  itemImage: {
+    flex: 1,
+    height: 55,
+    width: 55,
+    aspectRatio: 1,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
   container: {
     paddingTop: 20,
     flexDirection: 'column',
@@ -325,6 +383,51 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingLeft: 10,
   },
   addButton: { tintColor: colors.green },
+  noneEditableLogo: {
+    minHeight: 52,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  logoField: {
+    padding: 10,
+    borderColor: colors.grey50,
+    borderTopWidth: 1,
+  },
+  logoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 7,
+  },
+  logoContainer: {
+    flex: 1,
+    paddingLeft: 65,
+    alignItems: 'flex-start',
+  },
+  logoWrapper: {
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: colors.grey100,
+    borderRadius: 5,
+  },
+  companyLogoDescription: {
+    paddingLeft: 30,
+    paddingVertical: 10,
+  },
+  logoButtonContainer: { flexDirection: 'row', alignItems: 'center' },
+  logo: {
+    height: 55,
+    width: 55,
+  },
 }));
 
 const imageLocalUrl = new Map<string, string>();

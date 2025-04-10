@@ -1,25 +1,35 @@
 import * as Sentry from '@sentry/react-native';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Purchases from 'react-native-purchases';
+import { addAuthStateListener, getAuthState } from '#helpers/authStore';
 
-export const useRevenueCat = (userId: string | null | undefined) => {
+export const useRevenueCat = () => {
+  const lastUserId = useRef<string | null>(null);
+
   useEffect(() => {
-    async function login(userId: string) {
+    async function login() {
       try {
-        await Purchases.logIn(userId);
+        const { profileInfos } = getAuthState();
+        if (profileInfos) {
+          if (lastUserId.current !== profileInfos.userId) {
+            lastUserId.current = profileInfos.userId;
+            await Purchases.logIn(profileInfos.userId);
+          }
+        } else if (lastUserId.current !== null) {
+          lastUserId.current = null;
+          const isAnonymous = await Purchases.isAnonymous();
+          if (!isAnonymous) {
+            await Purchases.logOut();
+          }
+        }
       } catch (error) {
         Sentry.captureException(error);
       }
     }
-    if (userId) {
-      login(userId);
-    }
-    return () => {
-      Purchases.isAnonymous().then(isAnonymous => {
-        if (!isAnonymous) {
-          Purchases.logOut();
-        }
-      });
-    };
-  }, [userId]);
+
+    login();
+    const removeListener = addAuthStateListener(login);
+
+    return removeListener;
+  }, []);
 };

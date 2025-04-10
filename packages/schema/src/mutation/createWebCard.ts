@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
   createWebCard,
-  getCompanyActivitiesByWebCardCategory,
   buildDefaultContactCard,
   createProfile,
   getWebCardByUserNameWithRedirection,
@@ -29,7 +28,6 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     firstName,
     lastName,
     webCardCategoryId: graphqlWebCardCategoryId,
-    companyActivityId: graphqlCompanyActivityId,
     companyName,
   } = input;
 
@@ -42,24 +40,6 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   const webCardCategory = await webCardCategoryLoader.load(webCardCategoryId);
   if (!webCardCategory) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  let companyActivityId: string | null = null;
-  if (graphqlCompanyActivityId) {
-    const { id, type } = fromGlobalId(graphqlCompanyActivityId);
-    if (type !== 'CompanyActivity') {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-    companyActivityId = id;
-    const webCardCategoryActivities =
-      await getCompanyActivitiesByWebCardCategory(webCardCategoryId);
-    if (
-      !webCardCategoryActivities.find(
-        ({ id: activityId }) => activityId === companyActivityId,
-      )
-    ) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
   }
 
   if (!isValidUserName(userName)) {
@@ -78,7 +58,6 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     lastName: lastName ?? null,
     webCardKind: webCardCategory.webCardKind,
     webCardCategoryId,
-    companyActivityId: companyActivityId ?? null,
     companyName: companyName ?? null,
     lastUserNameUpdate: new Date(),
     locale: user?.locale ?? null,

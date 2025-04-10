@@ -1,0 +1,119 @@
+diff --git a/Libraries/Components/TextInput/TextInput.js b/Libraries/Components/TextInput/TextInput.js
+index dcf11237599d2f262012d88d0c0ff79ee9d3606d..408d07c1a874ccc3bfea32313a85477e13a4d78e 100644
+--- a/Libraries/Components/TextInput/TextInput.js
++++ b/Libraries/Components/TextInput/TextInput.js
+@@ -1308,7 +1308,7 @@ function InternalTextInput(props: Props): React.Node {
+       ? props.value
+       : typeof props.defaultValue === 'string'
+         ? props.defaultValue
+-        : '';
++        : undefined;
+ 
+   const viewCommands =
+     AndroidTextInputCommands ||
+diff --git a/Libraries/Renderer/implementations/ReactFabric-dev.js b/Libraries/Renderer/implementations/ReactFabric-dev.js
+index 4d49bcd510e76a9e391deebd046e12d44ea696b7..78964289ea9b264a52979a3ced3a8b1d469d5a65 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-dev.js
++++ b/Libraries/Renderer/implementations/ReactFabric-dev.js
+@@ -17912,6 +17912,9 @@ to return true:wantsResponderID|                            |
+       var transition = ReactCurrentBatchConfig$1.transition;
+ 
+       if (transition !== null) {
++        if (!transition._callbacks) {
++          transition._callbacks = new Set();
++        }
+         // Whenever a transition update is scheduled, register a callback on the
+         // transition object so we can get the return value of the scope function.
+         transition._callbacks.add(handleAsyncAction);
+diff --git a/Libraries/Renderer/implementations/ReactFabric-prod.js b/Libraries/Renderer/implementations/ReactFabric-prod.js
+index 3e5cf860260b7cf3a50114c805a96d17167f1be0..4fdca24755ca8507f405e08a24f71e9f20bdbf03 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-prod.js
++++ b/Libraries/Renderer/implementations/ReactFabric-prod.js
+@@ -7629,13 +7629,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
+     return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
+   fiber = ReactCurrentBatchConfig$1.transition;
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  if (null !== fiber)
++  if (null !== fiber){
++      if (!fiber._callbacks) {
++        fiber._callbacks = new Set();
++      }
++    fiber._callbacks.add(handleAsyncAction);
+     return (
+       0 === currentEventTransitionLane &&
+         (currentEventTransitionLane = claimNextTransitionLane()),
+       currentEventTransitionLane
+     );
++  }
+   fiber = currentUpdatePriority;
+   if (0 === fiber)
+     a: {
+diff --git a/Libraries/Renderer/implementations/ReactFabric-profiling.js b/Libraries/Renderer/implementations/ReactFabric-profiling.js
+index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..06fc72f6386116cf71706c570efedabffa8257b8 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-profiling.js
++++ b/Libraries/Renderer/implementations/ReactFabric-profiling.js
+@@ -8015,13 +8015,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
+     return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
+   fiber = ReactCurrentBatchConfig$1.transition;
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  if (null !== fiber)
++  if (null !== fiber){
++    if (!fiber._callbacks) {
++        fiber._callbacks = new Set();
++    }
++    fiber._callbacks.add(handleAsyncAction);
+     return (
+       0 === currentEventTransitionLane &&
+         (currentEventTransitionLane = claimNextTransitionLane()),
+       currentEventTransitionLane
+     );
++  }
+   fiber = currentUpdatePriority;
+   if (0 === fiber)
+     a: {
+diff --git a/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm b/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
+index cd69fec5b3549cfd097720a0a6fc3ea6b36daa54..339105fb4ecacdda35070de4ce0cae48a4c2cd52 100644
+--- a/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
++++ b/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
+@@ -534,6 +534,10 @@ - (void)setTextAndSelection:(NSInteger)eventCount
+   if (startPosition && endPosition) {
+     UITextRange *range = [_backedTextInputView textRangeFromPosition:startPosition toPosition:endPosition];
+     [_backedTextInputView setSelectedTextRange:range notifyDelegate:NO];
++    // ensure we scroll to the selected position
++    NSInteger offsetEnd = [_backedTextInputView offsetFromPosition:_backedTextInputView.beginningOfDocument
++                                                                  toPosition:range.end];
++    [_backedTextInputView scrollRangeToVisible:NSMakeRange(offsetEnd, 0)];
+   }
+   _comingFromJS = NO;
+ }
+@@ -708,18 +712,16 @@ - (void)_setAttributedString:(NSAttributedString *)attributedString
+   // Updating the UITextView attributedText, for example changing the lineHeight, the color or adding
+   // a new paragraph with \n, causes the cursor to move to the end of the Text and scroll.
+   // This is fixed by restoring the cursor position and scrolling to that position (iOS issue 652653).
+-  if (selectedRange.empty) {
+-    // Maintaining a cursor position relative to the end of the old text.
+-    NSInteger offsetStart = [_backedTextInputView offsetFromPosition:_backedTextInputView.beginningOfDocument
+-                                                          toPosition:selectedRange.start];
+-    NSInteger offsetFromEnd = oldTextLength - offsetStart;
+-    NSInteger newOffset = attributedString.string.length - offsetFromEnd;
+-    UITextPosition *position = [_backedTextInputView positionFromPosition:_backedTextInputView.beginningOfDocument
+-                                                                   offset:newOffset];
+-    [_backedTextInputView setSelectedTextRange:[_backedTextInputView textRangeFromPosition:position toPosition:position]
+-                                notifyDelegate:YES];
+-    [_backedTextInputView scrollRangeToVisible:NSMakeRange(offsetStart, 0)];
+-  }
++  // Maintaining a cursor position relative to the end of the old text.
++  NSInteger offsetStart = [_backedTextInputView offsetFromPosition:_backedTextInputView.beginningOfDocument
++                                                        toPosition:selectedRange.start];
++  NSInteger offsetFromEnd = oldTextLength - offsetStart;
++  NSInteger newOffset = attributedString.string.length - offsetFromEnd;
++  UITextPosition *position = [_backedTextInputView positionFromPosition:_backedTextInputView.beginningOfDocument
++                                                                  offset:newOffset];
++  [_backedTextInputView setSelectedTextRange:[_backedTextInputView textRangeFromPosition:position toPosition:position]
++                              notifyDelegate:YES];
++  [_backedTextInputView scrollRangeToVisible:NSMakeRange(offsetStart, 0)];
+   [self _restoreTextSelection];
+   [self _updateTypingAttributes];
+   _lastStringStateWasUpdatedWith = attributedString;
