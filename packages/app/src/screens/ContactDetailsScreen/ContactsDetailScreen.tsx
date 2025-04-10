@@ -26,6 +26,7 @@ const query = graphql`
   query ContactsDetailScreenQuery($contactId: ID!, $pixelRatio: Float!) {
     contact: node(id: $contactId) {
       ... on Contact {
+        id
         firstName
         lastName
         company
@@ -214,20 +215,26 @@ const ContactDetailsScreen = ({
         setLocalContacts(result.localContacts);
       }
     }
+    refreshLocalContacts();
   }, [
     contactsPermissionStatus,
     displayedContact,
     localContacts,
     onInviteContact,
+    refreshLocalContacts,
   ]);
 
   /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
         Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */
   return (
     <View collapsable={false} style={styles.container}>
-      {displayedContact ? (
+      {displayedContact && params.contactId ? (
         <ContactDetailsBody
-          details={{ ...displayedContact, createdAt: contact?.createdAt }}
+          details={{
+            ...displayedContact,
+            createdAt: contact?.createdAt,
+            id: params.contactId,
+          }}
           webCardKey={webCardKey}
           onClose={router.back}
           onSave={onInviteContactInner}

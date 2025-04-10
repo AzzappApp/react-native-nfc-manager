@@ -17,6 +17,7 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
@@ -30,7 +31,6 @@ import type {
   ContactsScreenLists_contacts$data,
   ContactsScreenLists_contacts$key,
 } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
-import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { Contact } from 'expo-contacts';
 
@@ -315,18 +315,7 @@ const ContactsScreenLists = ({
     });
   }, [commitContactsLastView, profileInfos, profileInfos?.profileId]);
 
-  const [commitRemoveContact] = useMutation<ContactsScreenListsMutation>(
-    graphql`
-      mutation ContactsScreenListsMutation(
-        $profileId: ID!
-        $input: RemoveContactsInput!
-      ) {
-        removeContacts(profileId: $profileId, input: $input) {
-          removedContactIds
-        }
-      }
-    `,
-  );
+  const removeContact = useRemoveContact();
 
   const onRemoveContacts = (contactIds: ContactType | ContactType[]) => {
     const profileId = profileInfos?.profileId;
@@ -337,32 +326,7 @@ const ContactsScreenLists = ({
       Array.isArray(contactIds) ? contactIds : [contactIds]
     ).map(contact => contact.id);
 
-    commitRemoveContact({
-      variables: {
-        profileId,
-        input: {
-          contactIds: removedIds,
-        },
-      },
-      updater: (store, response) => {
-        if (response?.removeContacts) {
-          response.removeContacts.removedContactIds.forEach(
-            removedContactId => {
-              store.delete(removedContactId);
-            },
-          );
-          const profile = store.get(profileId);
-          const nbContacts = profile?.getValue('nbContacts');
-
-          if (typeof nbContacts === 'number') {
-            profile?.setValue(
-              nbContacts - response.removeContacts.removedContactIds.length,
-              'nbContacts',
-            );
-          }
-        }
-      },
-    });
+    removeContact(removedIds, profileId);
   };
 
   const onInviteContact = useOnInviteContact({

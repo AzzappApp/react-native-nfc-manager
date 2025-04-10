@@ -279,4 +279,5 @@ export type ContactDetails = Contact & {
     region: string | null;
     subregion: string | null;
   } | null;
+  id?: string;
 };

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -8,10 +8,13 @@ import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
+import useBoolean from '#hooks/useBoolean';
+import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -19,6 +22,7 @@ import Container from '#ui/Container';
 import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import ContactDetailActionModal from './ContactDetailActionModal';
 import type { ContactDetails } from '#helpers/contactListHelpers';
 import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
 import type { Icons } from '#ui/Icon';
@@ -74,6 +78,8 @@ const ContactDetailsBody = ({
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
+
+  const [isMoreVisible, showMore, hideMore] = useBoolean(false);
 
   const webCard = useFragment(
     graphql`
@@ -143,6 +149,24 @@ const ContactDetailsBody = ({
         year: 'numeric',
       })
     : undefined;
+
+  const removeContact = useRemoveContact({
+    onCompleted: () => {
+      hideMore();
+      router.back();
+    },
+    onError: e => {
+      console.error('Error removing contact', e);
+    },
+  });
+
+  const onRemoveContacts = useCallback(() => {
+    const profileId = getAuthState().profileInfos?.profileId;
+    if (!profileId || !details.id) {
+      return;
+    }
+    removeContact([details.id], profileId);
+  }, [removeContact, details.id]);
 
   return (
     <Container style={styles.container}>
@@ -226,6 +250,21 @@ const ContactDetailsBody = ({
               })}
               style={styles.save}
               onPress={onSave}
+            />
+            <Button
+              label={
+                <Icon
+                  icon="more"
+                  style={styles.more}
+                  tintColor={
+                    appearance === 'dark' ? colors.black : colors.white
+                  }
+                  size={24}
+                />
+              }
+              textStyle={styles.moreContent}
+              style={styles.more}
+              onPress={showMore}
             />
           </View>
           {meetingDate && (
@@ -381,6 +420,16 @@ const ContactDetailsBody = ({
           ) : undefined}
         </View>
       </ScrollView>
+      {details ? (
+        <ContactDetailActionModal
+          visible={isMoreVisible}
+          close={hideMore}
+          onRemoveContacts={onRemoveContacts}
+          onSaveContact={onSave}
+          onShare={onShare}
+          details={details}
+        />
+      ) : undefined}
     </Container>
   );
 };
@@ -442,14 +491,19 @@ const stylesheet = createStyleSheet(appearance => ({
     color: colors.grey400,
   },
   saveContainer: {
-    paddingHorizontal: 20,
+    flexDirection: 'row',
     width: '100%',
     paddingBottom: 10,
+    marginTop: 20,
+    gap: 5,
   },
   save: {
-    marginTop: 20,
-    width: '100%',
+    flex: 1,
   },
+  more: {
+    width: 50,
+  },
+  moreContent: { transform: [{ scale: 1.5 }] },
   item: {
     width: '100%',
     height: 52,

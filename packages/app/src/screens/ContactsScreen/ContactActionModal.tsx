@@ -1,19 +1,19 @@
 import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
 import BottomSheetModal from '#ui/BottomSheetModal';
-import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import ContactActionModalOption from './ContactActionModalOption';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { Icons } from '#ui/Icon';
+import type { ContactActionModalOptionProps } from './ContactActionModalOption';
 import type { ContactActionProps } from './ContactsScreenLists';
-import type { ReactNode } from 'react';
 
 type ContactActionModalProps = {
   close: () => void;
@@ -167,54 +167,7 @@ const ContactActionModal = ({
   );
 };
 
-type ContactActionModalOptionProps = {
-  icon: Icons;
-  text: ReactNode;
-  onPress: () => void;
-};
-
-const ContactActionModalOption = ({
-  icon,
-  text,
-  onPress,
-}: {
-  icon: Icons;
-  text: ReactNode;
-  onPress: () => void;
-}) => {
-  const inner = (
-    <PressableNative style={styles.bottomSheetOptionButton} onPress={onPress}>
-      <View style={styles.bottomSheetOptionContainer}>
-        <View style={styles.bottomSheetOptionIconLabel}>
-          <Icon icon={icon} />
-          <Text>{text}</Text>
-        </View>
-        <Icon icon="arrow_right" />
-      </View>
-    </PressableNative>
-  );
-  return inner;
-};
-
-const ROW_HEIGHT = 42;
 const styles = StyleSheet.create({
-  bottomSheetOptionButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    height: ROW_HEIGHT,
-    justifyContent: 'center',
-  },
-  bottomSheetOptionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between',
-  },
-  bottomSheetOptionIconLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 10,
-  },
   removeButton: {
     marginTop: 10,
     display: 'flex',
