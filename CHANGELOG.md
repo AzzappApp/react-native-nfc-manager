@@ -1,3 +1,7 @@
+## 1.9.2-rc.39
+
+* **fix:**  - **contactCard:** [#8429](https://github.com/AzzappApp/azzapp/pull/8429) properly handle transparency ([#8437](https://github.com/AzzappApp/azzapp/pull/8437))
+
 ## 1.9.2-rc.38
 
 * **fix:**  - **payment:** [#8434](https://github.com/AzzappApp/azzapp/pull/8434) check subscription of webcard owner
