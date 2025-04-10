@@ -29,6 +29,7 @@ jest.mock('#GraphQLContext', () => ({
 jest.mock('#loaders', () => ({
   profileByWebCardIdAndUserIdLoader: { load: jest.fn() },
   profileLoader: { load: jest.fn() },
+  webCardOwnerLoader: { load: jest.fn() },
 }));
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
@@ -161,7 +162,8 @@ describe('updateProfileMutation', () => {
     });
     (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue({
       id: 'currentProfileId',
-      profileRole: 'admin',
+      profileRole: 'owner',
+      userId: 'userId',
     });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('targetProfileId');
     (getWebCardById as jest.Mock).mockResolvedValue({ cardIsPublished: true });
