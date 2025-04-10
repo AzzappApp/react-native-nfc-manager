@@ -1,3 +1,7 @@
+## 1.10.0-canary.4
+
+
+
 ## 1.10.0-canary.3
 
 * **fix:**  - replace bottomSheet for contact detail by a screen ([#8245](https://github.com/AzzappApp/azzapp/pull/8245))
