@@ -1,3 +1,7 @@
+## 1.9.2-canary.31
+
+* **fix:**  - **shakeAndShare:** [#8385](https://github.com/AzzappApp/azzapp/pull/8385) enhance qr code transition ([#8405](https://github.com/AzzappApp/azzapp/pull/8405))
+
 ## 1.9.2-canary.30
 
 * **fix:**  - **shakeAndShare:** [#8410](https://github.com/AzzappApp/azzapp/pull/8410) reset shake and share on opening route ([#8426](https://github.com/AzzappApp/azzapp/pull/8426))
