@@ -1,3 +1,7 @@
+## 1.9.2-canary.33
+
+* **fix:**  - keep logo in png
+
 ## 1.9.2-canary.32
 
 * **fix:**  - center home menu
