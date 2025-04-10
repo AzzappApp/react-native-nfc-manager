@@ -44,7 +44,7 @@
     {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "api.azzapp.com" }],
-      "destination": "https://azzapp.com/api/$1"
+      "destination": "https://www.azzapp.com/api/$1"
     }
   ]
 }
