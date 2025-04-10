@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     gap: 5,
     alignSelf: 'center',
   },
-  menuContainerStyle: { flexGrow: 1, flexShrink: 0, marginHorizontal: 10 },
+  menuContainerStyle: { flexGrow: 1, flexShrink: 0 },
   menuLabelStyle: {
     color: colors.white,
     textOverflow: 'ellipsis',
