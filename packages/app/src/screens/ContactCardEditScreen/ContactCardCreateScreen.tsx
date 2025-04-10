@@ -294,14 +294,17 @@ const ContactCardCreateScreen = ({
       let logoHeight = 0;
       if (logo?.uri) {
         const fileName = getFileName(logo.uri);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri);
+        const mimeType = mime.lookup(fileName);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+          output: mimeType === 'image/png' ? 'png' : 'jpg',
+        });
         const metaData = await getImageMetaData(compressedFileUri);
         logoHeight = metaData.ImageHeight;
         logoWidth = metaData.ImageWidth;
         const file: any = {
           name: fileName,
           uri: logo.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
+          type: mimeType || 'image/jpeg',
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({
