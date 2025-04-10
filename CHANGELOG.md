@@ -1,3 +1,7 @@
+## 1.9.2-rc.38
+
+* **fix:**  - **payment:** [#8434](https://github.com/AzzappApp/azzapp/pull/8434) check subscription of webcard owner
+
 ## 1.9.2-rc.37
 
 * **fix:**  - keep logo in png
