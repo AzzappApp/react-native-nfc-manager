@@ -73,7 +73,7 @@ const ContactCreateScreen = ({
     useState<Observable<number> | null>(null);
 
   const currentLocation = useCurrentLocation();
-  const { location, address } = currentLocation || {};
+  const { location, address } = currentLocation?.value || {};
 
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(

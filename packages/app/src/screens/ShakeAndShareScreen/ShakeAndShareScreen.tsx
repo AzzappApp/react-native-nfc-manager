@@ -11,7 +11,7 @@ import {
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { startTransition, Suspense, useCallback, useEffect } from 'react';
+import { Suspense, useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   ActivityIndicator,
@@ -35,6 +35,7 @@ import AddToWalletButton from '#components/AddToWalletButton';
 import ContactCardExportVcf from '#components/ContactCardExportVcf';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import Skeleton from '#components/Skeleton';
 import ToastUi from '#components/Toast';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -198,7 +199,7 @@ const ShakeAndShareScreen = ({
         <ScrollView style={styles.contentContainer}>
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
-              <Suspense>
+              <Suspense fallback={<Skeleton style={styles.canvas} />}>
                 <QRCode profile={node?.profile} />
               </Suspense>
             </View>
@@ -397,27 +398,29 @@ const QRCode = ({
 
   const currentLocation = useCurrentLocation();
 
-  const { location, address } = currentLocation ?? {};
+  const { location, address } = currentLocation?.value ?? {};
 
   useEffect(() => {
-    startTransition(() => {
-      refetch({
-        location: location
-          ? {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }
-          : null,
-        address: address
-          ? {
-              country: address.country,
-              city: address.city,
-              subregion: address.subregion,
-              region: address.region,
-            }
-          : null,
-      });
-    });
+    const previous = location
+      ? refetch({
+          location: location
+            ? {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }
+            : null,
+          address: address
+            ? {
+                country: address.country,
+                city: address.city,
+                subregion: address.subregion,
+                region: address.region,
+              }
+            : null,
+        })
+      : undefined;
+
+    return () => previous?.dispose();
   }, [address, location, refetch]);
 
   const svg = data?.contactCardQrCode
@@ -429,7 +432,7 @@ const QRCode = ({
 
   const styles = useStyleSheet(styleSheet);
 
-  return svg ? (
+  return svg && currentLocation.locationSearched ? (
     <Canvas style={styles.canvas}>
       <Group
         layer={

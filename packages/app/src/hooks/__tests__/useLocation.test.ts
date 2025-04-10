@@ -21,7 +21,7 @@ describe('useCurrentLocation', () => {
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({ value: null, locationSearched: false });
     expect(mockGetLastKnownPosition).not.toHaveBeenCalled();
   });
 
@@ -31,7 +31,7 @@ describe('useCurrentLocation', () => {
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({ value: null, locationSearched: false });
     expect(mockReverseGeocode).not.toHaveBeenCalled();
   });
 
@@ -53,7 +53,12 @@ describe('useCurrentLocation', () => {
 
     await waitForNextUpdate();
 
-    expect(result.current).toEqual({ location: fakeLocation });
+    expect(result.current).toEqual({
+      value: {
+        location: fakeLocation,
+      },
+      locationSearched: true,
+    });
   });
 
   test('returns location with address if reverse geocoding is successful', async () => {
@@ -80,8 +85,11 @@ describe('useCurrentLocation', () => {
     await waitForNextUpdate();
 
     expect(result.current).toEqual({
-      location: fakeLocation,
-      address: fakeAddress,
+      value: {
+        location: fakeLocation,
+        address: fakeAddress,
+      },
+      locationSearched: true,
     });
   });
 });
