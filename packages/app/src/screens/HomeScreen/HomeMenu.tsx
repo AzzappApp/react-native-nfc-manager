@@ -44,10 +44,7 @@ const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
   }, [currentIndexProfileSharedValue.value, intl, router, user?.profiles]);
 
   return (
-    <View
-      style={[styles.container, { width: minWidth }]}
-      accessibilityRole="tablist"
-    >
+    <View style={[styles.container, { minWidth }]} accessibilityRole="tablist">
       <TabBarMenuItem
         selected={selected === 'CONTACT_CARD'}
         onPress={() => setSelected('CONTACT_CARD')}
@@ -119,8 +116,9 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     gap: 5,
     alignSelf: 'center',
+    marginHorizontal: 20,
   },
-  menuContainerStyle: { flexGrow: 1, flexShrink: 0, marginHorizontal: 10 },
+  menuContainerStyle: { flexGrow: 1, flexShrink: 0 },
   menuLabelStyle: {
     color: colors.white,
     textOverflow: 'ellipsis',

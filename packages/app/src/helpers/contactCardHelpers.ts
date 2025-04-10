@@ -46,6 +46,7 @@ export const baseContactCardSchema = z.object({
       uri: z.string(),
       id: z.string().optional(),
       local: z.boolean().optional(),
+      external: z.boolean().optional(),
     })
     .optional()
     .nullable(),

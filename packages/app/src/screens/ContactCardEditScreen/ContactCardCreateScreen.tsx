@@ -6,6 +6,7 @@ import {
   ImageFormat,
 } from '@shopify/react-native-skia';
 import { ResizeMode, Video } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 import { Paths, File } from 'expo-file-system/next';
 import {
   parsePhoneNumberFromString,
@@ -192,6 +193,7 @@ const ContactCardCreateScreen = ({
         ? {
             uri: currentUser?.userContactData?.avatarUrl,
             local: false,
+            external: true,
           }
         : null,
     },
@@ -253,23 +255,32 @@ const ContactCardCreateScreen = ({
           target: 'avatar',
         });
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
-      } else if (!avatar?.local && avatar?.uri) {
+      } else if (avatar?.external && avatar?.uri) {
         try {
-          const compressedFileUri = await ImageCompressor.compress(avatar.uri, {
-            output: 'jpg',
-          });
-          const fileName = getFileName(compressedFileUri);
-          const file: any = {
-            name: fileName,
-            uri: compressedFileUri,
-            type: 'image/jpeg',
-          };
+          const fileUri = `${Paths.cache.uri}${createRandomFileName('jpg')}`;
+          const downloadResult = await FileSystem.downloadAsync(
+            avatar.uri,
+            fileUri,
+          );
+          if (downloadResult.status === 200) {
+            const compressedFileUri = await ImageCompressor.compress(
+              downloadResult.uri,
+            );
+            const fileName = getFileName(compressedFileUri);
+            const file: any = {
+              name: fileName,
+              uri: compressedFileUri,
+              type: 'image/jpeg',
+            };
 
-          const { uploadURL, uploadParameters } = await uploadSign({
-            kind: 'image',
-            target: 'avatar',
-          });
-          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+            const { uploadURL, uploadParameters } = await uploadSign({
+              kind: 'image',
+              target: 'avatar',
+            });
+            uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+          } else {
+            uploads.push(null);
+          }
         } catch (e) {
           Sentry.captureException(e);
           uploads.push(null);
@@ -412,7 +423,11 @@ const ContactCardCreateScreen = ({
         );
 
       const avatarId =
-        avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+        avatar === null
+          ? null
+          : avatar?.local || avatar?.external
+            ? uploadedAvatarId
+            : avatar?.id;
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
