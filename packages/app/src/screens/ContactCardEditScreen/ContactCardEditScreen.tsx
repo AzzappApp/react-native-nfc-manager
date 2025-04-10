@@ -166,11 +166,14 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(logo.uri);
-      const compressedFileUri = await ImageCompressor.compress(logo.uri);
+      const mimeType = mime.lookup(fileName);
+      const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+        output: mimeType === 'image/png' ? 'png' : 'jpg',
+      });
       const file: any = {
         name: fileName,
         uri: compressedFileUri,
-        type: mime.lookup(fileName) || 'image/jpeg',
+        type: mimeType || 'image/jpeg',
       };
 
       const { uploadURL, uploadParameters } = await uploadSign({
