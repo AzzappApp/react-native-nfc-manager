@@ -8,6 +8,7 @@ import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, Keyboard } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -408,10 +409,14 @@ const MultiUserAddModal = (
 
       if (logo?.local && logo.uri) {
         const fileName = getFileName(logo.uri);
+        const mimeType = mime.lookup(fileName);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
+        });
         const file: any = {
           name: fileName,
-          uri: logo.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
+          uri: compressedFileUri,
+          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({

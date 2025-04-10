@@ -1,10 +1,8 @@
-import { ImageFormat } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, ScrollView, View } from 'react-native';
-import * as mime from 'react-native-mime-types';
 import { useMutation, graphql } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
@@ -16,7 +14,6 @@ import { ScreenModal } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -94,29 +91,20 @@ const ContactCardEditCompanyLogo = ({
 
   const onImagePickerFinished = useCallback(
     async ({ id, uri, width, height }: ImagePickerResult) => {
-      const mimeType =
-        mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
-      const localPath = await saveTransformedImageToFile({
-        uri,
-        resolution: { width, height },
-        format: mimeType,
-        quality: 95,
-      });
-
       setPickerImage({
         id,
-        uri: localPath,
+        uri,
         width,
         height,
       });
       field.onChange({
         local: true,
         id,
-        uri: localPath,
+        uri,
         width,
         height,
       });
-      imageLocalUrl.set(id, localPath);
+      imageLocalUrl.set(id, uri);
       closeImagePicker();
     },
     [closeImagePicker, field],
