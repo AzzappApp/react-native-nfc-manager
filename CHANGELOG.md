@@ -1,3 +1,7 @@
+## 1.9.2-rc.40
+
+* **fix:**  - update profile check
+
 ## 1.9.2-rc.39
 
 * **fix:**  - **contactCard:** [#8429](https://github.com/AzzappApp/azzapp/pull/8429) properly handle transparency ([#8437](https://github.com/AzzappApp/azzapp/pull/8437))
