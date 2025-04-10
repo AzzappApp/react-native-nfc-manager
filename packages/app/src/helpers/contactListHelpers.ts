@@ -2,10 +2,100 @@ import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
-import type { ContactDetailsModal_webCard$key } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
+import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
+import type { ContactsDetailScreenQuery$data } from '#relayArtifacts/ContactsDetailScreenQuery.graphql';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { Contact, Image } from 'expo-contacts';
+import type { Contact, Date as ExpoDate, Image } from 'expo-contacts';
+
+export const buildLocalContactFromDetailScreenData = async (
+  contact: ContactsDetailScreenQuery$data['contact'],
+): Promise<Contact> => {
+  const personal = {
+    addresses: contact?.addresses?.map(address => ({
+      label: address.label,
+      street: address.address,
+      address: address.address,
+    })),
+    emails: contact?.emails?.map(email => ({
+      label: email.label,
+      email: email.address,
+    })),
+    phoneNumbers: contact?.phoneNumbers?.map(({ label, number }) => ({
+      label,
+      number,
+    })),
+    socialProfiles: contact?.socials?.map(({ label, url }) => ({ label, url })),
+    urlAddresses: contact?.urls?.map(({ url }) => ({ label: '', url })),
+  };
+
+  let updatedBirthDay: ExpoDate[] | undefined = undefined;
+  if (contact?.birthday) {
+    const contactBirthday = new Date(contact.birthday);
+    updatedBirthDay = [
+      {
+        label: 'birthday',
+        year: contactBirthday.getFullYear(),
+        month: contactBirthday.getMonth(),
+        day: contactBirthday.getDate(),
+      },
+    ];
+  }
+
+  let avatar: File | undefined;
+  try {
+    let contactAvatar = contact?.avatar;
+    if (contact?.contactProfile?.avatar?.uri) {
+      contactAvatar = contact.contactProfile?.avatar;
+    }
+    if (contact && !contactAvatar && 'logo' in contact) {
+      contactAvatar = contact?.logo;
+    }
+    if (contactAvatar) {
+      const existingFile = getLocalCachedMediaFile(contactAvatar.id, 'image');
+      if (existingFile) {
+        avatar = new File(existingFile);
+      }
+
+      if (!avatar || !avatar.exists) {
+        avatar = new File(Paths.cache.uri + contactAvatar.id);
+        if (!avatar.exists) {
+          await File.downloadFileAsync(contactAvatar.uri, avatar);
+        }
+      }
+    }
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error('download avatar failure', e);
+  }
+
+  const image = avatar
+    ? {
+        uri: avatar.uri,
+      }
+    : contact && contact.logo
+      ? {
+          uri: contact.logo.uri,
+        }
+      : undefined;
+
+  return {
+    ...contact,
+    name: `${contact?.firstName} ${contact?.lastName}`,
+    contactType: 'person' as const,
+    jobTitle: contact ? contact.title : undefined,
+    company: contact?.company,
+    addresses: personal.addresses,
+    emails: personal.emails,
+    phoneNumbers: personal.phoneNumbers,
+    socialProfiles: personal.socialProfiles,
+    urlAddresses: personal.urlAddresses,
+    dates: updatedBirthDay,
+    image,
+    imageAvailable: !!avatar,
+    birthday: undefined,
+  };
+};
 
 export const buildLocalContact = async (
   contact: Contact | ContactType,
@@ -180,9 +270,9 @@ export type ContactType = NonNullable<
 >;
 
 export type ContactDetails = Contact & {
-  createdAt: Date;
+  createdAt?: Date;
   profileId?: string;
-  webCard?: ContactDetailsModal_webCard$key | null;
+  webCard?: ContactDetailsBody_webCard$key | null;
   meetingPlace?: {
     city: string | null;
     country: string | null;

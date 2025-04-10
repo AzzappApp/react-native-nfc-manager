@@ -288,9 +288,10 @@ export type ContactsRoute = {
 
 export type ContactDetailsRoute = {
   route: 'CONTACT_DETAILS';
-  params: Contact & {
-    createdAt: Date;
-    profileId?: string;
+  params: {
+    webCardId?: string | null;
+    contactId?: string | null;
+    contact?: Contact;
   };
 };
 

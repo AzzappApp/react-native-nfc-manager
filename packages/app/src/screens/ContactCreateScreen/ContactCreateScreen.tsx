@@ -19,6 +19,7 @@ import {
   useRouter,
 } from '#components/NativeRouter';
 
+import { emitContactAddedToProfile } from '#helpers/addContactHelper';
 import { getAuthState } from '#helpers/authStore';
 import {
   getVCardAddresses,
@@ -259,6 +260,7 @@ const ContactCreateScreen = ({
             : null,
         },
         onCompleted: () => {
+          emitContactAddedToProfile();
           router.back();
         },
         updater: (store, response) => {

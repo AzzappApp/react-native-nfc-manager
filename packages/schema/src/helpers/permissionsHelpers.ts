@@ -7,6 +7,7 @@ import {
 } from '@azzapp/shared/profileHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
+import type { Profile } from '@azzapp/data';
 
 export type ProtectedResolver<T> = {
   [P in Exclude<keyof T, '__isTypeOf'>]-?: T[P];
@@ -52,11 +53,7 @@ export const checkWebCardHasCover = async (webCardId: string) => {
 
 export const checkWebCardProfileAdminRight = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  if (
-    !profile ||
-    profile.invited ||
-    !profileHasAdminRight(profile.profileRole)
-  ) {
+  if (!isProfileAdminRight(profile)) {
     throw new GraphQLError(ERRORS.FORBIDDEN, {
       extensions: {
         role: profile?.profileRole,
@@ -64,6 +61,15 @@ export const checkWebCardProfileAdminRight = async (webCardId: string) => {
     });
   }
   return profile;
+};
+
+export const isProfileAdminRight = async (profile?: Profile | null) => {
+  return (
+    profile &&
+    !profile.invited &&
+    !profile.deleted &&
+    profileHasAdminRight(profile.profileRole)
+  );
 };
 
 export const checkWebCardOwnerProfile = async (webCardId: string) => {

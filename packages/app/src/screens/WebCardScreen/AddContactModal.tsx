@@ -287,11 +287,7 @@ const AddContactModal = ({
             } else {
               router.push({
                 route: 'CONTACT_DETAILS',
-                params: {
-                  ...scanned.contact,
-                  createdAt: new Date(),
-                  profileId: scanned.profileId,
-                },
+                params: scanned,
               });
             }
           },
@@ -313,7 +309,7 @@ const AddContactModal = ({
     router,
   ]);
 
-  const onAddContactToAzzapp = useCallback(() => {
+  const onAddContactToProfile = useCallback(() => {
     if (!scanned || !viewer) return;
     const input = getContactInput();
     if (!input) return;
@@ -474,7 +470,7 @@ const AddContactModal = ({
             defaultMessage: 'Add to my WebCard contacts',
             description: 'AddContactModal - Submit title',
           })}
-          onPress={onAddContactToAzzapp}
+          onPress={onAddContactToProfile}
         />
         <PressableNative onPress={close} style={styles.notAddButton}>
           <Text variant="medium" style={styles.notAddLabel}>

@@ -2,14 +2,16 @@ import {
   PermissionStatus as ContactPermissionStatus,
   displayContactAsync,
 } from 'expo-contacts';
-import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { AppState, View, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
-import { useOnFocus } from '#components/NativeRouter';
-import { useOnContactAdded } from '#helpers/addContactHelper';
+import { useOnFocus, useRouter } from '#components/NativeRouter';
+import {
+  useOnContactAddedToProfile,
+  useOnContactAdded,
+} from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactHelpers';
-import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
@@ -18,7 +20,6 @@ import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
-import ContactDetailsModal from './ContactDetailsModal';
 import ContactsFilteredByLocation from './ContactsFilteredByLocation';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
@@ -31,7 +32,6 @@ import type {
 } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
-import type { ContactDetailsModalActions } from './ContactDetailsModal';
 import type { Contact } from 'expo-contacts';
 
 export type ContactActionProps = {
@@ -58,7 +58,6 @@ const ContactsScreenLists = ({
   const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
     ContactPermissionStatus.UNDETERMINED,
   );
-  const contactDetails = useRef<ContactDetailsModalActions>(null);
   const [contactActionData, setContactActionData] = useState<
     ContactActionProps | undefined
   >();
@@ -94,20 +93,6 @@ const ContactsScreenLists = ({
   ]);
 
   useOnContactAdded(refreshLocalContacts);
-
-  // ensure we refresh contacts oon resume
-  useEffect(() => {
-    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-      const subscription = AppState.addEventListener('change', state => {
-        if (state === 'active') {
-          refreshLocalContacts();
-        }
-      });
-      return () => {
-        subscription.remove();
-      };
-    }
-  }, [contactsPermissionStatus, refreshLocalContacts]);
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -195,10 +180,10 @@ const ContactsScreenLists = ({
                     }
                   }
                   webCard {
+                    id
                     cardIsPublished
                     userName
                     hasCover
-                    ...ContactDetailsModal_webCard
                     commonInformation {
                       addresses {
                         label
@@ -234,60 +219,10 @@ const ContactsScreenLists = ({
       profile,
     );
 
-  const contacts = useMemo(() => {
-    return (
-      (data as ContactsScreenLists_contacts$data)?.searchContacts?.edges
-        ?.map(edge => edge?.node)
-        .filter(contact => !!contact) ?? []
-    );
-  }, [data]);
-
-  const onRefresh = useCallback(() => {
-    if (!isLoadingNext && !refreshing) {
-      setRefreshing(true);
-      refreshLocalContacts();
-      refetch(
-        {
-          name: search,
-          orderBy: searchBy,
-          filterBy: filterBy
-            ? {
-                value: filterBy,
-                type: 'location',
-              }
-            : undefined,
-        },
-        { fetchPolicy: 'store-and-network' },
-      );
-      setRefreshing(false);
-    }
-  }, [
-    isLoadingNext,
-    refreshing,
-    refreshLocalContacts,
-    refetch,
-    search,
-    searchBy,
-    filterBy,
-  ]);
-
-  // This code is used to refresh the screen when we come back to it.
-  // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
-  // Or not.
-  // In some case, the new contact shall be displayed, and during search for exemple we cannot infer if the new contact shall be displayed
-  // The safest way to implement it is to refresh the screen.
-  useOnFocus(onRefresh);
-
-  const onEndReached = useCallback(() => {
-    if (hasNext && !isLoadingNext) {
-      loadNext(20);
-    }
-  }, [hasNext, isLoadingNext, loadNext]);
-
-  useEffect(() => {
+  const refetchWithDefaultProps = useCallback(() => {
     refetch(
       {
-        name: search || undefined,
+        name: search,
         orderBy: searchBy,
         filterBy: filterBy
           ? {
@@ -298,7 +233,64 @@ const ContactsScreenLists = ({
       },
       { fetchPolicy: 'store-and-network' },
     );
-  }, [search, refetch, searchBy, filterBy]);
+  }, [filterBy, refetch, search, searchBy]);
+
+  // ensure we refresh contacts on resume
+  useEffect(() => {
+    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
+      const subscription = AppState.addEventListener('change', state => {
+        if (state === 'active') {
+          refreshLocalContacts();
+          refetchWithDefaultProps();
+        }
+      });
+      return () => {
+        subscription.remove();
+      };
+    }
+  }, [contactsPermissionStatus, refetchWithDefaultProps, refreshLocalContacts]);
+
+  const contacts = useMemo(() => {
+    return (
+      (data as ContactsScreenLists_contacts$data)?.searchContacts?.edges
+        ?.map(edge => edge?.node)
+        .filter(contact => !!contact) ?? []
+    );
+  }, [data]);
+
+  // Warning This code trigger a full refresh of the contacts list
+  useOnContactAddedToProfile(refetchWithDefaultProps);
+
+  const onRefresh = useCallback(() => {
+    if (!isLoadingNext && !refreshing) {
+      setRefreshing(true);
+      refreshLocalContacts();
+      refetchWithDefaultProps();
+      setRefreshing(false);
+    }
+  }, [
+    isLoadingNext,
+    refreshing,
+    refreshLocalContacts,
+    refetchWithDefaultProps,
+  ]);
+
+  // This code is used to refresh the screen when we come back to it.
+  // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
+  // Or not.
+  // In some case, the new contact shall be displayed, and during search for example we cannot infer if the new contact shall be displayed
+  // The safest way to implement it is to refresh the screen.
+  useOnFocus(refreshLocalContacts);
+
+  const onEndReached = useCallback(() => {
+    if (hasNext && !isLoadingNext) {
+      loadNext(20);
+    }
+  }, [hasNext, isLoadingNext, loadNext]);
+
+  useEffect(() => {
+    refetchWithDefaultProps();
+  }, [refetchWithDefaultProps]);
 
   const [commitContactsLastView] =
     useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
@@ -400,6 +392,7 @@ const ContactsScreenLists = ({
     [contactsPermissionStatus, localContacts, onInviteContact],
   );
 
+  const router = useRouter();
   const onShowContact = useCallback(
     async (contact: ContactType) => {
       if (
@@ -418,19 +411,18 @@ const ContactsScreenLists = ({
         }
       }
 
-      const details = await buildLocalContact(contact);
-
-      contactDetails.current?.open({
-        ...details,
-        createdAt: contact.createdAt,
-        profileId: contact.contactProfile?.id,
-        webCard: contact.contactProfile?.webCard?.cardIsPublished
-          ? contact.contactProfile?.webCard
-          : null,
-        meetingPlace: contact.meetingPlace,
+      router.push({
+        route: 'CONTACT_DETAILS',
+        params: {
+          contactId: contact.id,
+          profileId: contact.contactProfile?.id,
+          webCardId: contact.contactProfile?.webCard?.cardIsPublished
+            ? contact.contactProfile?.webCard?.id
+            : null,
+        },
       });
     },
-    [contactsPermissionStatus, localContacts],
+    [contactsPermissionStatus, localContacts, router],
   );
 
   // manage keyboard height
@@ -507,10 +499,6 @@ const ContactsScreenLists = ({
             listFooterComponent={<Animated.View style={footerStyle} />}
           />
         )}
-        <ContactDetailsModal
-          ref={contactDetails}
-          onInviteContact={onInviteContactInner}
-        />
         <ContactActionModal
           contactActionData={contactActionData}
           close={() => setContactActionData(undefined)}

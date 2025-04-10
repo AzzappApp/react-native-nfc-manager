@@ -1,10 +1,10 @@
-import { type Contact } from 'expo-contacts';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -13,17 +13,20 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactDetailsModal_webCard$data } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
+import type { ContactDetails } from '#helpers/contactListHelpers';
+import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
-type Props = {
+type ContactDetailsBodyProps = {
   details: ContactDetails;
+  webCardKey?: ContactDetailsBody_webCard$key | null;
   onClose: () => void;
   onSave: () => void;
 };
@@ -62,13 +65,45 @@ const ContactDetailItem = ({
   );
 };
 
-const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
+const ContactDetailsBody = ({
+  details,
+  webCardKey,
+  onSave,
+  onClose,
+}: ContactDetailsBodyProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
 
+  const webCard = useFragment(
+    graphql`
+      fragment ContactDetailsBody_webCard on WebCard
+      @argumentDefinitions(
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+      ) {
+        id
+        ...CoverRenderer_webCard
+        coverMedia {
+          id
+          __typename
+          ... on MediaVideo {
+            uri(width: $screenWidth, pixelRatio: $pixelRatio)
+            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
+          }
+        }
+      }
+    `,
+    webCardKey,
+  );
+
   const date = useMemo(() => {
-    if (!details) {
+    if (!details || !details.createdAt) {
       return '';
     }
 
@@ -87,20 +122,21 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
   const avatar = details?.image?.uri;
 
-  const birthday = details.dates?.find(date => date.label === 'birthday');
+  const birthday = details?.dates?.find(date => date.label === 'birthday');
 
-  const onShare = async () => ShareContact(details);
+  const onShare = async () => details && ShareContact(details);
   const appearance = useColorScheme();
 
   const { width: screenWidth } = useScreenDimensions();
+  const { top, bottom } = useScreenInsets();
 
   const backgroundWidth = screenWidth + 40;
-  const backgroundImageUrl = avatar || details.webCard?.coverMedia?.thumbnail;
+  const backgroundImageUrl = avatar || webCard?.coverMedia?.thumbnail;
 
-  const meetingPlace = details.meetingPlace
+  const meetingPlace = details?.meetingPlace
     ? getFriendlyNameFromLocation(details.meetingPlace)
     : undefined;
-  const meetingDate = details.createdAt
+  const meetingDate = details?.createdAt
     ? new Date(details.createdAt).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
@@ -144,7 +180,10 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scroll]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: top, paddingBottom: bottom + 100 },
+        ]}
       >
         <View style={styles.content}>
           <PressableNative style={styles.close} onPress={onClose}>
@@ -157,8 +196,8 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             <View style={[styles.avatar, styles.avatarWrapper]}>
               {avatar ? (
                 <Image source={avatar} style={styles.avatar} />
-              ) : details.webCard ? (
-                <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
+              ) : webCard ? (
+                <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
               ) : (
                 <Text style={styles.initials}>
                   {details.firstName?.substring(0, 1)}
@@ -268,8 +307,6 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                 if (urlAddress.url) {
                   const route = await matchUrlWithRoute(urlAddress.url);
                   if (route) {
-                    // will close the contact detail modal
-                    onClose();
                     // move to route deeplink
                     router?.push(route);
                     return;
@@ -331,15 +368,17 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               content={social.url}
             />
           ))}
-          <ContactDetailItem
-            key="scanDate"
-            icon="calendar"
-            label={intl.formatMessage({
-              defaultMessage: 'Date of Contact',
-              description: 'ContactDetailsModal - Label for date item',
-            })}
-            content={date}
-          />
+          {date ? (
+            <ContactDetailItem
+              key="scanDate"
+              icon="calendar"
+              label={intl.formatMessage({
+                defaultMessage: 'Date of Contact',
+                description: 'ContactDetailsModal - Label for date item',
+              })}
+              content={date}
+            />
+          ) : undefined}
         </View>
       </ScrollView>
     </Container>
@@ -393,7 +432,7 @@ const stylesheet = createStyleSheet(appearance => ({
   content: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 20,
+    overflow: 'visible',
   },
   company: {
     marginTop: 5,
@@ -432,6 +471,7 @@ const stylesheet = createStyleSheet(appearance => ({
   avatarContainer: Platform.OS === 'ios' && {
     borderRadius: AVATAR_WIDTH / 2,
     ...shadow({ appearance, direction: 'bottom' }),
+    paddingTop: 30,
   },
   avatarBackgroundContainer: {
     top: -20,
@@ -462,7 +502,7 @@ const stylesheet = createStyleSheet(appearance => ({
     backgroundColor: colors.grey50,
   },
   scroll: {
-    paddingHorizontal: 20,
+    marginHorizontal: 20,
   },
   initials: {
     color: colors.grey300,
@@ -476,17 +516,5 @@ const stylesheet = createStyleSheet(appearance => ({
     height: 24,
   },
 }));
-
-export type ContactDetails = Contact & {
-  createdAt: Date;
-  profileId?: string;
-  webCard?: ContactDetailsModal_webCard$data | null;
-  meetingPlace?: {
-    city: string | null;
-    country: string | null;
-    region: string | null;
-    subregion: string | null;
-  } | null;
-};
 
 export default ContactDetailsBody;

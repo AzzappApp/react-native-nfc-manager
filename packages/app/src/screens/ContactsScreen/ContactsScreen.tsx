@@ -297,5 +297,4 @@ export default relayScreen(ContactsScreen, {
     fetchPolicy: 'store-and-network',
   }),
   fallback: ContactsScreenFallback,
-  refreshOnFocus: true,
 });

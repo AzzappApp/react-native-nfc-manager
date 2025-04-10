@@ -82,6 +82,10 @@ export const webCardLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('WebCard'),
 );
 
+export const contactLoader = createSessionDataLoader(
+  'ContactLoader',
+  createEntitiesBatchLoadFunction('Contact'),
+);
 export const moduleBackgroundLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ModuleBackground'),
 );

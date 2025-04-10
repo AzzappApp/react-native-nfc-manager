@@ -1,7 +1,7 @@
 """
 Represent a Contact
 """
-type Contact {
+type Contact implements Node {
   id: ID!
   ownerProfile: Profile
   contactProfile: Profile
