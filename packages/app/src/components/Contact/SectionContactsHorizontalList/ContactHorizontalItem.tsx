@@ -59,7 +59,7 @@ const ContactHorizontalItem = ({
       return [
         contact.firstName,
         contact.lastName,
-        `${contact.firstName} ${contact.lastName}`,
+        `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
       ];
     }
 

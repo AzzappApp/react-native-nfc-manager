@@ -210,7 +210,7 @@ const ContactDetailsBody = ({
             </View>
           </View>
           <Text variant="large" style={styles.name}>
-            {details.firstName} {details.lastName}
+            {`${details?.firstName ?? ''} ${details?.lastName ?? ''}`.trim()}
           </Text>
           {details.company && (
             <Text style={styles.company}>{details.company}</Text>

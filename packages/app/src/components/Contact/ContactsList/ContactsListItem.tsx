@@ -79,7 +79,7 @@ const ContactSearchByNameItem = ({
       return [
         contact.firstName,
         contact.lastName,
-        `${contact.firstName} ${contact.lastName}`,
+        `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
       ];
     }
 
@@ -129,7 +129,7 @@ const ContactSearchByNameItem = ({
         <View style={styles.infos}>
           {(contact.firstName || contact.lastName) && (
             <Text variant="large" numberOfLines={1}>
-              {contact.firstName} {contact.lastName}
+              {`${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim()}
             </Text>
           )}
           {!contact.firstName &&

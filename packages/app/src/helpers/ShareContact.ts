@@ -25,11 +25,8 @@ const ShareContact = async (details: Contact | ContactType) => {
     console.error('cannot generate VCard');
     return;
   }
-  const contactName = (
-    (details.firstName || '') +
-    ' ' +
-    (details.lastName || '')
-  ).trim();
+  const contactName =
+    `${details?.firstName ?? ''} ${details?.lastName ?? ''}`.trim();
   const filePath =
     Paths.cache.uri +
     sanitizeFilePath(contactName.length ? contactName : 'contact') +

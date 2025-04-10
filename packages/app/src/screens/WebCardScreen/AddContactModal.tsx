@@ -400,7 +400,7 @@ const AddContactModal = ({
       const { contact } = scanned;
 
       if (contact.firstName || contact.lastName) {
-        return `${contact.firstName} ${contact.lastName}`;
+        return `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim();
       }
 
       if (contact.company) {

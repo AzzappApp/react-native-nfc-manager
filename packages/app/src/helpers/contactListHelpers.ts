@@ -81,7 +81,7 @@ export const buildLocalContactFromDetailScreenData = async (
 
   return {
     ...contact,
-    name: `${contact?.firstName} ${contact?.lastName}`,
+    name: `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
     contactType: 'person' as const,
     jobTitle: contact ? contact.title : undefined,
     company: contact?.company,
@@ -206,7 +206,7 @@ export const buildLocalContact = async (
 
   return {
     ...contact,
-    name: `${contact.firstName} ${contact.lastName}`,
+    name: `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
     contactType: 'person' as const,
     jobTitle: 'title' in contact ? contact.title : contact.jobTitle,
     company: contact.company,
