@@ -296,7 +296,7 @@ const ContactCardCreateScreen = ({
         const fileName = getFileName(logo.uri);
         const mimeType = mime.lookup(fileName);
         const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-          output: mimeType === 'image/png' ? 'png' : 'jpg',
+          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
         });
         const metaData = await getImageMetaData(compressedFileUri);
         logoHeight = metaData.ImageHeight;
@@ -304,7 +304,7 @@ const ContactCardCreateScreen = ({
         const file: any = {
           name: fileName,
           uri: logo.uri,
-          type: mimeType || 'image/jpeg',
+          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({

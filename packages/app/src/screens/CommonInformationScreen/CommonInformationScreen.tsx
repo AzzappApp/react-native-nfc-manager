@@ -228,11 +228,14 @@ export const CommonInformationScreen = ({
         setProgressIndicator(Observable.from(0));
 
         const fileName = getFileName(logo.uri);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri);
+        const mimeType = mime.lookup(fileName);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
+          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
+        });
         const file: any = {
           name: fileName,
           uri: compressedFileUri,
-          type: mime.lookup(fileName) || 'image/jpeg',
+          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({

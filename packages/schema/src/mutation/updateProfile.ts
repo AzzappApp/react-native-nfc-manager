@@ -12,7 +12,11 @@ import {
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileByWebCardIdAndUserIdLoader, profileLoader } from '#loaders';
+import {
+  profileByWebCardIdAndUserIdLoader,
+  profileLoader,
+  webCardOwnerLoader,
+} from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -74,7 +78,16 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   const webCard = await getWebCardById(targetProfile.webCardId);
 
-  await validateCurrentSubscription(currentProfile.userId, {
+  const ownerId =
+    currentProfile.profileRole === 'owner'
+      ? currentProfile.userId
+      : (await webCardOwnerLoader.load(currentProfile.webCardId))?.id;
+
+  if (!ownerId) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await validateCurrentSubscription(ownerId, {
     action: 'UPDATE_CONTACT_CARD',
     webCardIsPublished: !!webCard?.cardIsPublished,
     contactCardHasCompanyName: !!contactCard?.company,

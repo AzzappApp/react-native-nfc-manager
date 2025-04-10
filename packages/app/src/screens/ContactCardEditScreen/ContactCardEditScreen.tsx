@@ -168,12 +168,12 @@ const ContactCardEditScreen = ({
       const fileName = getFileName(logo.uri);
       const mimeType = mime.lookup(fileName);
       const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-        output: mimeType === 'image/png' ? 'png' : 'jpg',
+        output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
       });
       const file: any = {
         name: fileName,
         uri: compressedFileUri,
-        type: mimeType || 'image/jpeg',
+        type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
       };
 
       const { uploadURL, uploadParameters } = await uploadSign({
