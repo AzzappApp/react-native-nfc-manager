@@ -81,7 +81,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   const ownerId =
     currentProfile.profileRole === 'owner'
       ? currentProfile.userId
-      : (await webCardOwnerLoader.load(currentProfile.id))?.id;
+      : (await webCardOwnerLoader.load(currentProfile.webCardId))?.id;
 
   if (!ownerId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
