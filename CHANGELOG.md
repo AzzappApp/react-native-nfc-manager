@@ -1,3 +1,7 @@
+## 1.10.0-canary.7
+
+
+
 ## 1.10.0-canary.6
 
 * **feat:**  - **banner:** [#8124](https://github.com/AzzappApp/azzapp/pull/8124) add banner support
