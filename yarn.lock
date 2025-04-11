@@ -409,9 +409,9 @@ __metadata:
     "@react-native/metro-config": "npm:^0.77.1"
     "@react-native/typescript-config": "npm:^0.77.1"
     "@reeq/react-native-passkit": "patch:@reeq/react-native-passkit@npm%3A0.1.3#~/.yarn/patches/@reeq-react-native-passkit-npm-0.1.3-587260733c.patch"
-    "@sentry/core": "npm:^9.11.0"
+    "@sentry/core": "npm:^9.12.0"
     "@sentry/react-native": "npm:^6.10.0"
-    "@sentry/types": "npm:^9.11.0"
+    "@sentry/types": "npm:^9.12.0"
     "@sentry/utils": "npm:^8.55.0"
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.6#~/.yarn/patches/@shopify-flash-list-npm-1.7.6-dd7668e04d.patch"
     "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.12.3#~/.yarn/patches/@shopify-react-native-skia-npm-1.12.3-ca2aa2ba4c.patch"
@@ -11354,10 +11354,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:9.11.0, @sentry/core@npm:^9.11.0":
-  version: 9.11.0
-  resolution: "@sentry/core@npm:9.11.0"
-  checksum: 10/f0304b1f4e736e7778ee290240f0c0f2d68bb521cf550b9b8b5fcc23038abf0f6679575b469ece77884c7eb2f27226d58a26b8dcfea6318cb885d522bd2a5ac5
+"@sentry/core@npm:9.12.0, @sentry/core@npm:^9.12.0":
+  version: 9.12.0
+  resolution: "@sentry/core@npm:9.12.0"
+  checksum: 10/dd5e9cc0bde5c52c873b40a51bb40ed72da9567a92dcd0baa924ba090fa6723839a012093517e0955b26d722fd8a9b5ba4462217a40920a0b0d05209144d3b61
   languageName: node
   linkType: hard
 
@@ -11510,12 +11510,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:^9.11.0":
-  version: 9.11.0
-  resolution: "@sentry/types@npm:9.11.0"
+"@sentry/types@npm:^9.12.0":
+  version: 9.12.0
+  resolution: "@sentry/types@npm:9.12.0"
   dependencies:
-    "@sentry/core": "npm:9.11.0"
-  checksum: 10/33ed8a1cdbeec562886853b83ccc41bd2e77f14d3e0e833b0e5fddc4741c0c3f1f1d03f94dae828500f67b185e95bc1f7540b258eaac32ee9cdf8a720c931791
+    "@sentry/core": "npm:9.12.0"
+  checksum: 10/aea23ae7f572e61053e5361f41217130ea8a917a64e7b86abeec2d5c4de7a6b0c9a7e91dbd21a84b3bc7985e30dbb8fa30ff4d94ee6c8261aa48aa5b60432ab5
   languageName: node
   linkType: hard
 
