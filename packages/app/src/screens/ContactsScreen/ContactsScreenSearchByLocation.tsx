@@ -5,10 +5,6 @@ import { useRouter } from '#components/NativeRouter';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
-import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 
 type ContactsScreenSearchByLocationProps = {
   contacts: ContactType[];
@@ -16,8 +12,6 @@ type ContactsScreenSearchByLocationProps = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
 };
@@ -28,8 +22,6 @@ const ContactsScreenSearchByLocation = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
 }: ContactsScreenSearchByLocationProps) => {
@@ -75,8 +67,6 @@ const ContactsScreenSearchByLocation = ({
       refreshing={refreshing}
       onRefresh={onRefresh}
       onShowContact={onShowContact}
-      localContacts={localContacts}
-      contactsPermissionStatus={contactsPermissionStatus}
       showContactAction={showContactAction}
       listFooterComponent={listFooterComponent}
       onPressAll={location => {

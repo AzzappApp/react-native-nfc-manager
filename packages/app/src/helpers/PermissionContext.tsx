@@ -3,6 +3,7 @@ import {
   useMediaPermission,
   useCameraPermission,
   useAudioPermission,
+  useContactReadWritePermission,
 } from '#hooks/usePermissions';
 import type { ReactNode } from 'react';
 import type { PermissionStatus } from 'react-native-permissions';
@@ -14,6 +15,8 @@ type PermissionContextProps = {
   requestCameraPermission: () => void;
   audioPermission: PermissionStatus;
   requestAudioPermission: () => void;
+  contactPermission: PermissionStatus;
+  requestContactPermission: () => void;
 };
 
 const PermissionContext = createContext<PermissionContextProps>({
@@ -23,12 +26,16 @@ const PermissionContext = createContext<PermissionContextProps>({
   requestCameraPermission: async () => {},
   audioPermission: 'unavailable',
   requestAudioPermission: async () => {},
+  contactPermission: 'unavailable',
+  requestContactPermission: async () => {},
 });
 
 export function PermissionProvider({ children }: { children: ReactNode }) {
   const { mediaPermission, requestMediaPermission } = useMediaPermission();
   const { cameraPermission, requestCameraPermission } = useCameraPermission();
   const { audioPermission, requestAudioPermission } = useAudioPermission();
+  const { contactPermission, requestContactPermission } =
+    useContactReadWritePermission();
 
   return (
     <PermissionContext.Provider
@@ -39,6 +46,8 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
         requestCameraPermission,
         audioPermission,
         requestAudioPermission,
+        contactPermission,
+        requestContactPermission,
       }}
     >
       {children}

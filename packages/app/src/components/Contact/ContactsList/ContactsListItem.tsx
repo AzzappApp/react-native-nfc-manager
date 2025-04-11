@@ -1,13 +1,9 @@
-import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import {
-  findLocalContact,
-  getFriendlyNameFromLocation,
-} from '#helpers/contactHelpers';
+import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import useImageFromContact from '#hooks/useImageFromContact';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -16,13 +12,10 @@ import ContactAvatar from '../ContactAvatar';
 import WhatsappButton from '../WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
-import type { Contact } from 'expo-contacts';
 
 type Props = {
   contact: ContactType;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg?: ContactActionProps) => void;
 };
 
@@ -31,33 +24,8 @@ const COVER_WIDTH = 35;
 const ContactSearchByNameItem = ({
   contact,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
 }: Props) => {
-  const [showInvite, setShowInvite] = useState(false);
-
-  useEffect(() => {
-    const verifyInvitation = async () => {
-      if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-        const foundContact = await findLocalContact(
-          contact.phoneNumbers?.map(({ number }) => number) ?? [],
-          contact.emails?.map(({ address }) => address) ?? [],
-          localContacts,
-          contact.contactProfile?.id,
-        );
-        setShowInvite(!foundContact);
-      }
-    };
-    verifyInvitation();
-  }, [
-    contact.contactProfile?.id,
-    contact.emails,
-    contact.phoneNumbers,
-    contactsPermissionStatus,
-    localContacts,
-  ]);
-
   const onShow = useCallback(() => {
     onShowContact(contact);
   }, [contact, onShowContact]);
@@ -65,12 +33,8 @@ const ContactSearchByNameItem = ({
   const onMore = useCallback(() => {
     showContactAction({
       contact,
-      showInvite,
-      hideInvitation: () => {
-        setShowInvite(false);
-      },
     });
-  }, [contact, showContactAction, showInvite]);
+  }, [contact, showContactAction]);
 
   const avatarSource = useImageFromContact(contact);
 

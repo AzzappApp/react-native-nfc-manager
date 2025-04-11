@@ -1,8 +1,4 @@
 import * as Sentry from '@sentry/react-native';
-import {
-  presentFormAsync,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { fromGlobalId } from 'graphql-relay';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,12 +17,8 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { findLocalContact } from '#helpers/contactHelpers';
-import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
-import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
 import useOnInviteContact from '#hooks/useOnInviteContact';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -56,10 +48,6 @@ const AddContactModal = ({
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
-  const {
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-    requestPhonebookPermissionAsync,
-  } = usePhonebookPermission();
 
   const webCard = useFragment(
     graphql`
@@ -175,49 +163,17 @@ const AddContactModal = ({
 
   const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
-
-    let localContacts = await getLocalContactsMap();
-
-    const findContact = async () => {
-      const phoneNumbers =
-        scanned.contact.phoneNumbers
-          ?.map(({ number }) => number)
-          .filter(isDefined) || [];
-      const emails =
-        scanned.contact.emails?.map(({ email }) => email).filter(isDefined) ||
-        [];
-
-      return findLocalContact(
-        phoneNumbers,
-        emails,
-        localContacts,
-        scanned.profileId,
-      );
-    };
-
     const name = `${
       `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
       scanned.contact.company ||
       webCard.userName
     }`;
 
-    let foundContact: Contact | undefined = undefined;
-    const { status } = await requestPhonebookPermissionAsync();
-    if (status === ContactPermissionStatus.GRANTED) {
-      foundContact = await findContact();
-    }
-
-    const addOrUpdateText = foundContact
-      ? intl.formatMessage({
-          defaultMessage: 'Update',
-          description:
-            'confirmation button displayed to update an existing contact on phone',
-        })
-      : intl.formatMessage({
-          defaultMessage: 'Add',
-          description:
-            'confirmation button displayed to add an new contact on phone',
-        });
+    const addText = intl.formatMessage({
+      defaultMessage: 'Add',
+      description:
+        'confirmation button displayed to add an new contact on phone',
+    });
 
     Alert.alert(
       intl.formatMessage({
@@ -235,26 +191,14 @@ const AddContactModal = ({
       ),
       [
         {
-          text: addOrUpdateText,
+          text: addText,
           onPress: async () => {
             try {
-              const { status } =
-                await requestPhonebookPermissionAndRedirectToSettingsAsync();
-              if (
-                status === ContactPermissionStatus.GRANTED &&
-                !localContacts
-              ) {
-                localContacts = await getLocalContactsMap();
-              }
-              await onInviteContact(
-                status,
-                {
-                  ...scanned.contact,
-                  profileId: scanned.profileId,
-                  createdAt: new Date(),
-                },
-                localContacts,
-              );
+              await onInviteContact({
+                ...scanned.contact,
+                profileId: scanned.profileId,
+                createdAt: new Date(),
+              });
             } catch (e) {
               console.error(e);
             }
@@ -266,48 +210,19 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            const allowSystemUI =
-              Platform.OS === 'ios'
-                ? (await requestPhonebookPermissionAndRedirectToSettingsAsync())
-                    .status === ContactPermissionStatus.GRANTED
-                : false;
-
-            if (allowSystemUI) {
-              try {
-                const updatedContact = reworkContactForDeviceInsert(
-                  scanned.contact,
-                );
-                await presentFormAsync(null, updatedContact, {
-                  isNew: true,
-                });
-              } catch (e) {
-                console.warn(e);
-                Sentry.captureException(e);
-              }
-            } else {
-              router.push({
-                route: 'CONTACT_DETAILS',
-                params: scanned,
-              });
-            }
+            router.push({
+              route: 'CONTACT_DETAILS',
+              params: scanned,
+            });
           },
         },
         { text: 'Cancel', style: 'cancel' },
       ],
       {
-        // options
         cancelable: true,
       },
     );
-  }, [
-    scanned,
-    webCard.userName,
-    requestPhonebookPermissionAsync,
-    intl,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-    onInviteContact,
-    router,
-  ]);
+  }, [scanned, webCard.userName, intl, onInviteContact, router]);
 
   const onAddContactToProfile = useCallback(() => {
     if (!scanned || !viewer) return;

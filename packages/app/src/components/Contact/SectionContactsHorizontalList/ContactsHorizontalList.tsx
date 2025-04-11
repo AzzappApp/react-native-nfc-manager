@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { isDefined } from '@azzapp/shared/isDefined';
@@ -12,18 +12,12 @@ import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
-import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 import type { ListRenderItemInfo } from 'react-native';
 
 type ContactsScreenSectionProps = {
   title: string;
   data: ContactType[];
-  localContacts: Contact[];
   onShowContact: (contact: ContactType) => void;
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   showLocationInSubtitle?: boolean;
   onPressAll?: (title: string) => void;
@@ -32,22 +26,16 @@ type ContactsScreenSectionProps = {
 const ContactsScreenSection = ({
   title,
   data,
-  localContacts,
   onShowContact,
-  contactsPermissionStatus,
   showContactAction,
   onPressAll,
   showLocationInSubtitle,
 }: ContactsScreenSectionProps) => {
-  const [invited, setInvited] = useState(false);
-
   const onMore = useCallback(() => {
     showContactAction({
       contact: data,
-      showInvite: !invited,
-      hideInvitation: () => setInvited(false),
     });
-  }, [data, invited, showContactAction]);
+  }, [data, showContactAction]);
 
   const RenderProfile = useCallback(
     ({ item }: ListRenderItemInfo<ContactType>) => {
@@ -55,13 +43,11 @@ const ContactsScreenSection = ({
         <ContactHorizontalItem
           contact={item}
           onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={showContactAction}
         />
       );
     },
-    [localContacts, onShowContact, contactsPermissionStatus, showContactAction],
+    [onShowContact, showContactAction],
   );
 
   const intl = useIntl();

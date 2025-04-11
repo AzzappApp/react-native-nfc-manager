@@ -65,6 +65,21 @@ function useAudioPermission(): {
   };
 }
 
+function useContactReadWritePermission(): {
+  contactPermission: PermissionStatus;
+  requestContactPermission: () => Promise<void>;
+} {
+  const { status, ask } = usePermission(
+    Platform.OS === 'android'
+      ? [PERMISSIONS.ANDROID.WRITE_CONTACTS, PERMISSIONS.ANDROID.READ_CONTACTS]
+      : PERMISSIONS.IOS.CONTACTS,
+  );
+  return {
+    contactPermission: status,
+    requestContactPermission: ask,
+  };
+}
+
 type PermissionHookResult = {
   status: PermissionStatus;
   ask: () => Promise<void>;
@@ -126,4 +141,9 @@ export const usePermission = (
   return { status, ask };
 };
 
-export { useCameraPermission, useAudioPermission, useMediaPermission };
+export {
+  useCameraPermission,
+  useAudioPermission,
+  useMediaPermission,
+  useContactReadWritePermission,
+};

@@ -1,6 +1,5 @@
-import { PermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
-import { AppState, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -9,10 +8,8 @@ import {
   buildLocalContactFromDetailScreenData,
 } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import relayScreen from '#helpers/relayScreen';
 import useOnInviteContact from '#hooks/useOnInviteContact';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
 import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
@@ -150,79 +147,14 @@ const ContactDetailsScreen = ({
 
   const webCardKey = contact?.contactProfile?.webCard;
 
-  const [localContacts, setLocalContacts] = useState<Contact[]>();
-  const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
-    PermissionStatus.UNDETERMINED,
-  );
-
-  const { requestPhonebookPermissionAsync } = usePhonebookPermission();
-
-  const updatePermission = useCallback(async () => {
-    const { status } = await requestPhonebookPermissionAsync();
-    setContactsPermissionStatus(status);
-  }, [requestPhonebookPermissionAsync]);
-
-  // will setup the permission for this screen at first opening
-  useEffect(() => {
-    if (contactsPermissionStatus === PermissionStatus.UNDETERMINED) {
-      updatePermission();
-    }
-  }, [contactsPermissionStatus, updatePermission]);
-
-  // refresh local contact map
-  const refreshLocalContacts = useCallback(async () => {
-    if (contactsPermissionStatus === PermissionStatus.GRANTED) {
-      setLocalContacts(await getLocalContactsMap());
-    } else if (contactsPermissionStatus === PermissionStatus.DENIED) {
-      setLocalContacts([]);
-    } // else wait for permission update
-  }, [contactsPermissionStatus]);
-
-  useEffect(() => {
-    refreshLocalContacts();
-  }, [refreshLocalContacts]);
-
-  // ensure we refresh contacts oon resume
-  useEffect(() => {
-    if (contactsPermissionStatus === PermissionStatus.GRANTED) {
-      const subscription = AppState.addEventListener('change', state => {
-        if (state === 'active') {
-          refreshLocalContacts();
-        }
-      });
-      return () => {
-        subscription.remove();
-      };
-    }
-  }, [contactsPermissionStatus, refreshLocalContacts]);
-
   const onInviteContact = useOnInviteContact();
 
   const onInviteContactInner = useCallback(async () => {
     if (!displayedContact) {
       return;
     }
-    const result = await onInviteContact(
-      contactsPermissionStatus,
-      displayedContact,
-      localContacts,
-    );
-    if (result) {
-      if (result.status) {
-        setContactsPermissionStatus(result.status);
-      }
-      if (result.localContacts) {
-        setLocalContacts(result.localContacts);
-      }
-    }
-    refreshLocalContacts();
-  }, [
-    contactsPermissionStatus,
-    displayedContact,
-    localContacts,
-    onInviteContact,
-    refreshLocalContacts,
-  ]);
+    await onInviteContact(displayedContact);
+  }, [displayedContact, onInviteContact]);
 
   /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
         Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */

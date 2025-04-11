@@ -5,10 +5,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsListItem from './ContactsListItem';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
-import type {
-  PermissionStatus as ContactPermissionStatus,
-  Contact,
-} from 'expo-contacts';
 import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
 
 type Props = {
@@ -17,8 +13,6 @@ type Props = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
   renderSectionHeader: (args: {
@@ -35,8 +29,6 @@ const ContactsList = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
   renderSectionHeader,
@@ -54,13 +46,11 @@ const ContactsList = ({
         <ContactsListItem
           contact={item}
           onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={showContactAction}
         />
       );
     },
-    [showContactAction, contactsPermissionStatus, localContacts, onShowContact],
+    [showContactAction, onShowContact],
   );
 
   return (

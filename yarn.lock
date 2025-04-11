@@ -18232,11 +18232,11 @@ __metadata:
 
 "expo-contacts@patch:expo-contacts@npm%3A14.0.5#~/.yarn/patches/expo-contacts-npm-14.0.5-a00cfde952.patch":
   version: 14.0.5
-  resolution: "expo-contacts@patch:expo-contacts@npm%3A14.0.5#~/.yarn/patches/expo-contacts-npm-14.0.5-a00cfde952.patch::version=14.0.5&hash=145532"
+  resolution: "expo-contacts@patch:expo-contacts@npm%3A14.0.5#~/.yarn/patches/expo-contacts-npm-14.0.5-a00cfde952.patch::version=14.0.5&hash=ee50bc"
   peerDependencies:
     expo: "*"
     react-native: "*"
-  checksum: 10/fa46e7ac5ad1289ed612b945b50dc570302b3565dec28e61c370c92495f799b2d72c47160e1743923504cfb20db6bb9fb4023a41cb41f2edb574caac435de817
+  checksum: 10/bcb5df91eb617c288d2cec6e740abf9803d0dc20b6a6949a3b4ad6ca23f73455fbf4a85374806b931e058610be30e058079353c654aad87c1a0be948559e38ab
   languageName: node
   linkType: hard
 

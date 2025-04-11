@@ -5,10 +5,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsScreenSection from './ContactsHorizontalList';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
-import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 import type { ListRenderItemInfo } from 'react-native';
 
 type Props = {
@@ -17,8 +13,6 @@ type Props = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
   onPressAll?: (title: string) => void;
@@ -31,8 +25,6 @@ const SectionContactsHorizontalList = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
   onPressAll,
@@ -45,24 +37,15 @@ const SectionContactsHorizontalList = ({
       return (
         <ContactsScreenSection
           data={item.data}
-          localContacts={localContacts}
           onShowContact={onShowContact}
           title={item.title}
-          contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={showContactAction}
           onPressAll={onPressAll}
           showLocationInSubtitle={showLocationInSubtitle}
         />
       );
     },
-    [
-      showLocationInSubtitle,
-      contactsPermissionStatus,
-      localContacts,
-      onPressAll,
-      onShowContact,
-      showContactAction,
-    ],
+    [showLocationInSubtitle, onPressAll, onShowContact, showContactAction],
   );
 
   return (

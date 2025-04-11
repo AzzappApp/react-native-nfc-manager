@@ -3,10 +3,6 @@ import { useIntl } from 'react-intl';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
-import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 
 type ContactsScreenSearchByDateProps = {
   contacts: ContactType[];
@@ -14,8 +10,6 @@ type ContactsScreenSearchByDateProps = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
 };
@@ -26,8 +20,6 @@ const ContactsScreenSearchByDate = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
 }: ContactsScreenSearchByDateProps) => {
@@ -74,8 +66,6 @@ const ContactsScreenSearchByDate = ({
       refreshing={refreshing}
       onRefresh={onRefresh}
       onShowContact={onShowContact}
-      localContacts={localContacts}
-      contactsPermissionStatus={contactsPermissionStatus}
       showContactAction={showContactAction}
       listFooterComponent={listFooterComponent}
       showLocationInSubtitle

@@ -4,8 +4,11 @@ import { StyleSheet } from 'react-native';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
+import useOnInviteContact from '#hooks/useOnInviteContact';
+import useRemoveContact from '#hooks/useRemoveContact';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -17,27 +20,32 @@ import type { ContactActionProps } from './ContactsScreenLists';
 
 type ContactActionModalProps = {
   close: () => void;
-
-  onRemoveContacts: (contacts: ContactType | ContactType[]) => void;
-
   contactActionData?: ContactActionProps;
-
-  onInviteContact: (
-    contact: ContactType | ContactType[],
-    onHideInvitation: () => void,
-  ) => void;
   onShow: (contact: ContactType) => void;
 };
 
 const ContactActionModal = ({
   contactActionData,
   close,
-  onRemoveContacts,
-  onInviteContact,
   onShow,
 }: ContactActionModalProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const onInviteContact = useOnInviteContact();
+
+  const removeContact = useRemoveContact();
+
+  const onRemoveContacts = (contactIds: ContactType | ContactType[]) => {
+    const profileId = getAuthState().profileInfos?.profileId;
+    if (!profileId) {
+      return;
+    }
+    const removedIds = (
+      Array.isArray(contactIds) ? contactIds : [contactIds]
+    ).map(contact => contact.id);
+
+    removeContact(removedIds, profileId);
+  };
 
   const onShowWebcard = useCallback(async () => {
     if (
@@ -101,24 +109,23 @@ const ContactActionModal = ({
               onShow(contactActionData?.contact as ContactType),
           }
         : undefined,
-      contactActionData?.showInvite || multiSelection
-        ? {
-            icon: 'invite' as Icons,
-            text: intl.formatMessage({
-              defaultMessage: "Save to my phone's Contact",
-              description: 'ContactsScreen - More option alert - save',
-            }),
-            onPress: () => {
-              if (contactActionData.contact)
-                onInviteContact(contactActionData.contact, close);
-            },
+      {
+        icon: 'invite' as Icons,
+        text: intl.formatMessage({
+          defaultMessage: "Save to my phone's Contact",
+          description: 'ContactsScreen - More option alert - save',
+        }),
+        onPress: () => {
+          if (contactActionData?.contact) {
+            onInviteContact(contactActionData.contact);
+            close();
           }
-        : undefined,
+        },
+      },
     ].filter(isDefined);
   }, [
     close,
     contactActionData?.contact,
-    contactActionData?.showInvite,
     intl,
     onInviteContact,
     onShow,

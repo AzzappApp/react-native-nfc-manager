@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/react-native';
-import { getContactByIdAsync } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -246,54 +245,6 @@ const formatDate = (date: Date) => {
   const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
 
   return `${year}-${month}-${day}`;
-};
-
-export const findLocalContact = async (
-  phoneNumbers: string[],
-  emails: string[],
-  localContacts: Contact[],
-  profileId?: string,
-): Promise<Contact | undefined> => {
-  if (profileId && contactStorage.contains(profileId)) {
-    const internalId = contactStorage.getString(profileId);
-    if (internalId) {
-      const contactByInternalId = await getContactByIdAsync(internalId);
-
-      if (contactByInternalId) {
-        //temporary patch: we have remarked that contacts are mixed, I think it's due to internal id that are reused by the OS
-        let hasCommonInfo = phoneNumbers?.find(phoneNumber =>
-          contactByInternalId.phoneNumbers?.some(ph => {
-            return ph.number === phoneNumber;
-          }),
-        );
-
-        hasCommonInfo =
-          hasCommonInfo ||
-          emails?.find(email =>
-            contactByInternalId.emails?.some(em => email === em.email),
-          );
-        if (hasCommonInfo) {
-          return contactByInternalId;
-        }
-      }
-    }
-  }
-
-  const localContact = localContacts?.find(localContact => {
-    const hasCommonPhoneNumber = phoneNumbers?.find(phoneNumber =>
-      localContact.phoneNumbers?.some(ph => {
-        return ph.number === phoneNumber;
-      }),
-    );
-
-    if (hasCommonPhoneNumber) return true;
-    const hasCommonEmails = emails?.find(email =>
-      localContact.emails?.some(em => email === em.email),
-    );
-    return hasCommonEmails;
-  });
-
-  return localContact;
 };
 
 export const buildVCardFromAzzappContact = async (contact: ContactType) => {

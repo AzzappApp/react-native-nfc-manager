@@ -1,23 +1,11 @@
-import {
-  PermissionStatus as ContactPermissionStatus,
-  displayContactAsync,
-} from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { AppState, View, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
-import { useOnFocus, useRouter } from '#components/NativeRouter';
-import {
-  useOnContactAddedToProfile,
-  useOnContactAdded,
-} from '#helpers/addContactHelper';
-import { findLocalContact } from '#helpers/contactHelpers';
-import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
-import { useProfileInfos } from '#hooks/authStateHooks';
+import { useRouter } from '#components/NativeRouter';
+import { useOnContactAddedToProfile } from '#helpers/addContactHelper';
+import { getAuthState } from '#helpers/authStore';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
-import useOnInviteContact from '#hooks/useOnInviteContact';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
-import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
@@ -26,18 +14,15 @@ import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import { IsAzzappSupportedProvider } from './isWhatsappSupportedContext';
-import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactListHelpers';
 import type {
   ContactsScreenLists_contacts$data,
   ContactsScreenLists_contacts$key,
 } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
-import type { Contact } from 'expo-contacts';
 
 export type ContactActionProps = {
   contact?: ContactType | ContactType[];
-  showInvite: boolean;
-  hideInvitation?: () => void;
 };
 
 type ContactsScreenListsProps = {
@@ -53,46 +38,9 @@ const ContactsScreenLists = ({
   filterBy,
 }: ContactsScreenListsProps) => {
   const [refreshing, setRefreshing] = useState(false);
-  const [localContacts, setLocalContacts] = useState<Contact[]>();
-  const profileInfos = useProfileInfos();
-  const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
-    ContactPermissionStatus.UNDETERMINED,
-  );
   const [contactActionData, setContactActionData] = useState<
     ContactActionProps | undefined
   >();
-
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
-
-  // refresh local contact map
-  const refreshLocalContacts = useCallback(async () => {
-    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-      setLocalContacts(await getLocalContactsMap());
-    } else if (contactsPermissionStatus === ContactPermissionStatus.DENIED) {
-      setLocalContacts([]);
-    } // else wait for permission update
-  }, [contactsPermissionStatus]);
-
-  // will setup the permission for this screen at first opening
-  useEffect(() => {
-    if (contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED) {
-      const updatePermission = async () => {
-        const { status } =
-          await requestPhonebookPermissionAndRedirectToSettingsAsync();
-        setContactsPermissionStatus(status);
-      };
-      updatePermission();
-    } else {
-      refreshLocalContacts();
-    }
-  }, [
-    contactsPermissionStatus,
-    refreshLocalContacts,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-  ]);
-
-  useOnContactAdded(refreshLocalContacts);
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -235,20 +183,17 @@ const ContactsScreenLists = ({
     );
   }, [filterBy, refetch, search, searchBy]);
 
-  // ensure we refresh contacts on resume
+  // ensure we refresh contacts oon resume
   useEffect(() => {
-    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-      const subscription = AppState.addEventListener('change', state => {
-        if (state === 'active') {
-          refreshLocalContacts();
-          refetchWithDefaultProps();
-        }
-      });
-      return () => {
-        subscription.remove();
-      };
-    }
-  }, [contactsPermissionStatus, refetchWithDefaultProps, refreshLocalContacts]);
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        refetchWithDefaultProps();
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, [refetchWithDefaultProps]);
 
   const contacts = useMemo(() => {
     return (
@@ -264,23 +209,10 @@ const ContactsScreenLists = ({
   const onRefresh = useCallback(() => {
     if (!isLoadingNext && !refreshing) {
       setRefreshing(true);
-      refreshLocalContacts();
       refetchWithDefaultProps();
       setRefreshing(false);
     }
-  }, [
-    isLoadingNext,
-    refreshing,
-    refreshLocalContacts,
-    refetchWithDefaultProps,
-  ]);
-
-  // This code is used to refresh the screen when we come back to it.
-  // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
-  // Or not.
-  // In some case, the new contact shall be displayed, and during search for example we cannot infer if the new contact shall be displayed
-  // The safest way to implement it is to refresh the screen.
-  useOnFocus(refreshLocalContacts);
+  }, [isLoadingNext, refreshing, refetchWithDefaultProps]);
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -304,7 +236,7 @@ const ContactsScreenLists = ({
     );
 
   useEffect(() => {
-    const profileId = profileInfos?.profileId;
+    const profileId = getAuthState().profileInfos?.profileId;
     if (!profileId) {
       return;
     }
@@ -313,68 +245,11 @@ const ContactsScreenLists = ({
         profileId,
       },
     });
-  }, [commitContactsLastView, profileInfos, profileInfos?.profileId]);
-
-  const removeContact = useRemoveContact();
-
-  const onRemoveContacts = (contactIds: ContactType | ContactType[]) => {
-    const profileId = profileInfos?.profileId;
-    if (!profileId) {
-      return;
-    }
-    const removedIds = (
-      Array.isArray(contactIds) ? contactIds : [contactIds]
-    ).map(contact => contact.id);
-
-    removeContact(removedIds, profileId);
-  };
-
-  const onInviteContact = useOnInviteContact({
-    onEnd: contactActionData?.hideInvitation,
-  });
-
-  const onInviteContactInner = useCallback(
-    async (
-      contact: ContactDetails | ContactType | ContactType[],
-      onHideInvitation?: () => void,
-    ) => {
-      const result = await onInviteContact(
-        contactsPermissionStatus,
-        contact,
-        localContacts,
-        onHideInvitation,
-      );
-      if (result) {
-        if (result.status) {
-          setContactsPermissionStatus(result.status);
-        }
-        if (result.localContacts) {
-          setLocalContacts(result.localContacts);
-        }
-      }
-    },
-    [contactsPermissionStatus, localContacts, onInviteContact],
-  );
+  }, [commitContactsLastView]);
 
   const router = useRouter();
   const onShowContact = useCallback(
     async (contact: ContactType) => {
-      if (
-        contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
-        localContacts
-      ) {
-        const foundContact = await findLocalContact(
-          contact.phoneNumbers.map(({ number }) => number),
-          contact.emails.map(({ address }) => address),
-          localContacts,
-          contact.contactProfile?.id,
-        );
-        if (foundContact?.id) {
-          await displayContactAsync(foundContact.id);
-          return;
-        }
-      }
-
       router.push({
         route: 'CONTACT_DETAILS',
         params: {
@@ -386,7 +261,7 @@ const ContactsScreenLists = ({
         },
       });
     },
-    [contactsPermissionStatus, localContacts, router],
+    [router],
   );
 
   // manage keyboard height
@@ -399,14 +274,6 @@ const ContactsScreenLists = ({
     };
   });
 
-  if (
-    localContacts === undefined ||
-    contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED
-  ) {
-    // no need to render before localContacts is queried
-    return undefined;
-  }
-
   return (
     <IsAzzappSupportedProvider>
       <View style={styles.flex}>
@@ -417,8 +284,6 @@ const ContactsScreenLists = ({
             onRefresh={onRefresh}
             refreshing={refreshing}
             onShowContact={onShowContact}
-            localContacts={localContacts}
-            contactsPermissionStatus={contactsPermissionStatus}
             showContactAction={setContactActionData}
             listFooterComponent={<Animated.View style={footerStyle} />}
           />
@@ -432,8 +297,6 @@ const ContactsScreenLists = ({
               onRefresh={onRefresh}
               refreshing={refreshing}
               onShowContact={onShowContact}
-              localContacts={localContacts}
-              contactsPermissionStatus={contactsPermissionStatus}
               showContactAction={setContactActionData}
               listFooterComponent={<Animated.View style={footerStyle} />}
             />
@@ -444,8 +307,6 @@ const ContactsScreenLists = ({
               onRefresh={onRefresh}
               refreshing={refreshing}
               onShowContact={onShowContact}
-              localContacts={localContacts}
-              contactsPermissionStatus={contactsPermissionStatus}
               showContactAction={setContactActionData}
               listFooterComponent={<Animated.View style={footerStyle} />}
             />
@@ -457,8 +318,6 @@ const ContactsScreenLists = ({
             onRefresh={onRefresh}
             refreshing={refreshing}
             onShowContact={onShowContact}
-            localContacts={localContacts}
-            contactsPermissionStatus={contactsPermissionStatus}
             showContactAction={setContactActionData}
             listFooterComponent={<Animated.View style={footerStyle} />}
           />
@@ -466,8 +325,6 @@ const ContactsScreenLists = ({
         <ContactActionModal
           contactActionData={contactActionData}
           close={() => setContactActionData(undefined)}
-          onRemoveContacts={onRemoveContacts}
-          onInviteContact={onInviteContactInner}
           onShow={onShowContact}
         />
       </View>

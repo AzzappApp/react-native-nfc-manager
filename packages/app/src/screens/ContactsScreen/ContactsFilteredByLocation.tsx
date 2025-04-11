@@ -6,10 +6,6 @@ import ContactsList from '#components/Contact/ContactsList';
 import Text from '#ui/Text';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
-import type {
-  PermissionStatus as ContactPermissionStatus,
-  Contact,
-} from 'expo-contacts';
 import type { SectionListData } from 'react-native';
 
 type Props = {
@@ -18,8 +14,6 @@ type Props = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
 };
@@ -30,8 +24,6 @@ const ContactsFilteredByLocation = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
 }: Props) => {
@@ -107,8 +99,6 @@ const ContactsFilteredByLocation = ({
       refreshing={refreshing}
       onRefresh={onRefresh}
       onShowContact={onShowContact}
-      localContacts={localContacts}
-      contactsPermissionStatus={contactsPermissionStatus}
       showContactAction={showContactAction}
       listFooterComponent={listFooterComponent}
     />
