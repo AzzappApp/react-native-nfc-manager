@@ -12,7 +12,7 @@
 	<key>SHARED_GROUP_IDENTIFIER</key>
 	<string>$(SHARED_GROUP_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.9.7</string>
+	<string>1.9.8</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 </dict>

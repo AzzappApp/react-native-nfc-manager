@@ -1,3 +1,7 @@
+## 1.9.8
+
+* **fix:**  - **payment:** [#8446](https://github.com/AzzappApp/azzapp/pull/8446) check owner of webcard id ([#8450](https://github.com/AzzappApp/azzapp/pull/8450))
+
 ## 1.9.7
 
 
