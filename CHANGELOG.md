@@ -1,3 +1,7 @@
+## 1.10.0-canary.10
+
+* **fix:**  - reduce item gaps in contact details ([#8447](https://github.com/AzzappApp/azzapp/pull/8447))
+
 ## 1.10.0-canary.9
 
 * **fix:**  - **payment:** [#8446](https://github.com/AzzappApp/azzapp/pull/8446) check owner of webcard id ([#8450](https://github.com/AzzappApp/azzapp/pull/8450))
