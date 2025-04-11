@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parse } from '@lepirlouit/vcard-parser';
+import * as Sentry from '@sentry/react-native';
 import { File } from 'expo-file-system/next';
 import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { Keyboard, StyleSheet, View } from 'react-native';
-import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
@@ -34,10 +34,13 @@ import {
   getVCardUrls,
 } from '#helpers/contacts/textToVCard';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getFileName } from '#helpers/fileHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
 import { keyboardDismiss } from '#helpers/keyboardHelper';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
-import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
@@ -144,35 +147,23 @@ const ContactCreateScreen = ({
       const uploads = [];
 
       if (avatar?.local && avatar.uri) {
-        const fileName = getFileName(avatar.uri);
-        const file: any = {
-          name: fileName,
-          uri: avatar.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
+        const { file, uploadURL, uploadParameters } =
+          await prepareAvatarForUpload(avatar.uri);
 
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'avatar',
-        });
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } else {
         uploads.push(null);
       }
 
       if (logo?.local && logo.uri) {
-        const fileName = getFileName(logo.uri);
-        const file: any = {
-          name: fileName,
-          uri: logo.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
-
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'logo',
-        });
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareLogoForUpload(logo.uri);
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }
