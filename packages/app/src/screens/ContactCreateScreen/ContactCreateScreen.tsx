@@ -200,7 +200,7 @@ const ContactCreateScreen = ({
       }
 
       if (logoUri) {
-        addLocalCachedMediaFile(logoId, 'image', logoUri);
+        //  addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
 
       commit({
