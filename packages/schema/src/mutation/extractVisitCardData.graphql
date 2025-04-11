@@ -7,6 +7,7 @@ extend type Mutation {
 
 input ExtractVisitCardDataConfigInput {
   createContactCard: Boolean
+  profileId: ID
 }
 
 type VisitCardData {
