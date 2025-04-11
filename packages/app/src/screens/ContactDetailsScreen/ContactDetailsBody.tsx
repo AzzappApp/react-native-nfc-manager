@@ -494,7 +494,7 @@ const stylesheet = createStyleSheet(appearance => ({
     width: '100%',
     height: 52,
     ...shadow({ appearance, direction: 'center' }),
-    marginTop: 20,
+    marginTop: 15,
     padding: 14,
     backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     borderRadius: 12,
