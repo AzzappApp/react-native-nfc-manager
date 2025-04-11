@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import {
   FlatList,
   Keyboard,
+  KeyboardAvoidingView,
   Platform,
   RefreshControl,
   StyleSheet,
@@ -298,65 +299,71 @@ const PostCommentsList = ({
   );
 
   return (
-    <Container
+    <KeyboardAvoidingView
       style={[
         styles.keyboardAreaView,
         { paddingBottom: insets.bottom, paddingTop: insets.top },
       ]}
+      behavior="height"
+      enabled
     >
-      <PostCommentsScreenHeader onClose={router.back} />
-      <FlatList
-        data={postComments}
-        renderItem={renderItem}
-        onEndReached={onEndReached}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        ListFooterComponent={ListFooterComponent}
-        onEndReachedThreshold={0.5}
-        style={styles.list}
-        refreshControl={refreshControl}
-        renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
-      />
-      <View style={styles.inputContainer}>
-        <AuthorCartouche
-          author={profile.webCard!}
-          variant="post"
-          hideUserName
-          style={{ height: 48 }}
+      <Container style={styles.keyboardAreaView}>
+        <PostCommentsScreenHeader onClose={router.back} />
+        <FlatList
+          data={postComments}
+          renderItem={renderItem}
+          onEndReached={onEndReached}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          ListFooterComponent={ListFooterComponent}
+          onEndReachedThreshold={0.5}
+          style={styles.list}
+          refreshControl={refreshControl}
+          renderScrollComponent={props => (
+            <KeyboardAwareScrollView {...props} />
+          )}
         />
-        <Input
-          multiline
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Add a comment',
-            description: 'Post comment textarea placeholdesd',
-          })}
-          value={comment}
-          onChangeText={setComment}
-          onContentSizeChange={onContentSizeChange}
-          maxLength={MAX_COMMENT_LENGHT}
-          style={{ height: inputHeight }}
-          inputStyle={{
-            paddingTop:
-              Platform.OS === 'ios'
-                ? inputHeight / 2 - textStyles.textField.fontSize + 1
-                : undefined,
-          }}
-          rightElement={
-            <PressableOpacity
-              onPress={onSubmit}
-              disabled={!isNotFalsyString(comment)}
-            >
-              <Text variant="large">
-                <FormattedMessage
-                  defaultMessage="Post"
-                  description="Post Comment screen - create comment action button"
-                />
-              </Text>
-            </PressableOpacity>
-          }
-        />
-      </View>
-    </Container>
+        <View style={styles.inputContainer}>
+          <AuthorCartouche
+            author={profile.webCard!}
+            variant="post"
+            hideUserName
+            style={{ height: 48 }}
+          />
+          <Input
+            multiline
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Add a comment',
+              description: 'Post comment textarea placeholdesd',
+            })}
+            value={comment}
+            onChangeText={setComment}
+            onContentSizeChange={onContentSizeChange}
+            maxLength={MAX_COMMENT_LENGHT}
+            style={{ height: inputHeight }}
+            inputStyle={{
+              paddingTop:
+                Platform.OS === 'ios'
+                  ? inputHeight / 2 - textStyles.textField.fontSize + 1
+                  : undefined,
+            }}
+            rightElement={
+              <PressableOpacity
+                onPress={onSubmit}
+                disabled={!isNotFalsyString(comment)}
+              >
+                <Text variant="large">
+                  <FormattedMessage
+                    defaultMessage="Post"
+                    description="Post Comment screen - create comment action button"
+                  />
+                </Text>
+              </PressableOpacity>
+            }
+          />
+        </View>
+      </Container>
+    </KeyboardAvoidingView>
   );
 };
 
