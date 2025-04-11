@@ -3,7 +3,7 @@ import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsScreenSection from './ContactsHorizontalList';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
 import type { ListRenderItemInfo } from 'react-native';
 

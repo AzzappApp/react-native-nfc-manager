@@ -1,15 +1,8 @@
 import { useMemo } from 'react';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 
 const useImageFromContact = (contact: ContactType) => {
   return useMemo(() => {
-    if (contact.contactProfile?.avatar?.uri) {
-      return {
-        uri: contact.contactProfile.avatar.uri,
-        mediaId: contact.contactProfile.avatar.id ?? '',
-        requestedSize: 26,
-      };
-    }
     if (contact.avatar?.uri) {
       return {
         uri: contact.avatar.uri,
@@ -24,14 +17,21 @@ const useImageFromContact = (contact: ContactType) => {
         requestedSize: 26,
       };
     }
+    if (contact.webCardPreview?.uri) {
+      return {
+        uri: contact.webCardPreview?.uri,
+        mediaId: contact.webCardPreview?.id ?? '',
+        requestedSize: 26,
+      };
+    }
+
     return null;
   }, [
     contact.avatar?.id,
     contact.avatar?.uri,
-    contact.contactProfile?.avatar?.id,
-    contact.contactProfile?.avatar?.uri,
     contact.logo?.id,
     contact.logo?.uri,
+    contact.webCardPreview,
   ]);
 };
 

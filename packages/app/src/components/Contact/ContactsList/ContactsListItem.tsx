@@ -10,7 +10,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from '../ContactAvatar';
 import WhatsappButton from '../WhatsappButton';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 
 type Props = {
@@ -47,20 +47,14 @@ const ContactSearchByNameItem = ({
       ];
     }
 
-    if (contact.contactProfile?.webCard?.userName) {
-      return [
-        contact.contactProfile.webCard.userName,
-        '',
-        contact.contactProfile.webCard.userName,
-      ];
+    if (contact.webCardUserName) {
+      return [contact.webCardUserName, '', contact.webCardUserName];
     }
 
     return ['', '', ''];
-  }, [
-    contact.contactProfile?.webCard?.userName,
-    contact.firstName,
-    contact.lastName,
-  ]);
+  }, [contact.firstName, contact.lastName, contact.webCardUserName]);
+
+  console.log('contact', contact, avatarSource);
 
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
@@ -70,7 +64,7 @@ const ContactSearchByNameItem = ({
         onLongPress={onMore}
         style={styles.contactInfos}
       >
-        {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
+        {!avatarSource && contact.webCard ? (
           <View style={styles.cover}>
             <CoverRenderer
               style={styles.webcard}
@@ -98,9 +92,9 @@ const ContactSearchByNameItem = ({
           )}
           {!contact.firstName &&
             !contact.lastName &&
-            contact.contactProfile?.webCard?.userName && (
+            contact.webCardUserName && (
               <Text variant="large" numberOfLines={1}>
-                {contact.contactProfile.webCard.userName}
+                {contact.webCardUserName}
               </Text>
             )}
           {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}

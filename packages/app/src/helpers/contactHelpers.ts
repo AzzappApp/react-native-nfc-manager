@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { MMKV } from 'react-native-mmkv';
 import VCard from 'vcard-creator';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
@@ -12,18 +11,14 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import { prefixWithHttp, type ContactType } from './contactListHelpers';
+import { prefixWithHttp } from './contactListHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
-import type { Contact } from 'expo-contacts';
+import type { ContactMeetingPlaceType, ContactType } from './contactTypes';
 import type { ColorSchemeName } from 'react-native';
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
 const MIN_FIELD_HEIGHT = 72;
-
-export const contactStorage = new MMKV({
-  id: 'contacts',
-});
 
 //TODO: if this updated color is validated after dev test
 // (respecting our color and not using pure black, using transparancy because the background behing have the right color)
@@ -239,41 +234,19 @@ export const useSocialLinkLabels = () => {
   return labelValues;
 };
 
-const formatDate = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two-digit month
-  const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
-
-  return `${year}-${month}-${day}`;
-};
-
-export const buildVCardFromAzzappContact = async (contact: ContactType) => {
+export const buildVCard = async (contact: ContactType) => {
   const vCard = new VCard();
   vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
-
   if (contact.title) {
     vCard.addJobtitle(contact.title);
   }
-
-  let birthday = contact.birthday;
-  if (
-    !birthday &&
-    'dates' in contact &&
-    Array.isArray(contact.dates) &&
-    contact.dates.length
-  ) {
-    const birth = contact.dates?.find(date => date.label === 'birthday');
-    birthday = formatDate(new Date(birth.year ?? 0, birth.month, birth.day));
-  }
-
-  if (birthday) {
-    vCard.addBirthday(birthday.toString());
+  if (contact.birthday) {
+    vCard.addBirthday(contact.birthday.toString());
   }
   if (contact.company) {
     vCard.addCompany(contact.company);
   }
-
-  contact.phoneNumbers.forEach(number => {
+  contact.phoneNumbers?.forEach(number => {
     if (number.number) {
       vCard.addPhoneNumber(
         `${number.number}`,
@@ -281,17 +254,9 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
       );
     }
   });
-
-  contact.emails.forEach(email => {
+  contact.emails?.forEach(email => {
     if (email.address)
       vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
-    else if (
-      'email' in email &&
-      email.email &&
-      typeof email.email === 'string'
-    ) {
-      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
-    }
   });
 
   contact.urls?.forEach(url => {
@@ -303,7 +268,7 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
       vCard.addSocial(prefixWithHttp(social.url), social.label || '');
   });
 
-  contact.addresses.forEach(addr => {
+  contact.addresses?.forEach(addr => {
     if (addr.address) {
       vCard.addAddress(
         undefined,
@@ -345,75 +310,8 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   return vCard;
 };
 
-export const buildVCardFromExpoContact = async (contact: Contact) => {
-  const vCard = new VCard();
-  vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
-
-  if (contact.jobTitle) {
-    vCard.addJobtitle(contact.jobTitle);
-  }
-  if (contact.birthday && contact.birthday) {
-    vCard.addBirthday(contact.birthday.toString());
-  }
-  if (contact.company) {
-    vCard.addCompany(contact.company);
-  }
-
-  contact.phoneNumbers?.forEach(number => {
-    vCard.addPhoneNumber(
-      `${number.number}`,
-      phoneLabelToVCardLabel(number.label) || '',
-    );
-  });
-  contact.emails?.forEach(email => {
-    if (email.email)
-      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
-  });
-  contact.urlAddresses?.forEach(url => {
-    if (url.url) vCard.addURL(url.url);
-  });
-  contact.socialProfiles?.forEach(social => {
-    if (social.url) vCard.addSocial(social.url, social.label || '');
-  });
-  contact.addresses?.forEach(addr => {
-    let fullAdress = addr.street || '';
-    if (fullAdress.length) fullAdress += ' ';
-    fullAdress += addr.postalCode || '';
-    if (fullAdress.length) fullAdress += ' ';
-    fullAdress += addr.city || '';
-    if (fullAdress.length) fullAdress = fullAdress + ' ';
-    fullAdress += addr.country || '';
-
-    if (fullAdress.length)
-      vCard.addAddress(
-        undefined,
-        undefined,
-        fullAdress,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        addressLabelToVCardLabel(addr.label),
-      );
-  });
-  if (contact?.image?.uri) {
-    const file = new File(contact.image.uri);
-    const image = file.base64();
-
-    if (image) {
-      vCard.addPhoto(image);
-    }
-  }
-  return vCard;
-};
-
 export const getFriendlyNameFromLocation = (
-  meetingPlace: {
-    readonly city: string | null;
-    readonly country: string | null;
-    readonly region: string | null;
-    readonly subregion: string | null;
-  } | null,
+  meetingPlace?: ContactMeetingPlaceType | null,
 ) => {
   return (
     meetingPlace?.city ||

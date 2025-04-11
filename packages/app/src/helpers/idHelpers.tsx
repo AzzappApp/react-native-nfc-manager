@@ -6,7 +6,7 @@
  */
 export const createId = () => Math.random().toString(16).slice(2);
 
-export const keyExtractor = <ItemT extends { id: string } | null>(
+export const keyExtractor = <ItemT extends { id?: string } | null>(
   item: ItemT,
   index: number,
 ) => item?.id ?? `${index}`;

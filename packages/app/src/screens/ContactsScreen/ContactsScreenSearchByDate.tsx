@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from './ContactsScreenLists';
 
 type ContactsScreenSearchByDateProps = {

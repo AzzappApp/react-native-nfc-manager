@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import { useRouter } from '#components/NativeRouter';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from './ContactsScreenLists';
 
 type ContactsScreenSearchByLocationProps = {

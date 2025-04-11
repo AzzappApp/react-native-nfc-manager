@@ -3,7 +3,7 @@ import { SectionList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsListItem from './ContactsListItem';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
 
@@ -73,8 +73,8 @@ const ContactsList = ({
   );
 };
 
-const sectionKeyExtractor = (item: { id: string }) => {
-  return item.id;
+const sectionKeyExtractor = (item: { id?: string }, index: number) => {
+  return item.id ?? `${index}`;
 };
 const ItemSeparator = () => {
   const styles = useStyleSheet(stylesheet);

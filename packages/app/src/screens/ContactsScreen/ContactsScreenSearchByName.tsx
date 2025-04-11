@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import ContactsList from '#components/Contact/ContactsList';
 import Text from '#ui/Text';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type { SectionListData } from 'react-native';
 
@@ -33,7 +33,7 @@ const ContactsScreenSearchByName = ({
           contact.firstName?.[0] ??
           contact.lastName?.[0] ??
           contact.company?.[0] ??
-          contact.contactProfile?.webCard?.userName?.[0] ??
+          contact.webCardUserName?.[0] ??
           ''
         ).toLocaleUpperCase();
 

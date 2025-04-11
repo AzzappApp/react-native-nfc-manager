@@ -6,7 +6,7 @@ import ContactActionModalOption from '#screens/ContactsScreen/ContactActionModal
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactDetails } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionModalOptionProps } from '#screens/ContactsScreen/ContactActionModalOption';
 import type { Icons } from '#ui/Icon';
 
@@ -16,7 +16,7 @@ type ContactDetailActionModalProps = {
   visible?: boolean;
   onSaveContact: () => void;
   onShare: () => void;
-  details?: ContactDetails;
+  details?: ContactType;
 };
 
 const ContactDetailActionModal = ({

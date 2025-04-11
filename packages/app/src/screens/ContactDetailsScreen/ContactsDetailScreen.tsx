@@ -3,10 +3,7 @@ import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import {
-  buildLocalContact,
-  buildLocalContactFromDetailScreenData,
-} from '#helpers/contactListHelpers';
+import { buildContactTypeFromContactNode } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useOnInviteContact from '#hooks/useOnInviteContact';
@@ -17,10 +14,13 @@ import ContactDetailsBody from './ContactDetailsBody';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsDetailScreenQuery } from '#relayArtifacts/ContactsDetailScreenQuery.graphql';
 import type { ContactDetailsRoute } from '#routes';
-import type { Contact } from 'expo-contacts';
 
 const query = graphql`
-  query ContactsDetailScreenQuery($contactId: ID!, $pixelRatio: Float!) {
+  query ContactsDetailScreenQuery(
+    $contactId: ID!
+    $pixelRatio: Float!
+    $screenWidth: Float!
+  ) {
     contact: node(id: $contactId) {
       ... on Contact {
         id
@@ -65,50 +65,22 @@ const query = graphql`
         }
         contactProfile {
           id
-          avatar {
-            id
-            uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
-          }
-          contactCard {
-            urls {
-              address
-              selected
-            }
-            socials {
-              url
-              label
-              selected
-            }
-          }
           webCard {
-            ...CoverRenderer_webCard
             ...ContactDetailsBody_webCard
             id
             cardIsPublished
             userName
             hasCover
-            commonInformation {
-              addresses {
-                label
-                address
-              }
-              company
-              emails {
-                label
-                address
-              }
-              phoneNumbers {
-                label
-                number
-              }
-              socials {
-                label
-                url
-              }
-              urls {
-                address
+            coverMedia {
+              id
+              ... on MediaVideo {
+                webcardThumbnail: thumbnail(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
               }
             }
+            ...CoverRenderer_webCard
           }
         }
       }
@@ -129,23 +101,19 @@ const ContactDetailsScreen = ({
   );
 
   // We need to use an intermediate state to avoid buildLocalContact which is an async function
-  const [displayedContact, setDisplayedContact] = useState<Contact | null>(
-    null,
-  );
+  const [displayedContact, setDisplayedContact] = useState(params.contact);
 
   const updateContact = useCallback(async () => {
-    if (params.contact) {
-      setDisplayedContact(await buildLocalContact(params.contact));
-    } else {
-      setDisplayedContact(await buildLocalContactFromDetailScreenData(contact));
+    if (!params.contact) {
+      setDisplayedContact(
+        (await buildContactTypeFromContactNode(contact)) || undefined,
+      );
     }
   }, [contact, params.contact]);
 
   useEffect(() => {
     updateContact();
   }, [updateContact]);
-
-  const webCardKey = contact?.contactProfile?.webCard;
 
   const onInviteContact = useOnInviteContact();
 
@@ -160,14 +128,9 @@ const ContactDetailsScreen = ({
         Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */
   return (
     <View collapsable={false} style={styles.container}>
-      {displayedContact && params.contactId ? (
+      {displayedContact ? (
         <ContactDetailsBody
-          details={{
-            ...displayedContact,
-            createdAt: contact?.createdAt,
-            id: params.contactId,
-          }}
-          webCardKey={webCardKey}
+          details={displayedContact}
           onClose={router.back}
           onSave={onInviteContactInner}
         />

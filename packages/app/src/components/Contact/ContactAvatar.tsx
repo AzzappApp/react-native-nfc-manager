@@ -8,8 +8,8 @@ import Text from '#ui/Text';
 import type { ViewProps } from 'react-native';
 
 type AvatarProps = ViewProps & {
-  firstName?: string;
-  lastName?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   small?: boolean;
   name?: string;
   company?: string;

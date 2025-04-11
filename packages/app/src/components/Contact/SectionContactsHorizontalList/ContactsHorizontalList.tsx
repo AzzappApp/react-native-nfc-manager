@@ -10,7 +10,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
 import type { ListRenderItemInfo } from 'react-native';
 

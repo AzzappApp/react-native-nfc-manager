@@ -1,5 +1,5 @@
-import { buildVCardFromAzzappContact } from '#helpers/contactHelpers';
-import type { ContactType } from '#helpers/contactListHelpers';
+import { buildVCard } from '#helpers/contactHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 
 const contactMock: ContactType = {
   addresses: [],
@@ -7,7 +7,6 @@ const contactMock: ContactType = {
   logo: null,
   birthday: null,
   company: '',
-  contactProfile: null,
   createdAt: new Date('2012-12-21'),
   emails: [],
   firstName: '',
@@ -22,11 +21,11 @@ const contactMock: ContactType = {
 };
 
 describe('contactHelpers', () => {
-  test('buildVCardFromAzzappContact empty contact', async () => {
-    const vCard = await buildVCardFromAzzappContact(contactMock);
+  test('buildVCard empty contact', async () => {
+    const vCard = await buildVCard(contactMock);
     expect(vCard).toMatchSnapshot();
   });
-  test('buildVCardFromAzzappContact contact with social', async () => {
+  test('buildVCard contact with social', async () => {
     const contact: ContactType = {
       ...contactMock,
       socials: [
@@ -36,7 +35,7 @@ describe('contactHelpers', () => {
         },
       ],
     };
-    const vCard = await buildVCardFromAzzappContact(contact);
+    const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
     const facebook = vCard
       .getProperties()

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`contactHelpers buildVCardFromAzzappContact contact with social 1`] = `
+exports[`contactHelpers buildVCard contact with social 1`] = `
 {
   "charset": "utf-8",
   "contentType": "text/x-vcard",
@@ -36,7 +36,7 @@ exports[`contactHelpers buildVCardFromAzzappContact contact with social 1`] = `
 }
 `;
 
-exports[`contactHelpers buildVCardFromAzzappContact empty contact 1`] = `
+exports[`contactHelpers buildVCard empty contact 1`] = `
 {
   "charset": "utf-8",
   "contentType": "text/x-vcard",

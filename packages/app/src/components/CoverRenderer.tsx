@@ -410,7 +410,6 @@ const CoverRenderer = (
           <CoverRendererUploadingProgress />
         </View>
       )}
-      {/* )} */}
     </View>
   );
 };

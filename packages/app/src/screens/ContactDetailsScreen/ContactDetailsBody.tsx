@@ -23,14 +23,12 @@ import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
-import type { ContactDetails } from '#helpers/contactListHelpers';
-import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
+import type { ContactType } from '#helpers/contactTypes';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type ContactDetailsBodyProps = {
-  details: ContactDetails;
-  webCardKey?: ContactDetailsBody_webCard$key | null;
+  details: ContactType;
   onClose: () => void;
   onSave: () => void;
 };
@@ -71,7 +69,6 @@ const ContactDetailItem = ({
 
 const ContactDetailsBody = ({
   details,
-  webCardKey,
   onSave,
   onClose,
 }: ContactDetailsBodyProps) => {
@@ -105,7 +102,7 @@ const ContactDetailsBody = ({
         }
       }
     `,
-    webCardKey,
+    details?.webCard,
   );
 
   const date = useMemo(() => {
@@ -126,9 +123,9 @@ const ContactDetailsBody = ({
       .join(' ');
   }, [details]);
 
-  const avatar = details?.image?.uri;
+  const avatar = details?.avatar?.uri || details.logo?.uri;
 
-  const birthday = details?.dates?.find(date => date.label === 'birthday');
+  const birthday = details?.birthday;
 
   const onShare = async () => details && ShareContact(details);
   const appearance = useColorScheme();
@@ -137,12 +134,12 @@ const ContactDetailsBody = ({
   const { top, bottom } = useScreenInsets();
 
   const backgroundWidth = screenWidth + 40;
-  const backgroundImageUrl = avatar || webCard?.coverMedia?.thumbnail;
+  const backgroundImageUrl = avatar || details?.webCardPreview?.uri;
 
   const meetingPlace = details?.meetingPlace
     ? getFriendlyNameFromLocation(details.meetingPlace)
     : undefined;
-  const meetingDate = details?.createdAt
+  const meetingDate = details.createdAt
     ? new Date(details.createdAt).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
@@ -221,7 +218,7 @@ const ContactDetailsBody = ({
               {avatar ? (
                 <Image source={avatar} style={styles.avatar} />
               ) : webCard ? (
-                <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
+                <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
               ) : (
                 <Text style={styles.initials}>
                   {details.firstName?.substring(0, 1)}
@@ -239,9 +236,7 @@ const ContactDetailsBody = ({
           {details.company && (
             <Text style={styles.company}>{details.company}</Text>
           )}
-          {details.jobTitle && (
-            <Text style={styles.job}>{details.jobTitle}</Text>
-          )}
+          {details.title && <Text style={styles.job}>{details.title}</Text>}
           <View style={styles.saveContainer}>
             <Button
               label={intl.formatMessage({
@@ -306,40 +301,34 @@ const ContactDetailsBody = ({
           ))}
           {details.emails?.map((email, index) => (
             <ContactDetailItem
-              key={'email' + index + '' + email.email}
+              key={'email' + index + '' + email.address}
               onPress={() => {
-                Linking.openURL(`mailto:${email.email}`);
+                Linking.openURL(`mailto:${email.address}`);
               }}
               icon="mail_line"
               label={email.label}
-              content={email.email}
+              content={email.address}
             />
           ))}
           {birthday && (
             <ContactDetailItem
               key="birthday"
               onPress={async () => {
-                openCalendar(
-                  `${birthday.year}-${birthday.month + 1}-${birthday.day}`,
-                );
+                openCalendar(birthday);
               }}
               icon="calendar"
               label={intl.formatMessage({
                 defaultMessage: 'Birthday',
                 description: 'ContactDetailsBody - Title for birthday',
               })}
-              content={new Date(
-                birthday.year ?? 0,
-                birthday.month,
-                birthday.day,
-              ).toLocaleDateString(undefined, {
-                year: birthday.year ? 'numeric' : undefined,
+              content={new Date(birthday).toLocaleDateString(undefined, {
+                year: 'numeric',
                 month: 'long',
                 day: 'numeric',
               })}
             />
           )}
-          {details.urlAddresses?.map((urlAddress, index) => (
+          {details.urls?.map((urlAddress, index) => (
             <ContactDetailItem
               key={'url' + index + '' + urlAddress.url}
               onPress={async () => {
@@ -358,38 +347,35 @@ const ContactDetailsBody = ({
                 }
               }}
               icon="link"
-              label={
-                urlAddress.label ||
-                intl.formatMessage({
-                  defaultMessage: 'Url',
-                  description:
-                    'ContactDetailsBody - Title for item URL with empty label',
-                })
-              }
+              label={intl.formatMessage({
+                defaultMessage: 'Url',
+                description:
+                  'ContactDetailsBody - Title for item URL with empty label',
+              })}
               content={urlAddress.url}
             />
           ))}
           {details.addresses?.map((address, index) => (
             <ContactDetailItem
-              key={'street' + index + '' + address.street}
+              key={'street' + index + '' + address.address}
               onPress={async () => {
                 const url = Platform.select({
-                  ios: `maps:0,0?q=${address.street}`,
-                  android: `geo:0,0?q=${address.street}`,
+                  ios: `maps:0,0?q=${address.address}`,
+                  android: `geo:0,0?q=${address.address}`,
                 });
 
                 if (url) {
                   Linking.openURL(url);
                 } else {
-                  console.warn(`${address.street} is not an adress`);
+                  console.warn(`${address.address} is not an adress`);
                 }
               }}
               icon="location"
               label={address.label}
-              content={address.street}
+              content={address.address}
             />
           ))}
-          {details.socialProfiles?.map((social, index) => (
+          {details.socials?.map((social, index) => (
             <ContactDetailItem
               key={'social' + index + '' + social.url}
               onPress={() => {

@@ -1,25 +1,12 @@
 import * as Sentry from '@sentry/react-native';
 import { Paths, File } from 'expo-file-system/next';
 import ShareCommand from 'react-native-share';
-import {
-  buildVCardFromAzzappContact,
-  buildVCardFromExpoContact,
-} from '#helpers/contactHelpers';
-import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
+import { buildVCard } from '#helpers/contactHelpers';
 import { sanitizeFilePath } from '#helpers/fileHelpers';
-import type { ContactType } from '#helpers/contactListHelpers';
-import type { Contact } from 'expo-contacts';
-import type VCard from 'vcard-creator';
+import type { ContactType } from '#helpers/contactTypes';
 
-const ShareContact = async (details: Contact | ContactType) => {
-  let vCardData: VCard | undefined;
-
-  if ('contactProfile' in details) {
-    vCardData = await buildVCardFromAzzappContact(details);
-  } else {
-    const contact = reworkContactForDeviceInsert(details);
-    vCardData = await buildVCardFromExpoContact(contact);
-  }
+const ShareContact = async (details: ContactType) => {
+  const vCardData = await buildVCard(details);
 
   if (!vCardData) {
     console.error('cannot generate VCard');

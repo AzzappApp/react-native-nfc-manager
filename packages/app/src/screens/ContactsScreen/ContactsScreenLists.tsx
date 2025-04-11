@@ -5,6 +5,7 @@ import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import { useOnContactAddedToProfile } from '#helpers/addContactHelper';
 import { getAuthState } from '#helpers/authStore';
+import { buildContactTypeFromContactNode } from '#helpers/contactListHelpers';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -14,11 +15,8 @@ import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import { IsAzzappSupportedProvider } from './isWhatsappSupportedContext';
-import type { ContactType } from '#helpers/contactListHelpers';
-import type {
-  ContactsScreenLists_contacts$data,
-  ContactsScreenLists_contacts$key,
-} from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
+import type { ContactType } from '#helpers/contactTypes';
+import type { ContactsScreenLists_contacts$key } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 
 export type ContactActionProps = {
@@ -57,6 +55,7 @@ const ContactsScreenLists = ({
             provider: "CappedPixelRatio.relayprovider"
           }
           filterBy: { type: SearchFilter }
+          screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
         ) {
           id
           nbContacts #keep this field to update  on the main screen after updating by pulling down #7896
@@ -112,52 +111,22 @@ const ContactsScreenLists = ({
                 }
                 contactProfile {
                   id
-                  avatar {
-                    id
-                    uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
-                  }
-                  contactCard {
-                    urls {
-                      address
-                      selected
-                    }
-                    socials {
-                      url
-                      label
-                      selected
-                    }
-                  }
                   webCard {
                     id
                     cardIsPublished
                     userName
                     hasCover
-                    commonInformation {
-                      addresses {
-                        label
-                        address
-                      }
-                      company
-                      emails {
-                        label
-                        address
-                      }
-                      phoneNumbers {
-                        label
-                        number
-                      }
-                      socials {
-                        label
-                        url
-                      }
-                      urls {
-                        address
+                    ...CoverRenderer_webCard
+                    coverMedia {
+                      id
+                      ... on MediaVideo {
+                        webcardThumbnail: thumbnail(
+                          width: $screenWidth
+                          pixelRatio: $pixelRatio
+                        )
                       }
                     }
                   }
-                }
-                webCard {
-                  ...CoverRenderer_webCard
                 }
               }
             }
@@ -196,15 +165,19 @@ const ContactsScreenLists = ({
   }, [refetchWithDefaultProps]);
 
   const contacts = useMemo(() => {
+    // data?.searchContacts?.edges[0]?.node?.webCard
     return (
-      (data as ContactsScreenLists_contacts$data)?.searchContacts?.edges
-        ?.map(edge => edge?.node)
+      data?.searchContacts?.edges
+        ?.map(edge => buildContactTypeFromContactNode(edge?.node))
         .filter(contact => !!contact) ?? []
     );
   }, [data]);
+  const onAzzappContactAdded = useCallback(() => {
+    // Warning This code trigger a full refresh of the contacts list
+    refetchWithDefaultProps();
+  }, [refetchWithDefaultProps]);
 
-  // Warning This code trigger a full refresh of the contacts list
-  useOnContactAddedToProfile(refetchWithDefaultProps);
+  useOnContactAddedToProfile(onAzzappContactAdded);
 
   const onRefresh = useCallback(() => {
     if (!isLoadingNext && !refreshing) {
@@ -254,10 +227,8 @@ const ContactsScreenLists = ({
         route: 'CONTACT_DETAILS',
         params: {
           contactId: contact.id,
-          profileId: contact.contactProfile?.id,
-          webCardId: contact.contactProfile?.webCard?.cardIsPublished
-            ? contact.contactProfile?.webCard?.id
-            : null,
+          profileId: contact.profileId,
+          webCardId: contact.webCardId,
         },
       });
     },

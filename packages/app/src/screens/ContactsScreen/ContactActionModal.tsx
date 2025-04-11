@@ -13,7 +13,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactActionModalOption from './ContactActionModalOption';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { Icons } from '#ui/Icon';
 import type { ContactActionModalOptionProps } from './ContactActionModalOption';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -40,9 +40,9 @@ const ContactActionModal = ({
     if (!profileId) {
       return;
     }
-    const removedIds = (
-      Array.isArray(contactIds) ? contactIds : [contactIds]
-    ).map(contact => contact.id);
+    const removedIds = (Array.isArray(contactIds) ? contactIds : [contactIds])
+      .map(contact => contact.id)
+      .filter(isDefined);
 
     removeContact(removedIds, profileId);
   };
@@ -54,7 +54,7 @@ const ContactActionModal = ({
     ) {
       return;
     }
-    const targetRoute = `${process.env.NEXT_PUBLIC_URL}/${contactActionData.contact?.contactProfile?.webCard?.userName}`;
+    const targetRoute = `${process.env.NEXT_PUBLIC_URL}/${contactActionData.contact?.webCardUserName}`;
     const route = await matchUrlWithRoute(targetRoute);
     if (route) {
       router?.push(route);
@@ -68,7 +68,7 @@ const ContactActionModal = ({
     return [
       contactActionData?.contact &&
       !Array.isArray(contactActionData.contact) &&
-      contactActionData?.contact?.contactProfile?.webCard?.userName
+      contactActionData?.contact.webCardUserName
         ? {
             icon: 'preview' as Icons,
             text: intl.formatMessage({

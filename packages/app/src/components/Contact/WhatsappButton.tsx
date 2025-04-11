@@ -9,15 +9,14 @@ import {
   useIsWhatsAppSupportedContext,
 } from '#screens/ContactsScreen/isWhatsappSupportedContext';
 import PressableNative from '#ui/PressableNative';
+import type { ContactPhoneNumberType } from '#helpers/contactTypes';
 import type { PressableNativeProps } from '#ui/PressableNative';
-
-type NumberDescription = { readonly label: string; readonly number: string };
 
 const WhatsappButton = ({
   phoneNumber: contactPhoneNumber,
   ...props
 }: PressableNativeProps & {
-  phoneNumber: readonly NumberDescription[];
+  phoneNumber?: ContactPhoneNumberType[] | null;
 }) => {
   // check whatsapp is installed
   const isWhatsappSupported = useIsWhatsAppSupportedContext();
@@ -31,19 +30,18 @@ const WhatsappButton = ({
     return undefined;
   }
   // check contact has valid phone number
-  const phoneNumber = contactPhoneNumber.find((number: NumberDescription) => {
-    if (!number.number) {
-      return false;
-    }
-    const parsedNumber = parsePhoneNumberFromString(number.number);
-    if (!parsedNumber) {
-      return false;
-    }
-    if (!isValidPhoneNumber(number.number)) {
-      return false;
-    }
-    return true;
-  });
+  const phoneNumber = contactPhoneNumber.find(
+    (number: ContactPhoneNumberType) => {
+      const parsedNumber = parsePhoneNumberFromString(number.number);
+      if (!parsedNumber) {
+        return false;
+      }
+      if (!isValidPhoneNumber(number.number)) {
+        return false;
+      }
+      return true;
+    },
+  );
   if (!phoneNumber) return undefined;
 
   // get whatsapp deeplink

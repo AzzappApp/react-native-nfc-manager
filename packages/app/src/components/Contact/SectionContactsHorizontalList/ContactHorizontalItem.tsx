@@ -5,7 +5,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import useImageFromContact from '#hooks/useImageFromContact';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from '../ContactAvatar';
-import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 
 type Props = {
@@ -31,21 +31,11 @@ const ContactHorizontalItem = ({
         `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
       ];
     }
-
-    if (contact.contactProfile?.webCard?.userName) {
-      return [
-        contact.contactProfile.webCard.userName,
-        '',
-        contact.contactProfile.webCard.userName,
-      ];
+    if (contact.webCardUserName) {
+      return [contact.webCardUserName, '', contact.webCardUserName];
     }
-
     return ['', '', ''];
-  }, [
-    contact.contactProfile?.webCard?.userName,
-    contact.firstName,
-    contact.lastName,
-  ]);
+  }, [contact.webCardUserName, contact.firstName, contact.lastName]);
 
   const onMore = useCallback(() => {
     showContactAction({
@@ -58,7 +48,7 @@ const ContactHorizontalItem = ({
   return (
     <View style={styles.profile}>
       <PressableNative onPress={onShow} onLongPress={onMore}>
-        {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
+        {!avatarSource && contact.webCard ? (
           <CoverRenderer width={80} webCard={contact.webCard} />
         ) : (
           <ContactAvatar
