@@ -210,11 +210,11 @@ export const CommonInformationScreen = ({
       }
 
       if (banner?.local && banner.uri) {
-        try{
-        const { file, uploadURL, uploadParameters } =
-          await prepareBannerForUpload(banner.uri);
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
-        } catch(e){
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareBannerForUpload(banner.uri);
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
           Sentry.captureException(e);
         }
       } else {
