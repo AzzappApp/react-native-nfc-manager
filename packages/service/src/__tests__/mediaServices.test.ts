@@ -1,5 +1,10 @@
 import { getMediasByIds } from '@azzapp/data';
-import { buildAvatarUrl, buildCoverImageUrl } from '../mediaServices';
+import {
+  buildAvatarUrl,
+  buildBannerUrl,
+  buildCoverImageUrl,
+  buildLogoUrl,
+} from '../mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 
 // Mock dependencies
@@ -18,6 +23,7 @@ const mockProfile: Profile = {
   webCardId: 'webcard-789',
   avatarId: 'avatar-image-id',
   logoId: 'logo-image-id',
+  bannerId: 'banner-image-id',
   contactCard: {
     firstName: 'John',
     lastName: 'Doe',
@@ -55,6 +61,7 @@ const mockWebCard: WebCard = {
     emails: [{ label: 'Work', address: 'test@example.com' }],
   },
   logoId: null,
+  bannerId: null,
   createdAt: new Date(),
   deleted: false,
   deletedAt: null,
@@ -170,5 +177,75 @@ describe('buildCoverImageUrl', () => {
     );
 
     expect(url).toBeUndefined();
+  });
+});
+
+describe('buildLogoUrl', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should build logo URL from profile logoId', async () => {
+    const url = await buildLogoUrl(mockProfile, null);
+    expect(url).toBe(
+      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
+    );
+  });
+
+  test('should build logo URL from webcard logoId if webcard is multiuser', async () => {
+    const url = await buildLogoUrl(
+      { ...mockProfile, logoId: null },
+      {
+        ...mockWebCard,
+        isMultiUser: true,
+        logoId: 'webcard-logo-image-id',
+      },
+    );
+    expect(url).toBe(
+      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/webcard-logo-image-id.jpg',
+    );
+  });
+
+  test('should return logo null', async () => {
+    const url = await buildLogoUrl(
+      { ...mockProfile, logoId: null },
+      mockWebCard,
+    );
+    expect(url).toBeNull();
+  });
+});
+
+describe('buildBannerUrl', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should build banner URL from profile bannerId', async () => {
+    const url = await buildBannerUrl(mockProfile, null);
+    expect(url).toBe(
+      'https://res.cloudinary.com/demo/image/upload/c_fill,w_1200/v1/banner-image-id.jpg',
+    );
+  });
+
+  test('should build banner URL from webcard bannerId if webcard is multiuser', async () => {
+    const url = await buildBannerUrl(
+      { ...mockProfile, bannerId: null },
+      {
+        ...mockWebCard,
+        isMultiUser: true,
+        bannerId: 'webcard-banner-image-id',
+      },
+    );
+    expect(url).toBe(
+      'https://res.cloudinary.com/demo/image/upload/c_fill,w_1200/v1/webcard-banner-image-id.jpg',
+    );
+  });
+
+  test('should return banner null', async () => {
+    const url = await buildBannerUrl(
+      { ...mockProfile, bannerId: null },
+      mockWebCard,
+    );
+    expect(url).toBeNull();
   });
 });

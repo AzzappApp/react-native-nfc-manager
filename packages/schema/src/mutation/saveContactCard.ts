@@ -64,6 +64,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
 
   updates.avatarId = contactCard.avatarId;
   updates.logoId = contactCard.logoId;
+  updates.bannerId = contactCard.bannerId;
 
   const owner =
     profile.profileRole === 'owner'
@@ -83,13 +84,19 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   });
 
   try {
-    const addedMedia = [contactCard.logoId, contactCard.avatarId].filter(
-      mediaId => mediaId,
-    ) as string[];
+    const addedMedia = [
+      contactCard.logoId,
+      contactCard.avatarId,
+      contactCard.bannerId,
+    ].filter(mediaId => mediaId) as string[];
     await checkMedias(addedMedia);
     await transaction(async () => {
       await updateProfile(profileId, updates);
-      await referencesMedias(addedMedia, [profile.logoId, profile.avatarId]);
+      await referencesMedias(addedMedia, [
+        profile.logoId,
+        profile.avatarId,
+        profile.bannerId,
+      ]);
     });
   } catch (e) {
     console.error(e);

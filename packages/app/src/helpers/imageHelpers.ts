@@ -47,3 +47,24 @@ export const prepareAvatarForUpload = async (avatarPath: string) => {
     file,
   };
 };
+
+export const prepareBannerForUpload = async (bannerPath: string) => {
+  const fileName = getFileName(bannerPath);
+  const compressedFileUri = await ImageCompressor.compress(bannerPath);
+  const file: any = {
+    name: fileName,
+    uri: compressedFileUri,
+    type: mime.lookup(fileName) || 'image/jpeg',
+  };
+
+  const { uploadURL, uploadParameters } = await uploadSign({
+    kind: 'image',
+    target: 'banner',
+  });
+
+  return {
+    uploadURL,
+    uploadParameters,
+    file,
+  };
+};

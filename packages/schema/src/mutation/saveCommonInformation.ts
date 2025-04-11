@@ -15,7 +15,10 @@ import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
-  async (_, { webCardId: gqlWebCardId, input: { logoId, ...data } }) => {
+  async (
+    _,
+    { webCardId: gqlWebCardId, input: { logoId, bannerId, ...data } },
+  ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileAdminRight(webCardId);
 
@@ -28,11 +31,11 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
     const updates: Partial<WebCard> = {
       commonInformation: data,
       logoId,
+      bannerId,
     };
     try {
-      if (logoId) {
-        await checkMedias([logoId]);
-      }
+      const addedMedia = [logoId, bannerId].filter(mediaId => mediaId != null);
+      await checkMedias(addedMedia);
       await transaction(async () => {
         await updateWebCard(webCardId, updates);
 
@@ -40,7 +43,7 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
           lastContactCardUpdate: new Date(),
         });
 
-        await referencesMedias(logoId ? [logoId] : [], [webCard.logoId]);
+        await referencesMedias(addedMedia, [webCard.logoId, webCard.bannerId]);
       });
 
       await notifyRelatedWalletPasses(webCardId);

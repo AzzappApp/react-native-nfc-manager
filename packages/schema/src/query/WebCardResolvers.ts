@@ -494,6 +494,13 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
           assetKind: 'logo',
         }
       : null,
+  banner: async webCard =>
+    webCard.bannerId && (await hasWebCardProfileRight(webCard.id))
+      ? {
+          media: webCard.bannerId,
+          assetKind: 'banner',
+        }
+      : null,
   coverTemplateTypes: async (webCard, args) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return emptyConnection;

@@ -20,6 +20,7 @@ import {
 } from '#components/NativeRouter';
 import {
   prepareAvatarForUpload,
+  prepareBannerForUpload,
   prepareLogoForUpload,
 } from '#helpers/imageHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
@@ -74,6 +75,7 @@ const ContactCardEditScreen = ({
     contactCard,
     avatar,
     logo,
+    banner,
     webCard,
     id: profileId,
   } = useFragment(
@@ -116,8 +118,17 @@ const ContactCardEditScreen = ({
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
       logo: webCard?.isMultiUser ? webCard?.logo || logo : logo,
+      banner: webCard?.isMultiUser ? webCard?.banner || banner : banner,
     };
-  }, [avatar, contactCard, logo, webCard?.isMultiUser, webCard?.logo]);
+  }, [
+    avatar,
+    banner,
+    contactCard,
+    logo,
+    webCard?.banner,
+    webCard?.isMultiUser,
+    webCard?.logo,
+  ]);
 
   const {
     control,
@@ -140,7 +151,7 @@ const ContactCardEditScreen = ({
 
   const router = useRouter();
 
-  const submit = handleSubmit(async ({ avatar, logo, ...data }) => {
+  const submit = handleSubmit(async ({ avatar, logo, banner, ...data }) => {
     const uploads = [];
 
     if (avatar?.local && avatar.uri) {
@@ -159,6 +170,15 @@ const ContactCardEditScreen = ({
     } else {
       uploads.push(null);
     }
+
+    if (banner?.local && banner.uri) {
+      const { file, uploadURL, uploadParameters } =
+        await prepareBannerForUpload(banner.uri);
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
     const uploadsToDo = uploads.filter(val => val !== null);
     if (uploadsToDo.length) {
       setProgressIndicator(
@@ -168,24 +188,30 @@ const ContactCardEditScreen = ({
       );
     }
 
-    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-      uploads.map(upload =>
-        upload?.promise.then(({ public_id }) => {
-          return public_id;
-        }),
-      ),
-    );
+    const [uploadedAvatarId, uploadedLogoId, uploadedBannerId] =
+      await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(({ public_id }) => {
+            return public_id;
+          }),
+        ),
+      );
 
     const avatarId =
       avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
     const logoId =
       logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
+    const bannerId =
+      banner === null ? null : banner?.local ? uploadedBannerId : banner?.id;
 
     if (avatar?.local) {
       addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
     }
     if (logo?.local) {
       addLocalCachedMediaFile(logoId, 'image', logo.uri);
+    }
+    if (banner?.local) {
+      addLocalCachedMediaFile(bannerId, 'image', banner.uri);
     }
 
     commit({
@@ -209,6 +235,7 @@ const ContactCardEditScreen = ({
           socials: data.socials?.filter(social => social.url),
           avatarId,
           logoId: !webCard?.isMultiUser || !webCard?.logo ? logoId : undefined,
+          bannerId,
         },
         pixelRatio: CappedPixelRatio(),
         width: QRCodeWidth(),

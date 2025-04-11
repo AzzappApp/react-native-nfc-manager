@@ -105,6 +105,7 @@ describe('ContactCardEditForm', () => {
         isPremium: false,
         logo: null,
         userName: null,
+        banner: null,
       },
     });
     const companyLogoCanEditLogo = getByTestId('companyLogoCanEditLogo');
@@ -129,6 +130,7 @@ describe('ContactCardEditForm', () => {
         isMultiUser: true,
         isPremium: false,
         logo: { uri: 'https://bla.com', id: 'bla' },
+        banner: { uri: 'https://bla.com', id: 'bla', width: 220, height: 50 },
         userName: null,
       },
     });
@@ -161,6 +163,7 @@ describe('ContactCardEditForm', () => {
         isMultiUser: false,
         isPremium: false,
         logo: { uri: 'https://bla.com', id: 'bla' },
+        banner: { uri: 'https://bla.com', id: 'bla', width: 220, height: 50 },
         userName: null,
       },
     });
@@ -193,6 +196,7 @@ describe('ContactCardEditForm', () => {
         isMultiUser: true,
         isPremium: false,
         logo: { uri: 'https://bla.com', id: 'bla' },
+        banner: { uri: 'https://bla.com', id: 'bla', width: 220, height: 50 },
         userName: null,
       },
     });

@@ -141,6 +141,18 @@ const EmailSignaturePage = async ({
     });
   }
 
+  const bannerId =
+    webCard.isMultiUser && webCard.logoId != null
+      ? webCard.bannerId
+      : profile.bannerId;
+
+  const bannerUrl = bannerId
+    ? getImageURLForSize({
+        id: bannerId,
+        width: 1200,
+      })
+    : null;
+
   return (
     <div className={styles.container}>
       <Image
@@ -170,6 +182,7 @@ const EmailSignaturePage = async ({
         media={media}
         contact={contact}
         companyLogoUrl={companyLogoUrl}
+        bannerUrl={bannerUrl}
         saveContactMessage={saveContactMessage}
         saveContactURL={saveContactURL}
       />
@@ -191,6 +204,7 @@ const EmailSignaturePage = async ({
       <CopySignatureButton
         mode={mode}
         companyLogoUrl={companyLogoUrl}
+        bannerUrl={bannerUrl}
         contact={contact}
         saveContactMessage={saveContactMessage}
         saveContactURL={saveContactURL}

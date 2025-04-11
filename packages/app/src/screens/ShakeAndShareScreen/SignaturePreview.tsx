@@ -17,6 +17,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
     contactCard,
     avatar,
     logo: profileLogo,
+    banner: profileBanner,
   } = useFragment(
     graphql`
       fragment SignaturePreview_profile on Profile
@@ -48,6 +49,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             id
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
+          banner {
+            id
+            uri: uri(width: 220, pixelRatio: $pixelRatio)
+            aspectRatio
+          }
         }
         contactCard {
           firstName
@@ -71,6 +77,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           id
           uri: uri(width: 180, pixelRatio: $pixelRatio)
         }
+        banner {
+          id
+          uri: uri(width: 220, pixelRatio: $pixelRatio)
+          aspectRatio
+        }
       }
     `,
     profileKey,
@@ -90,6 +101,9 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
 
   const logo =
     webCard?.isMultiUser && webCard?.logo ? webCard?.logo : profileLogo;
+
+  const banner =
+    webCard?.isMultiUser && webCard?.banner ? webCard?.banner : profileBanner;
 
   return (
     <>
@@ -182,6 +196,13 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           )}
         </View>
       </View>
+      {banner?.uri && (
+        <Image
+          source={{ uri: banner.uri }}
+          style={[styles.bannerImage, { aspectRatio: banner.aspectRatio }]}
+          contentFit="fill"
+        />
+      )}
     </>
   );
 };
@@ -195,6 +216,10 @@ const styles = StyleSheet.create({
   logoImage: {
     marginTop: 15 * SCALE_RATIO,
     height: 60 * SCALE_RATIO,
+    width: '100%',
+  },
+  bannerImage: {
+    marginTop: 15 * SCALE_RATIO,
     width: '100%',
   },
   leftView: {

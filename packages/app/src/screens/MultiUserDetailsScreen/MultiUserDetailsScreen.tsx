@@ -29,6 +29,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
   prepareAvatarForUpload,
+  prepareBannerForUpload,
   prepareLogoForUpload,
 } from '#helpers/imageHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
@@ -84,6 +85,7 @@ const MultiUserDetailsScreen = ({
     contactCard,
     logo,
     avatar,
+    banner,
     webCard,
     id: profileId,
   } = useFragment(
@@ -121,14 +123,17 @@ const MultiUserDetailsScreen = ({
             }
           : null,
       logo: webCard?.logo || logo,
+      banner: webCard?.banner || banner,
     };
   }, [
     avatar,
+    banner,
     contactCard,
     logo,
     profile?.profileRole,
     profile?.user?.email,
     profile?.user?.phoneNumber,
+    webCard?.banner,
     webCard?.logo,
   ]);
 
@@ -169,7 +174,8 @@ const MultiUserDetailsScreen = ({
   const submit = handleSubmit(
     async data => {
       if (profile == null) return;
-      const { avatar, logo, role, selectedContact, ...contactCard } = data;
+      const { avatar, logo, banner, role, selectedContact, ...contactCard } =
+        data;
 
       const input = {};
 
@@ -191,24 +197,38 @@ const MultiUserDetailsScreen = ({
         uploads.push(null);
       }
 
-      const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-        uploads.map(upload =>
-          upload?.promise.then(({ public_id }) => {
-            return public_id;
-          }),
-        ),
-      );
+      if (banner?.local && banner.uri) {
+        const { file, uploadURL, uploadParameters } =
+          await prepareBannerForUpload(banner.uri);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      const [uploadedAvatarId, uploadedLogoId, uploadedBannerId] =
+        await Promise.all(
+          uploads.map(upload =>
+            upload?.promise.then(({ public_id }) => {
+              return public_id;
+            }),
+          ),
+        );
 
       const avatarId =
         avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
+      const bannerId =
+        banner === null ? null : banner?.local ? uploadedBannerId : banner?.id;
 
       if (avatar?.local && avatar && avatar?.uri) {
         addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
       }
       if (logo?.local && logoId && logo?.uri) {
         addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+      if (banner?.local && bannerId && banner?.uri) {
+        addLocalCachedMediaFile(bannerId, 'image', banner.uri);
       }
 
       if (dirtyFields.role) Object.assign(input, { profileRole: role });
@@ -231,6 +251,7 @@ const MultiUserDetailsScreen = ({
                 }),
               avatarId,
               logoId,
+              bannerId,
             },
           },
           pixelRatio: CappedPixelRatio(),
@@ -769,6 +790,12 @@ const multiUserDetailsScreenQuery = graphql`
         statsSummary {
           day
           contactCardScans
+        }
+        banner {
+          id
+          uri: uri(width: 220, pixelRatio: $pixelRatio)
+          width
+          height
         }
         ...ContactCardEditFormFragment_profile
           @arguments(pixelRatio: $pixelRatio)

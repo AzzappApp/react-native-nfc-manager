@@ -4,12 +4,13 @@ import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactC
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { generateEmailSignature } from '../emailSignatureServices';
-import { buildAvatarUrl } from '../mediaServices';
+import { buildAvatarUrl, buildBannerUrl, buildLogoUrl } from '../mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 
 jest.mock('../mediaServices', () => ({
   buildAvatarUrl: jest.fn(),
   buildLogoUrl: jest.fn(),
+  buildBannerUrl: jest.fn(),
 }));
 
 jest.mock('@azzapp/data', () => ({
@@ -42,6 +43,7 @@ const baseProfile: Profile = {
   promotedAsOwner: false,
   avatarId: null,
   logoId: null,
+  bannerId: null,
   contactCardIsPrivate: false,
   contactCardDisplayedOnWebCard: false,
   createdAt: new Date(),
@@ -65,6 +67,7 @@ const baseWebCard: WebCard = {
   firstName: null,
   lastName: null,
   logoId: null,
+  bannerId: null,
   commonInformation: null,
   companyName: null,
   createdAt: new Date(),
@@ -134,6 +137,8 @@ describe('generateEmailSignature', () => {
 
   it('returns the generated URL and sends email', async () => {
     (buildAvatarUrl as jest.Mock).mockResolvedValue('https://avatar.url');
+    (buildLogoUrl as jest.Mock).mockResolvedValue('https://logo.url');
+    (buildBannerUrl as jest.Mock).mockResolvedValue('https://banner.url');
     (serializeAndSignEmailSignature as jest.Mock).mockResolvedValue({
       data: 'sig-data',
       signature: 'sig-signature',
@@ -154,6 +159,8 @@ describe('generateEmailSignature', () => {
     });
 
     expect(buildAvatarUrl).toHaveBeenCalled();
+    expect(buildLogoUrl).toHaveBeenCalled();
+    expect(buildBannerUrl).toHaveBeenCalled();
     expect(serializeAndSignEmailSignature).toHaveBeenCalled();
     expect(serializeAndSignContactCard).toHaveBeenCalled();
     expect(buildEmailSignatureGenerationUrl).toHaveBeenCalledWith(

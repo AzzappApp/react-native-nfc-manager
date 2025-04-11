@@ -258,7 +258,14 @@ export const refreshTokens: APIMethod<string, TokensResponse> = (
 export const uploadSign: APIMethod<
   {
     kind: 'image' | 'video';
-    target: 'avatar' | 'cover' | 'logo' | 'module' | 'post' | 'rawCover';
+    target:
+      | 'avatar'
+      | 'banner'
+      | 'cover'
+      | 'logo'
+      | 'module'
+      | 'post'
+      | 'rawCover';
   },
   { uploadURL: string; uploadParameters: Record<string, any> }
 > = async ({ kind, target }, init) =>

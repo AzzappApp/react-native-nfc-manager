@@ -95,9 +95,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     contactCardHasLogo: !!contactCard?.logoId,
   });
 
-  const { avatarId, logoId, ...restContactCard } = contactCard || {};
+  const { avatarId, logoId, bannerId, ...restContactCard } = contactCard || {};
   try {
-    const addedMedia = [avatarId, logoId].filter(
+    const addedMedia = [avatarId, logoId, bannerId].filter(
       mediaId => mediaId,
     ) as string[];
     await checkMedias(addedMedia);
@@ -109,10 +109,12 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
         },
         logoId,
         avatarId,
+        bannerId,
       });
       await referencesMedias(addedMedia, [
         targetProfile.avatarId,
         targetProfile.logoId,
+        targetProfile.bannerId,
       ]);
     });
   } catch {
@@ -128,6 +130,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   }
   if (logoId) {
     updatedProfile.logoId = logoId;
+  }
+  if (bannerId) {
+    updatedProfile.bannerId = bannerId;
   }
   if (contactCard) {
     updatedProfile.contactCard = {

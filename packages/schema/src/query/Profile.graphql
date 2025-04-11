@@ -45,6 +45,10 @@ type Profile implements Node {
   """
   logo: Media
   """
+  The signature banner
+  """
+  banner: Media
+  """
   True if user has been invited
   """
   invited: Boolean!

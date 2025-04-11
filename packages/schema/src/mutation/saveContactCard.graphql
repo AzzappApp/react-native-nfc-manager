@@ -35,6 +35,7 @@ input ContactCardInput {
   displayedOnWebCard: Boolean
   avatarId: String
   logoId: String
+  bannerId: String
   companyActivityLabel: String
 }
 

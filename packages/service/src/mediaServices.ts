@@ -7,6 +7,7 @@ import type { Profile, WebCard } from '@azzapp/data';
 
 const AVATAR_WIDTH = 720;
 const LOGO_WIDTH = 720;
+const BANNER_WIDTH = 1200;
 
 export const CROP = ['fit', 'lpad', 'fill'] as const;
 
@@ -42,6 +43,22 @@ export const buildLogoUrl = async (
 
   if (logoId) {
     return `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${width}/v1/${logoId}.jpg`;
+  }
+
+  return null;
+};
+
+export const buildBannerUrl = async (
+  profile: Profile,
+  webCard: WebCard | null,
+  width = BANNER_WIDTH,
+) => {
+  const bannerId = webCard?.isMultiUser
+    ? (webCard.bannerId ?? profile.bannerId)
+    : profile.bannerId;
+
+  if (bannerId) {
+    return `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${width}/v1/${bannerId}.jpg`;
   }
 
   return null;

@@ -82,6 +82,9 @@ const MultiUserScreenUserList = ({
         logo {
           id
         }
+        banner {
+          id
+        }
         isPremium
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
@@ -98,7 +101,8 @@ const MultiUserScreenUserList = ({
     (webCard.commonInformation?.phoneNumbers?.length ?? 0) +
     (webCard.commonInformation?.urls?.length ?? 0) +
     (webCard.commonInformation?.socials?.length ?? 0) +
-    (webCard.logo ? 1 : 0);
+    (webCard.logo ? 1 : 0) +
+    (webCard.banner ? 1 : 0);
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(

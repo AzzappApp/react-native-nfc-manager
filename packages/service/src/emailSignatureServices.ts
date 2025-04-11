@@ -4,7 +4,7 @@ import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
-import { buildAvatarUrl, buildLogoUrl } from './mediaServices';
+import { buildAvatarUrl, buildBannerUrl, buildLogoUrl } from './mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
 const IMAGE_AVATAR_LOGO_WIDTH = 180;
@@ -34,6 +34,7 @@ export const generateEmailSignature = async ({
     IMAGE_AVATAR_LOGO_WIDTH,
   );
   const logoUrl = await buildLogoUrl(profile, webCard, IMAGE_AVATAR_LOGO_WIDTH);
+  const bannerUrl = await buildBannerUrl(profile, webCard);
   const { data, signature } = await serializeAndSignEmailSignature(
     webCard.userName,
     profile.id,
@@ -71,6 +72,7 @@ export const generateEmailSignature = async ({
           dynamicTemplateData: {
             avatarUrl,
             logoUrl,
+            bannerUrl,
             name: `${profile.contactCard.firstName ?? ''} ${profile.contactCard.lastName ?? ''}`.trim(),
             jobTitle: profile.contactCard.title,
             company: webCard.isMultiUser

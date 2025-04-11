@@ -89,8 +89,10 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   }); //add owner
 
   try {
-    const { avatarId, logoId } = invited.contactCard ?? {};
-    const addedMedia = [avatarId, logoId].filter(mediaId => mediaId != null);
+    const { avatarId, logoId, bannerId } = invited.contactCard ?? {};
+    const addedMedia = [avatarId, logoId, bannerId].filter(
+      mediaId => mediaId != null,
+    );
     await checkMedias(addedMedia);
 
     const { profile, existingUser } = await transaction(async () => {
@@ -148,8 +150,14 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         existingProfile = foundProfile;
       }
 
-      const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
-        invited.contactCard ?? {};
+      const {
+        displayedOnWebCard,
+        isPrivate,
+        avatarId,
+        logoId,
+        bannerId,
+        ...data
+      } = invited.contactCard ?? {};
 
       const creationDate = new Date();
 
@@ -158,6 +166,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         userId,
         avatarId: avatarId ?? null,
         logoId: logoId ?? null,
+        bannerId: bannerId ?? null,
         invited: true,
         invitedBy: profileId,
         contactCard: data,
@@ -182,6 +191,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         [
           existingProfile?.avatarId ?? null,
           existingProfile?.logoId ?? null,
+          existingProfile?.bannerId ?? null,
         ].filter(mediaId => mediaId),
       );
 

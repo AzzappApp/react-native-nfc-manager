@@ -11,6 +11,7 @@ const renderFullEmailSignature = ({
   contact,
   webCard,
   companyLogoUrl,
+  bannerUrl,
   saveContactMessage,
   saveContactURL,
   isPreview,
@@ -18,6 +19,7 @@ const renderFullEmailSignature = ({
   contact: EmailSignatureParsed | undefined;
   webCard: WebCard;
   companyLogoUrl: string | null;
+  bannerUrl: string | null;
   saveContactMessage: string;
   saveContactURL?: string;
   isPreview?: boolean;
@@ -151,6 +153,23 @@ const renderFullEmailSignature = ({
     `
     : '';
 
+  const bannerSection = bannerUrl
+    ? `
+      <tr>
+        <td colspan="2" style="padding: 0; padding-top:20px">
+          <img
+            width="100%"
+            style="
+              display: inline-block;
+              max-width: 600px;
+              object-fit: fill;"
+            src="${bannerUrl}"
+          />
+        </td>
+      </tr>
+    `
+    : '';
+
   return `
    <table
     border="0"
@@ -193,6 +212,7 @@ const renderFullEmailSignature = ({
           </table>
         </td>
       </tr>
+      ${bannerSection}
     </tbody>
   </table>`;
 };

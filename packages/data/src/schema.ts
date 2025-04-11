@@ -547,6 +547,7 @@ export const ProfileTable = cols.table(
     promotedAsOwner: cols.boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),
     logoId: cols.mediaId('logoId'),
+    bannerId: cols.mediaId('bannerId'),
     /* Contact cards infos */
     contactCard: cols.json('contactCard').$type<ContactCard>(),
     contactCardIsPrivate: cols
@@ -809,6 +810,7 @@ export const WebCardTable = cols.table(
     firstName: cols.defaultVarchar('firstName'),
     lastName: cols.defaultVarchar('lastName'),
     logoId: cols.mediaId('logoId'),
+    bannerId: cols.mediaId('bannerId'),
     commonInformation: cols
       .json('commonInformation')
       .$type<CommonInformation>(),

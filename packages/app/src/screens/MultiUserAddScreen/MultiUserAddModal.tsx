@@ -25,6 +25,7 @@ import { getAuthState } from '#helpers/authStore';
 import { CardPhoneLabels } from '#helpers/contactHelpers';
 import {
   prepareAvatarForUpload,
+  prepareBannerForUpload,
   prepareLogoForUpload,
 } from '#helpers/imageHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
@@ -49,7 +50,6 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ContactCardPhoneNumber } from '#helpers/phoneNumbersHelper';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
-import type { MultiUserAddModal_profile$key } from '#relayArtifacts/MultiUserAddModal_profile.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
@@ -85,7 +85,6 @@ type MultiUserAddModalProps = {
   beforeClose: () => void;
   onCompleted: () => void;
   webCard: MultiUserAddModal_webCard$key;
-  profile: MultiUserAddModal_profile$key | null;
 };
 
 export type MultiUserAddModalActions = {
@@ -138,27 +137,15 @@ const MultiUserAddModal = (
           uri: uri(width: 180, pixelRatio: $pixelRatio)
           id
         }
+        banner {
+          id
+          uri: uri(width: 220, pixelRatio: $pixelRatio)
+          width
+          height
+        }
       }
     `,
     props.webCard,
-  );
-
-  const profile = useFragment(
-    graphql`
-      fragment MultiUserAddModal_profile on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
-        logo {
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-          id
-        }
-      }
-    `,
-    props.profile,
   );
 
   const { beforeClose, onCompleted } = props;
@@ -196,7 +183,8 @@ const MultiUserAddModal = (
     resolver: zodResolver(multiUserAddFormSchema),
     defaultValues: {
       role: 'user',
-      logo: webCard?.logo || profile?.logo,
+      logo: webCard?.logo,
+      banner: webCard?.banner,
     },
     mode: 'onSubmit',
   });
@@ -314,7 +302,8 @@ const MultiUserAddModal = (
                 selected: true,
               };
             }),
-            logo: webCard?.logo || profile?.logo,
+            logo: webCard?.logo,
+            banner: webCard?.banner,
           },
           { keepDirty: true },
         );
@@ -328,7 +317,8 @@ const MultiUserAddModal = (
                 : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
-          logo: webCard?.logo || profile?.logo,
+          logo: webCard?.logo,
+          banner: webCard?.banner,
         });
         setIsManual(isManual);
         setContact(undefined);
@@ -374,7 +364,7 @@ const MultiUserAddModal = (
 
       const uploads = [];
 
-      const { avatar, logo, ...data } = value;
+      const { avatar, logo, banner, ...data } = value;
 
       if (avatar?.local && avatar.uri) {
         let uri = avatar.uri;
@@ -389,7 +379,6 @@ const MultiUserAddModal = (
             );
           }
         }
-
         const { file, uploadURL, uploadParameters } =
           await prepareAvatarForUpload(uri);
 
@@ -405,14 +394,24 @@ const MultiUserAddModal = (
       } else {
         uploads.push(null);
       }
+
+      if (banner?.local && banner.uri) {
+        const { file, uploadURL, uploadParameters } =
+          await prepareBannerForUpload(banner.uri);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
       try {
-        const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-          uploads.map(upload =>
-            upload?.promise.then(({ public_id }) => {
-              return public_id;
-            }),
-          ),
-        );
+        const [uploadedAvatarId, uploadedLogoId, uploadedBannerId] =
+          await Promise.all(
+            uploads.map(upload =>
+              upload?.promise.then(({ public_id }) => {
+                return public_id;
+              }),
+            ),
+          );
 
         const avatarId =
           avatar === null
@@ -422,6 +421,12 @@ const MultiUserAddModal = (
               : avatar?.id;
         const logoId =
           logo === null ? null : logo?.local ? uploadedLogoId : null;
+        const bannerId =
+          banner === null
+            ? null
+            : banner?.local
+              ? uploadedBannerId
+              : banner?.id;
 
         const {
           selectedContact,
@@ -474,6 +479,7 @@ const MultiUserAddModal = (
             socials,
             avatarId,
             logoId,
+            bannerId,
             addresses,
           },
         };
@@ -484,6 +490,10 @@ const MultiUserAddModal = (
 
         if (logo?.local) {
           addLocalCachedMediaFile(logoId, 'image', logo.uri);
+        }
+
+        if (banner?.local && bannerId && banner?.uri) {
+          addLocalCachedMediaFile(bannerId, 'image', banner.uri);
         }
 
         commit({

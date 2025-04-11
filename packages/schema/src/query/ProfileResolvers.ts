@@ -230,6 +230,20 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
         }
       : null;
   },
+  banner: async profile => {
+    if (
+      !profileIsAssociatedToCurrentUser(profile) &&
+      !(await hasWebCardProfileRight(profile.webCardId))
+    ) {
+      return null;
+    }
+    return profile.bannerId
+      ? {
+          media: profile.bannerId,
+          assetKind: 'banner',
+        }
+      : null;
+  },
   statsSummary: async profile => {
     if (
       !profileIsAssociatedToCurrentUser(profile) &&
