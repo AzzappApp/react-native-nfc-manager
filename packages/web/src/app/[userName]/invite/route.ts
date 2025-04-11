@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import cors from '#helpers/cors';
 import { getDeviceInfo } from '#helpers/devices';
-import { withPluginsRoute } from '#helpers/queries';
 
 const iosApp = process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP;
 const androidApp = process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP;
@@ -28,4 +26,4 @@ const invite = async (req: Request) => {
   }
 };
 
-export const { GET, OPTIONS } = cors({ GET: withPluginsRoute(invite) });
+export { invite as GET };

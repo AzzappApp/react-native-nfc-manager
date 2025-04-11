@@ -74,10 +74,14 @@
         {
           "name": "web",
           "commands": ["cd packages/web", "yarn dev"]
-        },
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
         {
-          "name": "inngest",
-          "commands": ["cd packages/web", "yarn inngest-cli"]
+          "name": "api",
+          "commands": ["cd packages/api", "yarn dev"]
         }
       ]
     },

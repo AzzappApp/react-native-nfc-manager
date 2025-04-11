@@ -1,9 +1,9 @@
 'use client';
 import { useState, useTransition, useRef, useEffect, useCallback } from 'react';
-import { generateShareProfileLink } from '#helpers';
 import { ProfileActions } from '#app/actions';
 import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
+import { generateShareProfileLink } from '#helpers/link';
 import useScrollEnd from '#hooks/useScrollEnd';
 import styles from './PostFeed.css';
 import PostFeedHeader from './PostFeedHeader';

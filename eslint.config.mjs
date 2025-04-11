@@ -31,6 +31,8 @@ export default [
       'packages/payment/lib',
       'packages/service/lib',
       'packages/app/fonts',
+      'packages/api/persistedQueries',
+      'packages/api/.next',
       'packages/web/.next',
       'packages/backoffice/.next',
       '**/trash',

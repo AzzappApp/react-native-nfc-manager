@@ -21,7 +21,7 @@
     "graphql-codegen": "graphql-codegen",
     "relay:build": "relay-compiler",
     "relay:watch": "relay-compiler --watch ./relay.config.dev.js",
-    "relay:prepare": "touch ./packages/web/src/persisted-query-map.json",
+    "relay:prepare": "touch ./packages/api/src/persisted-query-map.json",
     "i18n:extract": "yarn workspace @azzapp/i18n extract",
     "i18n:pull": "yarn workspace @azzapp/i18n pull",
     "i18n:merge": "yarn workspace @azzapp/i18n merge",
@@ -33,7 +33,7 @@
     "release": "node ./scripts/release.js",
     "bump-version": "node ./scripts/bumpVersion.js",
     "write-dev-changelog": "node ./scripts/writeDevChangeLog.js",
-    "persist-queries": "yarn workspace @azzapp/web persist-queries"
+    "persist-queries": "yarn workspace @azzapp/api persist-queries"
   },
   "devScripts": [
     "relay:watch",

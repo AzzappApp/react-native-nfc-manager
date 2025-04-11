@@ -22,7 +22,8 @@
   "dependencies": {
     "@azzapp/data": "workspace:^",
     "@azzapp/i18n": "workspace:^",
-    "@azzapp/shared": "workspace:^"
+    "@azzapp/shared": "workspace:^",
+    "jose": "^6.0.10"
   },
   "devDependencies": {
     "eslint": "^9.24.0",

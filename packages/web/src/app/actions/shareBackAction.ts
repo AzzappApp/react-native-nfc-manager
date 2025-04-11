@@ -13,6 +13,13 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
+import {
+  getValuesFromSubmitData,
+  shareBackSignature,
+  shareBackVCardFilename,
+} from '@azzapp/service/shareBackHelper';
+import { sendTwilioSMS } from '@azzapp/service/twilioHelpers';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
@@ -21,15 +28,8 @@ import {
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
-import { sendPushNotification } from '#helpers/notificationsHelpers';
-import {
-  getValuesFromSubmitData,
-  shareBackSignature,
-  shareBackVCardFilename,
-} from '#helpers/shareBackHelper';
-import { sendTwilioSMS } from '#helpers/twilioHelpers';
-import type { VerifySignToken } from '#app/api/verifySign/route';
 import type { NewContact } from '@azzapp/data/src/schema';
+import type { VerifySignToken } from '@azzapp/service/signatureServices';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';
@@ -46,6 +46,7 @@ export type ShareBackFormData = FormData & {
   email: string;
 };
 
+// TODO why no locale here that's clearly a bug
 const intl = getServerIntl();
 
 export const processShareBackSubmission = async (

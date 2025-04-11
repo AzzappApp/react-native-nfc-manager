@@ -322,6 +322,63 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@azzapp/api@workspace:packages/api":
+  version: 0.0.0-use.local
+  resolution: "@azzapp/api@workspace:packages/api"
+  dependencies:
+    "@aws-sdk/credential-provider-web-identity": "npm:^3.750.0"
+    "@azzapp/data": "workspace:^"
+    "@azzapp/i18n": "workspace:^"
+    "@azzapp/payment": "workspace:^"
+    "@azzapp/schema": "workspace:^"
+    "@azzapp/service": "workspace:^"
+    "@azzapp/shared": "workspace:^"
+    "@envelop/generic-auth": "npm:^9.1.3"
+    "@envelop/parser-cache": "npm:^8.1.3"
+    "@envelop/sentry": "npm:^9.0.0"
+    "@envelop/validation-cache": "npm:^8.1.3"
+    "@escape.tech/graphql-armor-max-aliases": "npm:^2.6.0"
+    "@escape.tech/graphql-armor-max-tokens": "npm:^2.5.0"
+    "@graphql-yoga/plugin-disable-introspection": "npm:^2.14.2"
+    "@graphql-yoga/plugin-persisted-operations": "npm:^3.13.3"
+    "@paralleldrive/cuid2": "npm:^2.2.2"
+    "@sentry/nextjs": "npm:^7.113.0"
+    "@sentry/tracing": "npm:^7.114.0"
+    "@types/node": "npm:^22.7.4"
+    "@types/react": "npm:^18.3.11"
+    "@types/react-dom": "npm:^18.3.0"
+    "@types/sanitize-html": "npm:^2.13.0"
+    "@types/semver": "npm:^7.5.8"
+    "@vercel/functions": "npm:^2.0.0"
+    bcrypt-ts: "npm:^6.0.0"
+    eslint: "npm:^9.17.0"
+    google-wallet: "npm:^1.0.21"
+    graphql-yoga: "npm:^5.13.2"
+    inngest: "npm:^3.32.9"
+    inngest-cli: "npm:^1.5.5"
+    jest: "npm:^29.7.0"
+    jose: "npm:^6.0.10"
+    libphonenumber-js: "npm:^1.11.17"
+    lodash: "npm:^4.17.21"
+    lz-string: "npm:^1.5.0"
+    next: "npm:^14.2.25"
+    next-axiom: "npm:^1.9.1"
+    next-cloudinary: "npm:^6.16.0"
+    os-browserify: "npm:^0.3.0"
+    passkit-generator: "npm:~3.1.1"
+    path-browserify: "npm:^1.0.1"
+    react: "npm:^18.3.1"
+    react-dom: "npm:^18.3.1"
+    react-intl: "npm:^7.1.6"
+    sanitize-html: "npm:^2.15.0"
+    semver: "npm:^7.6.3"
+    server-only: "npm:^0.0.1"
+    sharp: "npm:^0.33.5"
+    stream-browserify: "npm:^3.0.0"
+    zod: "npm:3.24.1"
+  languageName: unknown
+  linkType: soft
+
 "@azzapp/app@workspace:packages/app":
   version: 0.0.0-use.local
   resolution: "@azzapp/app@workspace:packages/app"
@@ -715,6 +772,7 @@ __metadata:
     "@azzapp/shared": "workspace:^"
     eslint: "npm:^9.24.0"
     jest: "npm:^29.7.0"
+    jose: "npm:^6.0.10"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -751,17 +809,8 @@ __metadata:
     "@azzapp/schema": "workspace:^"
     "@azzapp/service": "workspace:^"
     "@azzapp/shared": "workspace:^"
-    "@conform-to/react": "npm:^1.3.0"
-    "@conform-to/zod": "npm:^1.3.0"
-    "@envelop/dataloader": "npm:^6.0.0"
-    "@envelop/generic-auth": "npm:^9.1.3"
-    "@envelop/parser-cache": "npm:^8.1.3"
-    "@envelop/sentry": "npm:^9.0.0"
-    "@envelop/validation-cache": "npm:^8.1.3"
-    "@escape.tech/graphql-armor-max-aliases": "npm:^2.6.0"
-    "@escape.tech/graphql-armor-max-tokens": "npm:^2.5.0"
-    "@graphql-yoga/plugin-disable-introspection": "npm:^2.14.2"
-    "@graphql-yoga/plugin-persisted-operations": "npm:^3.13.3"
+    "@conform-to/react": "npm:^1.2.2"
+    "@conform-to/zod": "npm:^1.2.2"
     "@next/third-parties": "npm:^14.2.14"
     "@paralleldrive/cuid2": "npm:^2.2.2"
     "@sentry/nextjs": "npm:^7.113.0"
@@ -769,49 +818,31 @@ __metadata:
     "@types/file-saver": "npm:^2.0.7"
     "@types/jsonwebtoken": "npm:^9.0.9"
     "@types/node": "npm:^22.7.4"
-    "@types/qrcode": "npm:^1.5.5"
     "@types/react": "npm:^18.3.11"
     "@types/react-dom": "npm:^18.3.0"
     "@types/react-lottie": "npm:^1.2.10"
-    "@types/sanitize-html": "npm:^2.13.0"
-    "@types/semver": "npm:^7.5.8"
     "@vanilla-extract/dynamic": "npm:^2.1.2"
     "@vanilla-extract/next-plugin": "npm:^2.4.10"
     "@vercel/functions": "npm:^2.0.0"
-    bcrypt-ts: "npm:^6.0.0"
     classnames: "npm:^2.5.1"
-    encoding: "npm:^0.1.13"
-    eslint: "npm:^9.24.0"
+    eslint: "npm:^9.17.0"
     file-saver: "npm:^2.0.5"
-    google-wallet: "npm:^1.0.21"
-    graphql-yoga: "npm:^5.13.2"
-    inngest: "npm:^3.32.9"
-    inngest-cli: "npm:^1.5.5"
     jest: "npm:^29.7.0"
-    jose: "npm:^6.0.10"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
-    libphonenumber-js: "npm:^1.12.6"
     lodash: "npm:^4.17.21"
     lottie-web: "npm:^5.12.2"
     lz-string: "npm:^1.5.0"
     next: "npm:^14.2.25"
     next-axiom: "npm:^1.9.1"
     next-cloudinary: "npm:^6.16.0"
-    os-browserify: "npm:^0.3.0"
-    passkit-generator: "npm:~3.1.1"
-    path-browserify: "npm:^1.0.1"
-    qrcode: "npm:^1.5.4"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-intl: "npm:^7.1.6"
     react-lottie: "npm:^1.2.10"
-    sanitize-html: "npm:^2.15.0"
-    semver: "npm:^7.6.3"
     server-only: "npm:^0.0.1"
     sharp: "npm:^0.33.5"
-    stream-browserify: "npm:^3.0.0"
-    zod: "npm:^3.24.2"
+    zod: "npm:3.24.1"
   languageName: unknown
   linkType: soft
 
@@ -4772,13 +4803,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@conform-to/dom@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@conform-to/dom@npm:1.3.0"
-  checksum: 10/57f3679bbaa29ec217078d3928b3ed913e90ea4b90a5c3d97f13ada72028450632ba39a22bb31a19df5d32b798693e2836fccb9190b2683ad92558148949f51d
-  languageName: node
-  linkType: hard
-
 "@conform-to/react@npm:^1.2.2":
   version: 1.2.2
   resolution: "@conform-to/react@npm:1.2.2"
@@ -4790,17 +4814,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@conform-to/react@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@conform-to/react@npm:1.3.0"
-  dependencies:
-    "@conform-to/dom": "npm:1.3.0"
-  peerDependencies:
-    react: ">=18"
-  checksum: 10/b660533e1c5ddabaa1d68131752c95279103a6dd24bdc63401557cdf0edb70c1c5629e7000b9ce203147af3c539cd3d6c6fbd6bd022b1996e36ee2e25f3299b8
-  languageName: node
-  linkType: hard
-
 "@conform-to/zod@npm:^1.2.2":
   version: 1.2.2
   resolution: "@conform-to/zod@npm:1.2.2"
@@ -4809,17 +4822,6 @@ __metadata:
   peerDependencies:
     zod: ^3.21.0
   checksum: 10/1fbc452aeebe0d3a4b347637f83d871f13cd4b64fe1e8baed2b82f8f51eceee532b78eb369e278be0792671c1d9245a0c7c449056ea74150613bf8907b69c758
-  languageName: node
-  linkType: hard
-
-"@conform-to/zod@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@conform-to/zod@npm:1.3.0"
-  dependencies:
-    "@conform-to/dom": "npm:1.3.0"
-  peerDependencies:
-    zod: ^3.21.0
-  checksum: 10/59b59aaf2799aed94474f77627096a8e235d5584fe7b3af9aa880763d3af07c7d93028ab9b36d8fe995c6c5e2f52e08307eb1338c329af6e496c5ecc36efaca3
   languageName: node
   linkType: hard
 
@@ -5115,18 +5117,6 @@ __metadata:
     "@whatwg-node/promise-helpers": "npm:^1.2.4"
     tslib: "npm:^2.5.0"
   checksum: 10/a98879bfccbe1d8a744381d9cf6a6ae139504026b0de40fa0a79dfc8a20996f69d144fbed5d714ca95ca27bde83a029af842b080503bf6e0dcfcef8c949cdfe0
-  languageName: node
-  linkType: hard
-
-"@envelop/dataloader@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@envelop/dataloader@npm:6.0.0"
-  dependencies:
-    tslib: "npm:^2.5.0"
-  peerDependencies:
-    "@envelop/core": ^5.0.0
-    dataloader: ^2.0.0
-  checksum: 10/0fd581fcc25ef13086d2e634eb10d0e474ca1bac097623b4ecbb27d422dc0e0e4134bd54bf880668e4a09cb5a74e6831c90a05b81f6c40d7e8009cb07336e0bf
   languageName: node
   linkType: hard
 
@@ -22688,6 +22678,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"libphonenumber-js@npm:^1.11.17":
+  version: 1.11.17
+  resolution: "libphonenumber-js@npm:1.11.17"
+  checksum: 10/e8e897834822060fe3067fc573a76f94eb0fbcc1ac075e3fdd9e1870b0c68f7c20f2bc50053ceeb69364fc3a8b881395bd121d904c38f716c4b69c3382b8f011
+  languageName: node
+  linkType: hard
+
 "libphonenumber-js@npm:^1.12.6":
   version: 1.12.6
   resolution: "libphonenumber-js@npm:1.12.6"
@@ -31289,6 +31286,13 @@ __metadata:
     property-expr: "npm:^2.0.4"
     toposort: "npm:^2.0.2"
   checksum: 10/a1f529c51d54b2f2f9a326bf65eb6cb6ceaa16f1a5d5d1f631d15f5db3b48c0f3e4852028384a628f2305d9a8f64080d10029fe4c6b19116efd528fe00afed6e
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.24.1":
+  version: 3.24.1
+  resolution: "zod@npm:3.24.1"
+  checksum: 10/54e25956495dec22acb9399c168c6ba657ff279801a7fcd0530c414d867f1dcca279335e160af9b138dd70c332e17d548be4bc4d2f7eaf627dead50d914fec27
   languageName: node
   linkType: hard
 

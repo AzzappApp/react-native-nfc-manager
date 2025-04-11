@@ -8,21 +8,11 @@ const withVanillaExtract = createVanillaExtractPlugin({
 
 /** @type {import('next').NextConfig} */
 const config = {
-  webpack(config, { nextRuntime }) {
+  webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
-
-    if (nextRuntime === 'edge') {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        stream: require.resolve('stream-browserify'),
-        path: require.resolve('path-browserify'),
-        os: require.resolve('os-browserify/browser'),
-      };
-    }
 
     return config;
   },
@@ -54,7 +44,7 @@ const config = {
     // ],
     // ],
   },
-  transpilePackages: ['@azzapp/shared', '@azzapp/data'],
+  transpilePackages: ['@azzapp/shared', '@azzapp/data', '@azzapp/service'],
 };
 
 module.exports = withAxiom(

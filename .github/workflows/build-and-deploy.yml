@@ -219,6 +219,31 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
+      - name: Azzapp API - Pull Vercel configuration
+        env:
+          VERCEL_PROJECT_ID: 'azzapp-api'
+        run: |
+          ENVIRONMENT="preview"
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ENVIRONMENT="production"
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            ADDITIONAL_ARGS="--git-branch=main"
+          fi
+          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+
+      - name: Azzapp API - Vercel deployment
+        env:
+          VERCEL_PROJECT_ID: 'azzapp-api'
+        run: |
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+      
       - name: Azzapp Web - Pull Vercel configuration
         env:
           VERCEL_PROJECT_ID: 'azzapp'

@@ -151,3 +151,17 @@ export const AVATAR_MAX_WIDTH = 2048;
 export const LOGO_MAX_WIDTH = 2048;
 
 export const CONTACTCARD_ASSET_SIZES = [112];
+
+export const displayName = (
+  contact: { firstName?: string; lastName?: string; company?: string },
+  webCard: { userName?: string | null } | null,
+) => {
+  if (contact.firstName || contact.lastName) {
+    return `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim();
+  }
+
+  if (contact.company) {
+    return contact.company;
+  }
+  return webCard?.userName ?? '';
+};
