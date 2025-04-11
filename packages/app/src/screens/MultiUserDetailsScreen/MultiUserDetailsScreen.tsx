@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as Sentry from '@sentry/react-native';
 import { useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -190,9 +191,14 @@ const MultiUserDetailsScreen = ({
       }
 
       if (logo?.local && logo.uri) {
-        const { file, uploadURL, uploadParameters } =
-          await prepareLogoForUpload(logo.uri);
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareLogoForUpload(logo.uri);
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parse } from '@lepirlouit/vcard-parser';
+import * as Sentry from '@sentry/react-native';
 import { File } from 'expo-file-system/next';
 import capitalize from 'lodash/capitalize';
 import { useCallback, useEffect, useState } from 'react';
@@ -157,9 +158,14 @@ const ContactCreateScreen = ({
       }
 
       if (logo?.local && logo.uri) {
-        const { file, uploadURL, uploadParameters } =
-          await prepareLogoForUpload(logo.uri);
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareLogoForUpload(logo.uri);
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }

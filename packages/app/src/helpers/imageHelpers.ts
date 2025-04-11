@@ -1,12 +1,20 @@
+import { Paths, File } from 'expo-file-system/next';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
-import { getFileName } from './fileHelpers';
+import { createRandomFileName, getFileName } from './fileHelpers';
 import { uploadSign } from './MobileWebAPI';
 
 export const prepareLogoForUpload = async (logoPath: string) => {
-  const fileName = getFileName(logoPath);
+  let logo = logoPath;
+  //brandfetch case
+  if (logoPath.startsWith('http')) {
+    logo = `${Paths.cache.uri}${createRandomFileName('png')}`;
+    await File.downloadFileAsync(logoPath, new File(logo));
+  }
+
+  const fileName = getFileName(logo);
   const mimeType = mime.lookup(fileName);
-  const compressedFileUri = await ImageCompressor.compress(logoPath, {
+  const compressedFileUri = await ImageCompressor.compress(logo, {
     output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
   });
   const file: any = {

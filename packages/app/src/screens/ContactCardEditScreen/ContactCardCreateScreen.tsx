@@ -271,22 +271,35 @@ const ContactCardCreateScreen = ({
       logo = webCardKind === 'business' ? logo : null;
       let logoWidth = 0;
       let logoHeight = 0;
+      let logoUri = logo?.uri;
       if (logo?.uri) {
-        const { file, uploadURL, uploadParameters } =
-          await prepareLogoForUpload(logo.uri);
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareLogoForUpload(logo.uri);
+          logoUri = file.uri;
+          const metaData = await getImageMetaData(file.uri);
+          logoHeight = metaData.ImageHeight;
+          logoWidth = metaData.ImageWidth;
 
-        const metaData = await getImageMetaData(file.uri);
-        logoHeight = metaData.ImageHeight;
-        logoWidth = metaData.ImageWidth;
-
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          logoUri = undefined;
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }
 
       //create the coverId
-      if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
-        const logoTextureInfo = NativeTextureLoader.loadImage(logo.uri, {
+      if (
+        logo &&
+        logo.id != null &&
+        logoWidth > 0 &&
+        logoHeight > 0 &&
+        logoUri
+      ) {
+        const logoTextureInfo = NativeTextureLoader.loadImage(logoUri, {
           width: logoWidth,
           height: logoHeight,
         });

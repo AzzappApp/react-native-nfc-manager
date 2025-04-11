@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as Sentry from '@sentry/react-native';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -209,9 +210,13 @@ export const CommonInformationScreen = ({
       }
 
       if (banner?.local && banner.uri) {
+        try{
         const { file, uploadURL, uploadParameters } =
           await prepareBannerForUpload(banner.uri);
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch(e){
+          Sentry.captureException(e);
+        }
       } else {
         uploads.push(null);
       }

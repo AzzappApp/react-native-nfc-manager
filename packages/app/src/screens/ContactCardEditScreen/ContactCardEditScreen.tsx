@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -163,10 +164,14 @@ const ContactCardEditScreen = ({
     }
 
     if (logo?.local && logo.uri) {
-      const { file, uploadURL, uploadParameters } = await prepareLogoForUpload(
-        logo.uri,
-      );
-      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      try {
+        const { file, uploadURL, uploadParameters } =
+          await prepareLogoForUpload(logo.uri);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } catch (e) {
+        Sentry.captureException(e);
+        uploads.push(null);
+      }
     } else {
       uploads.push(null);
     }

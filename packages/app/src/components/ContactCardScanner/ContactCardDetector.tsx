@@ -26,6 +26,7 @@ import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { ScreenModal, useOnFocus, useRouter } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
+import { getAuthState } from '#helpers/authStore';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useIsForeground from '#hooks/useIsForeground';
@@ -138,10 +139,11 @@ const ContactCardDetector = ({
         clearTimeout(networkLowSpeedTimeout);
       };
 
+      const profileId = getAuthState().profileInfos?.profileId;
       commit({
         variables: {
           imgUrl: `data:image/jpg;base64,${picture.base64}`,
-          config: { createContactCard },
+          config: { createContactCard, profileId },
         },
         onCompleted: data => {
           resetNetworkLowSpeedTimeout();
