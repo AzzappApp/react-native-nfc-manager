@@ -44,11 +44,8 @@ const updateUrl = (url: string): string => {
   // Replace 'webp' with 'png'
   let updatedUrl = url.replace('webp', 'png');
 
-  // Replace 'w/128' with 'w/1280' and 'h/128' with 'h/1280'
-  updatedUrl = updatedUrl
-    .replace(/w\/\d+/g, '')
-    // .replace(/w\/\d+/g, 'w/1280')
-    .replace(/h\/\d+/g, 'h/1280');
+  // Replace 'w/128' with default sizes
+  updatedUrl = updatedUrl.replace(/\/w\/\d+/g, '').replace(/\/h\/\d+/g, '');
 
   return updatedUrl;
 };
