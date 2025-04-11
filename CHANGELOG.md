@@ -1,3 +1,7 @@
+## 1.10.0-canary.12
+
+
+
 ## 1.10.0-canary.11
 
 * **fix:**  - reduce item gaps in contact details ([#8447](https://github.com/AzzappApp/azzapp/pull/8447))
