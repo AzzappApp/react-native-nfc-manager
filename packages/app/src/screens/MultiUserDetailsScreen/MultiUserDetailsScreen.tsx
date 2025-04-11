@@ -190,11 +190,13 @@ const MultiUserDetailsScreen = ({
         uploads.push(null);
       }
 
+      let logoUri;
       if (logo?.local && logo.uri) {
         try {
           const { file, uploadURL, uploadParameters } =
             await prepareLogoForUpload(logo.uri);
           uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+          logoUri = file.uri;
         } catch (e) {
           Sentry.captureException(e);
           uploads.push(null);
@@ -230,8 +232,8 @@ const MultiUserDetailsScreen = ({
       if (avatar?.local && avatar && avatar?.uri) {
         addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
       }
-      if (logo?.local && logoId && logo?.uri) {
-        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      if (logoUri) {
+        addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
       if (banner?.local && bannerId && banner?.uri) {
         addLocalCachedMediaFile(bannerId, 'image', banner.uri);

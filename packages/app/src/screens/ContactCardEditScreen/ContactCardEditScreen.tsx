@@ -162,11 +162,12 @@ const ContactCardEditScreen = ({
     } else {
       uploads.push(null);
     }
-
+    let logoUri;
     if (logo?.local && logo.uri) {
       try {
         const { file, uploadURL, uploadParameters } =
           await prepareLogoForUpload(logo.uri);
+        logoUri = file.uri;
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } catch (e) {
         Sentry.captureException(e);
@@ -212,8 +213,8 @@ const ContactCardEditScreen = ({
     if (avatar?.local) {
       addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
     }
-    if (logo?.local) {
-      addLocalCachedMediaFile(logoId, 'image', logo.uri);
+    if (logoUri) {
+      addLocalCachedMediaFile(logoId, 'image', logoUri);
     }
     if (banner?.local) {
       addLocalCachedMediaFile(bannerId, 'image', banner.uri);
