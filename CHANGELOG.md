@@ -1,3 +1,7 @@
+## 1.9.11
+
+
+
 ## 1.9.10
 
 * **fix:**  - put in cache right logo uri
