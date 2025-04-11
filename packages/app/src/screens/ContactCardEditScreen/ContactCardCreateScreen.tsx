@@ -271,7 +271,7 @@ const ContactCardCreateScreen = ({
       logo = webCardKind === 'business' ? logo : null;
       let logoWidth = 0;
       let logoHeight = 0;
-      let logoUri = logo?.uri;
+      let logoUri;
       if (logo?.uri) {
         try {
           const { file, uploadURL, uploadParameters } =
@@ -418,8 +418,8 @@ const ContactCardCreateScreen = ({
       if (avatar?.local) {
         addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
       }
-      if (logo?.local) {
-        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      if (logoUri) {
+        addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
 
       commit({
