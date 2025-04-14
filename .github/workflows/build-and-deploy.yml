@@ -72,13 +72,13 @@ jobs:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
       - name: Force rebuild the query-map.json
-        run: yarn relay:build --repersist
+        run: turbo run relay:build
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
 
       - name: Update persisted queries
         id: query-map-updated
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        run: yarn persist-queries
+        run: turbo run persist-queries --filter=@azzapp/api
         # ADD this once we support multiple versions
         env:
           LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
@@ -234,15 +234,7 @@ jobs:
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp API - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-api'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+        run: turbo run deploy --filter=@azzapp/api
       
       - name: Azzapp Web - Pull Vercel configuration
         env:
@@ -259,15 +251,7 @@ jobs:
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+        run: turbo run deploy --filter=@azzapp/web
 
       - name: Azzapp Backoffice - Pull Vercel configuration
         env:
@@ -284,16 +268,8 @@ jobs:
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-backoffice'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          rm -fr ./packages/web/.next
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+        run: turbo run deploy --filter=@azzapp/backoffice
+        
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native iOS application
