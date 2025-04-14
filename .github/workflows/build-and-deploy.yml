@@ -235,6 +235,9 @@ jobs:
 
       - name: Azzapp API - Vercel deployment
         run: yarn turbo run deploy --filter=@azzapp/api
+        env: 
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
       
       - name: Azzapp Web - Pull Vercel configuration
         env:
@@ -252,6 +255,9 @@ jobs:
 
       - name: Azzapp Web - Vercel deployment
         run: yarn turbo run deploy --filter=@azzapp/web
+        env: 
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
 
       - name: Azzapp Backoffice - Pull Vercel configuration
         env:
@@ -269,6 +275,9 @@ jobs:
 
       - name: Azzapp Backoffice - Vercel deployment
         run: yarn turbo run deploy --filter=@azzapp/backoffice
+        env: 
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
         
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
