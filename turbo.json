@@ -14,7 +14,11 @@
       ]
     },
     "app:build": { "dependsOn": ["build", "//#relay:build"] },
-    "//#relay:prepare": { "dependsOn": [], "inputs": [], "cache": false },
+    "//#relay:prepare": {
+      "dependsOn": [],
+      "inputs": [],
+      "outputs": ["packages/api/src/persisted-query-map.json"]
+    },
     "//#graphql-codegen": {
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
