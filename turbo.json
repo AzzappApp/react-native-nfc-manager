@@ -22,7 +22,7 @@
     "//#graphql-codegen": {
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
-      "outputs": ["./schema.graphql", "packages/schema/__generated__/**"]
+      "outputs": ["./schema.graphql", "./packages/schema/src/__generated__/**"]
     },
     "lint": {}
   }
