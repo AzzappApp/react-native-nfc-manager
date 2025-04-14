@@ -7,11 +7,6 @@
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]
     },
-    "deploy": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "public/**"],
-      "outputs": []
-    },
     "typecheck": { "dependsOn": ["^build"] },
     "test": { "inputs": ["src/**"] }
   }

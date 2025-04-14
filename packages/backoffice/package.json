@@ -7,7 +7,6 @@
     "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
-    "deploy": "VERCEL_PROJECT_ID=azzapp-backoffice && (cd ../.. && ./scripts/deploy-vercel.sh)",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.next.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
