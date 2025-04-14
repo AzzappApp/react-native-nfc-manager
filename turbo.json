@@ -2,42 +2,23 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["patches/*.patch"],
   "tasks": {
-    "clean": {
-      "dependsOn": []
-    },
-    "build": {
-      "dependsOn": []
-    },
-    "dev": {
-      "persistent": true,
-      "cache": false,
-      "dependsOn": []
-    },
+    "clean": { "dependsOn": [] },
+    "build": { "dependsOn": [] },
+    "dev": { "persistent": true, "cache": false, "dependsOn": [] },
     "//#relay:build": {
       "dependsOn": ["relay:prepare", "graphql-codegen"],
-      "inputs": ["packages/**/*.{js,jsx,ts,tsx}", "schema.graphql"],
+      "inputs": ["packages/app/*.{js,jsx,ts,tsx}", "./schema.graphql"],
       "outputs": [
         "packages/app/src/relayArtifacts/**",
-        "packages/web/src/persisted-query-map.json"
+        "packages/api/src/persisted-query-map.json"
       ]
     },
-    "app:build": {
-      "dependsOn": ["build", "//#relay:build"]
-    },
-    "//#relay:prepare": {
-      "dependsOn": [],
-      "inputs": [],
-      "cache": false
-    },
+    "app:build": { "dependsOn": ["build", "//#relay:build"] },
+    "//#relay:prepare": { "dependsOn": [], "inputs": [], "cache": false },
     "//#graphql-codegen": {
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
-      "cache": false
-    },
-    "//#relay:watch": {
-      "dependsOn": [],
-      "cache": false,
-      "persistent": true
+      "outputs": ["./schema.graphql"]
     },
     "lint": {}
   }
