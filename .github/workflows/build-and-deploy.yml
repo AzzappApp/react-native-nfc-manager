@@ -71,7 +71,9 @@ jobs:
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-      - name: Force rebuild the query-map.json
+      # This step is useless since it was already done in the build-app-dependencies step
+      # But we keep in case the app dependencies are not built in the future
+      - name: Build the persisted-query-map.json
         run: yarn turbo run relay:build
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
 

@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "VERCEL_PROJECT_ID=azzapp-api ../../scripts/deploy-vercel.sh",
+    "deploy": "VERCEL_PROJECT_ID=azzapp-api (cd ../.. && ./scripts/deploy-vercel.sh)",
     "test": "jest --passWithNoTests",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.next.tsbuildinfo && rm -rf .next && rm -rf node_modules",
