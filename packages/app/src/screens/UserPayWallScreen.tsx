@@ -627,7 +627,25 @@ const OfferItem = ({
         />
       </Text>
       <View>
-        <Text variant="button" appearance="light">
+        {period === 'year' && (
+          <Text variant="button" appearance="light">
+            <FormattedNumber
+              value={offer.product.price / 12}
+              style="currency"
+              currency={offer.product.currencyCode}
+            />
+            <FormattedMessage
+              defaultMessage=" / month"
+              description="MultiUser Paywall Screen - number of seat offer per month"
+            />
+          </Text>
+        )}
+
+        <Text
+          variant={period === 'year' ? 'smallbold' : 'button'}
+          style={period === 'year' && styles.yearlyPricing}
+          appearance="light"
+        >
           <FormattedNumber
             value={offer.product.price}
             style="currency"
@@ -645,20 +663,6 @@ const OfferItem = ({
             />
           )}
         </Text>
-
-        {period === 'year' && (
-          <Text variant="smallbold" style={styles.yearlyPricing}>
-            <FormattedNumber
-              value={offer.product.price / 12}
-              style="currency"
-              currency={offer.product.currencyCode}
-            />
-            <FormattedMessage
-              defaultMessage=" / month"
-              description="MultiUser Paywall Screen - number of seat offer per month"
-            />
-          </Text>
-        )}
       </View>
     </PressableOpacity>
   );
