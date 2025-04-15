@@ -211,6 +211,12 @@ const OauthButtonsBar = ({
     [googleErrorMessage, linkedinErrorMessage, router],
   );
 
+  const androidRippleConfig = {
+    radius: 30,
+    color: 'rgba(0,0,0,0.2)',
+    foreground: true,
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
@@ -226,6 +232,7 @@ const OauthButtonsBar = ({
         )}
         <PressableNative
           style={styles.button}
+          ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('linkedin')}
         >
           <View style={styles.button}>
@@ -237,6 +244,7 @@ const OauthButtonsBar = ({
         </PressableNative>
         <PressableNative
           style={styles.button}
+          ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('google')}
         >
           <View style={styles.button}>
