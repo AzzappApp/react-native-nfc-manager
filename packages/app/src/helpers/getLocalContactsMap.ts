@@ -23,7 +23,7 @@ const sanitizeSocialProfileLabel = (
     if (label && label === social.label.toLowerCase()) {
       return true;
     }
-    if (socialProfile.url?.includes(social.mask)) {
+    if (social.mask && socialProfile.url?.includes(social.mask)) {
       return true;
     }
     return false;
