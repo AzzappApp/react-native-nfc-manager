@@ -226,7 +226,7 @@ jobs:
 
           echo "Latest deployed commit: $LATEST_DEPLOYED_COMMIT"
 
-          yarn turbo@^2.5.0 run "build" --filter="@azzapp/api...[$LATEST_DEPLOYED_COMMIT]" --dry=json
+          npx -y turbo@^2.5.0 run "build" --filter="@azzapp/api...[$LATEST_DEPLOYED_COMMIT]" --dry=json
 
           if [ -z "$LATEST_DEPLOYED_COMMIT" ]; then
             echo "No previous deployment found, redeploying..."
