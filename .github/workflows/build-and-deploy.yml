@@ -59,7 +59,7 @@ jobs:
 
       - name: Bump version
         run: |
-          NEXT_VERSION=""
+          NEXT_VERSION="release"
           if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
             NEXT_VERSION="rc"
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then

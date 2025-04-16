@@ -6,7 +6,7 @@
     "build": { "dependsOn": [] },
     "dev": { "persistent": true, "cache": false, "dependsOn": [] },
     "//#relay:build": {
-      "dependsOn": ["relay:prepare", "graphql-codegen"],
+      "dependsOn": ["graphql-codegen"],
       "inputs": ["packages/app/*.{js,jsx,ts,tsx}", "./schema.graphql"],
       "outputs": [
         "packages/app/src/relayArtifacts/**",
@@ -14,14 +14,9 @@
       ]
     },
     "app:build": { "dependsOn": ["build", "//#relay:build"] },
-    "//#relay:prepare": {
-      "dependsOn": [],
-      "inputs": [],
-      "outputs": ["packages/api/src/persisted-query-map.json"]
-    },
     "//#graphql-codegen": {
       "dependsOn": [],
-      "inputs": ["packages/**/*.graphql"],
+      "inputs": ["packages/schema/**/*.graphql"],
       "outputs": ["./schema.graphql", "./packages/schema/src/__generated__/**"]
     },
     "lint": {}

@@ -31,9 +31,7 @@
       "splitTerminals": [
         {
           "name": "relay watch",
-          "commands": [
-            "yarn relay:prepare && yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
-          ]
+          "commands": ["yarn relay:watch"]
         },
         {
           "name": "graphQL codegen",

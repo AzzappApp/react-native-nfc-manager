@@ -6,6 +6,8 @@ const buildChangeLog = require('./buildChangeLog');
 const setWorkspaceVersions = require('./setWorkspaceVersions');
 
 const main = async () => {
+  console.error('This script is not up to date with new versioning system');
+  process.exit(1);
   const args = process.argv.slice(2);
   if (args.length > 2) {
     console.error('Too many arguments');
