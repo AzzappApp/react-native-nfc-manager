@@ -1,7 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
-const currentVersion = require('../package.json').version;
+const internal = require('../internal-version.json');
+const pkg = require('../package.json');
+
+const currentVersion = `${pkg.version}-${internal.kind}.${internal.version}`;
 
 const PERSISTED_QUERIES_DIR = path.join(__dirname, '../persistedQueries');
 const CURRENT_PERSISTED_QUERIES_MAP_FILE = path.join(
