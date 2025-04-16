@@ -62,6 +62,7 @@ const prereleaseToNumber = prerelease => {
     alpha: 200,
     beta: 300,
     rc: 400,
+    release: 500,
   }[prerelease];
 };
 
