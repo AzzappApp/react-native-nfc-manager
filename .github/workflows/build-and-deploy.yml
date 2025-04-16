@@ -90,27 +90,27 @@ jobs:
       # PlanetScale schema migration
       #
       ############################################
-      - name: Setup pscale
-        uses: planetscale/setup-pscale-action@v1
-
-      - name: PlanetScale - Check if migration is needed
-        id: planetscale_migration_needed
-        working-directory: packages/data
-        env:
-          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
-          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-        run: |
-          yarn introspect
-          yarn generate-migration
-          HAS_CHANGE="false"
-          if compgen -G "drizzle/0001*" > /dev/null; then
-              cat $(compgen -G "drizzle/0001*")
-              HAS_CHANGE="true"
-          fi
-          echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
-
       # TODO PlanetScale check don't work with the new setup, it breaks turbo-ignore
+      # - name: Setup pscale
+      #   uses: planetscale/setup-pscale-action@v1
+
+      # - name: PlanetScale - Check if migration is needed
+      #   id: planetscale_migration_needed
+      #   working-directory: packages/data
+      #   env:
+      #     DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+      #     DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+      #     DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      #   run: |
+      #     yarn introspect
+      #     yarn generate-migration
+      #     HAS_CHANGE="false"
+      #     if compgen -G "drizzle/0001*" > /dev/null; then
+      #         cat $(compgen -G "drizzle/0001*")
+      #         HAS_CHANGE="true"
+      #     fi
+      #     echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+
       # - name: PlanetScale - Extract branch name
       #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
       #   run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
@@ -246,8 +246,8 @@ jobs:
       - name: Commit version bump
         run: |
           git add .
-          git config user.name "Azzapp Dev Bot"
-          git config user.email "azzapp-dev-bot@azzapp.com"
+          git commit -m "chore(ci): bump version [skip ci]"
+          git push origin $GITHUB_REF_NAME
         
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
