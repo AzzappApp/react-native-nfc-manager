@@ -110,212 +110,134 @@ jobs:
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
 
-      - name: PlanetScale - Extract branch name
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
-        id: extract_branch
+      # TODO PlanetScale check don't work with the new setup, it breaks turbo-ignore
+      # - name: PlanetScale - Extract branch name
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
+      #   id: extract_branch
 
-      - name: PlanetScale - Create a branch
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        id: create_branch
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-        run: |
-          set +e
-          pscale branch show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp
-          exit_code=$?
-          set -e
-
-
-          if [ $exit_code -eq 0 ]; then
-            echo "Branch exists. Skipping branch creation."
-          else
-            echo "Branch does not exist. Creating."
-            pscale branch create azzapp ${{ steps.extract_branch.outputs.branch }} --from ${{ github.ref_name }}  --wait --org azzapp
-          fi
-
-      - name: PlanetScale - Create a password
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-        run: |
-          response=$(pscale password create azzapp ${{ steps.extract_branch.outputs.branch }} ${{ steps.extract_branch.outputs.branch }} -f json --org azzapp)
+      # - name: PlanetScale - Create a branch
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   id: create_branch
+      #   env:
+      #     PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+      #     PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      #   run: |
+      #     set +e
+      #     pscale branch show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp
+      #     exit_code=$?
+      #     set -e
 
 
-          id=$(echo "$response" | jq -r '.id')
-          host=$(echo "$response" | jq -r '.access_host_url')
-          username=$(echo "$response" | jq -r '.username')
-          password=$(echo "$response" | jq -r '.plain_text')
-          ssl_mode="verify_identity"  # Assuming a default value for ssl_mode
-          ssl_ca="/etc/ssl/certs/ca-certificates.crt"  # Assuming a default value for ssl_ca
+      #     if [ $exit_code -eq 0 ]; then
+      #       echo "Branch exists. Skipping branch creation."
+      #     else
+      #       echo "Branch does not exist. Creating."
+      #       pscale branch create azzapp ${{ steps.extract_branch.outputs.branch }} --from ${{ github.ref_name }}  --wait --org azzapp
+      #     fi
+
+      # - name: PlanetScale - Create a password
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   env:
+      #     PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+      #     PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      #   run: |
+      #     response=$(pscale password create azzapp ${{ steps.extract_branch.outputs.branch }} ${{ steps.extract_branch.outputs.branch }} -f json --org azzapp)
 
 
-          # Set the password ID, allows us to later delete it if wanted.
-          echo "PASSWORD_ID=$id" >> $GITHUB_ENV
+      #     id=$(echo "$response" | jq -r '.id')
+      #     host=$(echo "$response" | jq -r '.access_host_url')
+      #     username=$(echo "$response" | jq -r '.username')
+      #     password=$(echo "$response" | jq -r '.plain_text')
+      #     ssl_mode="verify_identity"  # Assuming a default value for ssl_mode
+      #     ssl_ca="/etc/ssl/certs/ca-certificates.crt"  # Assuming a default value for ssl_ca
 
 
-          # Create the DATABASE_URL
-          echo "DATABASE_HOST=$host" >> $GITHUB_ENV
-          echo "DATABASE_PASSWORD=$password" >> $GITHUB_ENV
-          echo "DATABASE_USERNAME=$username" >> $GITHUB_ENV
-
-      - name: PlanetScale - Apply drizzle changes
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        working-directory: packages/data
-        run: |
-          export DATABASE_HOST=$DATABASE_HOST
-          export DATABASE_PASSWORD=$DATABASE_PASSWORD
-          export DATABASE_USERNAME=$DATABASE_USERNAME
-          yarn push-migration
-
-      - name: PlanetScale - Create a deploy request
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-        run: |
-          pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp
-
-      - name: PlanetScale - Check deployment state
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        id: check-state
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-        run: |
-          for i in {1..10}; do
-            deployment_state=$(pscale deploy-request show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --format json | jq -r '.deployment_state')
-            echo "Deployment State: $deployment_state"
+      #     # Set the password ID, allows us to later delete it if wanted.
+      #     echo "PASSWORD_ID=$id" >> $GITHUB_ENV
 
 
-            if [ "$deployment_state" = "ready" ]; then
-              echo "Deployment state is ready. Continuing."
-              break
-            fi
+      #     # Create the DATABASE_URL
+      #     echo "DATABASE_HOST=$host" >> $GITHUB_ENV
+      #     echo "DATABASE_PASSWORD=$password" >> $GITHUB_ENV
+      #     echo "DATABASE_USERNAME=$username" >> $GITHUB_ENV
+
+      # - name: PlanetScale - Apply drizzle changes
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   working-directory: packages/data
+      #   run: |
+      #     export DATABASE_HOST=$DATABASE_HOST
+      #     export DATABASE_PASSWORD=$DATABASE_PASSWORD
+      #     export DATABASE_USERNAME=$DATABASE_USERNAME
+      #     yarn push-migration
+
+      # - name: PlanetScale - Create a deploy request
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   env:
+      #     PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+      #     PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      #   run: |
+      #     pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp
+
+      # - name: PlanetScale - Check deployment state
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   id: check-state
+      #   env:
+      #     PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+      #     PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      #   run: |
+      #     for i in {1..10}; do
+      #       deployment_state=$(pscale deploy-request show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --format json | jq -r '.deployment_state')
+      #       echo "Deployment State: $deployment_state"
 
 
-            echo "Deployment state is not ready. Waiting 2 seconds before checking again."
-            sleep 2
-          done
+      #       if [ "$deployment_state" = "ready" ]; then
+      #         echo "Deployment state is ready. Continuing."
+      #         break
+      #       fi
 
-      - name: PlanetScale - Deploy the changes
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-        run: |
-          pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --wait
 
-      - name: Check if azzapp api should be redeployed
-        id: check-azzapp-api
-        env: 
-          VERCEL_PROJECT_ID: 'azzapp-api'
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_TEAM_ID: 'azzapp'
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: |
-          echo "Fetching last deployed commit SHA from Vercel..."
-          LATEST_DEPLOYED_COMMIT=$(node ./scripts/getLatestVercelDeployment.js)
+      #       echo "Deployment state is not ready. Waiting 2 seconds before checking again."
+      #       sleep 2
+      #     done
 
-          echo "Latest deployed commit: $LATEST_DEPLOYED_COMMIT"
-
-          if [ -z "$LATEST_DEPLOYED_COMMIT" ]; then
-            echo "No previous deployment found, redeploying..."
-            echo "should_redeploy=true" >> $GITHUB_OUTPUT
-          else
-            echo "Checking for changes with turbo-ignore..."
-            if npx turbo-ignore @azzapp/api --fallback=$LATEST_DEPLOYED_COMMIT; then
-              echo "No significant changes detected, skipping redeploy."
-              echo "should_redeploy=false" >> $GITHUB_OUTPUT
-            else
-              echo "Changes detected! Redeploy required."
-              echo "should_redeploy=true" >> $GITHUB_OUTPUT
-            fi
-          fi
-
+      # - name: PlanetScale - Deploy the changes
+      #   if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+      #   env:
+      #     PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+      #     PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      #   run: |
+      #     pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --wait
+      
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
-      - name: Azzapp API - Pull Vercel configuration
-        if: steps.check-azzapp-api.outputs.should_redeploy == 'true'
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-api'
-        run: |
-          ENVIRONMENT="preview"
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ENVIRONMENT="production"
-          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            ADDITIONAL_ARGS="--git-branch=main"
-          fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp API - Vercel deployment
-        if: steps.check-azzapp-api.outputs.should_redeploy == 'true'
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-api'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
-      
-      - name: Azzapp Web - Pull Vercel configuration
-        env:
-          VERCEL_PROJECT_ID: 'azzapp'
-        run: |
-          ENVIRONMENT="preview"
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ENVIRONMENT="production"
-          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            ADDITIONAL_ARGS="--git-branch=main"
-          fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+      - name: Deploy API to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/api'
+          vercel_project_id: 'azzapp-api'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Azzapp Web - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Backoffice - Pull Vercel configuration
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-backoffice'
-        run: |
-          ENVIRONMENT="preview"
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ENVIRONMENT="production"
-          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            ADDITIONAL_ARGS="--git-branch=main"
-          fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+      - name: Deploy Web to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/web'
+          vercel_project_id: 'azzapp'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Azzapp Backoffice - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-backoffice'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          rm -fr ./packages/web/.next
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
-      
+      - name: Deploy Backoffice to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/backoffice'
+          vercel_project_id: 'azzapp-backoffice'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+    
       - name: Git config
         run: |
           git config user.name "Azzapp Dev Bot"

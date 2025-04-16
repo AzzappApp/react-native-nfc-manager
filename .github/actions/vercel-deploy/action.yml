@@ -1,0 +1,84 @@
+name: Vercel Deployment
+description: Check changes and deploy project to Vercel if needed.
+
+inputs:
+  package:
+    description: Workspace package (e.g. @azzapp/api)
+    required: true
+  vercel_project_id:
+    description: Vercel project ID
+    required: true
+  vercel_team_id:
+    description: Vercel team ID
+    required: true
+  vercel_token:
+    description: Vercel token
+    required: true
+
+outputs:
+  should_redeploy:
+    description: Whether deployment should happen
+    value: ${{ steps.check.outputs.should_redeploy }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm install
+
+    - name: Check if deployment is needed
+      id: check
+      shell: bash
+      env:
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_TEAM_ID: ${{ inputs.vercel_team_id }}
+      run: |
+        echo "Fetching last deployed commit SHA from Vercel..."
+        LATEST_DEPLOYED_COMMIT=$(node ./scripts/getLatestVercelDeployment.js)
+
+        echo "Latest deployed commit: $LATEST_DEPLOYED_COMMIT"
+
+        if [ -z "$LATEST_DEPLOYED_COMMIT" ]; then
+          echo "No previous deployment found, redeploying..."
+          echo "should_redeploy=true" >> $GITHUB_OUTPUT
+        else
+          echo "Checking for changes with turbo-ignore..."
+          if npx turbo-ignore ${{ inputs.package }} --fallback=$LATEST_DEPLOYED_COMMIT; then
+            echo "No significant changes detected, skipping redeploy."
+            echo "should_redeploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected! Redeploy required."
+            echo "should_redeploy=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+    - name: Pull Vercel configuration
+      if: steps.check.outputs.should_redeploy == 'true'
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      run: |
+        ENVIRONMENT="preview"
+        ADDITIONAL_ARGS=""
+        if [ "${{ github.ref }}" == "refs/heads/stable" ]; then
+          ENVIRONMENT="production"
+        elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          ADDITIONAL_ARGS="--git-branch=main"
+        fi
+        vercel pull --yes --environment=$ENVIRONMENT --token=$VERCEL_TOKEN $ADDITIONAL_ARGS
+
+    - name: Deploy to Vercel
+      if: steps.check.outputs.should_redeploy == 'true'
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      run: |
+        ADDITIONAL_ARGS=""
+        if [ "${{ github.ref }}" == "refs/heads/stable" ]; then
+          ADDITIONAL_ARGS="--prod"
+        fi
+        vercel deploy --token=$VERCEL_TOKEN --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
