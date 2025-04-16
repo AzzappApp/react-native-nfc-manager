@@ -9,7 +9,7 @@ export const revalidateWebcardsAndPosts = (
     id: string;
   }> = [],
 ) => {
-  if (cards.length || posts.length) {
+  if (posts.length || cards.length) {
     waitUntil(
       (async () => {
         await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/revalidate`, {
