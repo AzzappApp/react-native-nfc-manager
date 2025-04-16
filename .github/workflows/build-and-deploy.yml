@@ -85,6 +85,8 @@ jobs:
         env:
           LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
 
+      # We add the change from the previous step to the commit without committing it
+      # To avoid turbo-ignore to ignore the change due to '[skip ci]' in the commit message
       - name: Git config
         run: |
           git config user.name "Azzapp Dev Bot"
@@ -92,8 +94,6 @@ jobs:
       - name: Commit version bump
         run: |
           git add .
-          git commit -m "chore(ci): bump version [skip ci]"
-          git push origin $GITHUB_REF_NAME
 
       ############################################
       #
@@ -326,6 +326,17 @@ jobs:
           fi
           rm -fr ./packages/web/.next
           vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+      
+      # We commit the changes from the previously added file now that we are sure that 
+      # the commit message will not cause turbo-ignore to ignore the change
+      - name: Git config
+        run: |
+          git config user.name "Azzapp Dev Bot"
+          git config user.email "azzapp-dev-bot@azzapp.com"
+      - name: Commit version bump
+        run: |
+          git commit -m "chore(ci): bump version [skip ci]"
+          git push origin $GITHUB_REF_NAME
         
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
