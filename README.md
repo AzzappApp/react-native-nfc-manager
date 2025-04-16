@@ -175,3 +175,4 @@ Valid platforms are  `IOS` and `ANDROID`.
 
 - The design / graphic prototype of the application can be found on the [figma shared project](https://www.figma.com/files/project/59265907/MOBILE-APPLICATION).
 - Application specification can be found on the [google cloud shared folder](https://drive.google.com/drive/folders/1qXYQMdEyw1u5Etui4tIvRpnI40y172dt)
+
