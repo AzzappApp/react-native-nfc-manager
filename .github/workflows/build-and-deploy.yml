@@ -221,7 +221,36 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
+
+      - name: Check if azzapp api should be redeployed
+        id: check-azzapp-api
+        env: 
+          VERCEL_PROJECT_ID: 'azzapp-api'
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: 'azzapp'
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          echo "Fetching last deployed commit SHA from Vercel..."
+          LATEST_DEPLOYED_COMMIT=$(node ./scripts/getLatestVercelDeployment.js)
+
+          echo "Latest deployed commit: $LATEST_DEPLOYED_COMMIT"
+
+          if [ -z "$LATEST_DEPLOYED_COMMIT" ]; then
+            echo "No previous deployment found, redeploying..."
+            echo "should_redeploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "Checking for changes with turbo-ignore..."
+            if turbo-ignore --base=$LATEST_DEPLOYED_COMMIT --filter=apps/api; then
+              echo "No significant changes detected, skipping redeploy."
+              echo "should_redeploy=false" >> $GITHUB_OUTPUT
+            else
+              echo "Changes detected! Redeploy required."
+              echo "should_redeploy=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+
       - name: Azzapp API - Pull Vercel configuration
+        if: steps.check-azzapp-api.outputs.should_redeploy == 'true'
         env:
           VERCEL_PROJECT_ID: 'azzapp-api'
         run: |
@@ -236,6 +265,7 @@ jobs:
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp API - Vercel deployment
+        if: steps.check-azzapp-api.outputs.should_redeploy == 'true'
         env:
           VERCEL_PROJECT_ID: 'azzapp-api'
         run: |
