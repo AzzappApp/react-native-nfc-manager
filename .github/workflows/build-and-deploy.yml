@@ -240,7 +240,7 @@ jobs:
             echo "should_redeploy=true" >> $GITHUB_OUTPUT
           else
             echo "Checking for changes with turbo-ignore..."
-            if npx turbo-ignore @azzapp/api --filter=$LATEST_DEPLOYED_COMMIT; then
+            if npx turbo-ignore @azzapp/api --fallback=$LATEST_DEPLOYED_COMMIT; then
               echo "No significant changes detected, skipping redeploy."
               echo "should_redeploy=false" >> $GITHUB_OUTPUT
             else
