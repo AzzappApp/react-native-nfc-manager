@@ -1,3 +1,7 @@
+## 1.10.0-canary.42
+
+
+
 ## 1.10.0-canary.41
 
 * **fix:**  - middleware is called before  the rewrites ([#8482](https://github.com/AzzappApp/azzapp/pull/8482))
