@@ -104,7 +104,12 @@ const App = () => {
   const { width: screenWidth, height: screenHeight } = useScreenDimensions();
 
   // TODO handle errors
-  const [fontLoaded] = useApplicationFonts();
+  const [fontLoaded, fontLoadingError] = useApplicationFonts();
+  useEffect(() => {
+    if (fontLoadingError) {
+      Sentry.captureException(fontLoadingError);
+    }
+  }, [fontLoadingError]);
   if (!ready || !fontLoaded) {
     return null;
   }
