@@ -384,7 +384,7 @@ jobs:
       - name: Build Android native parts
         if: steps.restore-android-build-cache.outputs.cache-hit != 'true'
         run: |
-          echo "Hello depuis GitHub Actions!" > packages/app/blabla
+          echo "Hello depuis GitHub g!" > packages/app/blabla
       
       - name: Save Android Build cache
         id: cache-android-build-cache
