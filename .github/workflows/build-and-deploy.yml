@@ -363,6 +363,9 @@ jobs:
     env:
       RUBYOPT: -rostruct
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Restore Android build cache
         id: restore-android-build-cache
         uses: actions/cache/restore@v4
