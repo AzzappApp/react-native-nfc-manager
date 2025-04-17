@@ -356,45 +356,6 @@ jobs:
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-  buid-android-test:
-    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build native Android application
-    runs-on: ubuntu-latest-m
-    env:
-      RUBYOPT: -rostruct
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Restore Android build cache
-        id: restore-android-build-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            packages/app/blabla
-          key: android-cache-${{ hashFiles(
-            'packages/app/package.json',
-            'packages/app/android/build.gradle',
-            'packages/app/android/gradle.properties',
-            'packages/app/android/settings.gradle',
-            'packages/app/android/app/build.gradle',
-            'packages/app/android/app/proguard-rules.pro',
-            'packages/app/android/app/src/**') }}
-
-      - name: Build Android native parts
-        if: steps.restore-android-build-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "Hello depuis GitHub g!" > packages/app/blabla
-      
-      - name: Save Android Build cache
-        id: cache-android-build-cache
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            packages/app/blabla
-          key: ${{ steps.restore-android-build-cache.outputs.cache-primary-key }}
-      
-
 
   buid-android:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
