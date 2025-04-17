@@ -4,13 +4,8 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
-  // For local development, rewrite paths to /api/path
-  const path = nextUrl.pathname;
-  if (process.env.NODE_ENV === 'development' && !path.startsWith('/api/')) {
-    return NextResponse.rewrite(new URL(`/api${path}`, request.url));
-  }
-
-  if (nextUrl.pathname === '/api/graphql') {
+  // Handle both /graphql and /api/graphql paths
+  if (nextUrl.pathname === '/graphql' || nextUrl.pathname === '/api/graphql') {
     const latitude = parseFloat(
       request.headers.get('x-vercel-ip-latitude') || '',
     );
@@ -42,6 +37,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(`/api/graphql/edge`, request.url));
   }
 
+  // For local development, rewrite paths to /api/path
+  if (
+    process.env.NODE_ENV === 'development' &&
+    !nextUrl.pathname.startsWith('/api/')
+  ) {
+    return NextResponse.rewrite(
+      new URL(`/api${nextUrl.pathname}`, request.url),
+    );
+  }
+
   return undefined;
 }
 
@@ -52,7 +57,7 @@ export const config = {
       ? [
           '/((?!_next/static|_next/image|favicon.ico).*)', // In development, match all paths except Next.js internals
         ]
-      : ['/api/graphql'], // In production, only match specific API paths
+      : ['/graphql', '/api/graphql'], // In production, match both paths
 };
 
 // Fonction pour calculer la distance entre deux points (Haversine)
