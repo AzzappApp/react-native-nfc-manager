@@ -432,6 +432,7 @@ jobs:
             packages/app/android/app/build
             packages/app/android/build
           key: android-cache-${{ hashFiles(
+            'packages/app/package.json',
             'packages/app/android/build.gradle',
             'packages/app/android/gradle.properties',
             'packages/app/android/gradlew',
