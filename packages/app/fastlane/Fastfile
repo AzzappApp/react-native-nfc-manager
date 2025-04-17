@@ -312,11 +312,21 @@ platform :android do
   PLAY_CONFIG_PATH = ENV['PLAY_CONFIG_PATH']
   ANDROID_APP_IDENTIFIER = ENV['ANDROID_APP_IDENTIFIER']
   ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK']
+  android_target = ANDROID_BUILD_TASK[0].upcase + ANDROID_BUILD_TASK[1..-1]
 
+  desc 'Build Android application native part.'
+  lane :build_native do
+    gradle(
+      task: ":app:assemble#{android_target}",
+      build_type: "Release",
+      project_dir: "./android",
+      print_command_output: true,
+      print_command: true
+    )
+  end
+  
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
-    android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
-
     gradle(
       task: ":app:bundle#{android_target}",
       build_type: "Release",
@@ -330,7 +340,6 @@ platform :android do
         "android.injected.signing.key.password" => KEY_PASSWORD
       }
     )
-    puts "Test"
     puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
     puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
@@ -372,8 +381,4 @@ def update_project_version(xcodeproj:, target:, version:, value:)
   end
 
   project.save
-end
-
-def capitalize_first_letter(string)
-  string[0].upcase + string[1..-1]
 end

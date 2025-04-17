@@ -36,6 +36,14 @@ Build IOS application.
 
 ## Android
 
+### android build_native
+
+```sh
+[bundle exec] fastlane android build_native
+```
+
+Build Android application native part.
+
 ### android build
 
 ```sh
