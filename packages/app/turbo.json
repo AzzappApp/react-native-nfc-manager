@@ -6,34 +6,6 @@
       "dependsOn": ["//#relay:build", "^build"],
       "inputs": ["src/**"]
     },
-    "test": { "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"] },
-    "build:android": {
-      "dependsOn": ["//#relay:build", "^build", "build:android:native"],
-      "cache": false
-    },
-    "build:android:native": {
-      "dependsOn": [],
-      "inputs": [
-        "android/build.gradle",
-        "android/gradle.properties",
-        "android/gradlew",
-        "android/gradlew.bat",
-        "android/link-assets-manifest.json",
-        "android/sentry.properties",
-        "android/settings.gradle",
-        "android/gradle/**",
-        "android/app/build_defs.bzl",
-        "android/app/build.gradle",
-        "android/app/key.properties",
-        "android/app/proguard-rules.pro",
-        "android/app/src/**"
-      ],
-      "outputs": [
-        "android/.gradle/**",
-        "android/app/.cxx/**",
-        "android/app/build/**",
-        "android/build/**"
-      ]
-    }
+    "test": { "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"] }
   }
 }

@@ -16,8 +16,6 @@
     "build": "turbo run build",
     "build-app-dependencies": "turbo run app:build --filter=./packages/app^...",
     "dev": "node ./scripts/dev.js",
-    "build:ios": "turbo run build:ios --env-mode=loose",
-    "build:android": "turbo run build:android --env-mode=loose",
     "graphql-codegen": "graphql-codegen",
     "relay:build": "touch ./packages/api/src/persisted-query-map.json && relay-compiler",
     "relay:watch": "relay-compiler --watch ./relay.config.dev.js",
