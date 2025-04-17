@@ -8,7 +8,7 @@
     },
     "test": { "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"] },
     "build:android": {
-      "dependsOn": ["^build", "build:android:native"],
+      "dependsOn": ["//#relay:build", "^build", "build:android:native"],
       "cache": false
     },
     "build:android:native": {
