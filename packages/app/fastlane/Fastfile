@@ -318,7 +318,6 @@ platform :android do
   lane :build_native do
     gradle(
       task: ":app:package#{android_target}ReleaseBundle",
-      build_type: "Release",
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
@@ -334,7 +333,7 @@ platform :android do
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
     gradle(
-      task: "app:bundle#{android_target}Release",
+      task: "app:bundle#{android_target}",
       build_type: "Release",
       project_dir: "./android",
       print_command_output: true,
