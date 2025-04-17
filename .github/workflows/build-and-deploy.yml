@@ -423,8 +423,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Restore Android build cache
-        id: android-cache
-        uses: actions/cache@v4
+        id: restore-android-build-cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             packages/app/android/.gradle
@@ -446,13 +446,22 @@ jobs:
             'packages/app/android/app/key.properties',
             'packages/app/android/app/proguard-rules.pro',
             'packages/app/android/app/src/**') }}
-          restore-keys: |
-            android-cache-
 
       - name: Build Android native parts
         if: steps.android-cache.outputs.cache-hit != 'true'
         working-directory: packages/app/
         run: yarn build:android:native
+
+      - name: Save Android Build cache
+        id: cache-android-build-cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/app/android/.gradle
+            packages/app/android/app/.cxx
+            packages/app/android/app/build
+            packages/app/android/build
+          key: ${{ steps.restore-android-build-cache.outputs.cache-primary-key }}
 
       - name: Build android application
         working-directory: packages/app/
