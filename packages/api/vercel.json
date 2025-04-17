@@ -5,5 +5,11 @@
     { "path": "/api/cron/cancelPayments", "schedule": "*/1 * * * *" },
     { "path": "/api/cron/unpublishWebCards", "schedule": "*/3 * * * *" }
   ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/$1"
+    }
+  ],
   "redirects": [{ "source": "/", "destination": "https://web.azzapp.com/" }]
 }

@@ -4,6 +4,12 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
+  // For local development, rewrite paths to /api/path
+  const path = nextUrl.pathname;
+  if (process.env.NODE_ENV === 'development' && !path.startsWith('/api/')) {
+    return NextResponse.rewrite(new URL(`/api${path}`, request.url));
+  }
+
   if (nextUrl.pathname === '/api/graphql') {
     const latitude = parseFloat(
       request.headers.get('x-vercel-ip-latitude') || '',
@@ -40,16 +46,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_.*|favicon.*|site.*|.well-known).*)',
-  ],
+  matcher:
+    // For local development, rewrite paths to /api/path (not working with vercel.json rewrite)
+    process.env.NODE_ENV === 'development'
+      ? [
+          '/((?!_next/static|_next/image|favicon.ico).*)', // In development, match all paths except Next.js internals
+        ]
+      : ['/api/graphql'], // In production, only match specific API paths
 };
 
 // Fonction pour calculer la distance entre deux points (Haversine)

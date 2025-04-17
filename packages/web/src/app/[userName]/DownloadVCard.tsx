@@ -100,15 +100,18 @@ const DownloadVCard = ({
       }
 
       if (contactData && signature) {
-        const res = await fetch('/api/verifySign', {
-          body: JSON.stringify({
-            signature,
-            data: contactData,
-            salt: webCard.userName,
-            geolocation,
-          }),
-          method: 'POST',
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}verifySign`,
+          {
+            body: JSON.stringify({
+              signature,
+              data: contactData,
+              salt: webCard.userName,
+              geolocation,
+            }),
+            method: 'POST',
+          },
+        );
         if (res.ok) {
           const additionalData = await res.json();
 
