@@ -311,7 +311,7 @@ platform :android do
   KEY_PASSWORD = ENV['ANDROID_KEY_PASSWORD']
   PLAY_CONFIG_PATH = ENV['PLAY_CONFIG_PATH']
   ANDROID_APP_IDENTIFIER = ENV['ANDROID_APP_IDENTIFIER']
-  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK'] || "Release"
+  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK'] || "development"
   android_target = ANDROID_BUILD_TASK[0].upcase + ANDROID_BUILD_TASK[1..-1]
 
   desc 'Build Android application native part.'
