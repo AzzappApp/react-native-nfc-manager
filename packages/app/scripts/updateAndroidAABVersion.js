@@ -1,6 +1,9 @@
 const { execSync } = require('child_process');
 const path = require('path');
-const { kind, version: internalVersion } = require('../internal-version.json');
+const {
+  kind,
+  version: internalVersion,
+} = require('../../../internal-version.json');
 const pkg = require('../package.json');
 const [major, minor, patch] = require('../package.json')
   .version.split('-')[0]
