@@ -567,4 +567,4 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AAB_PATH: ./packages/app/azzapp.aab
+          AAB_PATH: ${{ github.workspace }}/packages/app/azzapp.aab
