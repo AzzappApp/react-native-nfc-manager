@@ -298,6 +298,9 @@ jobs:
           echo "Setup node for xcode to $(command -v node)"
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
+      
+      - name: Sync Native Version
+        run: yarn sync-native-project-versions
 
       - name: Build ios application
         working-directory: packages/app
@@ -456,6 +459,9 @@ jobs:
             packages/app/android/app/build
             packages/app/android/build
           key: ${{ steps.restore-android-build-cache.outputs.cache-primary-key }}
+
+      - name: Sync Native Version
+        run: yarn sync-native-project-versions
 
       - name: Build android application
         working-directory: packages/app/
