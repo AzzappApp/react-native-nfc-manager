@@ -322,6 +322,7 @@ platform :android do
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
+      flags: "--build-cache",
       properties: {
         "android.injected.signing.store.file" => KEYSTORE_PATH,
         "android.injected.signing.store.password" => KEYSTORE_PASSWORD,
@@ -335,26 +336,6 @@ platform :android do
     puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
   end
   
-  desc 'Build Android js bundle.'
-  lane :build_js do
-    gradle(
-      task: "app:createBundle#{android_target}ReleaseJsAndAssets",
-      project_dir: "./android",
-      print_command_output: true,
-      print_command: true,
-      properties: {
-        "android.injected.signing.store.file" => KEYSTORE_PATH,
-        "android.injected.signing.store.password" => KEYSTORE_PASSWORD,
-        "android.injected.signing.key.alias" => KEY_ALIAS,
-        "android.injected.signing.key.password" => KEY_PASSWORD
-      }
-    )
-    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
-    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
-    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
-    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
-  end
-
   lane :deploy do
     AAB_PATH = ENV['AAB_PATH']
     puts "deploy"

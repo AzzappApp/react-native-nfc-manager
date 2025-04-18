@@ -425,28 +425,22 @@ jobs:
       
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Restore Android build cache
-        id: restore-android-aab
-        uses: actions/cache/restore@v4
         with:
-          path: packages/app/azzapp.aab
-          key: android-cache-${{ hashFiles(
-            'packages/app/package.json',
-            'packages/app/android/build.gradle',
-            'packages/app/android/gradle.properties',
-            'packages/app/android/settings.gradle',
-            'packages/app/android/app/build.gradle',
-            'packages/app/android/app/proguard-rules.pro',
-            'packages/app/android/app/src/**') }}
+          cache-read-only: false
+          ## TODO use own password
+          cache-encryption-key: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+      
+      - name: Cache Android .gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            packages/app/android/.gradle
+          key: dotGradle-${{ runner.os }}
 
-      ## If the cache was not hit, build the android native application
       - name: Sync Native Version
-        if: steps.restore-android-aab.outputs.cache-hit != 'true'
         run: yarn sync-native-project-versions
 
       - name: Build Android native application
-        if: steps.restore-android-aab.outputs.cache-hit != 'true'
         working-directory: packages/app/
         run: yarn build:android
         env:
@@ -476,79 +470,10 @@ jobs:
           GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
 
       - name: Copy AAB
-        if: steps.restore-android-aab.outputs.cache-hit != 'true'
         working-directory: packages/app
         run: |
           cp -R ./android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab azzapp.aab
 
-      - name: Save Android Build cache
-        if: steps.restore-android-aab.outputs.cache-hit != 'true'
-        id: cache-android-aab
-        uses: actions/cache/save@v4
-        with:
-          path: packages/app/azzapp.aab
-          key: ${{ steps.restore-android-aab.outputs.cache-primary-key }}
-
-      # If the cache was hit, build the js only and inject it in the aab
-      - name: Build android js bundle only
-        if: steps.restore-android-aab.outputs.cache-hit == 'true'
-        working-directory: packages/app/
-        run: yarn build:android:js
-        env:
-          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
-          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
-          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
-          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
-          SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: 'azzapp'
-          SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
-          APP_SCHEME: ${{ vars.APP_SCHEME }}
-          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
-          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
-          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
-          NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
-          GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
-
-      - name: Inject js bundle in aab
-        if: steps.restore-android-aab.outputs.cache-hit == 'true'
-        working-directory: packages/app/
-        run: ./scripts/inject-android-js-bundle.sh ${{ vars.ANDROID_BUILD_TASK }}
-      
-      - name: Update android aab version
-        if: steps.restore-android-aab.outputs.cache-hit == 'true'
-        working-directory: packages/app/
-        run: node ./scripts/updateAndroidAABVersion.js
-        
-      - name: Resign android aab
-        if: steps.restore-android-aab.outputs.cache-hit == 'true'
-        working-directory: packages/app/
-        env:
-          STOREPASS: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          KEYPASS: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
-        run: |
-          jarsigner \
-            -verbose \
-            -sigalg SHA256withRSA \
-            -digestalg SHA-256 \
-            -keystore "$KEYSTORE_PATH" \
-            -storepass "$STOREPASS" \
-            -keypass "$KEYPASS" \
-            azzapp.aab \
-            "$ALIAS"
-            
       - name: Upload android artifact
         uses: actions/upload-artifact@v4
         with:
