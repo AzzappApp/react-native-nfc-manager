@@ -42,7 +42,7 @@ cp -r "$ASSET_PATH"/* "$TMP_DIR/base/res/"
 
 echo "🗜️ Rebuilding AAB..."
 cd "$TMP_DIR"
-zip -qr "../$AAB_PATH" .
+zip -0 -r "../$AAB_PATH" .
 cd - > /dev/null
 
 echo "🧹 Cleaning up"

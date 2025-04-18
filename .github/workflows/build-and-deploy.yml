@@ -489,41 +489,41 @@ jobs:
           path: packages/app/azzapp.aab
           key: ${{ steps.restore-android-aab.outputs.cache-primary-key }}
 
-      ## If the cache was hit, build the js only and inject it in the aab
-      # - name: Build android js bundle only
-      #   if: steps.restore-android-aab.outputs.cache-hit == 'true'
-      #   working-directory: packages/app/
-      #   run: yarn build:android:js
-      #   env:
-      #     NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-      #     NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-      #     DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
-      #     PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
-      #     APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
-      #     SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
-      #     SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
-      #     SENTRY_ORG: 'azzapp'
-      #     SENTRY_PROJECT: 'azzapp-app'
-      #     TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-      #     PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-      #     ABOUT: https://web.azzapp.com/company/about_us
-      #     FAQ: https://web.azzapp.com/company/faq
-      #     APP_SCHEME: ${{ vars.APP_SCHEME }}
-      #     ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
-      #     ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
-      #     ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
-      #     ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-      #     ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-      #     ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-      #     PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-      #     AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
-      #     NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
-      #     GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
+      # If the cache was hit, build the js only and inject it in the aab
+      - name: Build android js bundle only
+        if: steps.restore-android-aab.outputs.cache-hit == 'true'
+        working-directory: packages/app/
+        run: yarn build:android:js
+        env:
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
+          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'azzapp'
+          SENTRY_PROJECT: 'azzapp-app'
+          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
+          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
+          ABOUT: https://web.azzapp.com/company/about_us
+          FAQ: https://web.azzapp.com/company/faq
+          APP_SCHEME: ${{ vars.APP_SCHEME }}
+          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
+          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
+          AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
+          NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
+          GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
 
-      # - name: Inject js bundle in aab
-      #   if: steps.restore-android-aab.outputs.cache-hit == 'true'
-      #   working-directory: packages/app/
-      #   run: ./scripts/inject-android-js-bundle.sh ${{ vars.ANDROID_BUILD_TASK }}
+      - name: Inject js bundle in aab
+        if: steps.restore-android-aab.outputs.cache-hit == 'true'
+        working-directory: packages/app/
+        run: ./scripts/inject-android-js-bundle.sh ${{ vars.ANDROID_BUILD_TASK }}
       
       - name: Update android aab version
         if: steps.restore-android-aab.outputs.cache-hit == 'true'
