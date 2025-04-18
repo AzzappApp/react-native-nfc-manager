@@ -83,3 +83,7 @@ src/relayArtifacts
 .expo
 dist/
 web-build/
+
+# Android build
+tmp
+azzapp.aab

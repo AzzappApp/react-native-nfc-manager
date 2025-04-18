@@ -36,14 +36,6 @@ Build IOS application.
 
 ## Android
 
-### android build_native
-
-```sh
-[bundle exec] fastlane android build_native
-```
-
-Build Android application native part.
-
 ### android build
 
 ```sh
@@ -51,6 +43,14 @@ Build Android application native part.
 ```
 
 Build Android application based on ANDROID_TARGET environment variable.
+
+### android build_js
+
+```sh
+[bundle exec] fastlane android build_js
+```
+
+Build Android js bundle.
 
 ### android deploy
 

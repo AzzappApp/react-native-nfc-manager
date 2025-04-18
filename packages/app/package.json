@@ -10,7 +10,7 @@
     "run:android": "react-native run-android --no-packager --mode developmentDebug --appId=com.azzapp.app_dev",
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
     "build:ios": "bundle exec fastlane ios build",
-    "build:android:native": "bundle exec fastlane android build_native",
+    "build:android:js": "bundle exec fastlane android build_js",
     "build:android": "bundle exec fastlane android build",
     "deploy:ios": "bundle exec fastlane ios deploy",
     "pod-install": "cd ios && bundle exec pod install",

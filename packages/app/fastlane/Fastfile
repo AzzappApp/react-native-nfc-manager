@@ -314,10 +314,11 @@ platform :android do
   ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK'] || "development"
   android_target = ANDROID_BUILD_TASK[0].upcase + ANDROID_BUILD_TASK[1..-1]
 
-  desc 'Build Android application native part.'
-  lane :build_native do
+  desc 'Build Android application based on ANDROID_TARGET environment variable.'
+  lane :build do
     gradle(
-      task: ":app:package#{android_target}ReleaseBundle",
+      task: "app:bundle#{android_target}",
+      build_type: "Release",
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
@@ -328,13 +329,16 @@ platform :android do
         "android.injected.signing.key.password" => KEY_PASSWORD
       }
     )
+    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
   end
   
-  desc 'Build Android application based on ANDROID_TARGET environment variable.'
-  lane :build do
+  desc 'Build Android js bundle.'
+  lane :build_js do
     gradle(
-      task: "app:bundle#{android_target}",
-      build_type: "Release",
+      task: "app:createBundle#{android_target}ReleaseJsAndAssets",
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
