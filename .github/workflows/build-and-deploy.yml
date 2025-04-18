@@ -277,6 +277,9 @@ jobs:
 
       - name: JavaScript build
         run: yarn build-app-dependencies
+      
+      - name: Sync Native Version
+        run: yarn sync-native-project-versions
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -299,9 +302,6 @@ jobs:
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
       
-      - name: Sync Native Version
-        run: yarn sync-native-project-versions
-
       - name: Build ios application
         working-directory: packages/app
         run: yarn build:ios
