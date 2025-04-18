@@ -430,7 +430,7 @@ jobs:
         id: restore-android-aab
         uses: actions/cache/restore@v4
         with:
-          path: packages/app/android/app/build/azzapp.aab
+          path: packages/app/azzapp.aab
           key: android-cache-${{ hashFiles(
             'packages/app/package.json',
             'packages/app/android/build.gradle',
@@ -477,15 +477,16 @@ jobs:
 
       - name: Copy AAB
         if: steps.restore-android-aab.outputs.cache-hit != 'true'
+        working-directory: packages/app
         run: |
-          cp -R packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab packages/app/android/app/build/azzapp.aab
+          cp -R ./android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab azzapp.aab
 
       - name: Save Android Build cache
         if: steps.restore-android-aab.outputs.cache-hit != 'true'
         id: cache-android-aab
         uses: actions/cache/save@v4
         with:
-          path: packages/app/android/app/build/azzapp.aab
+          path: packages/app/azzapp.aab
           key: ${{ steps.restore-android-aab.outputs.cache-primary-key }}
 
       ## If the cache was hit, build the js only and inject it in the aab
