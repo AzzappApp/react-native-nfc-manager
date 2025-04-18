@@ -534,9 +534,9 @@ jobs:
         if: steps.restore-android-aab.outputs.cache-hit == 'true'
         working-directory: packages/app/
         run: |
-          STOREPASS="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          KEYPASS="${{ secrets.ANDROID_KEY_PASSWORD }}"
-          ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
+          STOREPASS="${{ secrets.KEYSTORE_STORE_PASSWORD }}"
+          KEYPASS="${{ secrets.KEYSTORE_KEY_PASSWORD }}"
+          ALIAS="${{ secrets.KEYSTORE_KEY_ALIAS }}"
           KEYSTORE_PATH="${{ github.workspace }}/keystore.jks"
 
           jarsigner \
