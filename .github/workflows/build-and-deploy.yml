@@ -533,8 +533,7 @@ jobs:
       - name: Resign android aab
         if: steps.restore-android-aab.outputs.cache-hit == 'true'
         working-directory: packages/app/
-        run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore "${{ github.workspace }}/keystore.jks" -storepass "${{ secrets.KEYSTORE_STORE_PASSWORD }}" -keypass "${{ secrets.KEYSTORE_KEY_PASSWORD }}" azzapp.aab "${{ secrets.KEYSTORE_KEY_ALIAS }}"
+        run: jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore ${{ github.workspace }}/keystore.jks -storepass ${{ secrets.KEYSTORE_STORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_KEY_PASSWORD }} azzapp.aab ${{ secrets.KEYSTORE_KEY_ALIAS }}
       
       - name: Upload android artifact
         uses: actions/upload-artifact@v4
