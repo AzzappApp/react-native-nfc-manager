@@ -523,7 +523,7 @@ jobs:
       - name: Inject js bundle in aab
         if: steps.restore-android-aab.outputs.cache-hit == 'true'
         working-directory: packages/app/
-        run: ./scripts/inject-android-js-bundle.sh
+        run: ./scripts/inject-android-js-bundle.sh ${{ vars.ANDROID_BUILD_TASK }}
       
       - name: Update android aab version
         if: steps.restore-android-aab.outputs.cache-hit == 'true'
