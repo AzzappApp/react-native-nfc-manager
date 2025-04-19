@@ -427,8 +427,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
-          ## TODO use own password
-          cache-encryption-key: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
       
       - name: Cache Android .gradle
         uses: actions/cache@v3
