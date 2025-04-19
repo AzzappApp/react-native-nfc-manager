@@ -44,14 +44,6 @@ Build IOS application.
 
 Build Android application based on ANDROID_TARGET environment variable.
 
-### android build_js
-
-```sh
-[bundle exec] fastlane android build_js
-```
-
-Build Android js bundle.
-
 ### android deploy
 
 ```sh
