@@ -427,6 +427,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}
       
       - name: Cache Android .gradle
         uses: actions/cache@v3
