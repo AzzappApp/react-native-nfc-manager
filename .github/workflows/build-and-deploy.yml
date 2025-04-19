@@ -448,7 +448,7 @@ jobs:
 
       - name: Restore gradle intermediate files
         uses: actions/cache/restore@v4
-        id: restore-gradle-intermediate-files
+        id: restore-gradle-files
         with:
           path: |
             packages/app/android/.gradle
@@ -505,7 +505,7 @@ jobs:
             packages/app/native_modules/react-native-buffer-loader/android/build
             packages/app/native_modules/react-native-skottie-template-player/android/.cxx
             packages/app/native_modules/react-native-skottie-template-player/android/build
-          key: ${{ steps.restore-gradle-intermediate-files.outputs.cache-primary-key}}
+          key: ${{ steps.restore-gradle-files.outputs.cache-primary-key}}
       
       - name: Copy AAB
         working-directory: packages/app
