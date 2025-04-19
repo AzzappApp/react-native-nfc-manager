@@ -316,13 +316,15 @@ platform :android do
 
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
+    flags = "--build-cache"
+    flags << " -PreactNativeArchitectures=arm64-v8a" if ENV["DEVELOPMENT_BUILD"] == "true"
     gradle(
       task: "app:bundle#{android_target}",
       build_type: "Release",
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
-      flags: "--build-cache",
+      flags: flags,
       properties: {
         "android.injected.signing.store.file" => KEYSTORE_PATH,
         "android.injected.signing.store.password" => KEYSTORE_PASSWORD,

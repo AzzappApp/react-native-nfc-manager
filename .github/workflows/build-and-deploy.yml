@@ -457,6 +457,7 @@ jobs:
         working-directory: packages/app/
         run: yarn build:android
         env:
+          DEVELOPMENT_BUILD: ${{ github.ref_name != 'stable' }}
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
           DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
