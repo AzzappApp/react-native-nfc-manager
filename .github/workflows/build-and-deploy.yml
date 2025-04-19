@@ -428,14 +428,24 @@ jobs:
         with:
           cache-read-only: false
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}
-      
-      - name: Cache Android .gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            packages/app/android/.gradle
-          key: dotGradle-${{ runner.os }}
 
+      - name: Install ccache
+        run: sudo apt-get install ccache
+
+      - name: Configure ccache
+        run: |
+          ccache --set-config=compiler_check=content
+          echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+
+      - name: Restore ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}-${{ hashFiles('**/*.cpp', '**/*.c', '**/*.h') }}
+          restore-keys: |
+            ccache-${{ runner.os }}- 
+      
       - name: Sync Native Version
         run: yarn sync-native-project-versions
 
