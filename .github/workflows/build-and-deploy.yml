@@ -445,6 +445,17 @@ jobs:
           key: ccache-${{ runner.os }}
           restore-keys: |
             ccache-${{ runner.os }}- 
+
+      - name: Restore gradle intermediate files
+        uses: actions/cache/restore@v4
+        id: restore-gradle-intermediate-files
+        with:
+          path: |
+            packages/app/android/.gradle
+            packages/app/android/build
+            packages/app/android/app/build
+            packages/app/android/app/.cxx
+          key: dotGradle-${{ runner.os }}
       
       - name: Sync Native Version
         run: yarn sync-native-project-versions
@@ -477,7 +488,17 @@ jobs:
           AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
           NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
           GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
-
+      
+      - name: Cache gradle intermediate files
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/app/android/.gradle
+            packages/app/android/build
+            packages/app/android/app/build
+            packages/app/android/app/.cxx
+          key: ${{ steps.restore-gradle-intermediate-files.outputs.cache-primary-key}}
+      
       - name: Copy AAB
         working-directory: packages/app
         run: |
