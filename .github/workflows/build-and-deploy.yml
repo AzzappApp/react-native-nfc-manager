@@ -451,11 +451,14 @@ jobs:
         id: restore-gradle-intermediate-files
         with:
           path: |
-            packages/app/android/.gradle
             packages/app/android/build
             packages/app/android/app/build
             packages/app/android/app/.cxx
-          key: dotGradle-${{ runner.os }}
+            packages/app/native_modules/react-native-buffer-loader/android/.cxx
+            packages/app/native_modules/react-native-buffer-loader/android/build
+            packages/app/native_modules/react-native-skottie-template-player/android/.cxx
+            packages/app/native_modules/react-native-skottie-template-player/android/build
+          key: gradle-intermediate-${{ runner.os }}
       
       - name: Sync Native Version
         run: yarn sync-native-project-versions
@@ -493,10 +496,13 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: |
-            packages/app/android/.gradle
             packages/app/android/build
             packages/app/android/app/build
             packages/app/android/app/.cxx
+            packages/app/native_modules/react-native-buffer-loader/android/.cxx
+            packages/app/native_modules/react-native-buffer-loader/android/build
+            packages/app/native_modules/react-native-skottie-template-player/android/.cxx
+            packages/app/native_modules/react-native-skottie-template-player/android/build
           key: ${{ steps.restore-gradle-intermediate-files.outputs.cache-primary-key}}
       
       - name: Copy AAB
