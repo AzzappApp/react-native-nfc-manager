@@ -78,7 +78,7 @@ abstract_target 'common' do
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :ccache_enabled => ENV['USE_CCACHE'] == '1',
     )
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|

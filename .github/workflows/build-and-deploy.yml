@@ -265,6 +265,23 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
 
+      - name: Install ccache
+        run: sudo apt-get install ccache
+
+      - name: Configure ccache
+        run: |
+          ccache --set-config=compiler_check=content
+          echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+
+      - name: Restore ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}
+          restore-keys: |
+            ccache-${{ runner.os }}- 
+
       - name: Setup
         uses: ./.github/actions/setup
 
@@ -334,6 +351,7 @@ jobs:
           AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
           WIDGET_APP_GROUP: ${{vars.WIDGET_APP_GROUP}}
           NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
+          USE_CCACHE: '1'
 
       - name: Upload ios artifact
         uses: actions/upload-artifact@v4
