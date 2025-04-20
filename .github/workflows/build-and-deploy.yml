@@ -310,6 +310,8 @@ jobs:
       - name: Pod install
         working-directory: packages/app/ios
         run: bundle exec pod install
+        env:
+          USE_CCACHE: '1'
 
       - name: Setup Xcode env
         run: |
