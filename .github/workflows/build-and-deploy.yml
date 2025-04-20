@@ -271,8 +271,6 @@ jobs:
       - name: Configure ccache
         run: |
           ccache --set-config=compiler_check=content
-          echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
       - name: Restore ccache
         uses: actions/cache@v4
