@@ -312,6 +312,7 @@ jobs:
         run: bundle exec pod install
         env:
           USE_CCACHE: '1'
+          PODS_ROOT: ${{ github.workspace }}/packages/app/ios/Pods
 
       - name: Setup Xcode env
         run: |
