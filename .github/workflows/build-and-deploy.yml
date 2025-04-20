@@ -266,7 +266,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
 
       - name: Install ccache
-        run: sudo apt-get install ccache
+        run: brew install --HEAD ccache
 
       - name: Configure ccache
         run: |
@@ -452,7 +452,7 @@ jobs:
             ${{ runner.os }}-gradle-
       
       - name: Install ccache
-        run: brew install --HEAD ccache
+        run: sudo apt-get install ccache
 
       - name: Configure ccache
         run: |
