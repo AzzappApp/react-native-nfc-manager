@@ -17,6 +17,7 @@ fastlane_require 'dotenv'
 
 default_platform(:ios)
 
+
 IOS_SCHEME = ENV["IOS_SCHEME"]
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
