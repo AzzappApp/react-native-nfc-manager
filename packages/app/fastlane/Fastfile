@@ -136,19 +136,28 @@ platform :ios do
     ############################
     # Update pbxproj
     ############################
-
-
     set_info_plist_value(
       path: "ios/azzapp/Info.plist",
       key: "CFBundleVersion",
       value: version_number
     )
     set_info_plist_value(
-      path: "ios/ShareContactAppClip/Info.plist",
+      path: "ios/azzapp/Info.plist",
       key: "CFBundleShortVersionString",
-      value: build_version
+      value: build_number
     )
 
+    set_info_plist_value(
+      path: "ios/ShareContactAppClip/Info.plist",
+      key: "CFBundleVersion",
+      value: version_number
+    )
+    set_info_plist_value(
+      path: "ios/ShareContactAppClip/Info.plist",
+      key: "CFBundleShortVersionString",
+      value: build_number
+    ) 
+    
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
