@@ -138,6 +138,8 @@ platform :ios do
 
     sh <<~BASH
       set -e
+      cd #{Dir.pwd}
+      
       echo '🔐  Resigning AppClip…'
       codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
         --entitlements "#{clip_entitlements}" \
