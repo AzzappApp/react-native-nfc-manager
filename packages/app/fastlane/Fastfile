@@ -130,8 +130,8 @@ platform :ios do
     ###########################
     # 2.3  Resign AppClip & Widget inside the archive
     ###########################
-    clip_entitlements   = "ShareContactAppClip/#{ios_appclip_scheme}.entitlements"
-    widget_entitlements = "azzappWidget/#{ios_widget_scheme}.entitlements"
+    clip_entitlements   = "./ios/ShareContactAppClip/#{ios_appclip_scheme}.entitlements"
+    widget_entitlements = "./ios/azzappWidget/#{ios_widget_scheme}.entitlements"
 
     clip_path_archive   = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
     widget_path_archive = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/PlugIns/#{ios_widget_scheme}.appex"
