@@ -246,8 +246,8 @@ platform :ios do
       project_slug: ENV['SENTRY_PROJECT'],
       version: release_name,
       app_identifier: APP_IDENT,
-      build: build,
-      dist: build,
+      build: BUILD_NUMBER,
+      dist: BUILD_NUMBER,
       sourcemap: [
         './fastlane/builds/sourcemaps/main.jsbundle', 
         './fastlane/builds/sourcemaps/main.jsbundle.map'
