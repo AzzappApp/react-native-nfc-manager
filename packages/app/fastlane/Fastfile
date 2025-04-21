@@ -285,8 +285,6 @@ platform :ios do
   end
 
   lane :deploy do
-    widget_config = ios_widget_config[IOS_SCHEME]
-    APP_IDENT = widget_config['app_ident']
     api_key = app_store_connect_api_key(
       key_id: "2FWWXZWMHY",
       issuer_id: "913e1653-0bf1-4fd2-8c0d-0d93a6ff4418",
@@ -299,7 +297,7 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
       ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
-      app_identifier: APP_IDENT,
+      app_identifier: ios_config[IOS_SCHEME]['app_ident'],
       submit_beta_review: false,
       api_key: api_key
     )
