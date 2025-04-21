@@ -237,7 +237,7 @@ platform :ios do
     # === SENTRY SOURCEMAP UPLOAD ===
 
     # Récupère les infos de version pour nommer la release
-    release_name = "#{APP_IDENT}@#{version}+#{build}"
+    release_name = "#{APP_IDENT}@#{VERSION_NUMBER}+#{BUILD_NUMBER}"
 
     # Upload vers Sentry via le plugin officiel
     sentry_upload_sourcemap(
