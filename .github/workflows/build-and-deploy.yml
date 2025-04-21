@@ -265,21 +265,6 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
 
-      - name: Install ccache
-        run: brew install --HEAD ccache
-
-      - name: Configure ccache
-        run: |
-          ccache --set-config=compiler_check=content
-
-      - name: Restore ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: ccache-${{ runner.os }}
-          restore-keys: |
-            ccache-${{ runner.os }}- 
-
       - name: Setup
         uses: ./.github/actions/setup
 
@@ -293,36 +278,69 @@ jobs:
       - name: JavaScript build
         run: yarn build-app-dependencies
       
-      - name: Sync Native Version
-        run: yarn sync-native-project-versions
-
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: packages/app
           bundler-cache: true
 
+      - name: Restore xarchive cache
+        id: restore-xarchive
+        uses: actions/cache/restore@v4
+        with:
+          path: packages/app/fastlane/builds/azzapp.xcarchive
+          key: ${{ runner.os }}-${{ vars.IOS_SCHEME }}-xarchive-${{ hashFiles(
+            'packages/app/ios/**/*',
+            'packages/app/native_modules/*/ios/**/*') }}
+
       - name: Cache CocoaPods
-        uses: actions/cache@v3
+        uses: actions/cache@v4
+        if: steps.restore-xarchive.outputs.cache-hit != 'true'
         with:
           path: packages/app/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
 
       - name: Pod install
         working-directory: packages/app/ios
+        if: steps.restore-xarchive.outputs.cache-hit != 'true'
         run: bundle exec pod install
-        env:
-          USE_CCACHE: '1'
-          PODS_ROOT: ${{ github.workspace }}/packages/app/ios/Pods
 
       - name: Setup Xcode env
         run: |
           echo "Setup node for xcode to $(command -v node)"
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
+
+      - name: Build ios application archive
+        if: steps.restore-xarchive.outputs.cache-hit != 'true'
+        working-directory: packages/app
+        run: yarn build:ios:archive
+        env: 
+          IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+
+      - name: Save archive to cache
+        if: steps.restore-xarchive.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: packages/app/fastlane/builds/azzapp.xcarchive
+          key: ${{ steps.restore-xarchive.outputs.cache-primary-key }}
+
+      - name: Bundle react-native code and assets
+        working-directory: packages/app
+        run: yarn build:ios:bundle
+        env:
+          IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+
+      - name: Read application version
+        id: read_version
+        run: |
+          VERSION_NUMBER=$(jq -r '.version' package.json)
+          BUILD_NUMBER=$(jq -r '.version' internal-version.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "build=$BUILD_NUMBER" >> $GITHUB_OUTPUT
       
       - name: Build ios application
         working-directory: packages/app
-        run: yarn build:ios
+        run: yarn build:ios:ipa
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
@@ -352,7 +370,8 @@ jobs:
           AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
           WIDGET_APP_GROUP: ${{vars.WIDGET_APP_GROUP}}
           NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
-          USE_CCACHE: '1'
+          VERSION_NUMBER: ${{ steps.read_version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.read_version.outputs.build }}
 
       - name: Upload ios artifact
         uses: actions/upload-artifact@v4

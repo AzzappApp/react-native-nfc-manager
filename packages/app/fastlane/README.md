@@ -15,10 +15,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios build
+### ios build_native
 
 ```sh
-[bundle exec] fastlane ios build
+[bundle exec] fastlane ios build_native
+```
+
+Build iOS application native part.
+
+### ios package
+
+```sh
+[bundle exec] fastlane ios package
 ```
 
 Build IOS application.
