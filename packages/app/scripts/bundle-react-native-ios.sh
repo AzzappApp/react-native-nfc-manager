@@ -15,9 +15,9 @@ yarn react-native bundle \
   --reset-cache \
   --bundle-output "$DEST/main.jsbundle" \
   --assets-dest "$DEST/$SCHEME.app/assets" \
-  --minify false
+  --minify false \
   --sourcemap-output "$SOURCE_MAP_DEST/main.jsbundle.map"
-"
+
 $DIR/ios/Pods/hermes-engine/destroot/bin/hermesc \
   -emit-binary -max-diagnostic-width=80 -O \
   -out "$DEST/$SCHEME.app/main.jsbundle" "$DEST/main.jsbundle"
