@@ -133,31 +133,23 @@ platform :ios do
     install_provisioning_profile(path: profile_clip_path)
     install_provisioning_profile(path: profile_wid_path)
 
+    ###########################
+    # Update archive version
+    ###########################
+    plists = [
+      "ios/azzapp/Info.plist",
+      "ios/ShareContactAppClip/Info.plist",
+      "#{archive_path}/Info.plist",
+      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist"
+    ]
+    plists.each do |plist|
+      set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
+      set_info_plist_value(path: plist, key: 'CFBundleShortVersionString', value: build_number)
+    end
+
     ############################
     # Update pbxproj
     ############################
-    set_info_plist_value(
-      path: "ios/azzapp/Info.plist",
-      key: "CFBundleVersion",
-      value: version_number
-    )
-    set_info_plist_value(
-      path: "ios/azzapp/Info.plist",
-      key: "CFBundleShortVersionString",
-      value: build_number
-    )
-
-    set_info_plist_value(
-      path: "ios/ShareContactAppClip/Info.plist",
-      key: "CFBundleVersion",
-      value: version_number
-    )
-    set_info_plist_value(
-      path: "ios/ShareContactAppClip/Info.plist",
-      key: "CFBundleShortVersionString",
-      value: build_number
-    ) 
-    
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
@@ -206,20 +198,6 @@ platform :ios do
       build_configuration: "Release"
     )
 
-
-    ###########################
-    # Update archive version
-    ###########################
-    plists = [
-      "#{archive_path}/Info.plist",
-      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist"
-    ]
-    plists.each do |plist|
-      set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
-      set_info_plist_value(path: plist, key: 'CFBundleShortVersionString', value: build_number)
-    end
-
- 
 
     ###########################
     # Resign AppClip & Widget inside the archive
@@ -279,10 +257,10 @@ platform :ios do
     ipa_path       = "./fastlane/builds/#{IOS_SCHEME}.ipa"
     clip_path_ipa  = "#{ipa_path}/Payload/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
 
-    sh <<~BASH
-      echo '🔍  Checking on‑demand‑install entitlement:'
-      codesign -d --entitlements :- "#{clip_path_ipa}" | grep -A1 'on-demand-install'
-    BASH
+    # sh <<~BASH
+    #   echo '🔍  Checking on‑demand‑install entitlement:'
+    #   codesign -d --entitlements :- "#{clip_path_ipa}" | grep -A1 'on-demand-install'
+    # BASH
 
     ###########################
     # SENTRY SOURCEMAP UPLOAD
