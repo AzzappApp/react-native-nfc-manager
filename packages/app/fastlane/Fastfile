@@ -252,23 +252,24 @@ platform :ios do
     # Export IPA from the archive
     ###########################
     gym(
-      skip_build_archive: true,
-      archive_path: archive_path,
       scheme: IOS_SCHEME,
-      workspace: 'ios/azzapp.xcworkspace',
-      configuration: 'Release',
-      output_directory: './fastlane/builds',
-      output_name: IOS_SCHEME,
+      workspace: "ios/azzapp.xcworkspace",
+      configuration: "Release",
+      output_directory: "./fastlane/builds",
+      export_method: EXPORT_METHOD,
+      export_team_id: TEAM_ID,
+      skip_build_archive: true,
+      archive_path: "./fastlane/builds/azzapp.xcarchive",
       export_options: {
         method: EXPORT_METHOD,
-        teamID: TEAM_ID,
-        signingStyle: 'manual',
-        signingCertificate: CODE_SIGNING_IDENTITY,
+        signingStyle: "manual",
         provisioningProfiles: {
-          app_ident    => profile_app_id,
-          clip_ident   => profile_clip_id,
+          app_ident => profile_app_id,
+          clip_ident => profile_clip_id,
           widget_ident => profile_widget_id
-        }
+        },
+        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        distributionBundleIdentifier: app_ident,
       }
     )
 
