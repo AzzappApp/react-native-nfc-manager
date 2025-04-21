@@ -77,167 +77,119 @@ platform :ios do
 
   desc 'Build IOS application.'
   lane :package do
-    # Force appclip bundle version to app bundle version (they must be the same)
-    # Define paths to Info.plist files
-    widget_config = ios_widget_config[IOS_SCHEME]
-    APP_IDENT = widget_config['app_ident']
-    APPCLIP_IDENT = widget_config['appclip_ident']
-    IOS_APPCLIP_SCHEME = widget_config['appclip_scheme']
-    PROFILE_ID = widget_config['app_id']
-    PROFILECLIP_ID = widget_config['appclip_widget_id']
-    IOS_WIDGET_SCHEME = widget_config['widget_scheme']
-    WIDGET_IDENT = widget_config['widget_ident']
-    PROFILEWIDGET_ID = widget_config['profile_widget_id']
+    ###########################
+    # Dynamic variables
+    ###########################
+    widget_config      = ios_widget_config[IOS_SCHEME]
 
-    archive_path = "./fastlane/builds/azzapp.xcarchive"
+    app_ident          = widget_config['app_ident']
+    clip_ident         = widget_config['appclip_ident']
+    widget_ident       = widget_config['widget_ident']
+
+    ios_appclip_scheme = widget_config['appclip_scheme']
+    ios_widget_scheme  = widget_config['widget_scheme']
+
+    profile_app_id     = widget_config['app_id']
+    profile_clip_id    = widget_config['appclip_widget_id']
+    profile_widget_id  = widget_config['profile_widget_id']
+
+    archive_path       = './fastlane/builds/azzapp.xcarchive'
+
+    version_number = ENV['VERSION_NUMBER']
+    build_number   = ENV['BUILD_NUMBER']
+
+    ###########################
+    # 2.1  Bump CFBundle versions
+    ###########################
     plists = [
       "#{archive_path}/Info.plist",
-      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
+      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist"
     ]
-    
-
-    VERSION_NUMBER = ENV['VERSION_NUMBER']
-    BUILD_NUMBER = ENV['BUILD_NUMBER']
-
-    for plist in plists do
-      set_info_plist_value(
-        path: plist,
-        key: "CFBundleVersion",
-        value: VERSION_NUMBER
-      )
-      set_info_plist_value(
-        path: plist,
-        key: "CFBundleShortVersionString",
-        value: BUILD_NUMBER
-      )
+    plists.each do |plist|
+      set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
+      set_info_plist_value(path: plist, key: 'CFBundleShortVersionString', value: build_number)
     end
 
+    ###########################
+    # 2.2  Prepare keychain + provisioning profiles
+    ###########################
     keychain_created = true
-    create_keychain(
-      name: "CI",
-      password: "CI",
-      default_keychain: true,
-      unlock: true,
-      timeout: 0,
-      lock_when_sleeps: false
-    )
-    # Import certificate and provisioning profile
-    PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
-    PROFILE_CLIP_PATH = "./ios/certs/#{APPCLIP_IDENT}.mobileprovision"
-    PROFILE_WIDGET_PATH = "./ios/certs/#{WIDGET_IDENT}.mobileprovision"
-    CERTIFICATE_PATH = "./ios/certs/certificate.p12"
+    create_keychain(name: 'CI', password: 'CI', default_keychain: true, unlock: true, timeout: 0, lock_when_sleeps: false)
 
-    import_certificate(
-      keychain_name: "CI",
-      keychain_password: "CI",
-      certificate_path: CERTIFICATE_PATH,
-      certificate_password: P12_PASSWORD
-    )
+    cert_path         = './ios/certs/certificate.p12'
+    profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
+    profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
+    profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
 
-    install_provisioning_profile(path: PROFILE_PATH)
-    install_provisioning_profile(path: PROFILE_CLIP_PATH)
-    install_provisioning_profile(path: PROFILE_WIDGET_PATH)
+    import_certificate(keychain_name: 'CI', keychain_password: 'CI', certificate_path: cert_path, certificate_password: P12_PASSWORD)
 
-    # Update code signing settings
-    pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
+    install_provisioning_profile(path: profile_app_path)
+    install_provisioning_profile(path: profile_clip_path)
+    install_provisioning_profile(path: profile_wid_path)
 
-    backup_file(path: pbxprojPath)
+    ###########################
+    # 2.3  Resign AppClip & Widget inside the archive
+    ###########################
+    clip_entitlements   = "ShareContactAppClip/#{ios_appclip_scheme}.entitlements"
+    widget_entitlements = "azzappWidget/#{ios_widget_scheme}.entitlements"
 
-    entitlements_files = {
-      "azzapp-dev" => "azzapp-devRelease.entitlements",
-      "azzapp-staging" => "azzapp-stagingRelease.entitlements",
-      "azzapp" => "azzapp/azzappRelease.entitlements"
-    }
+    clip_path_archive   = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
+    widget_path_archive = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/PlugIns/#{ios_widget_scheme}.appex"
 
-    clip_entitlements_files = {
-      "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
-      "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
-      "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
-    }
+    sh <<~BASH
+      set -e
+      echo '🔐  Resigning AppClip…'
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{clip_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{clip_path_archive}"
 
-    widget_entitlements_files = {
-      "azzapp-dev" => "azzappWidget/azzappWidgetExtension-dev.entitlements",
-      "azzapp-staging" => "azzappWidget/azzappWidgetExtension-staging.entitlements",
-      "azzapp" => "azzappWidget/azzappWidgetExtension.entitlements"
-    }
+      echo '🔐  Resigning Widget…'
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{widget_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{widget_path_archive}"
+    BASH
 
-    # Determine the entitlements file based on the target
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME],
-      targets: [IOS_SCHEME],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
-      targets: [IOS_APPCLIP_SCHEME],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: widget_entitlements_files[IOS_WIDGET_SCHEME],
-      targets: [IOS_WIDGET_SCHEME],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_PATH,
-      target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      build_configuration: "Release"
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_CLIP_PATH,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: IOS_APPCLIP_SCHEME,
-      build_configuration: "Release"
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_WIDGET_PATH,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: IOS_WIDGET_SCHEME,
-      build_configuration: "Release"
-    )
-
-    # Build the application
+    ###########################
+    # 2.4  Export IPA from the archive
+    ###########################
     gym(
-      scheme: IOS_SCHEME,
-      workspace: "ios/azzapp.xcworkspace",
-      configuration: "Release",
-      output_directory: "./fastlane/builds",
-      export_method: EXPORT_METHOD,
-      export_team_id: TEAM_ID,
       skip_build_archive: true,
-      archive_path: "./fastlane/builds/azzapp.xcarchive",
+      archive_path: archive_path,
+      scheme: IOS_SCHEME,
+      workspace: 'ios/azzapp.xcworkspace',
+      configuration: 'Release',
+      output_directory: './fastlane/builds',
+      output_name: IOS_SCHEME,
       export_options: {
         method: EXPORT_METHOD,
-        signingStyle: "manual",
+        teamID: TEAM_ID,
+        signingStyle: 'manual',
+        signingCertificate: CODE_SIGNING_IDENTITY,
         provisioningProfiles: {
-          APP_IDENT => PROFILE_ID,
-          APPCLIP_IDENT => PROFILECLIP_ID,
-          WIDGET_IDENT => PROFILEWIDGET_ID
-        },
-        installerSigningCertificate: CODE_SIGNING_IDENTITY,
-        distributionBundleIdentifier: APP_IDENT
+          app_ident    => profile_app_id,
+          clip_ident   => profile_clip_id,
+          widget_ident => profile_widget_id
+        }
       }
     )
-    restore_file(path: pbxprojPath)
 
-    # === SENTRY SOURCEMAP UPLOAD ===
+    ###########################
+    # 2.5  Check the AppClip entitlement inside the IPA
+    ###########################
+    ipa_path       = "./fastlane/builds/#{IOS_SCHEME}.ipa"
+    clip_path_ipa  = "#{ipa_path}/Payload/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
 
-    # Récupère les infos de version pour nommer la release
-    release_name = "#{APP_IDENT}@#{VERSION_NUMBER}+#{BUILD_NUMBER}"
+    sh <<~BASH
+      echo '🔍  Checking on‑demand‑install entitlement:'
+      codesign -d --entitlements :- "#{clip_path_ipa}" | grep -A1 'on-demand-install'
+    BASH
+
+    ###########################
+    # SENTRY SOURCEMAP UPLOAD
+    ###########################
+    release_name = "#{app_ident}@#{version_number}+#{build_number}"
 
     # Upload vers Sentry via le plugin officiel
     sentry_upload_sourcemap(
@@ -245,9 +197,9 @@ platform :ios do
       org_slug: ENV['SENTRY_ORG'],
       project_slug: ENV['SENTRY_PROJECT'],
       version: release_name,
-      app_identifier: APP_IDENT,
-      build: BUILD_NUMBER,
-      dist: BUILD_NUMBER,
+      app_identifier: app_ident,
+      build: build_number,
+      dist: build_number,
       sourcemap: [
         './fastlane/builds/sourcemaps/main.jsbundle', 
         './fastlane/builds/sourcemaps/main.jsbundle.map'
