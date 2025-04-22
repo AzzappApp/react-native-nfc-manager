@@ -43,6 +43,7 @@ const config = {
     //   ],
     // ],
     // ],
+    instrumentationHook: true,
   },
   transpilePackages: ['@azzapp/shared', '@azzapp/data', '@azzapp/service'],
 };
