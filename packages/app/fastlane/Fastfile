@@ -144,7 +144,8 @@ platform :ios do
 
     compiled_plists.each do |plist|
       sh "
-        cd #{File.dirname(plist)}
+        cd #{Dir.pwd}
+        cd ..
         plutil -convert xml1 #{plist}
       "
     end
