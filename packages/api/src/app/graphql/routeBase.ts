@@ -304,11 +304,11 @@ const { handleRequest } = createYoga({
       mode: 'protect-all',
     }) as YogaPlugin,
     useRevalidatePages() as YogaPlugin,
+    runOnPrimaryPlugin,
     useSentry({
       includeRawResult: false,
       includeExecuteVariables: true,
     }),
-    runOnPrimaryPlugin,
   ],
 });
 

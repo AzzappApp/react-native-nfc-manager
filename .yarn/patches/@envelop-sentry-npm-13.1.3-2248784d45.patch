@@ -1,5 +1,5 @@
 diff --git a/cjs/index.js b/cjs/index.js
-index 42259d6dc48bbc0b85d27298f752b3b2625dfe5c..707b47aa5744cab5f442162c491e6ae32f171f1f 100644
+index 840e1407ccf195a4860e361d6c16873c8176d736..6f011282f23dabbf3892caa4408d338e6630f5d9 100644
 --- a/cjs/index.js
 +++ b/cjs/index.js
 @@ -4,7 +4,7 @@ exports.useSentry = exports.defaultSkipError = void 0;
@@ -11,8 +11,17 @@ index 42259d6dc48bbc0b85d27298f752b3b2625dfe5c..707b47aa5744cab5f442162c491e6ae3
  exports.defaultSkipError = core_1.isOriginalGraphQLError;
  const useSentry = (options = {}) => {
      function pick(key, defaultValue) {
+@@ -50,7 +50,7 @@ const useSentry = (options = {}) => {
+                 forceTransaction,
+                 ...traceparentData,
+             }, rootSpan => {
+-                rootSpan.setAttribute('document', document);
++                rootSpan?.setAttribute('document', document);
+                 if (renameTransaction) {
+                     Sentry.getCurrentScope().setTransactionName(transactionName);
+                 }
 diff --git a/esm/index.js b/esm/index.js
-index 3de73bd6bc83a2f720a54d45cf443ac5a496153b..b5aed07b0a64be54088f2fdca5bb56d6a78270ba 100644
+index 88d876f2e94a8181e0c3aeb29952337dc77f7769..fb8406f4ed0f5ceb0ca3f4abe0d26b2c4cd99483 100644
 --- a/esm/index.js
 +++ b/esm/index.js
 @@ -1,6 +1,6 @@
@@ -23,8 +32,17 @@ index 3de73bd6bc83a2f720a54d45cf443ac5a496153b..b5aed07b0a64be54088f2fdca5bb56d6
  export const defaultSkipError = isOriginalGraphQLError;
  export const useSentry = (options = {}) => {
      function pick(key, defaultValue) {
+@@ -46,7 +46,7 @@ export const useSentry = (options = {}) => {
+                 forceTransaction,
+                 ...traceparentData,
+             }, rootSpan => {
+-                rootSpan.setAttribute('document', document);
++                rootSpan?.setAttribute('document', document);
+                 if (renameTransaction) {
+                     Sentry.getCurrentScope().setTransactionName(transactionName);
+                 }
 diff --git a/typings/index.d.cts b/typings/index.d.cts
-index 5f191dd8541bbac5428d2a085ad9592bb356ad89..2832fcc024defc2caf755419d887eef1b570c0ac 100644
+index a5b5560dbedbe53cb4132fc2c95af78f203139c4..7c8958b5792df090b455883674a687defdf0ea92 100644
 --- a/typings/index.d.cts
 +++ b/typings/index.d.cts
 @@ -1,5 +1,5 @@
@@ -35,7 +53,7 @@ index 5f191dd8541bbac5428d2a085ad9592bb356ad89..2832fcc024defc2caf755419d887eef1
  export type SentryPluginOptions<PluginContext extends Record<string, any>> = {
      /**
 diff --git a/typings/index.d.ts b/typings/index.d.ts
-index 5f191dd8541bbac5428d2a085ad9592bb356ad89..2832fcc024defc2caf755419d887eef1b570c0ac 100644
+index a5b5560dbedbe53cb4132fc2c95af78f203139c4..7c8958b5792df090b455883674a687defdf0ea92 100644
 --- a/typings/index.d.ts
 +++ b/typings/index.d.ts
 @@ -1,5 +1,5 @@

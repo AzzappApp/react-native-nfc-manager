@@ -87,3 +87,4 @@ web-build/
 # Android build
 tmp
 azzapp.aab
+.env.local

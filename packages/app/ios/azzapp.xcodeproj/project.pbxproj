@@ -736,6 +736,7 @@
 				9642B15F2D11B4F3008E236B /* Embed WIDGET Extensions */,
 				355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */,
 				042AF6C7FA6CB55FDA81A235 /* [CP] Copy Pods Resources */,
+				066FEA548F374430B8871626 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -1100,7 +1101,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli')\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n";
+			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli')\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n/bin/sh `\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode.sh'\"` `\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n";
 		};
 		042AF6C7FA6CB55FDA81A235 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1416,6 +1417,20 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli')\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n";
 		};
+		066FEA548F374430B8871626 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Upload Debug Symbols to Sentry";
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1559,7 +1574,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzapp.entitlements;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				ENABLE_BITCODE = NO;
@@ -1569,7 +1584,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1598,7 +1613,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzappRelease.entitlements;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -1607,7 +1622,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1825,7 +1840,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1845,7 +1860,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -1881,7 +1896,7 @@
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1897,7 +1912,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.azzappWidget";
@@ -1930,7 +1945,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1951,7 +1966,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -1987,7 +2002,7 @@
 				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2004,7 +2019,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.azzappWidget;
@@ -2037,7 +2052,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2057,7 +2072,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2093,7 +2108,7 @@
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2109,7 +2124,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.azzappWidget";
@@ -2141,7 +2156,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2167,7 +2182,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2200,7 +2215,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2222,7 +2237,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.Clip";
@@ -2252,7 +2267,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2278,7 +2293,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2311,7 +2326,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2333,7 +2348,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.Clip";
@@ -2363,7 +2378,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2389,7 +2404,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2422,7 +2437,7 @@
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2444,7 +2459,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.Clip;
@@ -2469,7 +2484,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devDebug.entitlements";
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Dev";
 				ENABLE_BITCODE = NO;
@@ -2479,7 +2494,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2510,7 +2525,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devRelease.entitlements";
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Dev";
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -2519,7 +2534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2549,7 +2564,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-staging.entitlements";
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Staging";
 				ENABLE_BITCODE = NO;
@@ -2559,7 +2574,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2589,7 +2604,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-stagingRelease.entitlements";
-				CURRENT_PROJECT_VERSION =55;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Staging";
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -2598,7 +2613,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.10.0;
+				MARKETING_VERSION = 1.10.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

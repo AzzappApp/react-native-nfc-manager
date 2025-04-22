@@ -58,7 +58,7 @@ module.exports = withAxiom(
       authToken: process.env.SENTRY_AUTH_TOKEN,
 
       // Suppresses source map uploading logs during build
-      silent: true,
+      silent: !process.env.CI,
       org: 'azzapp',
       project: 'web',
     },

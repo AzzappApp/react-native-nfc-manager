@@ -40,16 +40,6 @@ export async function middleware(request: NextRequest) {
   return undefined;
 }
 
-export const config = {
-  matcher:
-    // For local development, rewrite paths to /api/path (not working with vercel.json rewrite)
-    process.env.NODE_ENV === 'development'
-      ? [
-          '/((?!_next/static|_next/image|favicon.ico).*)', // In development, match all paths except Next.js internals
-        ]
-      : ['/graphql'],
-};
-
 // Fonction pour calculer la distance entre deux points (Haversine)
 function haversine(
   lat1: number,
