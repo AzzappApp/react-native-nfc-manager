@@ -1,3 +1,7 @@
+## 1.10.0-canary.115
+
+* **fix:**  - error on monaco address
+
 ## 1.10.0-canary.114
 
 
