@@ -2,6 +2,14 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "env": [
+        "DATABASE_USERNAME",
+        "DATABASE_PASSWORD",
+        "REPLICA_DATABASE_USERNAME",
+        "REPLICA_DATABASE_PASSWORD"
+      ]
+    },
     "typecheck": {
       "dependsOn": ["^build"],
       "inputs": ["src/**"]
