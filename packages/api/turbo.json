@@ -3,6 +3,12 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "env": [
+        "DATABASE_USERNAME",
+        "DATABASE_PASSWORD",
+        "REPLICA_DATABASE_USERNAME",
+        "REPLICA_DATABASE_PASSWORD"
+      ],
       "dependsOn": ["^build"],
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]
