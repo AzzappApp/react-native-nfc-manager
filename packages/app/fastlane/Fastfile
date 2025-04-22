@@ -144,7 +144,7 @@ platform :ios do
       "#{archive_path}/Products/Applications/PlugIns/#{ios_widget_scheme}.appex/Info.plist",
       "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{ios_appclip_scheme}.appex.dSYM/Contents/Info.plist",
-      "#{archive_path}/dSYMs/#{widget_scheme}.appex.dSYM/Contents/Info.plist",
+      "#{archive_path}/dSYMs/#{ios_widget_scheme}.appex.dSYM/Contents/Info.plist",
     ]
     plists.each do |plist|
       set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
