@@ -29,10 +29,10 @@ const verifySignBody = z.object({
         .optional(),
       address: z
         .object({
-          country: z.string(),
-          city: z.string(),
-          subregion: z.string(),
-          region: z.string(),
+          country: z.string().nullable(),
+          city: z.string().nullable(),
+          subregion: z.string().nullable(),
+          region: z.string().nullable(),
         })
         .optional(),
     })
