@@ -189,7 +189,7 @@ platform :ios do
           widget_ident => profile_widget_id
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
-        distributionBundleIdentifier: APP_IDENT
+        distributionBundleIdentifier: app_ident
       }
     )
   end
