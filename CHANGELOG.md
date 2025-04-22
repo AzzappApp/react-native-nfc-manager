@@ -1,3 +1,8 @@
+## 1.10.0-canary.133
+
+* **fix:**  - wrong used urls ([#8490](https://github.com/AzzappApp/azzapp/pull/8490))
+* **fix:**  - limit middleware and fix revalidate path ([#8492](https://github.com/AzzappApp/azzapp/pull/8492))
+
 ## 1.10.0-canary.132
 
 
