@@ -214,12 +214,14 @@ platform :ios do
       cd ..
       
       echo '🔐  Resigning AppClip…'
+      cp #{profile_clip_path} "#{clip_path_archive}/embedded.mobileprovision"
       codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
         --entitlements "#{clip_entitlements}" \
         --preserve-metadata=identifier,flags,runtime \
         "#{clip_path_archive}"
 
       echo '🔐  Resigning Widget…'
+      cp #{profile_wid_path} "#{widget_path_archive}/embedded.mobileprovision"
       codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
         --entitlements "#{widget_entitlements}" \
         --preserve-metadata=identifier,flags,runtime \
