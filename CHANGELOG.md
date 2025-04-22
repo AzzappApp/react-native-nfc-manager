@@ -1,3 +1,7 @@
+## 1.9.12
+
+* **fix:**  - error on monaco address
+
 ## 1.9.11
 
 

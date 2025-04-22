@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
