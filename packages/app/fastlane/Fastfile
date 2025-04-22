@@ -200,35 +200,6 @@ platform :ios do
 
 
     ###########################
-    # Resign AppClip & Widget inside the archive
-    ###########################
-    clip_entitlements   = "./ios/ShareContactAppClip/#{ios_appclip_scheme}.entitlements"
-    widget_entitlements = "./ios/azzappWidget/#{ios_widget_scheme}.entitlements"
-
-    clip_path_archive   = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
-    widget_path_archive = "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/PlugIns/#{ios_widget_scheme}.appex"
-
-    sh <<~BASH
-      set -e
-      cd #{Dir.pwd}
-      cd ..
-      
-      echo '🔐  Resigning AppClip…'
-      cp #{profile_clip_path} "#{clip_path_archive}/embedded.mobileprovision"
-      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
-        --entitlements "#{clip_entitlements}" \
-        --preserve-metadata=identifier,flags,runtime \
-        "#{clip_path_archive}"
-
-      echo '🔐  Resigning Widget…'
-      cp #{profile_wid_path} "#{widget_path_archive}/embedded.mobileprovision"
-      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
-        --entitlements "#{widget_entitlements}" \
-        --preserve-metadata=identifier,flags,runtime \
-        "#{widget_path_archive}"
-    BASH
-
-    ###########################
     # Export IPA from the archive
     ###########################
     gym(
@@ -239,7 +210,9 @@ platform :ios do
       export_method: EXPORT_METHOD,
       export_team_id: TEAM_ID,
       skip_build_archive: true,
+      skip_profile_detection: true,
       archive_path: "./fastlane/builds/azzapp.xcarchive",
+      xcargs: "-showBuildSettings",
       export_options: {
         method: EXPORT_METHOD,
         signingStyle: "manual",
@@ -252,17 +225,6 @@ platform :ios do
         distributionBundleIdentifier: app_ident,
       }
     )
-
-    ###########################
-    # Check the AppClip entitlement inside the IPA
-    ###########################
-    ipa_path       = "./fastlane/builds/#{IOS_SCHEME}.ipa"
-    clip_path_ipa  = "#{ipa_path}/Payload/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app"
-
-    # sh <<~BASH
-    #   echo '🔍  Checking on‑demand‑install entitlement:'
-    #   codesign -d --entitlements :- "#{clip_path_ipa}" | grep -A1 'on-demand-install'
-    # BASH
 
     ###########################
     # SENTRY SOURCEMAP UPLOAD
