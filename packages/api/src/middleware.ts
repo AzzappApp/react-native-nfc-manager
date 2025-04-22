@@ -40,6 +40,10 @@ export async function middleware(request: NextRequest) {
   return undefined;
 }
 
+export const config = {
+  matcher: ['/graphql'],
+};
+
 // Fonction pour calculer la distance entre deux points (Haversine)
 function haversine(
   lat1: number,

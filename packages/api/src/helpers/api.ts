@@ -12,7 +12,7 @@ export const revalidateWebcardsAndPosts = (
   if (posts.length || cards.length) {
     waitUntil(
       (async () => {
-        await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/revalidate`, {
+        await fetch(`${process.env.NEXT_PUBLIC_URL}api/revalidate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
