@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
   // Handle both /graphql and /api/graphql paths
-  if (nextUrl.pathname === '/graphql' || nextUrl.pathname === '/api/graphql') {
+  if (nextUrl.pathname === '/graphql') {
     const latitude = parseFloat(
       request.headers.get('x-vercel-ip-latitude') || '',
     );
@@ -31,20 +31,10 @@ export async function middleware(request: NextRequest) {
         }
       }
       if (closestRegion && NODE_JS_REGIONS.includes(closestRegion)) {
-        return NextResponse.rewrite(new URL(`/api/graphql/node`, request.url));
+        return NextResponse.rewrite(new URL(`/graphql/node`, request.url));
       }
     }
-    return NextResponse.rewrite(new URL(`/api/graphql/edge`, request.url));
-  }
-
-  // For local development, rewrite paths to /api/path
-  if (
-    process.env.NODE_ENV === 'development' &&
-    !nextUrl.pathname.startsWith('/api/')
-  ) {
-    return NextResponse.rewrite(
-      new URL(`/api${nextUrl.pathname}`, request.url),
-    );
+    return NextResponse.rewrite(new URL(`/graphql/edge`, request.url));
   }
 
   return undefined;
@@ -57,7 +47,7 @@ export const config = {
       ? [
           '/((?!_next/static|_next/image|favicon.ico).*)', // In development, match all paths except Next.js internals
         ]
-      : ['/graphql', '/api/graphql'], // In production, match both paths
+      : ['/graphql'],
 };
 
 // Fonction pour calculer la distance entre deux points (Haversine)

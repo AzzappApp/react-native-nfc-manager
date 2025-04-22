@@ -2,14 +2,7 @@
   "git": { "deploymentEnabled": false },
   "regions": ["fra1", "iad1", "gru1"],
   "crons": [
-    { "path": "/api/cron/cancelPayments", "schedule": "*/1 * * * *" },
-    { "path": "/api/cron/unpublishWebCards", "schedule": "*/3 * * * *" }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api).*)",
-      "destination": "/api/$1"
-    }
-  ],
-  "redirects": [{ "source": "/", "destination": "https://web.azzapp.com/" }]
+    { "path": "/cron/cancelPayments", "schedule": "*/1 * * * *" },
+    { "path": "/cron/unpublishWebCards", "schedule": "*/3 * * * *" }
+  ]
 }

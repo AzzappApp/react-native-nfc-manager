@@ -36,7 +36,7 @@ import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import { inngest } from '#inngest/client';
-import packageJSON from '../../../../package.json';
+import packageJSON from '../../../package.json';
 import type { WebCard } from '@azzapp/data';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
