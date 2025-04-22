@@ -288,7 +288,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: packages/app/fastlane/builds/azzapp.xcarchive
-          key: ${{ runner.os }}-${{ vars.IOS_SCHEME }}-xarchive-${{ hashFiles(
+          key: xcarchive-${{ runner.os }}-${{ vars.IOS_SCHEME }}-${{ hashFiles(
             'packages/app/ios/**/*',
             'packages/app/native_modules/*/ios/**/*') }}
 

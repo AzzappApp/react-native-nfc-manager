@@ -81,6 +81,83 @@ platform :ios do
 
   desc 'Build iOS application native part.'
   lane :build_native do
+    ###########################
+    # Dynamic variables
+    ###########################
+    config             = ios_config[IOS_SCHEME]
+
+    app_ident          = config['app_ident']
+    clip_ident         = config['appclip_ident']
+    widget_ident       = config['widget_ident']
+
+    ios_appclip_scheme = config['appclip_scheme']
+    ios_widget_scheme  = config['widget_scheme']
+
+    profile_app_id     = config['app_id']
+    profile_clip_id    = config['appclip_widget_id']
+    profile_widget_id  = config['profile_widget_id']
+
+    archive_path       = './fastlane/builds/azzapp.xcarchive'
+
+    version_number = ENV['VERSION_NUMBER']
+    build_number   = ENV['BUILD_NUMBER']
+
+    cert_path         = './ios/certs/certificate.p12'
+    profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
+    profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
+    profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
+
+    ############################
+    # Update pbxproj
+    ############################
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: entitlements_files[IOS_SCHEME],
+      targets: [IOS_SCHEME],
+      code_sign_identity: CODE_SIGNING_IDENTITY
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: clip_entitlements_files[ios_appclip_scheme],
+      targets: [ios_appclip_scheme],
+      code_sign_identity: CODE_SIGNING_IDENTITY
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: widget_entitlements_files[ios_widget_scheme],
+      targets: [ios_widget_scheme],
+      code_sign_identity: CODE_SIGNING_IDENTITY
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: profile_app_path,
+      target_filter: IOS_SCHEME,
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      build_configuration: "Release"
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: profile_clip_path,
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      target_filter: ios_appclip_scheme,
+      build_configuration: "Release"
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: profile_wid_path,
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      target_filter: ios_widget_scheme,
+      build_configuration: "Release"
+    )
+
     # Build the application
     gym(
       scheme: IOS_SCHEME,
@@ -171,57 +248,6 @@ platform :ios do
         plutil -convert binary1 #{plist}
       "
     end
-
-    ############################
-    # Update pbxproj
-    ############################
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME],
-      targets: [IOS_SCHEME],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: clip_entitlements_files[ios_appclip_scheme],
-      targets: [ios_appclip_scheme],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: widget_entitlements_files[ios_widget_scheme],
-      targets: [ios_widget_scheme],
-      code_sign_identity: CODE_SIGNING_IDENTITY
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: profile_app_path,
-      target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      build_configuration: "Release"
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: profile_clip_path,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: ios_appclip_scheme,
-      build_configuration: "Release"
-    )
-
-    update_project_provisioning(
-      xcodeproj: "ios/azzapp.xcodeproj",
-      profile: profile_wid_path,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: ios_widget_scheme,
-      build_configuration: "Release"
-    )
 
 
     ###########################
