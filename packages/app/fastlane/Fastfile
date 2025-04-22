@@ -165,7 +165,8 @@ platform :ios do
 
     compiled_plists.each do |plist|
       sh "
-        cd #{File.dirname(plist)}
+        cd #{Dir.pwd}
+        cd ..
         plutil -convert binary1 #{plist}
       "
     end
