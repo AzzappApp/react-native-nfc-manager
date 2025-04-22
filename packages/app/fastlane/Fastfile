@@ -142,7 +142,7 @@ platform :ios do
       "#{archive_path}/Info.plist",
       "#{archive_path}/Products/Applications/AppClips/#{ios_appclip_scheme}.app/Info.plist",
       "#{archive_path}/Products/Applications/PlugIns/#{ios_widget_scheme}.appex/Info.plist",
-      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist"
+      "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{ios_appclip_scheme}.appex.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{widget_scheme}.appex.dSYM/Contents/Info.plist",
     ]
