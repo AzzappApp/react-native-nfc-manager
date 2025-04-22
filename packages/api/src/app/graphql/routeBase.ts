@@ -140,7 +140,7 @@ const runOnPrimaryPlugin: YogaPlugin = {
 };
 
 const { handleRequest } = createYoga({
-  graphqlEndpoint: '/api/graphql',
+  graphqlEndpoint: '/graphql',
   schema,
   fetchAPI: {
     Request,
