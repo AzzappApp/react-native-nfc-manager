@@ -142,7 +142,7 @@ platform :ios do
       "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/PlugIns/#{ios_widget_scheme}.appex/Info.plist",
     ]
 
-    compiled_plist.each do |plist|
+    compiled_plists.each do |plist|
       sh "
         cd #{File.dirname(plist)}
         plutil -convert xml1 #{plist}
@@ -157,13 +157,13 @@ platform :ios do
       "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{ios_appclip_scheme}.appex.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{ios_widget_scheme}.appex.dSYM/Contents/Info.plist",
-    ].concat(compiled_plist)
+    ].concat(compiled_plists)
     plists.each do |plist|
       set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
       set_info_plist_value(path: plist, key: 'CFBundleShortVersionString', value: build_number)
     end
 
-    compiled_plist.each do |plist|
+    compiled_plists.each do |plist|
       sh "
         cd #{File.dirname(plist)}
         plutil -convert binary1 #{plist}
