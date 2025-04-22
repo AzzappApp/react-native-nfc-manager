@@ -2,7 +2,7 @@ import { importPKCS8, SignJWT } from 'jose';
 import { oauthSigninCallback } from '../../oauthSigninUtils';
 
 const APPLE_PRIVATE_KEY = process.env.APPLE_PRIVATE_KEY!;
-const APPLE_TEAM_ID = process.env.APPLE_TEAM_ID!;
+const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER!;
 const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID!;
 const APPLE_KEY_ID = process.env.APPLE_KEY_ID!;
 
@@ -13,7 +13,7 @@ async function generateAppleClientSecret() {
 
   const jwt = await new SignJWT({})
     .setProtectedHeader({ alg: 'ES256', kid: APPLE_KEY_ID })
-    .setIssuer(APPLE_TEAM_ID)
+    .setIssuer(APPLE_TEAM_IDENTIFIER)
     .setSubject(APPLE_CLIENT_ID)
     .setAudience('https://appleid.apple.com')
     .setIssuedAt(now)
