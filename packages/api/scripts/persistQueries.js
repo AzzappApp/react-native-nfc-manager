@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
-const internal = require('../internal-version.json');
+const internal = require('../../../internal-version.json');
 const pkg = require('../package.json');
 
 const currentVersion = `${pkg.version}-${internal.kind}.${internal.version}`;
