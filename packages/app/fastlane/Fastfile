@@ -156,7 +156,7 @@ platform :ios do
       "ios/ShareContactAppClip/Info.plist",
       "#{archive_path}/Info.plist",
       "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
-      "#{archive_path}/dSYMs/#{ios_appclip_scheme}.appex.dSYM/Contents/Info.plist",
+      "#{archive_path}/dSYMs/#{ios_appclip_scheme}.app.dSYM/Contents/Info.plist",
       "#{archive_path}/dSYMs/#{ios_widget_scheme}.appex.dSYM/Contents/Info.plist",
     ].concat(compiled_plists)
     plists.each do |plist|
