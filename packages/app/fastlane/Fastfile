@@ -307,8 +307,12 @@ platform :ios do
     resign(
       ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
       signing_identity: CODE_SIGNING_IDENTITY,
-      provisioning_profile: profile_app_path,
-      entitlements: entitlements_files[IOS_SCHEME],
+      provisioning_profile: {
+        app_ident => profile_app_path,
+        clip_ident => profile_clip_path,
+        widget_ident => profile_wid_path
+      },
+      use_app_entitlements: true,
     )
 
     ###########################
@@ -322,7 +326,7 @@ platform :ios do
       org_slug: ENV['SENTRY_ORG'],
       project_slug: ENV['SENTRY_PROJECT'],
       version: release_name,
-      app_identifier: APP_IDENT,
+      app_identifier: app_ident,
       build: build_number,
       dist: build_number,
       sourcemap: ['./builds/main.jsbundle', './builds/main.jsbundle.map'],
