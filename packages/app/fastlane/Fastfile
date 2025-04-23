@@ -307,11 +307,7 @@ platform :ios do
     resign(
       ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
       signing_identity: CODE_SIGNING_IDENTITY,
-      provisioning_profile: {
-        app_ident => profile_app_path,
-        clip_ident => profile_clip_path,
-        widget_ident => profile_wid_path
-      },
+      provisioning_profile: profile_app_path,
       entitlements: entitlements_files[IOS_SCHEME],
     )
 
