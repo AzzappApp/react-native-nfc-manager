@@ -287,7 +287,7 @@ jobs:
         id: restore-ipa
         uses: actions/cache/restore@v4
         with:
-          path: packages/app/fastlane/builds/azzapp.xcarchive
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
           key: ipa-${{ runner.os }}-${{ vars.IOS_SCHEME }}-${{ hashFiles(
             'packages/app/ios/**/*',
             'packages/app/native_modules/*/ios/**/*') }}
@@ -356,7 +356,7 @@ jobs:
         if: steps.restore-ipa.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: packages/app/fastlane/builds/azzapp.xcarchive
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
           key: ${{ steps.restore-ipa.outputs.cache-primary-key }}
 
       - name: inject react-native code and assets
