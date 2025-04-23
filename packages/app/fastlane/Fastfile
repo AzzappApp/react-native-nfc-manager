@@ -305,7 +305,7 @@ platform :ios do
     sh "mv ./builds/azzapp/#{IOS_SCHEME}.ipa ./builds/#{IOS_SCHEME}.ipa"
 
     resign(
-      ipa: "./builds/#{IOS_SCHEME}.ipa",
+      ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
       signing_identity: CODE_SIGNING_IDENTITY,
       provisioning_profile: {
         app_ident => profile_app_id,
