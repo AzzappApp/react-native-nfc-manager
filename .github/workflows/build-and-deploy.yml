@@ -510,7 +510,8 @@ jobs:
             ccache-${{ runner.os }}- 
 
       - name: Sync Native Version
-        run: yarn sync-native-project-versions
+        working-directory: packages/app/
+        run: yarn sync-android-versions
 
       - name: Build Android native application
         working-directory: packages/app/

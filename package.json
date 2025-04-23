@@ -28,7 +28,6 @@
     "clean": "turbo run clean && rm -Rf node_modules && rm -f tsconfig.tsbuildinfo",
     "release": "node ./scripts/release.js",
     "bump-version": "node ./scripts/bumpVersion.js",
-    "sync-native-project-versions": "node ./scripts/syncNativeProjectVersions.js",
     "write-dev-changelog": "node ./scripts/writeDevChangeLog.js"
   },
   "devScripts": [
