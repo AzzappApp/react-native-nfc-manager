@@ -329,7 +329,7 @@ platform :ios do
       app_identifier: app_ident,
       build: build_number,
       dist: build_number,
-      sourcemap: ['./builds/main.jsbundle', './builds/main.jsbundle.map'],
+      sourcemap: ['./fastlane/builds/main.jsbundle', './fastlane/builds/main.jsbundle.map'],
       rewrite: true
     )
   end
