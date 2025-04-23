@@ -20,8 +20,6 @@ const androidVersionCode = `${major}${paddedMinor}${paddedPatch}${paddedPreRelea
 const buildGradlePath = path.join(
   __dirname,
   '..',
-  'packages',
-  'app',
   'android',
   'app',
   'build.gradle',
