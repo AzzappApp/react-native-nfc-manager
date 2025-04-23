@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { getWebCardById, type Profile, type User } from '@azzapp/data';
@@ -11,8 +12,19 @@ export const handleSignInAuthMethod = async (
 ) => {
   try {
     return NextResponse.json(await retrieveSigninInfos(user, profile));
-  } catch {
-    return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+  } catch (e) {
+    if (
+      e instanceof Error &&
+      (e.message === 'User deleted' || e.message === 'Verification canceled')
+    ) {
+      return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+    }
+    Sentry.captureException(e);
+    console.error(e);
+    return NextResponse.json(
+      { message: ERRORS.INTERNAL_SERVER_ERROR },
+      { status: 500 },
+    );
   }
 };
 
@@ -63,7 +75,7 @@ export const retrieveSigninInfos = async (
     userId: user.id,
   });
 
-  const webCard = await getWebCardById(profile?.webCardId ?? '');
+  const webCard = profile ? await getWebCardById(profile.webCardId) : null;
 
   return {
     profileInfos: profile
