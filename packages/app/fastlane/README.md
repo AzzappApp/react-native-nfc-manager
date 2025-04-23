@@ -15,21 +15,21 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios build_native
+### ios build
 
 ```sh
-[bundle exec] fastlane ios build_native
+[bundle exec] fastlane ios build
 ```
 
 Build iOS application native part.
 
-### ios package
+### ios inject_react_native
 
 ```sh
-[bundle exec] fastlane ios package
+[bundle exec] fastlane ios inject_react_native
 ```
 
-Build IOS application.
+Inject React Native and resign the app.
 
 ### ios deploy
 
@@ -37,7 +37,7 @@ Build IOS application.
 [bundle exec] fastlane ios deploy
 ```
 
-
+Deploy iOS application to App Store.
 
 ----
 
@@ -58,7 +58,7 @@ Build Android application based on ANDROID_TARGET environment variable.
 [bundle exec] fastlane android deploy
 ```
 
-
+Deploy Android application to Play Store.
 
 ----
 

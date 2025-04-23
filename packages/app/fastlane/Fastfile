@@ -79,34 +79,35 @@ widget_entitlements_files = {
 platform :ios do
   keychain_created = false
 
+  ###########################
+  # Dynamic variables
+  ###########################
+  config             = ios_config[IOS_SCHEME]
+
+  app_ident          = config['app_ident']
+  clip_ident         = config['appclip_ident']
+  widget_ident       = config['widget_ident']
+
+  ios_appclip_scheme = config['appclip_scheme']
+  ios_widget_scheme  = config['widget_scheme']
+
+  profile_app_id     = config['app_id']
+  profile_clip_id    = config['appclip_widget_id']
+  profile_widget_id  = config['profile_widget_id']
+
+  archive_path       = './fastlane/builds/azzapp.xcarchive'
+
+  version_number = ENV['VERSION_NUMBER']
+  build_number   = ENV['BUILD_NUMBER']
+
+  cert_path         = './ios/certs/certificate.p12'
+  profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
+  profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
+  profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
+
+
   desc 'Build iOS application native part.'
-  lane :build_native do
-    ###########################
-    # Dynamic variables
-    ###########################
-    config             = ios_config[IOS_SCHEME]
-
-    app_ident          = config['app_ident']
-    clip_ident         = config['appclip_ident']
-    widget_ident       = config['widget_ident']
-
-    ios_appclip_scheme = config['appclip_scheme']
-    ios_widget_scheme  = config['widget_scheme']
-
-    profile_app_id     = config['app_id']
-    profile_clip_id    = config['appclip_widget_id']
-    profile_widget_id  = config['profile_widget_id']
-
-    archive_path       = './fastlane/builds/azzapp.xcarchive'
-
-    version_number = ENV['VERSION_NUMBER']
-    build_number   = ENV['BUILD_NUMBER']
-
-    cert_path         = './ios/certs/certificate.p12'
-    profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
-    profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
-    profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
-
+  lane :build do
     ###########################
     # Prepare keychain + provisioning profiles
     ###########################
@@ -194,134 +195,146 @@ platform :ios do
     )
   end
 
-  # desc 'Build IOS application.'
-  # lane :package do
-  #   ###########################
-  #   # Dynamic variables
-  #   ###########################
-  #   config             = ios_config[IOS_SCHEME]
+  desc 'Inject React Native and resign the app.'
+  lane :inject_react_native do
+    ###########################
+    # Prepare keychain + provisioning profiles
+    ###########################
+    keychain_created = true
+    create_keychain(name: 'CI', password: 'CI', default_keychain: true, unlock: true, timeout: 0, lock_when_sleeps: false)
 
-  #   app_ident          = config['app_ident']
-  #   clip_ident         = config['appclip_ident']
-  #   widget_ident       = config['widget_ident']
+    import_certificate(keychain_name: 'CI', keychain_password: 'CI', certificate_path: cert_path, certificate_password: P12_PASSWORD)
 
-  #   ios_appclip_scheme = config['appclip_scheme']
-  #   ios_widget_scheme  = config['widget_scheme']
+    install_provisioning_profile(path: profile_app_path)
+    install_provisioning_profile(path: profile_clip_path)
+    install_provisioning_profile(path: profile_wid_path)
 
-  #   profile_app_id     = config['app_id']
-  #   profile_clip_id    = config['appclip_widget_id']
-  #   profile_widget_id  = config['profile_widget_id']
+    ###########################
+    # Unzip IPA
+    ###########################
+    sh"unzip -o ./builds/#{IOS_SCHEME}.ipa -d ./builds/azzapp"
 
-  #   archive_path       = './fastlane/builds/azzapp.xcarchive'
+    ###########################
+    # Update version number
+    ###########################
+    app_dir = "./builds/azzapp/Payload/#{IOS_SCHEME}.app"
+    app_clip_dir = "#{app_dir}/AppClips/#{ios_appclip_scheme}.app"
+    widget_dir = "#{app_dir}/PlugIns/#{ios_widget_scheme}.appex"
+    plists = [
+      "#{app_dir}/Info.plist",
+      "#{app_clip_dir}/Info.plist",
+      "#{widget_dir}/Info.plist",
+    ]
 
-  #   version_number = ENV['VERSION_NUMBER']
-  #   build_number   = ENV['BUILD_NUMBER']
+    plists.each do |plist|
+      sh "
+        plutil -convert xml1 #{plist}
+        plutil -replace CFBundleShortVersionString -string #{version_number} #{plist}
+        plutil -replace CFBundleVersion -string #{build_number} #{plist}
+        plutil -convert binary1 #{plist}
+      "
+    end  
 
-  #   cert_path         = './ios/certs/certificate.p12'
-  #   profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
-  #   profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
-  #   profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
 
-  #   ###########################
-  #   # Prepare keychain + provisioning profiles
-  #   ###########################
-  #   keychain_created = true
-  #   create_keychain(name: 'CI', password: 'CI', default_keychain: true, unlock: true, timeout: 0, lock_when_sleeps: false)
+    ###########################
+    # Resign the Widget and AppClip
+    ###########################
+    clip_entitlements = 
+      File.absolute_path(
+        "../ios/#{clip_entitlements_files[IOS_SCHEME]}"
+      )
+    widget_entitlements = 
+      File.absolute_path(
+        "../ios/#{widget_entitlements_files[IOS_SCHEME]}"
+      )
 
-  #   import_certificate(keychain_name: 'CI', keychain_password: 'CI', certificate_path: cert_path, certificate_password: P12_PASSWORD)
+    sh <<~BASH
+      set -e
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{clip_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{app_clip_dir}"
 
-  #   install_provisioning_profile(path: profile_app_path)
-  #   install_provisioning_profile(path: profile_clip_path)
-  #   install_provisioning_profile(path: profile_wid_path)
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{widget_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{widget_dir}"
+    BASH
 
-  #   ###########################
-  #   # Update archive version
-  #   ###########################
+    ###########################
+    # Inject React Native
+    ###########################
+    absolute_app_dir = File.absolute_path(app_dir)
+    hermesc = File.absolute_path(
+      "../ios/Pods/hermes-engine/destroot/bin/hermesc"
+    )
+    build_dir = File.absolute_path('./builds')
+    sh <<~BASH
+      cd ..
+      
+      yarn react-native bundle \
+      --entry-file index.js \
+      --platform ios \
+      --dev false \
+      --reset-cache \
+      --bundle-output "#{build_dir}/main.jsbundle" \
+      --assets-dest "#{absolute_app_dir}/assets" \
+      --minify false \
+      --sourcemap-output "#{build_dir}/packager.jsbundle.map"
 
-  #   compiled_plists = [
-  #     "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/AppClips/#{ios_appclip_scheme}.app/Info.plist",
-  #     "#{archive_path}/Products/Applications/#{IOS_SCHEME}.app/PlugIns/#{ios_widget_scheme}.appex/Info.plist",
-  #   ]
-
-  #   compiled_plists.each do |plist|
-  #     sh "
-  #       cd #{Dir.pwd}
-  #       cd ..
-  #       plutil -convert xml1 #{plist}
-  #     "
-  #   end
-
+      #{hermesc} -emit-binary -max-diagnostic-width=80 -O \
+        -output-source-map \
+        -out #{absolute_app_dir}/main.jsbundle \
+        "#{build_dir}/main.jsbundle"
     
-  #   plists = [
-  #     "ios/azzapp/Info.plist",
-  #     "ios/ShareContactAppClip/Info.plist",
-  #     "#{archive_path}/Info.plist",
-  #     "#{archive_path}/dSYMs/#{IOS_SCHEME}.app.dSYM/Contents/Info.plist",
-  #     "#{archive_path}/dSYMs/#{ios_appclip_scheme}.app.dSYM/Contents/Info.plist",
-  #     "#{archive_path}/dSYMs/#{ios_widget_scheme}.appex.dSYM/Contents/Info.plist",
-  #   ].concat(compiled_plists)
-  #   plists.each do |plist|
-  #     set_info_plist_value(path: plist, key: 'CFBundleVersion', value: version_number)
-  #     set_info_plist_value(path: plist, key: 'CFBundleShortVersionString', value: build_number)
-  #   end
+      RN_PATH=$(node -e "console.log(require.resolve('react-native/package.json'))")
+      RN_PATH=$(dirname "$RN_PATH")
 
-  #   compiled_plists.each do |plist|
-  #     sh "
-  #       cd #{Dir.pwd}
-  #       cd ..
-  #       plutil -convert binary1 #{plist}
-  #     "
-  #   end
+      node $RN_PATH/scripts/compose-source-maps.js \
+        #{build_dir}/packager.jsbundle.map \
+        #{absolute_app_dir}/main.jsbundle.map \
+        -o #{build_dir}/main.jsbundle.map
 
+    BASH
 
-  #   ###########################
-  #   # Export IPA from the archive
-  #   ###########################
-  #   gym(
-  #     scheme: IOS_SCHEME,
-  #     workspace: "ios/azzapp.xcworkspace",
-  #     configuration: "Release",
-  #     output_directory: "./fastlane/builds",
-  #     export_method: EXPORT_METHOD,
-  #     export_team_id: TEAM_ID,
-  #     skip_build_archive: true,
-  #     skip_profile_detection: true,
-  #     archive_path: "./fastlane/builds/azzapp.xcarchive",
-  #     export_options: {
-  #       method: EXPORT_METHOD,
-  #       signingStyle: "manual",
-  #       provisioningProfiles: {
-  #         app_ident => profile_app_id,
-  #         clip_ident => profile_clip_id,
-  #         widget_ident => profile_widget_id
-  #       },
-  #       installerSigningCertificate: CODE_SIGNING_IDENTITY,
-  #       distributionBundleIdentifier: app_ident,
-  #     }
-  #   )
+    ###########################
+    # Recreate IPA
+    ###########################
+    sh "rm -rf ./builds/#{IOS_SCHEME}.ipa"
+    sh "cd ./builds/azzapp && zip -r #{IOS_SCHEME}.ipa ."
+    sh "mv ./builds/azzapp/#{IOS_SCHEME}.ipa ./builds/#{IOS_SCHEME}.ipa"
 
-  #   ###########################
-  #   # SENTRY SOURCEMAP UPLOAD
-  #   ###########################
-  #   release_name = "#{app_ident}@#{version_number}+#{build_number}"
+    resign(
+      ipa: "./builds/#{IOS_SCHEME}.ipa",
+      signing_identity: CODE_SIGNING_IDENTITY,
+      provisioning_profile: {
+        app_ident => profile_app_id,
+        clip_ident => profile_clip_id,
+        widget_ident => profile_widget_id
+      },
+      entitlements: entitlements_files[IOS_SCHEME],
+    )
 
-  #   # Upload vers Sentry via le plugin officiel
-  #   sentry_upload_sourcemap(
-  #     auth_token: ENV['SENTRY_AUTH_TOKEN'],
-  #     org_slug: ENV['SENTRY_ORG'],
-  #     project_slug: ENV['SENTRY_PROJECT'],
-  #     version: release_name,
-  #     app_identifier: app_ident,
-  #     build: build_number,
-  #     dist: build_number,
-  #     sourcemap: [
-  #       './fastlane/builds/sourcemaps/main.jsbundle', 
-  #       './fastlane/builds/sourcemaps/main.jsbundle.map'
-  #     ],
-  #     rewrite: true
-  #   )
-  # end
+    ###########################
+    # SENTRY SOURCEMAP UPLOAD
+    ###########################
+    release_name = "#{app_ident}@#{version_number}+#{build_number}"
 
+    # Upload vers Sentry via le plugin officiel
+    sentry_upload_sourcemap(
+      auth_token: ENV['SENTRY_AUTH_TOKEN'],
+      org_slug: ENV['SENTRY_ORG'],
+      project_slug: ENV['SENTRY_PROJECT'],
+      version: release_name,
+      app_identifier: APP_IDENT,
+      build: build_number,
+      dist: build_number,
+      sourcemap: ['./builds/main.jsbundle', './builds/main.jsbundle.map'],
+      rewrite: true
+    )
+  end
+
+  desc 'Deploy iOS application to App Store.'
   lane :deploy do
     api_key = app_store_connect_api_key(
       key_id: "2FWWXZWMHY",
@@ -389,6 +402,7 @@ platform :android do
     puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
   end
   
+  desc 'Deploy Android application to Play Store.'
   lane :deploy do
     AAB_PATH = ENV['AAB_PATH']
     puts "deploy"
