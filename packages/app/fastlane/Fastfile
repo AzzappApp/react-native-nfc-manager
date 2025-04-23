@@ -278,7 +278,7 @@ platform :ios do
       --dev false \
       --reset-cache \
       --bundle-output "#{build_dir}/main.jsbundle" \
-      --assets-dest "#{absolute_app_dir}/assets" \
+      --assets-dest "#{absolute_app_dir}" \
       --minify false \
       --sourcemap-output "#{build_dir}/packager.jsbundle.map"
 
