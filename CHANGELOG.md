@@ -1,3 +1,8 @@
+## 1.9.3-rc.6
+
+* **fix:**  - **ShareBackModal:** use english for country name in phone selector ([#8532](https://github.com/AzzappApp/azzapp/pull/8532))
+* **fix:**  - widget not working the specific caracter ([#8533](https://github.com/AzzappApp/azzapp/pull/8533))
+
 ## 1.9.3-rc.5
 
 * **fix:**  - start with correct step
