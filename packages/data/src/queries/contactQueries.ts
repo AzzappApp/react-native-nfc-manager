@@ -178,7 +178,14 @@ export const searchContacts = async (
 
   const orders =
     orderBy === 'name'
-      ? [ContactTable.firstName, ContactTable.lastName]
+      ? [
+          sql`COALESCE(       
+            NULLIF(${ContactTable.lastName}, ''),
+            NULLIF(${ContactTable.firstName}, ''),    
+            NULLIF(${ContactTable.company}, ''),
+            ''
+          )`,
+        ]
       : orderBy === 'location'
         ? [desc(locationExpr), desc(ContactTable.createdAt)]
         : [desc(ContactTable.createdAt)];
