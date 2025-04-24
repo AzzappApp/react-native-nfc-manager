@@ -101,7 +101,7 @@ const DownloadVCard = ({
 
       if (contactData && signature) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_ENDPOINT}verifySign`,
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/verifySign`,
           {
             body: JSON.stringify({
               signature,
