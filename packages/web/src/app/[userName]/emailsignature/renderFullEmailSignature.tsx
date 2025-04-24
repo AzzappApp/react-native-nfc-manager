@@ -158,7 +158,6 @@ const renderFullEmailSignature = ({
     cellspacing="0"
     style="
       padding: 20px 15px;
-      background: white;
       font-family: Helvetica Neue;
       border-collapse: collapse;
       ${isPreview ? 'width: 100%;' : ''}"
