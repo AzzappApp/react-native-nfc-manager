@@ -237,6 +237,7 @@ const ShakeAndShareScreen = ({
                   profile={profile}
                   appearance="dark"
                   style={styles.button}
+                  publicKey={publicKey}
                 />
               )}
               {profile && publicKey && (

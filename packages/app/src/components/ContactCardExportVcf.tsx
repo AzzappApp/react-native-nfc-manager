@@ -4,6 +4,7 @@ import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { logEvent } from '#helpers/analytics';
+import useContactCardAccess from '#hooks/useContactCardAccess';
 import LargeButton from '#ui/LargeButton';
 import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
 import type { ColorSchemeName, ViewStyle } from 'react-native';
@@ -25,22 +26,18 @@ const ContactCardExportVcf = ({
 }) => {
   const profile = useFragment(
     graphql`
-      fragment ContactCardExportVcf_card on Profile
-      @argumentDefinitions(
-        deviceId: { type: "String!", provider: "qrCodeDeviceId.relayprovider" }
-      ) {
-        webCard {
-          userName
-        }
+      fragment ContactCardExportVcf_card on Profile {
         contactCard {
           firstName
           lastName
         }
-        contactCardAccessId(deviceId: $deviceId)
+        ...useContactCardAccess_profile
       }
     `,
     profileKey,
   );
+
+  const contactCardAccessData = useContactCardAccess(profile);
 
   const intl = useIntl();
   return (
@@ -56,14 +53,14 @@ const ContactCardExportVcf = ({
         try {
           logEvent('share_contact_card');
           if (
-            profile.webCard?.userName &&
+            contactCardAccessData?.webCard?.userName &&
             publicKey &&
-            profile.contactCardAccessId
+            contactCardAccessData?.contactCardAccessId
           ) {
             const contactCardUrl = buildUserUrlWithKey({
-              userName: profile.webCard?.userName,
+              userName: contactCardAccessData.webCard.userName,
               key: publicKey,
-              contactCardAccessId: profile.contactCardAccessId,
+              contactCardAccessId: contactCardAccessData.contactCardAccessId,
             });
             await ShareCommand.open({
               title,
