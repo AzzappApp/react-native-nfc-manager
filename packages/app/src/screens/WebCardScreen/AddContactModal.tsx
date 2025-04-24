@@ -4,7 +4,6 @@ import {
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
-import { fromGlobalId } from 'graphql-relay';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
@@ -23,6 +22,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
+import { createHash } from '#helpers/cryptoHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
 import useOnInviteContact from '#hooks/useOnInviteContact';
@@ -44,6 +44,7 @@ import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModa
 import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
 
 type Props = {
@@ -52,7 +53,14 @@ type Props = {
 };
 
 const AddContactModal = ({
-  params: { additionalContactData, contactData, geolocation },
+  params: {
+    additionalContactData,
+    contactData,
+    geolocation,
+    contactCard,
+    avatarUrl,
+    contactProfileId,
+  },
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
@@ -385,19 +393,38 @@ const AddContactModal = ({
         );
         return;
       }
-      if (!scanned && contactData && webCard) {
-        const { contact, webCardId, profileId } = await buildContact(
-          contactData,
-          additionalContactData,
-          webCard.userName,
-        );
-        if (webCardId === fromGlobalId(webCard.id).id) {
+      if (!scanned && webCard) {
+        if (contactData) {
+          const { contact, profileId } = await buildContact(
+            contactData,
+            additionalContactData,
+            webCard.userName,
+          );
+
           setScanned({ contact, profileId });
+          open();
+        } else if (contactCard) {
+          const { contact } = await buildContactFromContactCard(
+            contactCard,
+            avatarUrl,
+            webCard.userName,
+          );
+
+          setScanned({ contact, profileId: contactProfileId ?? '' });
           open();
         }
       }
     })();
-  }, [contactData, webCard, additionalContactData, scanned, open]);
+  }, [
+    contactData,
+    webCard,
+    additionalContactData,
+    scanned,
+    open,
+    contactCard,
+    avatarUrl,
+    contactProfileId,
+  ]);
 
   const userName = useMemo(() => {
     if (scanned) {
@@ -489,19 +516,15 @@ const AddContactModal = ({
   );
 };
 
-const downloadAvatar = async (
-  profileId: string,
-  additionalContactData: WebCardRoute['params']['additionalContactData'],
-) => {
+const downloadAvatar = async (avatarUrl?: string) => {
   let image: Image | undefined = undefined;
-  if (additionalContactData?.avatarUrl) {
+  if (avatarUrl) {
     try {
-      const avatar = new File(Paths.cache.uri + profileId);
-      if (avatar.exists) {
-        // be sure that avatar can be refreshed
-        avatar.delete();
+      const hash = createHash(avatarUrl);
+      const avatar = new File(Paths.cache.uri + hash);
+      if (!avatar.exists) {
+        await File.downloadFileAsync(avatarUrl, avatar);
       }
-      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
 
       image = {
         width: 720,
@@ -517,6 +540,85 @@ const downloadAvatar = async (
   return image;
 };
 
+const buildContactFromContactCard = async (
+  contactCard: ContactCard,
+  avatarUrl?: string,
+  userName?: string,
+) => {
+  const image = await downloadAvatar(avatarUrl);
+
+  const birthdayDate = contactCard.birthday
+    ? new Date(contactCard.birthday.birthday)
+    : undefined;
+
+  const contact: Contact = {
+    contactType: 'person',
+    firstName: contactCard.firstName ?? '',
+    lastName: contactCard.lastName ?? '',
+    name: `${contactCard.firstName ?? ''} ${contactCard.lastName ?? ''}`,
+    company: contactCard.company ?? '',
+    jobTitle: contactCard.title ?? '',
+    addresses: contactCard.addresses?.map(address => ({
+      label: address.label,
+      street: address.address,
+      isPrimary: address.label === 'Main',
+    })),
+    phoneNumbers: contactCard.phoneNumbers?.map(phone => ({
+      label:
+        Platform.OS === 'android' && phone.label !== 'Main'
+          ? phone.label.toLowerCase()
+          : phone.label,
+      number: phone.number,
+      isPrimary: phone.label === 'Main',
+    })),
+    emails: contactCard.emails?.map(email => ({
+      label:
+        Platform.OS === 'android' && email.label !== 'Main'
+          ? email.label.toLowerCase()
+          : email.label,
+      email: email.address,
+      isPrimary: email.label === 'Main',
+    })),
+    dates: birthdayDate
+      ? [
+          {
+            label: 'birthday',
+            year: birthdayDate?.getFullYear(),
+            month: birthdayDate?.getMonth(),
+            day: birthdayDate?.getDate(),
+          },
+        ]
+      : [],
+    socialProfiles:
+      contactCard?.socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+        service: social.label,
+      })) ?? [],
+    urlAddresses: (userName
+      ? [
+          {
+            label: 'azzapp',
+            url: buildUserUrl(userName),
+          },
+        ]
+      : []
+    ).concat(
+      contactCard?.urls?.map(url => ({
+        label: '',
+        url:
+          !url.address || url.address.toLocaleLowerCase().startsWith('http')
+            ? url.address
+            : `https://${url.address}`,
+      })) ?? [],
+    ),
+    image,
+    imageAvailable: !!image,
+  };
+
+  return { contact };
+};
+
 const buildContact = async (
   contactCardData: string,
   additionalContactData: WebCardRoute['params']['additionalContactData'],
@@ -524,7 +626,6 @@ const buildContact = async (
 ) => {
   const {
     profileId,
-    webCardId,
     firstName,
     addresses,
     lastName,
@@ -535,7 +636,7 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  const image = await downloadAvatar(profileId, additionalContactData);
+  const image = await downloadAvatar(additionalContactData?.avatarUrl);
 
   const birthdayDate = birthday ? new Date(birthday) : undefined;
 
@@ -605,7 +706,7 @@ const buildContact = async (
     image,
     imageAvailable: !!image,
   };
-  return { contact, webCardId, profileId };
+  return { contact, profileId };
 };
 
 const styles = StyleSheet.create({

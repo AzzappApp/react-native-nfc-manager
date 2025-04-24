@@ -32,7 +32,11 @@ const updatePass = async (
     });
   }
 
-  const pass = await buildApplePass(profile.id, params.lang);
+  const pass = await buildApplePass({
+    profile,
+    locale: params.lang,
+    includeBarCode: false,
+  });
 
   if (pass) {
     return new Response(pass.getAsBuffer(), {

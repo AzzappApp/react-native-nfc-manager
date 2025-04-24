@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import { BarcodeTypeEnum } from 'google-wallet/lib/cjs/generic';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
@@ -8,8 +7,6 @@ import {
   updateHasGooglePass,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
-import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
@@ -58,14 +55,6 @@ export const POST = withPluginsRoute(async (req: Request) => {
     }
 
     if (contactCard) {
-      const { data, signature } = await serializeAndSignContactCard(
-        webCard?.userName ?? '',
-        profile.id,
-        profile.webCardId,
-        contactCard,
-        webCard?.isMultiUser ? webCard?.commonInformation : undefined,
-      );
-
       const objectData = {
         ...currentPass,
         // Define the object data
@@ -81,16 +70,6 @@ export const POST = withPluginsRoute(async (req: Request) => {
               webCard?.userName ||
               ' ', // empty string is not allowed
           },
-        },
-
-        barcode: {
-          type: BarcodeTypeEnum.QR_CODE,
-          value: buildUserUrlWithContactCard(
-            webCard?.userName ?? '',
-            data,
-            signature,
-          ),
-          alternateText: '',
         },
         hexBackgroundColor: webCard?.cardColors?.primary ?? '#000000',
       };

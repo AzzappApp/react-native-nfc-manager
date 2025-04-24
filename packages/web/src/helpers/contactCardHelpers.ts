@@ -1,5 +1,9 @@
 export const displayName = (
-  contact: { firstName?: string; lastName?: string; company?: string },
+  contact: {
+    firstName?: string | null;
+    lastName?: string | null;
+    company?: string | null;
+  },
   webCard: { userName?: string | null } | null,
 ) => {
   if (contact.firstName || contact.lastName) {

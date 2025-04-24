@@ -2,27 +2,36 @@ import {
   getEmailSignatureTitleColor,
   colors,
 } from '@azzapp/shared/colorsHelpers';
+import { getRoundImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
-import type { WebCard } from '@azzapp/data';
-import type { EmailSignatureParsed } from '@azzapp/shared/emailSignatureHelpers';
+import type { Profile, WebCard } from '@azzapp/data';
 
 const renderFullEmailSignature = ({
-  contact,
   webCard,
+  profile,
   companyLogoUrl,
   saveContactMessage,
   saveContactURL,
   isPreview,
 }: {
-  contact: EmailSignatureParsed | undefined;
   webCard: WebCard;
+  profile: Profile;
   companyLogoUrl: string | null;
   saveContactMessage: string;
   saveContactURL?: string;
   isPreview?: boolean;
 }) => {
-  const avatarSection = contact?.avatar
+  const avatar = profile.avatarId
+    ? getRoundImageURLForSize({
+        id: profile.avatarId,
+        height: 120,
+        width: 120,
+        format: 'png',
+      })
+    : null;
+
+  const avatarSection = avatar
     ? `
       <tr>
         <td colSpan="2" width="60" valign="top" style="padding-bottom: 10px; width: 60px;">
@@ -34,7 +43,7 @@ const renderFullEmailSignature = ({
               height: 60px;
               display: inline-block; 
               border-radius: 30px;" 
-            src="${contact?.avatar}"
+            src="${avatar}"
           />
         </td>
       </tr>
@@ -51,7 +60,7 @@ const renderFullEmailSignature = ({
           font-weight: 500;
           white-space: nowrap;"
         >
-          ${formatDisplayName(contact?.firstName, contact?.lastName)}
+          ${formatDisplayName(profile.contactCard?.firstName, profile.contactCard?.lastName)}
         </span>
       </td>
     </tr>
@@ -59,7 +68,7 @@ const renderFullEmailSignature = ({
 
   const titleColor = getEmailSignatureTitleColor(webCard.cardColors?.primary);
 
-  const titleSection = contact?.title
+  const titleSection = profile.contactCard?.title
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
@@ -69,13 +78,13 @@ const renderFullEmailSignature = ({
             font-weight: 500;
             white-space: nowrap;"
           >
-            ${contact.title}
+            ${profile.contactCard.title}
           </span>
         </td>
       </tr>`
     : '';
 
-  const companySection = contact?.company
+  const companySection = profile.contactCard?.company
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
@@ -85,7 +94,7 @@ const renderFullEmailSignature = ({
             font-weight: 400;
             white-space: nowrap;"
           >
-            ${contact.company}
+            ${profile.contactCard.company}
           </span>
         </td>
       </tr>`
@@ -120,16 +129,21 @@ const renderFullEmailSignature = ({
     `;
 
   const phoneSection =
-    contact?.phoneNumbers && contact?.phoneNumbers.length > 0
-      ? contact?.phoneNumbers
-          .map(phone => generateContactLink(`tel:${phone}`, phone))
+    profile.contactCard?.phoneNumbers &&
+    profile.contactCard?.phoneNumbers.length > 0
+      ? profile.contactCard?.phoneNumbers
+          .map(phone =>
+            generateContactLink(`tel:${phone.number}`, phone.number),
+          )
           .join('')
       : '';
 
   const emailSection =
-    contact?.emails && contact?.emails.length > 0
-      ? contact?.emails
-          .map(mail => generateContactLink(`mailto:${mail}`, mail))
+    profile.contactCard?.emails && profile.contactCard?.emails.length > 0
+      ? profile.contactCard?.emails
+          .map(mail =>
+            generateContactLink(`mailto:${mail.address}`, mail.address),
+          )
           .join('')
       : '';
 

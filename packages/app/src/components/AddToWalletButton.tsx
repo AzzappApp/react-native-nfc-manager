@@ -16,17 +16,24 @@ import { colors } from '#theme';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
+import { getQRCodeDeviceId } from '#hooks/useQRCodeKey';
 import PressableNative from '../ui/PressableNative';
 import Text from '../ui/Text';
 import type { ColorSchemeName, ViewStyle } from 'react-native';
 
 type Props = {
-  webCardId?: string | null;
+  profileId: string;
+  publicKey: string;
   style?: ViewStyle;
   appearance?: ColorSchemeName;
 };
 
-const AddToWalletButton = ({ webCardId, style, appearance }: Props) => {
+const AddToWalletButton = ({
+  profileId,
+  publicKey,
+  style,
+  appearance,
+}: Props) => {
   const intl = useIntl();
   const [loadingPass, setLoadingPass] = useState(false);
   const scheme = useColorScheme();
@@ -36,26 +43,29 @@ const AddToWalletButton = ({ webCardId, style, appearance }: Props) => {
   const generateLoadingPass = useCallback(async () => {
     try {
       setLoadingPass(true);
-      if (webCardId) {
-        if (Platform.OS === 'ios') {
-          const pass = await getAppleWalletPass({
-            webCardId: fromGlobalId(webCardId).id,
-            locale: intl.locale,
-          });
 
-          const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
+      if (Platform.OS === 'ios') {
+        const pass = await getAppleWalletPass({
+          profileId: fromGlobalId(profileId).id,
+          key: publicKey,
+          locale: intl.locale,
+          deviceId: getQRCodeDeviceId(),
+        });
 
-          await addPass(base64Pass);
-        } else if (Platform.OS === 'android') {
-          const pass = await getGoogleWalletPass({
-            webCardId: fromGlobalId(webCardId).id,
-            locale: intl.locale,
-          });
+        const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
 
-          await addPassJWT(pass.token);
-        }
-        logEvent('add_pass_wallet');
+        await addPass(base64Pass);
+      } else if (Platform.OS === 'android') {
+        const pass = await getGoogleWalletPass({
+          profileId: fromGlobalId(profileId).id,
+          key: publicKey,
+          locale: intl.locale,
+          deviceId: getQRCodeDeviceId(),
+        });
+
+        await addPassJWT(pass.token);
       }
+      logEvent('add_pass_wallet');
     } catch {
       Toast.show({
         text1: intl.formatMessage({
@@ -87,7 +97,7 @@ const AddToWalletButton = ({ webCardId, style, appearance }: Props) => {
     } finally {
       setLoadingPass(false);
     }
-  }, [webCardId, intl]);
+  }, [profileId, publicKey, intl]);
 
   return (
     <>

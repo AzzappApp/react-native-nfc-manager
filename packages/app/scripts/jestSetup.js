@@ -152,3 +152,12 @@ jest.mock('expo-image-manipulator', () => ({
 jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'mock://redirect'),
 }));
+
+jest.mock('react-native-quick-crypto', () => ({
+  createHash: jest.fn(() => ({
+    update: jest.fn(() => ({
+      digest: jest.fn(() => 'mocked_hash'),
+    })),
+  })),
+  randomUUID: jest.fn(() => 'mocked-uuid'),
+}));

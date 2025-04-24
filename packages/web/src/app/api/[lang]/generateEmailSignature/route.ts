@@ -4,7 +4,6 @@ import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import cors from '#helpers/cors';
@@ -50,15 +49,6 @@ const generateEmailSignature = async (req: NextRequest) => {
       avatarUrl,
     );
 
-    const { data: contactCardData, signature: contactCardSignature } =
-      await serializeAndSignContactCard(
-        webCard.userName,
-        profileId,
-        webCard.id,
-        profile.contactCard,
-        webCard.isMultiUser ? webCard.commonInformation : undefined,
-      );
-
     const mailParam: Record<
       string,
       Array<{ mail: string }> | Array<{ number: string }> | string
@@ -67,8 +57,6 @@ const generateEmailSignature = async (req: NextRequest) => {
         webCard.userName,
         data,
         signature,
-        contactCardData,
-        contactCardSignature,
       ),
     };
 

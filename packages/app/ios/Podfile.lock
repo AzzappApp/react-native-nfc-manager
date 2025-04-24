@@ -293,6 +293,7 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - OpenSSL-Universal (3.3.3001)
   - PromisesObjC (2.4.0)
   - PurchasesHybridCommon (13.26.0):
     - RevenueCat (= 5.20.0)
@@ -1680,6 +1681,29 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-quick-crypto (0.7.13):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - OpenSSL-Universal
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-safe-area-context (5.3.0):
     - DoubleConversion
     - glog
@@ -2647,6 +2671,7 @@ DEPENDENCIES:
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - "react-native-passkit (from `../../../node_modules/@reeq/react-native-passkit`)"
   - react-native-quick-base64 (from `../../../node_modules/react-native-quick-base64`)
+  - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
   - react-native-skottie-template-player (from `../../../node_modules/react-native-skottie-template-player`)
@@ -2722,6 +2747,7 @@ SPEC REPOS:
     - libwebp
     - lottie-ios
     - nanopb
+    - OpenSSL-Universal
     - PromisesObjC
     - PurchasesHybridCommon
     - React-Codegen
@@ -2888,6 +2914,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@reeq/react-native-passkit"
   react-native-quick-base64:
     :path: "../../../node_modules/react-native-quick-base64"
+  react-native-quick-crypto:
+    :path: "../../../node_modules/react-native-quick-crypto"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-skia:
@@ -3053,6 +3081,7 @@ SPEC CHECKSUMS:
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
   lottie-react-native: 28e5b80459ee6723917995556657e54b98bb16bc
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  OpenSSL-Universal: 6082b0bf950e5636fe0d78def171184e2b3899c2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PurchasesHybridCommon: fa166fc8b385cf80f581f923c91d8ccffe5dd7f8
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
@@ -3095,6 +3124,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: cda3e94765176877702695c4b8c4b5ca69cb2f16
   react-native-passkit: 3979317a86e60cc9288eeffab27da37d62d15160
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
+  react-native-quick-crypto: 4dafcc99067e4b36b17cb33f1766e110ad164f18
   react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
   react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0

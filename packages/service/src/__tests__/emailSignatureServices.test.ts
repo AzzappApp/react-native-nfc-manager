@@ -1,6 +1,5 @@
 import { getUserById } from '@azzapp/data';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { generateEmailSignature } from '../emailSignatureServices';
@@ -20,7 +19,6 @@ jest.mock('@azzapp/shared/emailHelpers', () => ({
   sendTemplateEmail: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/serializeAndSignContactCard', () => jest.fn());
 jest.mock('@azzapp/shared/serializeAndSignEmailSignature', () => jest.fn());
 jest.mock('@azzapp/shared/urlHelpers', () => ({
   buildEmailSignatureGenerationUrl: jest.fn(),
@@ -138,10 +136,6 @@ describe('generateEmailSignature', () => {
       data: 'sig-data',
       signature: 'sig-signature',
     });
-    (serializeAndSignContactCard as jest.Mock).mockResolvedValue({
-      data: 'card-data',
-      signature: 'card-signature',
-    });
     (buildEmailSignatureGenerationUrl as jest.Mock).mockReturnValue(
       'https://signature.url',
     );
@@ -155,13 +149,10 @@ describe('generateEmailSignature', () => {
 
     expect(buildAvatarUrl).toHaveBeenCalled();
     expect(serializeAndSignEmailSignature).toHaveBeenCalled();
-    expect(serializeAndSignContactCard).toHaveBeenCalled();
     expect(buildEmailSignatureGenerationUrl).toHaveBeenCalledWith(
       'johndoe',
       'sig-data',
       'sig-signature',
-      'card-data',
-      'card-signature',
     );
     expect(sendTemplateEmail).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -180,10 +171,6 @@ describe('generateEmailSignature', () => {
     (serializeAndSignEmailSignature as jest.Mock).mockResolvedValue({
       data: 'sig-data',
       signature: 'sig-signature',
-    });
-    (serializeAndSignContactCard as jest.Mock).mockResolvedValue({
-      data: 'card-data',
-      signature: 'card-signature',
     });
     (buildEmailSignatureGenerationUrl as jest.Mock).mockReturnValue(
       'https://signature.url',

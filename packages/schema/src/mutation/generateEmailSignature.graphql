@@ -1,5 +1,19 @@
 extend type Mutation {
-  generateEmailSignature(profileId: ID!, config: GenerateEmailSignatureInput @deprecated): GenerateEmailSignaturePayload
+  generateEmailSignature(
+    profileId: ID!
+    config: GenerateEmailSignatureInput @deprecated
+  ): GenerateEmailSignaturePayload
+    @deprecated(reason: "Use generateEmailSignatureWithKey instead")
+
+  generateEmailSignatureWithKey(
+    input: GenerateEmailSignatureWithKeyInput!
+  ): GenerateEmailSignaturePayload
+}
+
+input GenerateEmailSignatureWithKeyInput {
+  profileId: ID!
+  key: String!
+  deviceId: String!
 }
 
 input GenerateEmailSignatureInput {

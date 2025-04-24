@@ -6,6 +6,7 @@ import {
 } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardExportVcf from '../ContactCardExportVcf';
 import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardExportVcfTestQuery.graphql';
@@ -77,8 +78,11 @@ describe('ContactCardExportVcf', () => {
       return MockPayloadGenerator.generate(operation, {
         Profile() {
           return {
-            contactCardUrl: 'contactCardUrl',
+            contactCardAccessId: 'contactCardAccessId',
             contactCard,
+            webCard: {
+              userName: 'userName',
+            },
           };
         },
       });
@@ -98,7 +102,11 @@ describe('ContactCardExportVcf', () => {
 
       return (
         data.profile && (
-          <ContactCardExportVcf profile={data.profile} {...props} />
+          <ContactCardExportVcf
+            profile={data.profile}
+            publicKey="publicKey"
+            {...props}
+          />
         )
       );
     };
@@ -133,7 +141,11 @@ describe('ContactCardExportVcf', () => {
       title: 'John Doe',
       subject: 'John Doe',
       failOnCancel: false,
-      message: 'contactCardUrl',
+      message: buildUserUrlWithKey({
+        userName: 'userName',
+        contactCardAccessId: 'contactCardAccessId',
+        key: 'publicKey',
+      }),
     });
   });
 });

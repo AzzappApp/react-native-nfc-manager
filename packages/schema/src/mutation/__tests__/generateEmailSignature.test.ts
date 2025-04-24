@@ -5,7 +5,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
-import generateEmailSignatureMutation from '../generateEmailSignature';
+import { generateEmailSignature as generateEmailSignatureMutation } from '../generateEmailSignature';
 import type { GraphQLContext } from '#GraphQLContext';
 
 // Mocks

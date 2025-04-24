@@ -7,9 +7,14 @@ import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import { useAppState } from './useAppState';
+import {
+  addOnPublicKeysChangeListener,
+  getPublicKeyForProfileId,
+} from './useQRCodeKey';
 import type {
   useWidget_user$data,
   useWidget_user$key,
@@ -35,7 +40,10 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
   const [widgetProfile, setWidgetProfile] = useState<WidgetData[]>([]);
   const data = useFragment(
     graphql`
-      fragment useWidget_user on User {
+      fragment useWidget_user on User
+      @argumentDefinitions(
+        deviceId: { type: "String!", provider: "qrCodeDeviceId.relayprovider" }
+      ) {
         profiles {
           id
           webCard {
@@ -55,7 +63,7 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
             title
             company
           }
-          contactCardUrl
+          contactCardAccessId(deviceId: $deviceId)
         }
       }
     `,
@@ -73,19 +81,34 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
                 ? webCard.commonInformation?.company || contactCard?.company
                 : contactCard?.company;
 
-              return {
-                userName: profile.webCard.userName,
-                url: profile.contactCardUrl,
-                color: profile.webCard.cardColors?.primary ?? colors.white,
-                textColor: getTextColor(
-                  profile?.webCard?.cardColors?.primary ?? colors.black,
-                ),
-                displayName: formatDisplayName(
-                  contactCard?.firstName,
-                  contactCard?.lastName,
-                  company,
-                ),
-              };
+              const contactCardAccessId = profile.contactCardAccessId;
+
+              const publicKey = getPublicKeyForProfileId(profile.id);
+              if (
+                contactCardAccessId &&
+                publicKey &&
+                profile.webCard.userName
+              ) {
+                return {
+                  userName: profile.webCard.userName,
+                  url: buildUserUrlWithKey({
+                    userName: profile.webCard.userName,
+                    key: publicKey,
+                    contactCardAccessId,
+                  }),
+                  color: profile.webCard.cardColors?.primary ?? colors.white,
+                  textColor: getTextColor(
+                    profile.webCard.cardColors?.primary ?? colors.black,
+                  ),
+                  displayName: formatDisplayName(
+                    contactCard?.firstName,
+                    contactCard?.lastName,
+                    company,
+                  ),
+                };
+              } else {
+                return null;
+              }
             } else return null;
           })
           .filter(isDefined);
@@ -135,6 +158,18 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
       updateWidgetData([...data.profiles]);
     }
   }, [data?.profiles, updateWidgetData, appState]);
+
+  useEffect(() => {
+    const listener = addOnPublicKeysChangeListener(() => {
+      if (data?.profiles) {
+        updateWidgetData([...data.profiles]);
+      }
+    });
+
+    return () => {
+      listener.remove();
+    };
+  }, [data?.profiles, updateWidgetData]);
 };
 
 type WidgetProfile = NonNullable<

@@ -130,3 +130,37 @@ export const sha256 = async (message: string) => {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 };
+
+export const importPublicKey = async (base64Key: string) => {
+  const rawKey = Buffer.from(base64Key, 'base64');
+
+  return getCrypto().subtle.importKey(
+    'raw',
+    rawKey,
+    {
+      name: 'Ed25519',
+      namedCurve: 'Ed25519',
+    },
+    true,
+    ['verify'],
+  );
+};
+
+export const verifyMessage = async (
+  publicKey: CryptoKey,
+  message: string,
+  signatureBase64: string,
+) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const signature = Buffer.from(signatureBase64, 'base64');
+
+  return getCrypto().subtle.verify(
+    {
+      name: 'Ed25519',
+    },
+    publicKey,
+    signature,
+    data,
+  );
+};

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileByUserAndWebCard } from '@azzapp/data';
+import { getProfileById, getProfileByUserAndWebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
 import { withPluginsRoute } from '#helpers/queries';
@@ -14,7 +14,16 @@ const createPass = async (
     params: { lang: string };
   },
 ) => {
-  const webCardId = new URL(req.url).searchParams.get('webCardId')!;
+  const searchParams = new URL(req.url).searchParams;
+
+  const webCardId = searchParams.get('webCardId');
+
+  const profileId = searchParams.get('profileId');
+
+  const deviceId = searchParams.get('deviceId');
+
+  const key = searchParams.get('key');
+
   let userId: string | undefined;
   try {
     const data = await getSessionData();
@@ -25,14 +34,29 @@ const createPass = async (
         { status: 401 },
       );
     }
-    const profile = await getProfileByUserAndWebCard(userId, webCardId);
+    const profile = webCardId
+      ? await getProfileByUserAndWebCard(userId, webCardId)
+      : profileId
+        ? await getProfileById(profileId)
+        : null;
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },
         { status: 401 },
       );
     }
-    const pass = await buildApplePass(profile.id, params.lang);
+
+    if (profile.userId !== userId) {
+      return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+    }
+
+    const pass = await buildApplePass({
+      profile,
+      locale: params.lang,
+      deviceId,
+      key,
+      includeBarCode: true,
+    });
 
     if (pass) {
       return new Response(pass.getAsBuffer(), {

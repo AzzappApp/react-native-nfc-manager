@@ -10,7 +10,10 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
-import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import {
+  buildVCardFromContactCard,
+  buildVCardFromSerializedContact,
+} from '@azzapp/shared/vCardHelpers';
 import { CloseIcon, InviteIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
@@ -158,6 +161,81 @@ const DownloadVCard = ({
     [webCard.userName, webCard.id, startOpen, step],
   );
 
+  const processKey = useCallback(
+    async (keyData: string) => {
+      let contactCardAccessId: string;
+      let key: string;
+      let geolocation: Geolocation;
+      try {
+        [contactCardAccessId, key, geolocation] = JSON.parse(
+          decompressFromEncodedURIComponent(keyData),
+        );
+        const res = await fetch('/api/verifyQrCodeKey', {
+          body: JSON.stringify({
+            contactCardAccessId,
+            key,
+            geolocation,
+            userName: webCard.userName,
+          }),
+          method: 'POST',
+        });
+        if (res.ok) {
+          const { contactCard, avatarUrl, token, displayName, profileId } =
+            await res.json();
+
+          let avatar;
+
+          if (avatarUrl) {
+            const data = await fetch(avatarUrl);
+            const blob = await data.arrayBuffer();
+            const base64 = Buffer.from(blob).toString('base64');
+
+            avatar = {
+              type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
+              base64,
+            };
+          }
+
+          const { vCard } = await buildVCardFromContactCard(
+            webCard.userName,
+            profileId,
+            contactCard,
+            avatar,
+          );
+
+          const isIE = !!(window as any)?.StyleMedia;
+
+          setContact({
+            firstName: contactCard.firstName,
+            lastName: contactCard.lastName,
+            company: contactCard.company,
+            title: contactCard.title,
+            avatarUrl,
+          });
+
+          const file = new Blob([vCard.toString()], {
+            type: isIE ? 'application/octet-stream' : 'text/vcard',
+          });
+          const fileURL = URL.createObjectURL(file);
+          setFileUrl(fileURL);
+
+          if (step === 0) {
+            // No need to count views on other steps
+            updateContactCardScanCounter(profileId);
+          }
+          setToken(token);
+          setDisplayName(displayName);
+        }
+        if (startOpen) {
+          setOpened(true);
+        }
+      } catch {
+        return;
+      }
+    },
+    [startOpen, step, webCard.userName],
+  );
+
   useEffect(() => {
     const compressedContactCard = searchParams.get('c');
     if (!compressedContactCard) {
@@ -173,6 +251,22 @@ const DownloadVCard = ({
         });
     }
   }, [searchParams, contact, processContact]);
+
+  useEffect(() => {
+    const keyData = searchParams.get('k');
+    if (!keyData) {
+      return;
+    }
+
+    if (!loading.current && !contact) {
+      loading.current = true;
+      processKey(keyData)
+        .catch(() => void 0)
+        .finally(() => {
+          loading.current = false;
+        });
+    }
+  }, [searchParams, contact, processKey]);
 
   const handleClose = useCallback(() => {
     setOpened(false);
@@ -253,7 +347,7 @@ const DownloadVCard = ({
             size="medium"
             href={fileUrl}
             className={styles.buttonLink}
-            download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+            download={`${webCard.userName}${contact?.firstName?.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName?.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
             userName={webCard.userName}
             onClick={handleClose}
           >

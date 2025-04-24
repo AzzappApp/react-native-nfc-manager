@@ -1,7 +1,7 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
 import { buildUserUrl } from './urlHelpers';
-import type { CommonInformation } from './contactCardHelpers';
+import type { CommonInformation, ContactCard } from './contactCardHelpers';
 
 /**
  * Helpers to help generate correct VCards
@@ -109,6 +109,71 @@ export const buildVCardFromSerializedContact = async (
       company: contactCard.company,
       title: contactCard.title,
     },
+  };
+};
+
+export const buildVCardFromContactCard = async (
+  userName: string | null | undefined,
+  profileId: string,
+  contactCard: ContactCard,
+  avatar?: { base64: string; type: string } | null,
+) => {
+  const vcard = new VCard();
+
+  vcard.addUID(profileId);
+
+  vcard.addName(contactCard.lastName ?? '', contactCard.firstName ?? '');
+
+  vcard.addCompany(contactCard.company ?? '');
+
+  vcard.addJobtitle(contactCard.title ?? '');
+
+  if (avatar) {
+    vcard.addPhoto(avatar.base64, avatar.type);
+  }
+
+  contactCard.emails?.forEach(email => {
+    vcard.addEmail(email.address, emailLabelToVCardLabel(email.label));
+  });
+
+  contactCard.phoneNumbers?.forEach(phone => {
+    vcard.addPhoneNumber(phone.number, phoneLabelToVCardLabel(phone.label));
+  });
+
+  if (userName) {
+    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+  }
+  contactCard?.urls?.forEach(url => {
+    vcard.addURL(url.address, '');
+  });
+
+  contactCard.addresses?.forEach(address => {
+    const type = addressLabelToVCardLabel(address.label);
+
+    vcard.addAddress(
+      address.label,
+      address.address.replace(/;/g, '\\;'),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      type ?? address.label,
+    );
+  });
+
+  if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday.birthday)))
+    vcard.addBirthday(contactCard.birthday.birthday.split('T')[0]);
+
+  contactCard?.socials?.forEach(social => {
+    vcard.addSocial(
+      `https://${social.url.replace(/^https?:\/\//, '')}`,
+      social.label,
+    );
+  });
+
+  return {
+    vCard: vcard,
   };
 };
 
