@@ -77,8 +77,6 @@ type Profile implements Node {
 
   contactCardUrl(deviceId:String, key:String): String! @deprecated(reason: "Use contact card url builder instead")
 
-  """
-
   serializedContactCard: String!
     @deprecated(reason: "Use contactCardUrl instead")
 
