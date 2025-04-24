@@ -219,12 +219,15 @@ const SignUpScreen = () => {
   const keyboardHeight = useKeyboardHeight();
   const keyboardAvoidAnimatedStyle = useAnimatedStyle(() => {
     return {
-      paddingBottom: keyboardHeight.value - insets.bottom + 16,
+      paddingBottom:
+        keyboardHeight.value -
+        insets.bottom +
+        (keyboardHeight.value && Platform.OS === 'ios' ? 80 : 16),
     };
   });
 
   return (
-    <View style={styles.root}>
+    <View style={styles.flex}>
       <View style={styles.background}>
         <LottieView
           source={require('../assets/sign/login_sign_up_asset.json')}
@@ -374,9 +377,6 @@ SignUpScreen.options = {
 
 const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },
-  root: {
-    flex: 1,
-  },
   background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   content: {
     flex: 1,
