@@ -1,3 +1,7 @@
+## 1.9.13-rc.5
+
+* **fix:**  - **emailSignature:** [#8552](https://github.com/AzzappApp/azzapp/pull/8552) merge common info in email signature ([#8553](https://github.com/AzzappApp/azzapp/pull/8553))
+
 ## 1.9.13-rc.4
 
 * **fix:**  - **contactCard:** [#8547](https://github.com/AzzappApp/azzapp/pull/8547) key may have special characters ([#8548](https://github.com/AzzappApp/azzapp/pull/8548))
