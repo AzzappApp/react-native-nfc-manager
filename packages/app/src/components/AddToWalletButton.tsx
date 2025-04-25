@@ -1,6 +1,5 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { Image } from 'expo-image';
-import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -16,20 +15,19 @@ import { colors } from '#theme';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
-import { getQRCodeDeviceId } from '#hooks/useQRCodeKey';
 import PressableNative from '../ui/PressableNative';
 import Text from '../ui/Text';
 import type { ColorSchemeName, ViewStyle } from 'react-native';
 
 type Props = {
-  profileId: string;
+  contactCardAccessId: string;
   publicKey: string;
   style?: ViewStyle;
   appearance?: ColorSchemeName;
 };
 
 const AddToWalletButton = ({
-  profileId,
+  contactCardAccessId,
   publicKey,
   style,
   appearance,
@@ -46,10 +44,9 @@ const AddToWalletButton = ({
 
       if (Platform.OS === 'ios') {
         const pass = await getAppleWalletPass({
-          profileId: fromGlobalId(profileId).id,
+          contactCardAccessId,
           key: publicKey,
           locale: intl.locale,
-          deviceId: getQRCodeDeviceId(),
         });
 
         const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
@@ -57,10 +54,9 @@ const AddToWalletButton = ({
         await addPass(base64Pass);
       } else if (Platform.OS === 'android') {
         const pass = await getGoogleWalletPass({
-          profileId: fromGlobalId(profileId).id,
+          contactCardAccessId,
           key: publicKey,
           locale: intl.locale,
-          deviceId: getQRCodeDeviceId(),
         });
 
         await addPassJWT(pass.token);
@@ -97,7 +93,7 @@ const AddToWalletButton = ({
     } finally {
       setLoadingPass(false);
     }
-  }, [profileId, publicKey, intl]);
+  }, [contactCardAccessId, publicKey, intl]);
 
   return (
     <>

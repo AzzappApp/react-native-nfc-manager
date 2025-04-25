@@ -1073,6 +1073,7 @@ export const ContactCardAccessTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
+    hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
   },
   table => ({
     pk: cols

@@ -338,14 +338,13 @@ export const verifyQrCodeKey: APIMethod<
 export const getAppleWalletPass = (
   {
     locale,
-    profileId,
-    deviceId,
+    contactCardAccessId,
     key,
-  }: { locale: string; profileId: string; deviceId: string; key: string },
+  }: { locale: string; contactCardAccessId: string; key: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
   apiFetch(
-    `${API_ENDPOINT}/${locale}/wallet/apple?profileId=${profileId}&deviceId=${deviceId}&key=${key}`,
+    `${API_ENDPOINT}/${locale}/wallet/apple?contactCardAccessId=${contactCardAccessId}&key=${key}`,
     {
       ...init,
       method: 'GET',
@@ -356,11 +355,11 @@ export const getAppleWalletPass = (
  * Api call to generate a google wallet pass.
  */
 export const getGoogleWalletPass: APIMethod<
-  { locale: string; profileId: string; deviceId: string; key: string },
+  { locale: string; contactCardAccessId: string; key: string },
   { token: string }
-> = ({ locale, profileId, deviceId, key }, init) =>
+> = ({ locale, contactCardAccessId, key }, init) =>
   apiFetch(
-    `${API_ENDPOINT}/${locale}/wallet/google?profileId=${profileId}&deviceId=${deviceId}&key=${key}`,
+    `${API_ENDPOINT}/${locale}/wallet/google?contactCardAccessId=${contactCardAccessId}&key=${key}`,
     {
       ...init,
       method: 'GET',

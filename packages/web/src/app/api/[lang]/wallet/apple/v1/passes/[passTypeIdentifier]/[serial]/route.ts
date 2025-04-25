@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileById } from '@azzapp/data';
+import { getContactCardAccessById, getProfileById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass, checkAuthorization } from '#helpers/pass/apple';
 import { withPluginsRoute } from '#helpers/queries';
@@ -8,15 +8,32 @@ const updatePass = async (
   req: Request,
   { params }: { params: { serial: string; lang: string } },
 ) => {
+  let data;
   try {
-    await checkAuthorization(req, params.serial);
+    data = await checkAuthorization(req, params.serial);
   } catch {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const ifModifiedSince = req.headers.get('If-Modified-Since');
+  let profile;
+  let contactCardAccessId;
+  let key;
+  // old pass
+  if (typeof data === 'string') {
+    profile = await getProfileById(data);
+  } else {
+    const contactCardAccess = await getContactCardAccessById(
+      data.contactCardAccessId,
+    );
 
-  const profile = await getProfileById(params.serial);
+    if (!contactCardAccess || contactCardAccess.isRevoked) {
+      return NextResponse.json({ message: 'Not found' }, { status: 404 });
+    }
+    profile = await getProfileById(contactCardAccess.profileId);
+    key = data.key;
+    contactCardAccessId = data.contactCardAccessId;
+  }
+  const ifModifiedSince = req.headers.get('If-Modified-Since');
 
   if (!profile) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });
@@ -35,7 +52,8 @@ const updatePass = async (
   const pass = await buildApplePass({
     profile,
     locale: params.lang,
-    includeBarCode: false,
+    contactCardAccessId,
+    key,
   });
 
   if (pass) {

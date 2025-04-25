@@ -3,7 +3,6 @@ import {
   getMediasByIds,
   buildDefaultContactCard,
   getWebCardById,
-  getActiveContactCardAccess,
 } from '@azzapp/data';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
@@ -49,28 +48,37 @@ export const checkAuthorization = async (req: Request, serial: string) => {
     throw new Error('Unauthorized');
   }
 
-  const profileId = await unseal(
+  const data = await unseal(
     authorization,
     process.env.APPLE_TOKEN_PASSWORD ?? '',
   );
+  if (typeof data === 'object' && data) {
+    const { contactCardAccessId, key } = data as {
+      contactCardAccessId: string;
+      key: string;
+    };
 
-  if (profileId !== serial) {
+    if (serial !== contactCardAccessId) {
+      throw new Error('Unauthorized');
+    }
+    return { contactCardAccessId, key };
+  } else if (data !== serial) {
     throw new Error('Unauthorized');
   }
+
+  return data;
 };
 
 export const buildApplePass = async ({
   profile,
   locale,
-  deviceId,
+  contactCardAccessId,
   key,
-  includeBarCode,
 }: {
   profile: Profile;
   locale: string;
-  deviceId?: string | null;
+  contactCardAccessId?: string | null;
   key?: string | null;
-  includeBarCode: boolean;
 }) => {
   const webCard = await getWebCardById(profile.webCardId);
   if (webCard) {
@@ -154,50 +162,46 @@ export const buildApplePass = async ({
         backgroundColor,
         labelColor: convertHexToRGBA(getTextColor(backgroundColor)),
         suppressStripShine: false,
-        serialNumber: profile.id,
-        webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,
+        serialNumber: contactCardAccessId ?? profile.id,
+        webServiceURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${locale}/wallet/apple/`,
         authenticationToken: await seal(
-          profile.id,
+          key
+            ? {
+                contactCardAccessId,
+                key,
+              }
+            : profile.id,
           process.env.APPLE_TOKEN_PASSWORD ?? '',
         ),
       },
     );
 
-    if (includeBarCode) {
-      let contactCardAccess;
-      if (deviceId) {
-        contactCardAccess = await getActiveContactCardAccess(
-          deviceId,
-          profile.id,
-        );
-      }
-      if (contactCardAccess && key) {
-        pass.setBarcodes({
-          message: buildUserUrlWithKey({
-            userName: webCard?.userName ?? '',
-            contactCardAccessId: contactCardAccess.id,
-            key,
-          }),
-          format: 'PKBarcodeFormatQR',
-        });
-      } else {
-        const { data, signature } = await serializeAndSignContactCard(
-          webCard.userName ?? '',
-          profile.id,
-          webCard.id,
-          contactCard,
-          webCard.isMultiUser ? webCard.commonInformation : undefined,
-        );
+    if (contactCardAccessId && key) {
+      pass.setBarcodes({
+        message: buildUserUrlWithKey({
+          userName: webCard?.userName ?? '',
+          contactCardAccessId,
+          key,
+        }),
+        format: 'PKBarcodeFormatQR',
+      });
+    } else {
+      const { data, signature } = await serializeAndSignContactCard(
+        webCard.userName ?? '',
+        profile.id,
+        webCard.id,
+        contactCard,
+        webCard.isMultiUser ? webCard.commonInformation : undefined,
+      );
 
-        pass.setBarcodes({
-          message: buildUserUrlWithContactCard(
-            webCard?.userName ?? '',
-            data,
-            signature,
-          ),
-          format: 'PKBarcodeFormatQR',
-        });
-      }
+      pass.setBarcodes({
+        message: buildUserUrlWithContactCard(
+          webCard?.userName ?? '',
+          data,
+          signature,
+        ),
+        format: 'PKBarcodeFormatQR',
+      });
     }
 
     pass.type = 'generic';

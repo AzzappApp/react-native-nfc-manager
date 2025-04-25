@@ -69,8 +69,7 @@ export const verifyQrCodeKey = withFetchFunction(
 
 type appleWalletPassParams = {
   locale: string;
-  profileId: string;
-  deviceId: string;
+  contactCardAccessId: string;
   key: string;
 };
 

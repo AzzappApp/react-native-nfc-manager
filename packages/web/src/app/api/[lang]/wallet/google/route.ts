@@ -8,10 +8,11 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import {
   buildDefaultContactCard,
-  getActiveContactCardAccess,
+  getContactCardAccessById,
   getProfileById,
   getProfileByUserAndWebCard,
   getWebCardById,
+  updateContactCardAccessHasGooglePass,
   updateHasGooglePass,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -42,11 +43,11 @@ const getGoogleWalletPass = async (
 
   const webCardId = searchParams.get('webCardId');
 
-  const profileId = searchParams.get('profileId');
-
-  const deviceId = searchParams.get('deviceId');
+  const contactCardAccessId = searchParams.get('contactCardAccessId');
 
   const key = searchParams.get('key');
+
+  const hasPassData = contactCardAccessId && key;
 
   let currentUserId: string | undefined;
   try {
@@ -59,11 +60,18 @@ const getGoogleWalletPass = async (
     }
     currentUserId = userId;
 
-    const profile = webCardId
-      ? await getProfileByUserAndWebCard(userId, webCardId)
-      : profileId
-        ? await getProfileById(profileId)
-        : null;
+    let profile;
+
+    if (hasPassData) {
+      const contactCardAccess =
+        await getContactCardAccessById(contactCardAccessId);
+
+      if (contactCardAccess && !contactCardAccess.isRevoked) {
+        profile = await getProfileById(contactCardAccess.profileId);
+      }
+    } else if (webCardId) {
+      profile = await getProfileByUserAndWebCard(userId, webCardId);
+    }
 
     if (!profile) {
       return NextResponse.json(
@@ -119,18 +127,12 @@ const getGoogleWalletPass = async (
       contactCard = await buildDefaultContactCard(webCard, currentUserId);
     }
 
-    let contactCardAccess;
     let barCodeUrl;
-    if (deviceId) {
-      contactCardAccess = await getActiveContactCardAccess(
-        deviceId,
-        profile.id,
-      );
-    }
-    if (contactCardAccess && key) {
+
+    if (hasPassData) {
       barCodeUrl = buildUserUrlWithKey({
         userName: webCard?.userName ?? '',
-        contactCardAccessId: contactCardAccess.id,
+        contactCardAccessId,
         key,
       });
     } else {
@@ -212,7 +214,11 @@ const getGoogleWalletPass = async (
       // Update the object data
       genericObject = await genericClient.patchObject(objectData);
     }
-    await updateHasGooglePass(profile.id, true);
+    if (hasPassData) {
+      await updateContactCardAccessHasGooglePass(contactCardAccessId, true);
+    } else {
+      await updateHasGooglePass(profile.id, true);
+    }
 
     const token = jwt.sign(
       {

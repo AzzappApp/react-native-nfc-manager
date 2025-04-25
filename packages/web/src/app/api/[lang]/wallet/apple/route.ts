@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getProfileById, getProfileByUserAndWebCard } from '@azzapp/data';
+import {
+  getContactCardAccessById,
+  getProfileById,
+  getProfileByUserAndWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
 import { withPluginsRoute } from '#helpers/queries';
@@ -18,9 +22,7 @@ const createPass = async (
 
   const webCardId = searchParams.get('webCardId');
 
-  const profileId = searchParams.get('profileId');
-
-  const deviceId = searchParams.get('deviceId');
+  const contactCardAccessId = searchParams.get('contactCardAccessId');
 
   const key = searchParams.get('key');
 
@@ -34,11 +36,19 @@ const createPass = async (
         { status: 401 },
       );
     }
-    const profile = webCardId
-      ? await getProfileByUserAndWebCard(userId, webCardId)
-      : profileId
-        ? await getProfileById(profileId)
-        : null;
+
+    let profile;
+    if (contactCardAccessId) {
+      const contactCardAccess =
+        await getContactCardAccessById(contactCardAccessId);
+
+      if (contactCardAccess && !contactCardAccess.isRevoked) {
+        profile = await getProfileById(contactCardAccess.profileId);
+      }
+    } else if (webCardId) {
+      profile = await getProfileByUserAndWebCard(userId, webCardId);
+    }
+
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },
@@ -53,9 +63,8 @@ const createPass = async (
     const pass = await buildApplePass({
       profile,
       locale: params.lang,
-      deviceId,
+      contactCardAccessId,
       key,
-      includeBarCode: true,
     });
 
     if (pass) {

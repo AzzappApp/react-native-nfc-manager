@@ -240,9 +240,9 @@ const ShakeAndShareScreen = ({
                   publicKey={publicKey}
                 />
               )}
-              {profile && publicKey && (
+              {data?.contactCardAccessId && publicKey && (
                 <AddToWalletButton
-                  profileId={profile.id}
+                  contactCardAccessId={data.contactCardAccessId}
                   publicKey={publicKey}
                   style={styles.button}
                   appearance="light"

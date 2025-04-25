@@ -1,5 +1,6 @@
 import {
   deleteRedirection,
+  getContactCardAccessWithHasGooglePass,
   getProfilesWithHasGooglePass,
   getPushTokensFromWebCardId,
   getRedirectWebCardByUserName,
@@ -35,11 +36,21 @@ export const notifyRelatedWalletPasses = async (
   }
 
   if (!appleOnly) {
-    const googleWalletPasses = await getProfilesWithHasGooglePass(webCardId);
+    const oldGoogleWalletPasses = await getProfilesWithHasGooglePass(webCardId); //legacy passes
+    const googleWalletPasses =
+      await getContactCardAccessWithHasGooglePass(webCardId);
 
-    if (googleWalletPasses.length) {
-      googleWalletPasses.map(({ profileId, userLocale }) =>
+    if (oldGoogleWalletPasses.length) {
+      oldGoogleWalletPasses.map(({ profileId, userLocale }) =>
         notifyGooglePassWallet(profileId, userLocale ?? DEFAULT_LOCALE),
+      );
+    }
+    if (googleWalletPasses.length) {
+      googleWalletPasses.map(({ contactCardAccessId, userLocale }) =>
+        notifyGooglePassWallet(
+          contactCardAccessId,
+          userLocale ?? DEFAULT_LOCALE,
+        ),
       );
     }
   }
