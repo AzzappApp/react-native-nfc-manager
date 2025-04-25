@@ -1,3 +1,7 @@
+## 1.9.13-rc.3
+
+* **fix:**  - **CookieConsentScreen:** handle dark mode
+
 ## 1.9.13-rc.2
 
 * **fix:**  - **contactCard:** [#8539](https://github.com/AzzappApp/azzapp/pull/8539) wrong address set in common infos ([#8543](https://github.com/AzzappApp/azzapp/pull/8543))
