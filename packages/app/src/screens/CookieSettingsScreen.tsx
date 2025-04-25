@@ -314,7 +314,7 @@ const CookieSettingsScreen = ({
         onDismiss={onInformationClose}
         variant="modal"
       >
-        <View style={styles.modalContent}>
+        <Container style={styles.modalContent}>
           <Header
             leftElement={
               <IconButton
@@ -334,7 +334,7 @@ const CookieSettingsScreen = ({
             {displayedInformation &&
               cookieDescriptions[displayedInformation].text}
           </Text>
-        </View>
+        </Container>
       </BottomSheetModal>
     </Container>
   );
@@ -372,7 +372,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   modalContent: {
-    backgroundColor: colors.white,
     paddingHorizontal: 20,
   },
 });
