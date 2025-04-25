@@ -1,8 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { z } from 'zod';
+import { getProfileById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
+import { webCardOwnerLoader } from '#loaders';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
@@ -27,9 +30,32 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     if (!args.config?.createContactCard) {
-      await validateCurrentSubscription(userId, {
-        action: 'USE_SCAN',
-      });
+      if (args.config?.profileId) {
+        const profileId = fromGlobalIdWithType(
+          args.config.profileId,
+          'Profile',
+        );
+
+        const profile = await getProfileById(profileId);
+
+        if (!profile) {
+          throw new GraphQLError(ERRORS.INVALID_REQUEST);
+        }
+        const ownerId =
+          profile.profileRole === 'owner'
+            ? profile.userId
+            : (await webCardOwnerLoader.load(profile.webCardId))?.id;
+        if (!ownerId) {
+          throw new GraphQLError(ERRORS.INVALID_REQUEST);
+        }
+        await validateCurrentSubscription(ownerId, {
+          action: 'USE_SCAN',
+        });
+      } else {
+        await validateCurrentSubscription(userId, {
+          action: 'USE_SCAN',
+        });
+      }
     }
 
     try {

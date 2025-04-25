@@ -17,15 +17,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View, StyleSheet } from 'react-native';
-import {
-  Image as ImageCompressor,
-  getImageMetaData,
-} from 'react-native-compressor';
+import { getImageMetaData } from 'react-native-compressor';
 import { getLocales } from 'react-native-localize';
-import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation, usePreloadedQuery } from 'react-relay';
-import { graphql, Observable } from 'relay-runtime';
+import { graphql } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { PAYMENT_IS_ENABLED } from '#Config';
@@ -42,6 +38,10 @@ import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { createRandomFileName, getFileName } from '#helpers/fileHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
 import { keyboardDismiss } from '#helpers/keyboardHelper';
 import { NativeTextureLoader } from '#helpers/mediaEditions';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
@@ -72,6 +72,7 @@ import type { ContactCardCreateScreenQuery } from '#relayArtifacts/ContactCardCr
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
 import type { ViewStyle } from 'react-native';
+import type { Observable } from 'relay-runtime';
 
 const contactCardCreateScreenQuery = graphql`
   query ContactCardCreateScreenQuery {
@@ -240,20 +241,9 @@ const ContactCardCreateScreen = ({
       const uploads = [];
 
       if (avatar?.local && avatar.uri) {
-        setProgressIndicator(Observable.from(0));
+        const { file, uploadURL, uploadParameters } =
+          await prepareAvatarForUpload(avatar.uri);
 
-        const fileName = getFileName(avatar.uri);
-        const compressedFileUri = await ImageCompressor.compress(avatar.uri);
-        const file: any = {
-          name: fileName,
-          uri: compressedFileUri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
-
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'avatar',
-        });
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } else if (avatar?.external && avatar?.uri) {
         try {
@@ -263,20 +253,9 @@ const ContactCardCreateScreen = ({
             fileUri,
           );
           if (downloadResult.status === 200) {
-            const compressedFileUri = await ImageCompressor.compress(
-              downloadResult.uri,
-            );
-            const fileName = getFileName(compressedFileUri);
-            const file: any = {
-              name: fileName,
-              uri: compressedFileUri,
-              type: 'image/jpeg',
-            };
+            const { file, uploadURL, uploadParameters } =
+              await prepareAvatarForUpload(downloadResult.uri);
 
-            const { uploadURL, uploadParameters } = await uploadSign({
-              kind: 'image',
-              target: 'avatar',
-            });
             uploads.push(uploadMedia(file, uploadURL, uploadParameters));
           } else {
             uploads.push(null);
@@ -292,33 +271,35 @@ const ContactCardCreateScreen = ({
       logo = webCardKind === 'business' ? logo : null;
       let logoWidth = 0;
       let logoHeight = 0;
+      let logoUri;
       if (logo?.uri) {
-        const fileName = getFileName(logo.uri);
-        const mimeType = mime.lookup(fileName);
-        const compressedFileUri = await ImageCompressor.compress(logo.uri, {
-          output: mimeType === 'image/jpeg' ? 'jpg' : 'png',
-        });
-        const metaData = await getImageMetaData(compressedFileUri);
-        logoHeight = metaData.ImageHeight;
-        logoWidth = metaData.ImageWidth;
-        const file: any = {
-          name: fileName,
-          uri: logo.uri,
-          type: mimeType === 'image/jpeg' ? mimeType : 'image/png',
-        };
+        try {
+          const { file, uploadURL, uploadParameters } =
+            await prepareLogoForUpload(logo.uri);
+          logoUri = file.uri;
+          const metaData = await getImageMetaData(file.uri);
+          logoHeight = metaData.ImageHeight;
+          logoWidth = metaData.ImageWidth;
 
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'logo',
-        });
-        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          logoUri = undefined;
+          Sentry.captureException(e);
+          uploads.push(null);
+        }
       } else {
         uploads.push(null);
       }
 
       //create the coverId
-      if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
-        const logoTextureInfo = NativeTextureLoader.loadImage(logo.uri, {
+      if (
+        logo &&
+        logo.id != null &&
+        logoWidth > 0 &&
+        logoHeight > 0 &&
+        logoUri
+      ) {
+        const logoTextureInfo = NativeTextureLoader.loadImage(logoUri, {
           width: logoWidth,
           height: logoHeight,
         });
@@ -437,8 +418,8 @@ const ContactCardCreateScreen = ({
       if (avatar?.local) {
         addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
       }
-      if (logo?.local) {
-        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      if (logoUri) {
+        addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
 
       commit({

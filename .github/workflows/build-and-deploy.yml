@@ -34,6 +34,9 @@ jobs:
       - name: Put staging translations to production
         run: yarn i18n:merge
         if: github.ref == 'refs/heads/stable'
+        env:
+          API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
+          TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
