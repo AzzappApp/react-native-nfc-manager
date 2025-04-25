@@ -344,7 +344,7 @@ export const getAppleWalletPass = (
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
   apiFetch(
-    `${API_ENDPOINT}/${locale}/wallet/apple?contactCardAccessId=${contactCardAccessId}&key=${key}`,
+    `${API_ENDPOINT}/${locale}/wallet/apple?contactCardAccessId=${contactCardAccessId}&key=${encodeURIComponent(key)}`,
     {
       ...init,
       method: 'GET',
@@ -359,7 +359,7 @@ export const getGoogleWalletPass: APIMethod<
   { token: string }
 > = ({ locale, contactCardAccessId, key }, init) =>
   apiFetch(
-    `${API_ENDPOINT}/${locale}/wallet/google?contactCardAccessId=${contactCardAccessId}&key=${key}`,
+    `${API_ENDPOINT}/${locale}/wallet/google?contactCardAccessId=${contactCardAccessId}&key=${encodeURIComponent(key)}`,
     {
       ...init,
       method: 'GET',
