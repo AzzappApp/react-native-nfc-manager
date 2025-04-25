@@ -245,7 +245,13 @@ export const OfflineVCardScreenRenderer = ({
               });
               webCard?.commonInformation?.addresses?.forEach(addr => {
                 vCard.addAddress(
+                  undefined,
+                  undefined,
                   addr.address,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
                   addressLabelToVCardLabel(addr.label),
                 );
               });
