@@ -28,6 +28,7 @@ import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 const AppIntlProvider = dynamic(
   () => import('../../components/AppIntlProvider'),
@@ -194,6 +195,11 @@ const DownloadVCard = ({
               type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
               base64,
             };
+          }
+          const firstPhoneNumber = (contactCard as ContactCard)
+            ?.phoneNumbers?.[0]?.number;
+          if (firstPhoneNumber) {
+            setPhoneNumber(firstPhoneNumber);
           }
 
           const { vCard } = await buildVCardFromContactCard(

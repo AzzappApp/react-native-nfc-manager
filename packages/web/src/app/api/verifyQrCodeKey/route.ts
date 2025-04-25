@@ -129,6 +129,18 @@ const verifyQrCodeKeyApi = async (req: Request) => {
         profileId: storedProfile.id,
         contactCard: {
           ...storedProfile.contactCard,
+          company:
+            (webCard?.isMultiUser
+              ? webCard?.commonInformation?.company
+              : null) ?? storedProfile.contactCard?.company,
+          phoneNumbers: (webCard?.isMultiUser
+            ? (webCard?.commonInformation?.phoneNumbers ?? [])
+            : []
+          ).concat(storedProfile.contactCard?.phoneNumbers || []),
+          emails: (webCard?.isMultiUser
+            ? (webCard?.commonInformation?.emails ?? [])
+            : []
+          ).concat(storedProfile.contactCard?.emails || []),
           urls: (webCard?.isMultiUser
             ? (webCard?.commonInformation?.urls ?? [])
             : []
