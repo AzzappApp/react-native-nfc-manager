@@ -1,3 +1,9 @@
+## 1.9.3-rc.8
+
+* **anaytlics:**  - try to activate reporting ([#8541](https://github.com/AzzappApp/azzapp/pull/8541))
+* **feat:**  - put back apple pass update ([#8538](https://github.com/AzzappApp/azzapp/pull/8538))
+* **fix:**  - add missed addresses in common info ([#8540](https://github.com/AzzappApp/azzapp/pull/8540))
+
 ## 1.9.3-rc.7
 
 * **fix:**  - **contactCard:** [#8535](https://github.com/AzzappApp/azzapp/pull/8535) add missing common info + whatsapp button ([#8536](https://github.com/AzzappApp/azzapp/pull/8536))
