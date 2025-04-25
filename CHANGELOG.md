@@ -1,3 +1,7 @@
+## 1.9.13-rc.4
+
+* **fix:**  - **contactCard:** [#8547](https://github.com/AzzappApp/azzapp/pull/8547) key may have special characters ([#8548](https://github.com/AzzappApp/azzapp/pull/8548))
+
 ## 1.9.13-rc.3
 
 * **fix:**  - **CookieConsentScreen:** handle dark mode
