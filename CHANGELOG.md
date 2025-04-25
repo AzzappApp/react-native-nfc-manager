@@ -1,3 +1,7 @@
+## 1.9.3-rc.7
+
+* **fix:**  - **contactCard:** [#8535](https://github.com/AzzappApp/azzapp/pull/8535) add missing common info + whatsapp button ([#8536](https://github.com/AzzappApp/azzapp/pull/8536))
+
 ## 1.9.3-rc.6
 
 * **fix:**  - **ShareBackModal:** use english for country name in phone selector ([#8532](https://github.com/AzzappApp/azzapp/pull/8532))
