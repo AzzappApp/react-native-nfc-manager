@@ -1,3 +1,4 @@
+import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
 import {
   getEmailSignatureTitleColor,
   colors,
@@ -31,6 +32,11 @@ const renderFullEmailSignature = ({
       })
     : null;
 
+  const contactCard = mergeContactCardWithCommonInfos(
+    webCard,
+    profile.contactCard,
+  );
+
   const avatarSection = avatar
     ? `
       <tr>
@@ -60,7 +66,7 @@ const renderFullEmailSignature = ({
           font-weight: 500;
           white-space: nowrap;"
         >
-          ${formatDisplayName(profile.contactCard?.firstName, profile.contactCard?.lastName)}
+          ${formatDisplayName(contactCard.firstName, contactCard.lastName)}
         </span>
       </td>
     </tr>
@@ -68,7 +74,7 @@ const renderFullEmailSignature = ({
 
   const titleColor = getEmailSignatureTitleColor(webCard.cardColors?.primary);
 
-  const titleSection = profile.contactCard?.title
+  const titleSection = contactCard?.title
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
@@ -78,13 +84,13 @@ const renderFullEmailSignature = ({
             font-weight: 500;
             white-space: nowrap;"
           >
-            ${profile.contactCard.title}
+            ${contactCard.title}
           </span>
         </td>
       </tr>`
     : '';
 
-  const companySection = profile.contactCard?.company
+  const companySection = contactCard.company
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
@@ -94,7 +100,7 @@ const renderFullEmailSignature = ({
             font-weight: 400;
             white-space: nowrap;"
           >
-            ${profile.contactCard.company}
+            ${contactCard.company}
           </span>
         </td>
       </tr>`
@@ -129,9 +135,8 @@ const renderFullEmailSignature = ({
     `;
 
   const phoneSection =
-    profile.contactCard?.phoneNumbers &&
-    profile.contactCard?.phoneNumbers.length > 0
-      ? profile.contactCard?.phoneNumbers
+    contactCard?.phoneNumbers && contactCard?.phoneNumbers.length > 0
+      ? contactCard?.phoneNumbers
           .map(phone =>
             generateContactLink(`tel:${phone.number}`, phone.number),
           )
@@ -139,8 +144,8 @@ const renderFullEmailSignature = ({
       : '';
 
   const emailSection =
-    profile.contactCard?.emails && profile.contactCard?.emails.length > 0
-      ? profile.contactCard?.emails
+    contactCard?.emails && contactCard?.emails.length > 0
+      ? contactCard?.emails
           .map(mail =>
             generateContactLink(`mailto:${mail.address}`, mail.address),
           )

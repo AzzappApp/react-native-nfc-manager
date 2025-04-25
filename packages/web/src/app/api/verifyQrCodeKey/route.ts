@@ -8,6 +8,7 @@ import {
   updateContactCardAccessLastRead,
   getProfileWithWebCardById,
 } from '@azzapp/data';
+import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import { importPublicKey, verifyMessage } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
@@ -127,33 +128,10 @@ const verifyQrCodeKeyApi = async (req: Request) => {
       {
         avatarUrl,
         profileId: storedProfile.id,
-        contactCard: {
-          ...storedProfile.contactCard,
-          addresses: (webCard?.isMultiUser
-            ? (webCard?.commonInformation?.addresses ?? [])
-            : []
-          ).concat(storedProfile.contactCard?.addresses || []),
-          company:
-            (webCard?.isMultiUser
-              ? webCard?.commonInformation?.company
-              : null) ?? storedProfile.contactCard?.company,
-          phoneNumbers: (webCard?.isMultiUser
-            ? (webCard?.commonInformation?.phoneNumbers ?? [])
-            : []
-          ).concat(storedProfile.contactCard?.phoneNumbers || []),
-          emails: (webCard?.isMultiUser
-            ? (webCard?.commonInformation?.emails ?? [])
-            : []
-          ).concat(storedProfile.contactCard?.emails || []),
-          urls: (webCard?.isMultiUser
-            ? (webCard?.commonInformation?.urls ?? [])
-            : []
-          ).concat(storedProfile.contactCard?.urls || []),
-          socials: (webCard?.isMultiUser
-            ? (webCard?.commonInformation?.socials ?? [])
-            : []
-          ).concat(storedProfile.contactCard?.socials || []),
-        },
+        contactCard: mergeContactCardWithCommonInfos(
+          webCard,
+          storedProfile.contactCard,
+        ),
         displayName: displayName(storedProfile.contactCard ?? {}, webCard),
         token,
       },
