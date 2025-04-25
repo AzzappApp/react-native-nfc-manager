@@ -1,3 +1,12 @@
+## 1.9.13-rc.2
+
+* **fix:**  - **contactCard:** [#8539](https://github.com/AzzappApp/azzapp/pull/8539) wrong address set in common infos ([#8543](https://github.com/AzzappApp/azzapp/pull/8543))
+* **fix:**  - error on monaco address
+* **fix:**  - put in cache right logo uri
+* **fix:**  - url build
+* **fix:**  - **payment:** [#8446](https://github.com/AzzappApp/azzapp/pull/8446) check owner of webcard id ([#8450](https://github.com/AzzappApp/azzapp/pull/8450))
+* **fix:**  - change redirection
+
 ## 1.9.3-rc.8
 
 * **anaytlics:**  - try to activate reporting ([#8541](https://github.com/AzzappApp/azzapp/pull/8541))

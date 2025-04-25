@@ -12,8 +12,8 @@
 	<key>SHARED_GROUP_IDENTIFIER</key>
 	<string>$(SHARED_GROUP_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.9.12</string>
+	<string>1.9.13</string>
 	<key>CFBundleVersion</key>
-	<string>9</string>
+	<string>3</string>
 </dict>
 </plist>
