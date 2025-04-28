@@ -1,3 +1,8 @@
+## 1.10.0-canary.149
+
+* **fix:**  - remove date of contact in contact detail ([#8555](https://github.com/AzzappApp/azzapp/pull/8555))
+* **fix:**  - ensure email and phone are not blank before adding them during web shareback ([#8557](https://github.com/AzzappApp/azzapp/pull/8557))
+
 ## 1.10.0-canary.148
 
 * **feat:**  - Appclip shareback ([#8468](https://github.com/AzzappApp/azzapp/pull/8468))
