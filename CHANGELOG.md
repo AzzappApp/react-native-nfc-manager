@@ -1,3 +1,7 @@
+## 1.9.13-rc.8
+
+
+
 ## 1.9.13-rc.7
 
 * **feat:**  - remove selected flags in contact card ([#8554](https://github.com/AzzappApp/azzapp/pull/8554))
