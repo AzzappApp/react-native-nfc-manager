@@ -174,15 +174,18 @@ const DownloadVCard = ({
         [contactCardAccessId, key, geolocation] = JSON.parse(
           decompressFromEncodedURIComponent(keyData),
         );
-        const res = await fetch('/api/verifyQrCodeKey', {
-          body: JSON.stringify({
-            contactCardAccessId,
-            key,
-            geolocation,
-            userName: webCard.userName,
-          }),
-          method: 'POST',
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/verifyQrCodeKey`,
+          {
+            body: JSON.stringify({
+              contactCardAccessId,
+              key,
+              geolocation,
+              userName: webCard.userName,
+            }),
+            method: 'POST',
+          },
+        );
         if (res.ok) {
           const { contactCard, avatarUrl, token, displayName, profileId } =
             await res.json();
