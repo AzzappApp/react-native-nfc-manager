@@ -53,6 +53,9 @@ export const buildExpoContact = async (
           await File.downloadFileAsync(contactAvatar.uri, avatar);
         }
       }
+    } else if (contactAvatar?.uri) {
+      // already in cache
+      avatar = new File(contactAvatar.uri);
     }
   } catch (e) {
     Sentry.captureException(e);
