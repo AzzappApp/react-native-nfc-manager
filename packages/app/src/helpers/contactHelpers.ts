@@ -3,6 +3,7 @@ import { getContactByIdAsync } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { getImageMetaData } from 'react-native-compressor';
 import { MMKV } from 'react-native-mmkv';
 import VCard from 'vcard-creator';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
@@ -384,7 +385,7 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
       }
       const image = file.base64();
       if (image) {
-        vCard.addPhoto(image);
+        vCard.addPhoto(image, 'png'); // requested avatars format
       }
     } catch (e) {
       Sentry.captureException(e);
