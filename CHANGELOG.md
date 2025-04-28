@@ -1,3 +1,8 @@
+## 1.9.13-rc.6
+
+* **fix:**  - **pass:** [#8551](https://github.com/AzzappApp/azzapp/pull/8551) set correct cover aspect ratio ([#8556](https://github.com/AzzappApp/azzapp/pull/8556))
+* **fix:**  - **multiUser:** [#8550](https://github.com/AzzappApp/azzapp/pull/8550) remove logo from user ([#8558](https://github.com/AzzappApp/azzapp/pull/8558))
+
 ## 1.9.13-rc.5
 
 * **fix:**  - **emailSignature:** [#8552](https://github.com/AzzappApp/azzapp/pull/8552) merge common info in email signature ([#8553](https://github.com/AzzappApp/azzapp/pull/8553))
