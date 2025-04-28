@@ -7,7 +7,6 @@ export const phoneNumberSchema = z.object({
   label: z.string(),
   number: z.string(),
   countryCode: z.string().optional(),
-  selected: z.boolean().nullable().optional(),
 });
 
 export type ContactCardPhoneNumber = z.infer<typeof phoneNumberSchema>;

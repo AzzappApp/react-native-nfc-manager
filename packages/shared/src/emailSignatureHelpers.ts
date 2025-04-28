@@ -29,10 +29,10 @@ export const serializeEmailSignature = (
     (commonInformation?.company || card?.company) ?? '',
     card?.title ?? '',
     (commonInformation?.emails ?? [])
-      .concat(card?.emails?.filter(p => p.selected) ?? [])
+      .concat(card?.emails ?? [])
       .map(({ address }) => address),
     (commonInformation?.phoneNumbers ?? [])
-      .concat(card?.phoneNumbers?.filter(p => p.selected) ?? [])
+      .concat(card?.phoneNumbers ?? [])
       .map(({ number }) => number),
     avatarUrl ?? undefined,
     new Date().toISOString(),

@@ -34,28 +34,24 @@ const contactCard = {
     {
       address: 'test@mail.com',
       label: 'Work',
-      selected: true,
     },
   ],
   phoneNumbers: [
     {
       number: '123456789',
       label: 'Mobile',
-      selected: true,
     },
   ],
   urls: [
     {
       address: 'https://www.google.com',
       label: 'Website',
-      selected: true,
     },
   ],
   socials: [
     {
       url: 'https://www.facebook.com',
       label: 'Facebook',
-      selected: true,
     },
   ],
 };

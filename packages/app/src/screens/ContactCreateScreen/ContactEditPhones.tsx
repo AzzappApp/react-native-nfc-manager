@@ -63,7 +63,6 @@ const ContactEditPhones = ({
               label: 'Home',
               number: '',
               countryCode: locales[0].countryCode,
-              selected: true,
             })
           }
         >

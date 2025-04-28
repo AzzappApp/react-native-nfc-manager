@@ -30,7 +30,6 @@ const ContactCardEditModalBirthdays = ({
         <ContactCardEditDateField
           control={control}
           valueKey="birthday.birthday"
-          selectedKey="birthday.selected"
           deleteField={() => field.onChange(null)}
           title={intl.formatMessage({
             defaultMessage: 'Birthday',

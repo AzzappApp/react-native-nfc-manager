@@ -40,7 +40,6 @@ const ContactCardEditModalEmails = ({
             control={control}
             labelKey={`emails.${index}.label`}
             valueKey={`emails.${index}.address`}
-            selectedKey={`emails.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -65,7 +64,6 @@ const ContactCardEditModalEmails = ({
             append({
               label: 'Home',
               address: '',
-              selected: true,
             });
           }}
         >

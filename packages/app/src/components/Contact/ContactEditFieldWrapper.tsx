@@ -23,7 +23,6 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SelectList from '#ui/SelectList';
-import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import { useFormDeleteContext } from '../FormDeleteFieldOverlay';
 import type { PropsWithChildren } from 'react';
@@ -33,7 +32,6 @@ import type { LayoutRectangle } from 'react-native';
 const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
-  selectedKey,
   control,
   labelValues,
   onChangeLabel,
@@ -42,7 +40,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 }: PropsWithChildren<{
   labelKey?: FieldPath<TFieldValues>;
   deleteField: () => void;
-  selectedKey?: FieldPath<TFieldValues>;
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   onChangeLabel?: (label: string) => void;
@@ -164,19 +161,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             )}
           </View>
           {children}
-          {selectedKey && (
-            <Controller
-              control={control}
-              name={selectedKey}
-              render={({ field: { onChange, value } }) => (
-                <Switch
-                  value={Boolean(value)}
-                  onValueChange={onChange}
-                  style={styles.switch}
-                />
-              )}
-            />
-          )}
           <PressableNative
             style={styles.deleteButton}
             pointerEvents="auto"

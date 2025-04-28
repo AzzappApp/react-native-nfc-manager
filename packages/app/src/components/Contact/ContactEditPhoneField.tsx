@@ -25,7 +25,6 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
   valueKey,
   labelKey,
   countryCodeKey,
-  selectedKey,
   labelValues,
   placeholder,
   onChangeLabel,
@@ -40,7 +39,6 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
   labelKey?: FieldPath<TFieldValues>;
   valueKey: FieldPath<TFieldValues>;
   countryCodeKey: FieldPath<TFieldValues>;
-  selectedKey?: FieldPath<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
@@ -64,7 +62,6 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
           labelValues={labelValues}
           onChangeLabel={onChangeLabel}
           deleteField={deleteField}
-          selectedKey={selectedKey}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >
           <Controller

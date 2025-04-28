@@ -236,7 +236,6 @@ export const buildDefaultContactCard = async (
           {
             address: user.email,
             label: 'Home',
-            selected: true,
           },
         ]
       : null,
@@ -245,7 +244,6 @@ export const buildDefaultContactCard = async (
           {
             number: user.phoneNumber,
             label: 'Home',
-            selected: true,
           },
         ]
       : null,

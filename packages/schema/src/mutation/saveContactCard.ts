@@ -50,17 +50,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   };
 
   const updates: Partial<Profile> = {
-    contactCard: {
-      ...contactCardUpdates,
-      urls: [
-        ...(contactCardUpdates.urls?.map(u => ({ ...u, selected: true })) ||
-          []),
-      ],
-      socials: [
-        ...(contactCardUpdates.socials?.map(u => ({ ...u, selected: true })) ||
-          []),
-      ],
-    },
+    contactCard: contactCardUpdates,
   };
 
   updates.avatarId = contactCard.avatarId;
