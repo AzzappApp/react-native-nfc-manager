@@ -108,34 +108,25 @@ const addContact: MutationResolvers['addContact'] = async (
       ? webCard?.commonInformation
       : undefined;
     const addresses =
-      profile.contactCard?.addresses
-        ?.filter(address => address.selected)
-        .map(address => ({
-          label: address.label,
-          address: address.address,
-        })) || [];
+      profile.contactCard?.addresses?.map(address => ({
+        label: address.label,
+        address: address.address,
+      })) || [];
 
     const emails =
-      profile.contactCard?.emails
-        ?.filter(email => email.selected)
-        .map(email => ({
-          label: email.label,
-          address: email.address,
-        })) || [];
+      profile.contactCard?.emails?.map(email => ({
+        label: email.label,
+        address: email.address,
+      })) || [];
 
     const phoneNumbers =
-      profile.contactCard?.phoneNumbers
-        ?.filter(phoneNumber => phoneNumber.selected)
-        .map(phoneNumber => ({
-          label: phoneNumber.label,
-          number: phoneNumber.number,
-        })) || [];
+      profile.contactCard?.phoneNumbers?.map(phoneNumber => ({
+        label: phoneNumber.label,
+        number: phoneNumber.number,
+      })) || [];
 
     const birthday =
-      profile.contactCard?.birthday?.birthday &&
-      profile.contactCard?.birthday.selected
-        ? profile.contactCard.birthday.birthday?.split('T')[0]
-        : null;
+      profile.contactCard?.birthday?.birthday?.split('T')[0] ?? null;
 
     const urls = (
       webCard?.userName ? [{ url: buildUserUrl(webCard.userName) }] : []

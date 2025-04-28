@@ -1,5 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
+  getContactCardAccessForProfile,
+  getContactCardAccessWithHasGooglePass,
   getPushTokens,
   referencesMedias,
   transaction,
@@ -22,6 +24,8 @@ jest.mock('@azzapp/data', () => ({
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateProfile: jest.fn(),
+  getContactCardAccessWithHasGooglePass: jest.fn(),
+  getContactCardAccessForProfile: jest.fn(),
 }));
 
 jest.mock('#externals', () => ({
@@ -162,6 +166,7 @@ describe('saveContactCard', () => {
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getPushTokens as jest.Mock).mockResolvedValue([]);
+    (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
@@ -193,6 +198,7 @@ describe('saveContactCard', () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
     (getPushTokens as jest.Mock).mockResolvedValue(['token1', 'token2']);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
@@ -235,6 +241,8 @@ describe('saveContactCard', () => {
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
+    (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
+    (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
 
     await saveContactCard(
       {},

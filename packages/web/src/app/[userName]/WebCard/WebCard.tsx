@@ -59,7 +59,7 @@ const WebCard = ({
 
   const hasPosts = posts.length > 0;
 
-  const hasContactCard = !!searchParams.get('c');
+  const hasContactCard = !!searchParams.get('c') || !!searchParams.get('k');
 
   return (
     <FullScreenOverlay cardStyle={cardStyle}>

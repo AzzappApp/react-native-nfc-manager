@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
-import { fromGlobalId } from 'graphql-relay';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
@@ -22,6 +21,7 @@ import {
   stringToContactEmailLabelType,
   stringToContactPhoneNumberLabelType,
 } from '#helpers/contactListHelpers';
+import { createHash } from '#helpers/cryptoHelpers';
 import { isFileURL } from '#helpers/fileHelpers';
 import { prepareAvatarForUpload } from '#helpers/imageHelpers';
 import { uploadMedia } from '#helpers/MobileWebAPI';
@@ -45,6 +45,8 @@ import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModa
 import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { Image } from 'expo-contacts';
 
 type Props = {
   params: WebCardRoute['params'];
@@ -52,7 +54,14 @@ type Props = {
 };
 
 const AddContactModal = ({
-  params: { additionalContactData, contactData, geolocation },
+  params: {
+    additionalContactData,
+    contactData,
+    geolocation,
+    contactCard,
+    avatarUrl,
+    contactProfileId,
+  },
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
@@ -273,19 +282,39 @@ const AddContactModal = ({
         );
         return;
       }
-      if (!scanned && contactData && webCard) {
-        const contact = await buildContact(
-          contactData,
-          additionalContactData,
-          webCard.userName,
-        );
-        if (contact.webCardId === fromGlobalId(webCard.id).id) {
+      if (!scanned && webCard) {
+        if (contactData) {
+          const contact = await buildContact(
+            contactData,
+            additionalContactData,
+            webCard.userName,
+          );
+
+          setScanned(contact);
+          open();
+        } else if (contactCard) {
+          const { contact } = await buildContactFromContactCard(
+            contactCard,
+            contactProfileId ?? '',
+            avatarUrl,
+            webCard.userName,
+          );
+
           setScanned(contact);
           open();
         }
       }
     })();
-  }, [contactData, webCard, additionalContactData, scanned, open]);
+  }, [
+    contactData,
+    webCard,
+    additionalContactData,
+    scanned,
+    open,
+    contactCard,
+    avatarUrl,
+    contactProfileId,
+  ]);
 
   const userName = useMemo(() => {
     if (scanned) {
@@ -375,19 +404,15 @@ const AddContactModal = ({
   );
 };
 
-const downloadAvatar = async (
-  profileId: string,
-  additionalContactData: WebCardRoute['params']['additionalContactData'],
-) => {
-  let image = undefined;
-  if (additionalContactData?.avatarUrl) {
+const downloadAvatar = async (avatarUrl?: string) => {
+  let image: Image | undefined = undefined;
+  if (avatarUrl) {
     try {
-      const avatar = new File(Paths.cache.uri + profileId);
-      if (avatar.exists) {
-        // be sure that avatar can be refreshed
-        avatar.delete();
+      const hash = createHash(avatarUrl);
+      const avatar = new File(Paths.cache.uri + hash);
+      if (!avatar.exists) {
+        await File.downloadFileAsync(avatarUrl, avatar);
       }
-      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
 
       image = {
         width: 720,
@@ -403,6 +428,68 @@ const downloadAvatar = async (
   return image;
 };
 
+const buildContactFromContactCard = async (
+  contactCard: ContactCard,
+  profileId: string,
+  avatarUrl?: string,
+  userName?: string,
+) => {
+  const image = await downloadAvatar(avatarUrl);
+
+  const contact: ContactType = {
+    firstName: contactCard.firstName ?? '',
+    lastName: contactCard.lastName ?? '',
+    company: contactCard.company ?? '',
+    title: contactCard.title ?? '',
+    addresses: contactCard.addresses?.map(address => ({
+      label: stringToContactAddressLabelType(address.label),
+      address: address.address,
+      isPrimary: address.label === 'Main',
+    })),
+    phoneNumbers: contactCard.phoneNumbers?.map(phone => ({
+      label: stringToContactPhoneNumberLabelType(phone.label),
+      number: phone.number,
+      isPrimary: phone.label === 'Main',
+    })),
+    emails: contactCard.emails?.map(email => ({
+      label: stringToContactEmailLabelType(email.label),
+      address: email.address,
+      isPrimary: email.label === 'Main',
+    })),
+    birthday: contactCard.birthday?.birthday,
+    socials:
+      contactCard?.socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+        service: social.label,
+      })) ?? [],
+    urls: (userName
+      ? [
+          {
+            label: 'azzapp',
+            url: buildUserUrl(userName),
+          },
+        ]
+      : []
+    ).concat(
+      contactCard?.urls?.map(url => ({
+        label: '',
+        url:
+          !url.address || url.address.toLocaleLowerCase().startsWith('http')
+            ? url.address
+            : `https://${url.address}`,
+      })) ?? [],
+    ),
+    avatar: {
+      uri: image?.uri,
+    },
+    profileId,
+    createdAt: new Date(),
+  };
+
+  return { contact };
+};
+
 const buildContact = async (
   contactCardData: string,
   additionalContactData: WebCardRoute['params']['additionalContactData'],
@@ -410,7 +497,6 @@ const buildContact = async (
 ): Promise<ContactType> => {
   const {
     profileId,
-    webCardId,
     firstName,
     addresses,
     lastName,
@@ -421,7 +507,7 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  const image = await downloadAvatar(profileId, additionalContactData);
+  const image = await downloadAvatar(additionalContactData?.avatarUrl);
 
   const contact: ContactType = {
     id: profileId,
@@ -476,7 +562,6 @@ const buildContact = async (
     avatar: {
       uri: image?.uri,
     },
-    webCardId,
     profileId,
     createdAt: new Date(),
   };

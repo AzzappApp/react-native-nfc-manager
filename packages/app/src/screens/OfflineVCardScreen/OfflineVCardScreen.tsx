@@ -90,30 +90,24 @@ export const OfflineVCardScreenProfilesFragment = graphql`
       emails {
         label
         address
-        selected
       }
       phoneNumbers {
         label
         number
-        selected
       }
       urls {
         address
-        selected
       }
       addresses {
         address
         label
-        selected
       }
       birthday {
         birthday
-        selected
       }
       socials {
         url
         label
-        selected
       }
     }
   }
@@ -187,42 +181,38 @@ export const OfflineVCardScreenRenderer = ({
             if (contactCard?.title) {
               vCard.addJobtitle(contactCard.title);
             }
-            if (contactCard?.birthday && contactCard.birthday?.selected) {
+            if (contactCard?.birthday) {
               vCard.addBirthday(contactCard.birthday?.birthday.toString());
             }
             contactCard?.phoneNumbers?.forEach(number => {
-              if (number.selected)
-                vCard.addPhoneNumber(
-                  number.number,
-                  phoneLabelToVCardLabel(number.label) || '',
-                );
+              vCard.addPhoneNumber(
+                number.number,
+                phoneLabelToVCardLabel(number.label) || '',
+              );
             });
             contactCard?.emails?.forEach(email => {
-              if (email.selected)
-                vCard.addEmail(
-                  email.address,
-                  emailLabelToVCardLabel(email.label) || '',
-                );
+              vCard.addEmail(
+                email.address,
+                emailLabelToVCardLabel(email.label) || '',
+              );
             });
             contactCard?.urls?.forEach(url => {
-              if (url.selected) vCard.addURL(url.address);
+              vCard.addURL(url.address);
             });
             contactCard?.socials?.forEach(social => {
-              if (social.selected)
-                vCard.addSocial(social.url, social.label || '');
+              vCard.addSocial(social.url, social.label || '');
             });
             contactCard?.addresses?.forEach(addr => {
-              if (addr.selected)
-                vCard.addAddress(
-                  undefined,
-                  undefined,
-                  addr.address,
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
-                  addressLabelToVCardLabel(addr.label),
-                );
+              vCard.addAddress(
+                undefined,
+                undefined,
+                addr.address,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                addressLabelToVCardLabel(addr.label),
+              );
             });
             if (webCard?.isMultiUser) {
               webCard?.commonInformation?.phoneNumbers?.forEach(number => {
@@ -245,7 +235,13 @@ export const OfflineVCardScreenRenderer = ({
               });
               webCard?.commonInformation?.addresses?.forEach(addr => {
                 vCard.addAddress(
+                  undefined,
+                  undefined,
                   addr.address,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
                   addressLabelToVCardLabel(addr.label),
                 );
               });

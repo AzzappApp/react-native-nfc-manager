@@ -41,7 +41,10 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
     cardStyle,
   } = props;
   const searchParams = useSearchParams();
-  const isShareBack = !!searchParams.get('c') || !!searchParams.get('token');
+  const isShareBack =
+    !!searchParams.get('c') ||
+    !!searchParams.get('k') ||
+    !!searchParams.get('token');
   const mode = searchParams.get('mode');
   const [step, setStep] = useState(() => (isShareBack ? 0 : 2));
   const [contactDataVCard, setContactDataVCard] = useState({

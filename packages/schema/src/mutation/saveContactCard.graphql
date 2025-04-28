@@ -42,35 +42,35 @@ input ContactCardInput {
 input ContactCardEmailInput {
   address: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 input ContactCardPhoneNumberInput {
   number: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 input ContactCardUrlInput {
   address: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 input ContactCardAddressInput {
   address: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 input ContactCardBirthdayInput {
   birthday: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 input ContactCardSocialInput {
   url: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type SaveContactCardPayload {

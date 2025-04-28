@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getWebCardByUserName } from '@azzapp/data';
 import { CROP, buildCoverImageUrl } from '@azzapp/service/mediaServices';
 import {
+  COVER_CARD_RADIUS,
   COVER_MAX_WIDTH,
   COVER_RATIO,
   DEFAULT_COVER_WIDTH,
@@ -145,6 +146,7 @@ export const GET = async (
               width: imageWidth,
               height,
               crop: 'fit',
+              radius: COVER_CARD_RADIUS * 100,
             })}
           />
 

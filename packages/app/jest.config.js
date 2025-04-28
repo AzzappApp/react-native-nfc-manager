@@ -8,6 +8,7 @@ const esModules = [
   '@expo(nent)?/.*',
   '@expo-.*',
   '@shopify/react-native-skia',
+  '@noble/ed25519',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */

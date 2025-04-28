@@ -20,7 +20,6 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   valueKey,
-  selectedKey,
   control,
   labelValues,
   onChangeLabel,
@@ -29,7 +28,6 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
   labelKey?: FieldPath<TFieldValues>;
   deleteField: () => void;
   valueKey: FieldPath<TFieldValues>;
-  selectedKey?: FieldPath<TFieldValues>;
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   onChangeLabel?: (label: string) => void;
@@ -44,7 +42,6 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
       labelValues={labelValues}
       onChangeLabel={onChangeLabel}
       deleteField={deleteField}
-      selectedKey={selectedKey}
     >
       <Controller
         control={control}

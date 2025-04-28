@@ -1,16 +1,21 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import Image from 'next/image';
-import { getMediasByIds, getProfileById, getUserById } from '@azzapp/data';
+import {
+  getContactCardAccessById,
+  getMediasByIds,
+  getProfileById,
+  getUserById,
+} from '@azzapp/data';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
-import {
-  getImageURLForSize,
-  getRoundImageURLForSize,
-} from '@azzapp/shared/imagesHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
-import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
+import {
+  buildUserUrlWithContactCard,
+  buildUserUrlWithKey,
+} from '@azzapp/shared/urlHelpers';
 import azzappFull from '#assets/images/azzapp-full.png';
 import { CopyrightFooter } from '#components/CopyrightFooter';
 import { getDeviceInfo } from '#helpers/devices';
@@ -37,7 +42,7 @@ const EmailSignaturePage = async ({
   const { isMobileDevice } = getDeviceInfo(headers().get('user-agent'));
 
   const webCard = await cachedGetWebCardByUserName(params.userName);
-  if (!webCard) {
+  if (!webCard || !webCard.userName || webCard.deleted) {
     return notFound();
   }
 
@@ -50,52 +55,100 @@ const EmailSignaturePage = async ({
   }
 
   const mode = searchParams?.['mode'] === 'simple' ? 'simple' : 'full';
-  const compressedContactCard = searchParams['e'];
 
-  if (!compressedContactCard) {
-    return;
-  }
-  let contactData: string;
-  let signature: string;
-  try {
-    [contactData, signature] = JSON.parse(
-      decompressFromEncodedURIComponent(compressedContactCard),
+  const compressedKey = searchParams['k'];
+
+  let saveContactURL;
+  let profile;
+
+  if (compressedKey) {
+    const [serialized, signature] = JSON.parse(
+      decompressFromEncodedURIComponent(compressedKey),
     );
-  } catch {
-    return notFound();
-  }
-  if (!contactData || !signature || !webCard.userName) {
-    return notFound();
-  }
-  const isValid = await verifyHmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
-    signature,
-    contactData,
-    { salt: webCard.userName },
-  );
-  if (!isValid) {
-    return notFound();
-  }
-  const contact = parseEmailSignature(contactData);
-  const profile = await getProfileById(contact.profileId);
 
-  if (!profile || profile.webCardId !== webCard.id) {
-    return notFound();
+    const isValid = await verifyHmacWithPassword(
+      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      signature,
+      serialized,
+      { salt: webCard.userName },
+    );
+    if (!isValid) {
+      return notFound();
+    }
+
+    const [contactCardAccessId, key] = JSON.parse(serialized);
+
+    const contactAccess = await getContactCardAccessById(contactCardAccessId);
+
+    if (!contactAccess || contactAccess.isRevoked) {
+      return notFound();
+    }
+
+    profile = await getProfileById(contactAccess.profileId);
+
+    if (!profile || profile.webCardId !== webCard.id) {
+      return notFound();
+    }
+
+    saveContactURL = buildUserUrlWithKey({
+      userName: webCard.userName,
+      key,
+      contactCardAccessId,
+    });
+  } else {
+    const compressedContactCard = searchParams['e'];
+
+    if (!compressedContactCard) {
+      return;
+    }
+    let contactData: string;
+    let signature: string;
+    try {
+      [contactData, signature] = JSON.parse(
+        decompressFromEncodedURIComponent(compressedContactCard),
+      );
+    } catch {
+      return notFound();
+    }
+    if (!contactData || !signature) {
+      return notFound();
+    }
+    const isValid = await verifyHmacWithPassword(
+      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      signature,
+      contactData,
+      { salt: webCard.userName },
+    );
+    if (!isValid) {
+      return notFound();
+    }
+    const contact = parseEmailSignature(contactData);
+    profile = await getProfileById(contact.profileId);
+
+    if (!profile || profile.webCardId !== webCard.id) {
+      return notFound();
+    }
+
+    const { data: saveContactData, signature: saveContactSignature } =
+      await serializeAndSignContactCard(
+        webCard.userName,
+        profile.id,
+        profile.webCardId,
+        profile.contactCard ?? {},
+        webCard.isMultiUser ? webCard?.commonInformation : null,
+      );
+
+    saveContactURL = buildUserUrlWithContactCard(
+      webCard.userName,
+      saveContactData,
+      saveContactSignature,
+    );
   }
 
   const user = await getUserById(profile.userId);
   if (!user) {
     return notFound();
   }
-
-  const { data: saveContactData, signature: saveContactSignature } =
-    await serializeAndSignContactCard(
-      webCard.userName,
-      profile.id,
-      profile.webCardId,
-      profile.contactCard ?? {},
-      webCard.isMultiUser ? webCard?.commonInformation : null,
-    );
 
   const companyLogo =
     webCard.isMultiUser && webCard.logoId != null
@@ -113,12 +166,6 @@ const EmailSignaturePage = async ({
     }
   }
 
-  const saveContactURL = buildUserUrlWithContactCard(
-    webCard.userName,
-    saveContactData,
-    saveContactSignature,
-  );
-
   const showStoreLinks = !isMobileDevice;
 
   const intl = getServerIntl(
@@ -130,19 +177,8 @@ const EmailSignaturePage = async ({
     description: 'Signature web link / save my contact',
   });
 
-  // we override the avatar with the one from the profile if it exists
-  // to transform it into a round image
-  if (contact.avatar && profile.avatarId) {
-    contact.avatar = getRoundImageURLForSize({
-      id: profile.avatarId,
-      height: 120,
-      width: 120,
-      format: 'png',
-    });
-  }
-
   const bannerId =
-    webCard.isMultiUser && webCard.logoId != null
+    webCard.isMultiUser && webCard.bannerId != null
       ? webCard.bannerId
       : profile.bannerId;
 
@@ -180,7 +216,7 @@ const EmailSignaturePage = async ({
         mode={mode}
         webCard={webCard}
         media={media}
-        contact={contact}
+        profile={profile}
         companyLogoUrl={companyLogoUrl}
         bannerUrl={bannerUrl}
         saveContactMessage={saveContactMessage}
@@ -204,9 +240,9 @@ const EmailSignaturePage = async ({
       <CopySignatureButton
         mode={mode}
         companyLogoUrl={companyLogoUrl}
-        bannerUrl={bannerUrl}
-        contact={contact}
+        profile={profile}
         saveContactMessage={saveContactMessage}
+        bannerUrl={bannerUrl}
         saveContactURL={saveContactURL}
         webCard={webCard}
       />

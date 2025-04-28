@@ -13,7 +13,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   deleteField,
   keyboardType,
   valueKey,
-  selectedKey,
   control,
   labelValues,
   placeholder,
@@ -32,7 +31,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   autoCapitalize?: TextInputProps['autoCapitalize'];
   deleteField: () => void;
   valueKey: FieldPath<TFieldValues>;
-  selectedKey?: FieldPath<TFieldValues>;
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
@@ -61,7 +59,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           labelValues={labelValues}
           onChangeLabel={onChangeLabel}
           deleteField={deleteField}
-          selectedKey={selectedKey}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >
           <TextInput

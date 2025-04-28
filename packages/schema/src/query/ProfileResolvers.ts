@@ -16,6 +16,7 @@ import {
   searchWebCards,
   getCardTemplatesForWebCardKind,
   searchContacts,
+  getActiveContactCardAccess,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -25,6 +26,7 @@ import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
   buildUserUrl,
   buildUserUrlWithContactCard,
+  buildUserUrlWithKey,
 } from '@azzapp/shared/urlHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
@@ -276,15 +278,15 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       webCard?.isMultiUser ? webCard?.commonInformation : undefined,
     );
   },
-  contactCardUrl: async profile => {
-    return getContactCardUrl(profile);
+  contactCardUrl: async (profile, { deviceId, key }) => {
+    return getContactCardUrl({ profile, deviceId, key });
   },
   contactCardQrCode: async (
     profile,
-    { width, location, address, dark, light },
+    { width, location, address, dark, light, deviceId, key },
   ) => {
     const result = await toString(
-      await getContactCardUrl(profile, location, address),
+      await getContactCardUrl({ profile, location, address, deviceId, key }),
       {
         errorCorrectionLevel: 'L',
         width,
@@ -661,15 +663,37 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   deleted: async profile => {
     return profile.deleted;
   },
+  contactCardAccessId: async (profile, { deviceId }) => {
+    if (!profileIsAssociatedToCurrentUser(profile)) {
+      return null;
+    }
+
+    const contactCardAccess = await getActiveContactCardAccess(
+      deviceId,
+      profile.id,
+    );
+
+    return contactCardAccess && !contactCardAccess.isRevoked
+      ? contactCardAccess.id
+      : null;
+  },
 };
 
 export { ProfileResolverImpl as Profile };
 
-const getContactCardUrl = async (
-  profile: Profile,
-  location?: LocationInput | null,
-  address?: AddressInput | null,
-) => {
+const getContactCardUrl = async ({
+  profile,
+  location,
+  address,
+  deviceId,
+  key,
+}: {
+  profile: Profile;
+  location?: LocationInput | null;
+  address?: AddressInput | null;
+  deviceId?: string | null;
+  key?: string | null;
+}) => {
   const webCard = await webCardLoader.load(profile.webCardId);
   if (!webCard || !webCard?.userName) {
     return process.env.NEXT_PUBLIC_URL!;
@@ -677,6 +701,23 @@ const getContactCardUrl = async (
   if (!profileIsAssociatedToCurrentUser(profile)) {
     return buildUserUrl(webCard.userName);
   }
+
+  const geolocation = location && address ? { location, address } : null;
+
+  if (deviceId && key) {
+    const activeContactCardAccess = await getActiveContactCardAccess(
+      deviceId,
+      profile.id,
+    );
+    const url = buildUserUrlWithKey({
+      userName: webCard.userName,
+      key,
+      contactCardAccessId: activeContactCardAccess?.id,
+      geolocation,
+    });
+    return url;
+  }
+
   const { data, signature } = await serializeAndSignContactCard(
     webCard?.userName ?? '',
     profile.id,
@@ -684,8 +725,6 @@ const getContactCardUrl = async (
     profile.contactCard ?? {},
     webCard.isMultiUser ? webCard?.commonInformation : null,
   );
-
-  const geolocation = location || address ? { location, address } : undefined;
 
   const url = buildUserUrlWithContactCard(
     webCard?.userName ?? '',

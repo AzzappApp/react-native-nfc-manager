@@ -9,6 +9,7 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useQRCodeKey from '#hooks/useQRCodeKey';
 import FingerHint, {
   FINGER_HINT_HEIGHT,
   FINGER_HINT_WIDTH,
@@ -125,12 +126,15 @@ const ContactCardItem = ({
         invited
         promotedAsOwner
         ...ContactCard_profile
+        ...useQRCodeKey_profile
         lastContactCardUpdate
         createdAt
       }
     `,
     item,
   );
+
+  const qrCodeKey = useQRCodeKey(profile);
 
   const showUpdateContactHint =
     profile.lastContactCardUpdate <= profile.createdAt &&
@@ -168,6 +172,7 @@ const ContactCardItem = ({
                 height={Math.min(height, height)}
                 style={styles.card}
                 edit
+                qrCodeKey={qrCodeKey}
               />
             </TouchableOpacity>
           </View>

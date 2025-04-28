@@ -173,7 +173,6 @@ const ContactCardCreateScreen = ({
             {
               label: 'Work',
               address: currentUser?.userContactData?.email,
-              selected: true,
             },
           ]
         : [],
@@ -184,7 +183,6 @@ const ContactCardCreateScreen = ({
               number:
                 parsedPhoneNumber?.nationalNumber ||
                 currentUser?.userContactData?.phoneNumber,
-              selected: true,
               countryCode:
                 parsedPhoneNumber?.country || getLocales()[0].countryCode,
             },

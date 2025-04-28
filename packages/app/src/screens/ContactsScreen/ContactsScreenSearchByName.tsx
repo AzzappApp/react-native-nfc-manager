@@ -30,8 +30,8 @@ const ContactsScreenSearchByName = ({
     return contacts.reduce(
       (accumulator, contact) => {
         const initial = (
-          contact.firstName?.[0] ??
           contact.lastName?.[0] ??
+          contact.firstName?.[0] ??
           contact.company?.[0] ??
           contact.webCardUserName?.[0] ??
           ''

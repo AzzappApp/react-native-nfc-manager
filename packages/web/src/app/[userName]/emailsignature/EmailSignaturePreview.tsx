@@ -3,14 +3,13 @@ import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './EmailSignaturePreview.css';
 import renderFullEmailSignature from './renderFullEmailSignature';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
-import type { Media, WebCard } from '@azzapp/data';
-import type { EmailSignatureParsed } from '@azzapp/shared/emailSignatureHelpers';
+import type { Media, Profile, WebCard } from '@azzapp/data';
 
 type EmailSignaturePreviewProps = {
   mode: 'full' | 'simple';
   webCard: WebCard;
   media: Media | null;
-  contact: EmailSignatureParsed;
+  profile: Profile;
   companyLogoUrl: string | null;
   bannerUrl: string | null;
   saveContactMessage: string;
@@ -24,7 +23,7 @@ const EmailSignaturePreview = ({
   mode,
   webCard,
   media,
-  contact,
+  profile,
   companyLogoUrl,
   bannerUrl,
   saveContactMessage,
@@ -66,7 +65,7 @@ const EmailSignaturePreview = ({
       <div
         dangerouslySetInnerHTML={{
           __html: renderFullEmailSignature({
-            contact,
+            profile,
             webCard,
             companyLogoUrl,
             bannerUrl,

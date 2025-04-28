@@ -68,7 +68,8 @@
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>$(PRODUCT_NAME) wants to send you notifications.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with others.</string>
+	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with
+		others.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true />
 	<key>UIAppFonts</key>
@@ -123,7 +124,15 @@
 	<true />
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false />
-	<key>FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED</key>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<true />
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_ANALYTICS_STORAGE</key>
+	<true />
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_STORAGE</key>
+	<true />
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_USER_DATA</key>
+	<true />
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS</key>
 	<true />
 </dict>
 </plist>

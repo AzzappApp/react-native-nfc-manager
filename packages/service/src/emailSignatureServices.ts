@@ -1,9 +1,12 @@
-import { getUserById } from '@azzapp/data';
+import { getActiveContactCardAccess, getUserById } from '@azzapp/data';
 import { getEmailSignatureTitleColor } from '@azzapp/shared/colorsHelpers';
+import { hmacWithPassword } from '@azzapp/shared/crypto';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
-import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
+import {
+  buildEmailSignatureGenerationUrl,
+  buildEmailSignatureGenerationUrlWithKey,
+} from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl, buildBannerUrl, buildLogoUrl } from './mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
@@ -13,10 +16,14 @@ export const generateEmailSignature = async ({
   webCard,
   profile,
   intl,
+  deviceId,
+  key,
 }: {
   webCard: WebCard;
   profile: Profile;
   intl: IntlShape;
+  deviceId?: string;
+  key?: string;
 }) => {
   if (!webCard.userName) {
     throw new Error('User name is required');
@@ -34,32 +41,49 @@ export const generateEmailSignature = async ({
     IMAGE_AVATAR_LOGO_WIDTH,
   );
   const logoUrl = await buildLogoUrl(profile, webCard, IMAGE_AVATAR_LOGO_WIDTH);
-  const bannerUrl = await buildBannerUrl(profile, webCard);
-  const { data, signature } = await serializeAndSignEmailSignature(
-    webCard.userName,
-    profile.id,
-    webCard.id,
-    profile.contactCard,
-    webCard.isMultiUser ? webCard.commonInformation : undefined,
-    avatarUrl,
-  );
 
-  const { data: contactCardData, signature: contactCardSignature } =
-    await serializeAndSignContactCard(
+  const bannerUrl = await buildBannerUrl(profile, webCard);
+
+  let contactCardAccess;
+  let linkUrl;
+
+  if (deviceId && key) {
+    contactCardAccess = await getActiveContactCardAccess(deviceId, profile.id);
+
+    if (contactCardAccess) {
+      const serialized = JSON.stringify([contactCardAccess.id, key]);
+      const signature = await hmacWithPassword(
+        process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+        serialized,
+        {
+          salt: `${webCard.userName}`,
+        },
+      );
+
+      linkUrl = buildEmailSignatureGenerationUrlWithKey(
+        webCard.userName,
+        serialized,
+        signature.digest,
+      );
+    }
+  }
+
+  if (!linkUrl) {
+    const { data, signature } = await serializeAndSignEmailSignature(
       webCard.userName,
       profile.id,
       webCard.id,
       profile.contactCard,
       webCard.isMultiUser ? webCard.commonInformation : undefined,
+      avatarUrl,
     );
 
-  const linkUrl = buildEmailSignatureGenerationUrl(
-    webCard.userName,
-    data,
-    signature,
-    contactCardData,
-    contactCardSignature,
-  );
+    linkUrl = buildEmailSignatureGenerationUrl(
+      webCard.userName,
+      data,
+      signature,
+    );
+  }
 
   const user = await getUserById(profile.userId);
 
@@ -100,7 +124,7 @@ export const generateEmailSignature = async ({
                 'Subject of the email sent to the user when generating an email signature',
             }),
             title: intl.formatMessage({
-              defaultMessage: 'Elevate Your Email Signature 🚀y',
+              defaultMessage: 'Elevate Your Email Signature 🚀',
               id: 'BYBLJq',
               description:
                 'Title of the email sent to the user when generating an email signature',

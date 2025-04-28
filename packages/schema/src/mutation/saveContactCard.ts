@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import {
   buildDefaultContactCard,
   checkMedias,
+  getContactCardAccessForProfile,
   getPushTokens,
   getUserById,
   referencesMedias,
@@ -49,17 +50,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   };
 
   const updates: Partial<Profile> = {
-    contactCard: {
-      ...contactCardUpdates,
-      urls: [
-        ...(contactCardUpdates.urls?.map(u => ({ ...u, selected: true })) ||
-          []),
-      ],
-      socials: [
-        ...(contactCardUpdates.socials?.map(u => ({ ...u, selected: true })) ||
-          []),
-      ],
-    },
+    contactCard: contactCardUpdates,
   };
 
   updates.avatarId = contactCard.avatarId;
@@ -103,10 +94,18 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const pushTokens = await getPushTokens(profileId);
+  const contactCardsAccesses = await getContactCardAccessForProfile(profileId);
+
+  const pushTokens = await getPushTokens(
+    contactCardsAccesses.map(c => c.id).concat(profileId), // we add profile id for legacy passes
+  );
   if (pushTokens.length) {
     pushTokens.map(notifyApplePassWallet);
   }
+
+  contactCardsAccesses
+    .filter(contactCardAccess => contactCardAccess.hasGooglePass)
+    .map(c => notifyGooglePassWallet(c.id, user?.locale ?? DEFAULT_LOCALE));
 
   if (profile.hasGooglePass) {
     notifyGooglePassWallet(profile.id, user?.locale ?? DEFAULT_LOCALE);

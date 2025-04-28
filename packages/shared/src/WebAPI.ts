@@ -2,7 +2,7 @@
  * This modules contains helper functions to make API calls to the backend.
  */
 import { fetchJSON, postFormData } from './networkHelpers';
-import type { CommonInformation } from './contactCardHelpers';
+import type { CommonInformation, ContactCard } from './contactCardHelpers';
 import type { Geolocation } from './geolocationHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
@@ -313,36 +313,65 @@ export const verifySign: APIMethod<
   Pick<CommonInformation, 'socials' | 'urls'> & {
     avatarUrl?: string;
   }
-> = async ({ signature, data, salt }, init) =>
+> = async (params, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {
     ...init,
     method: 'POST',
-    body: JSON.stringify({ signature, data, salt }),
+    body: JSON.stringify(params),
+  });
+
+export const verifyQrCodeKey: APIMethod<
+  {
+    contactCardAccessId: string;
+    key: string;
+    userName: string;
+    geolocation?: Geolocation;
+  },
+  {
+    contactCard: ContactCard;
+    avatarUrl?: string;
+    profileId: string;
+  }
+> = async (params, init) =>
+  apiFetch(`${API_ENDPOINT}/verifyQrCodeKey`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(params),
   });
 
 /**
  * Api call to generate an apple wallet pass.
  */
 export const getAppleWalletPass = (
-  { locale, webCardId }: { locale: string; webCardId: string },
+  {
+    locale,
+    contactCardAccessId,
+    key,
+  }: { locale: string; contactCardAccessId: string; key: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?webCardId=${webCardId}`, {
-    ...init,
-    method: 'GET',
-  });
+  apiFetch(
+    `${API_ENDPOINT}/${locale}/wallet/apple?contactCardAccessId=${contactCardAccessId}&key=${encodeURIComponent(key)}`,
+    {
+      ...init,
+      method: 'GET',
+    },
+  );
 
 /**
  * Api call to generate a google wallet pass.
  */
 export const getGoogleWalletPass: APIMethod<
-  { locale: string; webCardId: string },
+  { locale: string; contactCardAccessId: string; key: string },
   { token: string }
-> = ({ locale, webCardId }, init) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?webCardId=${webCardId}`, {
-    ...init,
-    method: 'GET',
-  });
+> = ({ locale, contactCardAccessId, key }, init) =>
+  apiFetch(
+    `${API_ENDPOINT}/${locale}/wallet/google?contactCardAccessId=${contactCardAccessId}&key=${encodeURIComponent(key)}`,
+    {
+      ...init,
+      method: 'GET',
+    },
+  );
 
 export const requestUpdateContact: APIMethod<
   { email?: string | null; phoneNumber?: string | null; locale: string },

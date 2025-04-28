@@ -5,12 +5,11 @@ import { Button } from '#ui';
 import styles from './CopySignatureButton.css';
 import renderFullEmailSignature from './renderFullEmailSignature';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
-import type { WebCard } from '@azzapp/data';
-import type { EmailSignatureParsed } from '@azzapp/shared/emailSignatureHelpers';
+import type { Profile, WebCard } from '@azzapp/data';
 
 type CopySignatureButtonProps = {
   mode: 'full' | 'simple';
-  contact: EmailSignatureParsed;
+  profile: Profile;
   webCard: WebCard;
   companyLogoUrl: string | null;
   bannerUrl: string | null;
@@ -20,7 +19,7 @@ type CopySignatureButtonProps = {
 
 const CopySignatureButton = ({
   mode,
-  contact,
+  profile,
   webCard,
   companyLogoUrl,
   bannerUrl,
@@ -33,7 +32,7 @@ const CopySignatureButton = ({
     const signature =
       mode === 'full'
         ? renderFullEmailSignature({
-            contact,
+            profile,
             webCard,
             companyLogoUrl,
             bannerUrl,

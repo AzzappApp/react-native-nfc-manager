@@ -43,7 +43,6 @@ const ContactCardEditModalPhones = ({
             labelKey={`phoneNumbers.${index}.label`}
             valueKey={`phoneNumbers.${index}.number`}
             countryCodeKey={`phoneNumbers.${index}.countryCode`}
-            selectedKey={`phoneNumbers.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="phone-pad"
             labelValues={labelValues}
@@ -64,7 +63,6 @@ const ContactCardEditModalPhones = ({
               label: 'Home',
               number: '',
               countryCode: locales[0].countryCode,
-              selected: true,
             })
           }
         >

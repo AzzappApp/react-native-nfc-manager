@@ -358,7 +358,7 @@ const notifyApplePassWallet = (pushToken: string) => {
   );
 };
 
-const notifyGooglePassWallet = (profileId: string, locale: string) => {
+const notifyGooglePassWallet = (serial: string, locale: string) => {
   waitUntil(
     (async () => {
       fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/google`, {
@@ -367,7 +367,7 @@ const notifyGooglePassWallet = (profileId: string, locale: string) => {
           'Content-Type': 'application/json',
           [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
         },
-        body: JSON.stringify({ profileId, locale }),
+        body: JSON.stringify({ serial, locale }),
       });
     })(),
   );

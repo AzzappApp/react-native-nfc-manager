@@ -2,8 +2,10 @@ import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NativeModules, Platform } from 'react-native';
+import * as z from 'zod';
+import { deserializeGeolocation } from '@azzapp/shared/urlHelpers';
 import { logEvent } from './analytics';
-import { verifySign } from './MobileWebAPI';
+import { verifyQrCodeKey, verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
 import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 
@@ -36,6 +38,18 @@ const prefixes = [
 ];
 //we had to many issue with end, add all url to avoid issue with env variable during build
 const { AZPMediaHelpers } = NativeModules;
+
+const geolocationSchema = z
+  .tuple([
+    z.number().nullable(),
+    z.number().nullable(),
+    z.string().nullable(),
+    z.string().nullable(),
+    z.string().nullable(),
+    z.string().nullable(),
+  ])
+  .optional()
+  .nullable();
 
 export const matchUrlWithRoute = async (
   url: string,
@@ -112,10 +126,10 @@ export const matchUrlWithRoute = async (
 
   const matchProfile = withoutPrefix.match(profileUrl);
   if (matchProfile) {
-    const username = matchProfile[1];
+    const userName = matchProfile[1];
     const route = matchProfile[2];
     const routeId = matchProfile[3];
-    if (!username) {
+    if (!userName) {
       return;
     }
     if (route === 'post' && routeId) {
@@ -140,7 +154,7 @@ export const matchUrlWithRoute = async (
       return {
         route: 'EMAIL_SIGNATURE',
         params: {
-          userName: username,
+          userName,
           mode,
           compressedContactCard,
         },
@@ -152,7 +166,53 @@ export const matchUrlWithRoute = async (
     }
     //this is a webCard and maybe container a download liink
     const compressedContactCard = getSearchParamFromURL(url, 'c');
-    if (compressedContactCard) {
+
+    const keyData = getSearchParamFromURL(url, 'k');
+
+    if (keyData) {
+      let contactCardAccessId: string;
+      let key: string;
+      let geolocation: Geolocation;
+      try {
+        [contactCardAccessId, key, geolocation] = JSON.parse(
+          decompressFromEncodedURIComponent(keyData),
+        );
+
+        let builtGeolocation;
+        const geolocationParsed = geolocationSchema.safeParse(geolocation);
+        if (geolocationParsed.success && geolocationParsed.data) {
+          builtGeolocation = deserializeGeolocation(geolocationParsed.data);
+        }
+
+        const res = await verifyQrCodeKey({
+          contactCardAccessId,
+          key,
+          userName,
+        });
+
+        logEvent('link_contactCard');
+        return {
+          route: 'WEBCARD',
+          params: {
+            userName,
+            contactCard: res.contactCard,
+            avatarUrl: res.avatarUrl,
+            contactProfileId: res.profileId,
+            geolocation: builtGeolocation,
+          },
+        };
+      } catch (error) {
+        Sentry.captureException(error, {
+          data: 'app-deeplink-decompressKeyFromEncodedURIComponent',
+        });
+        return {
+          route: 'WEBCARD',
+          params: {
+            userName,
+          },
+        };
+      }
+    } else if (compressedContactCard) {
       let contactData: string;
       let signature: string;
       let geolocation: Geolocation;
@@ -169,7 +229,7 @@ export const matchUrlWithRoute = async (
         return {
           route: 'WEBCARD',
           params: {
-            userName: username,
+            userName,
           },
         };
       }
@@ -179,13 +239,13 @@ export const matchUrlWithRoute = async (
           const additionalContactData = await verifySign({
             signature,
             data: contactData,
-            salt: username,
+            salt: userName,
           });
           logEvent('link_contactCard');
           return {
             route: 'WEBCARD',
             params: {
-              userName: username,
+              userName,
               contactData,
               additionalContactData,
               geolocation,
@@ -196,7 +256,7 @@ export const matchUrlWithRoute = async (
           return {
             route: 'WEBCARD',
             params: {
-              userName: username,
+              userName,
             },
           };
         }
@@ -206,7 +266,7 @@ export const matchUrlWithRoute = async (
       return {
         route: 'WEBCARD',
         params: {
-          userName: username,
+          userName,
         },
       };
     }
@@ -254,6 +314,7 @@ const handleAppClip = async (url: string): Promise<Route | undefined> => {
           signature,
           data: contactData,
           salt: username,
+          geolocation,
         });
 
         return {

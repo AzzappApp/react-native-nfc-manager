@@ -1,9 +1,9 @@
 export type Geolocation = {
-  location: { latitude: number; longitude: number };
+  location: { latitude: number; longitude: number } | null;
   address?: {
-    city: string;
-    country: string;
-    region: string;
-    subregion: string;
-  };
+    city?: string | null;
+    country?: string | null;
+    region?: string | null;
+    subregion?: string | null;
+  } | null;
 };

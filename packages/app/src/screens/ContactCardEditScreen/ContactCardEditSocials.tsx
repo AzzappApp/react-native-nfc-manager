@@ -50,7 +50,6 @@ const ContactCardEditModalSocials = ({
             })}
             onChangeLabel={label => {
               update(index, {
-                selected: social.selected,
                 label,
                 url:
                   SOCIAL_NETWORK_LINKS.find(

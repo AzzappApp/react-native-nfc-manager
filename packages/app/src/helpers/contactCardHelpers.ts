@@ -11,26 +11,22 @@ export const baseContactCardSchema = z.object({
     z.object({
       label: z.string(),
       address: z.string(),
-      selected: z.boolean().nullable().optional(),
     }),
   ),
   urls: z.array(
     z.object({
       address: z.string(),
-      selected: z.boolean().nullable().optional(),
     }),
   ),
   addresses: z.array(
     z.object({
       label: z.string(),
       address: z.string(),
-      selected: z.boolean().nullable().optional(),
     }),
   ),
   birthday: z
     .object({
       birthday: z.string(),
-      selected: z.boolean().nullable().optional(),
     })
     .nullable()
     .optional(),
@@ -38,7 +34,6 @@ export const baseContactCardSchema = z.object({
     z.object({
       url: z.string(),
       label: z.string(),
-      selected: z.boolean().nullable().optional(),
     }),
   ),
   avatar: z

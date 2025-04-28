@@ -300,8 +300,9 @@ export const buildVCard = async (contact: ContactType) => {
       }
       const image = file.base64();
       if (image) {
-        vCard.addPhoto(image);
+        vCard.addPhoto(image, 'png'); // requested avatars format
       }
+      console.log(vCard.toString());
     } catch (e) {
       Sentry.captureException(e);
       console.error('download avatar failure', e);

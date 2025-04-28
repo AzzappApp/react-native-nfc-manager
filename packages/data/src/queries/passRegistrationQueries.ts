@@ -1,6 +1,7 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '../database';
 import {
+  ContactCardAccessTable,
   PassRegistrationTable,
   ProfileTable,
   type PassRegistration,
@@ -83,22 +84,48 @@ export const getPassRegistration = async (
     .then(res => res[0]);
 };
 
-export const getPushTokens = async (serial: string) =>
+export const getPushTokens = async (serial: string[]) =>
   db()
     .selectDistinct({
       pushToken: PassRegistrationTable.pushToken,
     })
     .from(PassRegistrationTable)
-    .where(eq(PassRegistrationTable.serial, serial))
+    .where(inArray(PassRegistrationTable.serial, serial))
     .then(res => res.map(r => r.pushToken));
 
-export const getPushTokensFromWebCardId = async (webCardId: string) =>
-  db()
-    .selectDistinct({ pushToken: PassRegistrationTable.pushToken })
-    .from(PassRegistrationTable)
-    .innerJoin(ProfileTable, eq(ProfileTable.id, PassRegistrationTable.serial))
-    .where(eq(ProfileTable.webCardId, webCardId))
-    .then(res => res.map(r => r.pushToken));
+export const getPushTokensFromWebCardId = async (webCardId: string) => {
+  const [tokensFromProfile, tokensFromContactCardAccess] = await Promise.all([
+    db()
+      .selectDistinct({ pushToken: PassRegistrationTable.pushToken })
+      .from(PassRegistrationTable)
+      .innerJoin(
+        ProfileTable,
+        eq(ProfileTable.id, PassRegistrationTable.serial),
+      )
+      .where(eq(ProfileTable.webCardId, webCardId)), // legacy passes
+    db()
+      .selectDistinct({ pushToken: PassRegistrationTable.pushToken })
+      .from(PassRegistrationTable)
+      .innerJoin(
+        ContactCardAccessTable,
+        eq(ContactCardAccessTable.profileId, PassRegistrationTable.serial),
+      )
+      .innerJoin(
+        ProfileTable,
+        eq(ProfileTable.id, ContactCardAccessTable.profileId),
+      )
+      .where(
+        and(
+          eq(ProfileTable.webCardId, webCardId),
+          eq(ContactCardAccessTable.isRevoked, false),
+        ),
+      ),
+  ]);
+
+  return [...tokensFromProfile, ...tokensFromContactCardAccess].map(
+    d => d.pushToken,
+  );
+};
 
 export const deletePushToken = async (pushToken: string) =>
   db()

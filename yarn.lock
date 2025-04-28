@@ -592,6 +592,7 @@ __metadata:
     "@hookform/resolvers": "npm:^5.0.1"
     "@lepirlouit/vcard-parser": "patch:@lepirlouit/vcard-parser@npm%3A1.4.0#~/.yarn/patches/@lepirlouit-vcard-parser-npm-1.4.0-fee601014a.patch"
     "@miblanchard/react-native-slider": "npm:2.6.0"
+    "@noble/ed25519": "npm:^2.2.3"
     "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch"
     "@react-native-community/cli": "npm:^15.0.0"
     "@react-native-community/cli-platform-android": "npm:^15.0.0"
@@ -719,6 +720,7 @@ __metadata:
     react-native-popover-view: "npm:^6.1.0"
     react-native-purchases: "npm:^8.9.5"
     react-native-quick-base64: "npm:^2.1.2"
+    react-native-quick-crypto: "npm:^0.7.13"
     react-native-reanimated: "npm:^3.17.5"
     react-native-safe-area-context: "npm:^5.4.0"
     react-native-screens: "patch:react-native-screens@npm%3A4.10.0#~/.yarn/patches/react-native-screens-npm-4.10.0-a9c3a4e55e.patch"
@@ -5047,6 +5049,16 @@ __metadata:
   peerDependencies:
     zod: ^3.21.0
   checksum: 10/b78c65326110b656096c136f0e70e778cbda2e88ef8d90669bf32326aa297d49b9bdc4d5945d6884f696d053aff1c0683c31ea3c7da75b3e4d3d3cb8a514c5d2
+  languageName: node
+  linkType: hard
+
+"@craftzdog/react-native-buffer@npm:^6.0.5":
+  version: 6.0.5
+  resolution: "@craftzdog/react-native-buffer@npm:6.0.5"
+  dependencies:
+    ieee754: "npm:^1.2.1"
+    react-native-quick-base64: "npm:^2.0.5"
+  checksum: 10/9963b430d0cd2af030605a7e81b3982dfec36603406d4f14d520e28936d24a79d69ca4e8a3b650734f6e45b12d87f1bd1ce86f0db11379103e7b1c024a2510d5
   languageName: node
   linkType: hard
 
@@ -9934,6 +9946,13 @@ __metadata:
   version: 2.1.8-no-fsevents.3
   resolution: "@nicolo-ribaudo/chokidar-2@npm:2.1.8-no-fsevents.3"
   checksum: 10/c6e83af3b5051a3f6562649ff8fe37de9934a4cc02138678ed1badbd13ed3334f7ae5f63f2bbc3432210f6b245f082ac97e9b2afe0c13730c9838b295658c185
+  languageName: node
+  linkType: hard
+
+"@noble/ed25519@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "@noble/ed25519@npm:2.2.3"
+  checksum: 10/43e4df5d5767d9d7a930d306c181a6ea70c825f7dbe2e73d9a1025f6c438ac82f14f5e8ddcd94663e30b30ee1c66d756a53c08cf8fcf0b91c01c7d73e31a84bc
   languageName: node
   linkType: hard
 
@@ -22405,6 +22424,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-arguments@npm:^1.0.4":
+  version: 1.2.0
+  resolution: "is-arguments@npm:1.2.0"
+  dependencies:
+    call-bound: "npm:^1.0.2"
+    has-tostringtag: "npm:^1.0.2"
+  checksum: 10/471a8ef631b8ee8829c43a8ab05c081700c0e25180c73d19f3bf819c1a8448c426a9e8e601f278973eca68966384b16ceb78b8c63af795b099cd199ea5afc457
+  languageName: node
+  linkType: hard
+
 "is-array-buffer@npm:^3.0.1, is-array-buffer@npm:^3.0.2":
   version: 3.0.2
   resolution: "is-array-buffer@npm:3.0.2"
@@ -22644,6 +22673,18 @@ __metadata:
   dependencies:
     has-tostringtag: "npm:^1.0.0"
   checksum: 10/499a3ce6361064c3bd27fbff5c8000212d48506ebe1977842bbd7b3e708832d0deb1f4cc69186ece3640770e8c4f1287b24d99588a0b8058b2dbdd344bc1f47f
+  languageName: node
+  linkType: hard
+
+"is-generator-function@npm:^1.0.7":
+  version: 1.1.0
+  resolution: "is-generator-function@npm:1.1.0"
+  dependencies:
+    call-bound: "npm:^1.0.3"
+    get-proto: "npm:^1.0.0"
+    has-tostringtag: "npm:^1.0.2"
+    safe-regex-test: "npm:^1.1.0"
+  checksum: 10/5906ff51a856a5fbc6b90a90fce32040b0a6870da905f98818f1350f9acadfc9884f7c3dec833fce04b83dd883937b86a190b6593ede82e8b1af8b6c4ecf7cbd
   languageName: node
   linkType: hard
 
@@ -22915,7 +22956,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-typed-array@npm:^1.1.14, is-typed-array@npm:^1.1.15":
+"is-typed-array@npm:^1.1.14, is-typed-array@npm:^1.1.15, is-typed-array@npm:^1.1.3":
   version: 1.1.15
   resolution: "is-typed-array@npm:1.1.15"
   dependencies:
@@ -28349,7 +28390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-quick-base64@npm:^2.1.2":
+"react-native-quick-base64@npm:^2.0.5, react-native-quick-base64@npm:^2.1.2":
   version: 2.1.2
   resolution: "react-native-quick-base64@npm:2.1.2"
   dependencies:
@@ -28358,6 +28399,19 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/20b205612417a6c39452ad3ebd205d74fcfaa244832ec9e717b87ee075bf28076bf2445e8f690aad8cf0be6f3da89b4148eb8379d0b71d1c953bd06f66cc7c56
+  languageName: node
+  linkType: hard
+
+"react-native-quick-crypto@npm:^0.7.13":
+  version: 0.7.13
+  resolution: "react-native-quick-crypto@npm:0.7.13"
+  dependencies:
+    "@craftzdog/react-native-buffer": "npm:^6.0.5"
+    events: "npm:^3.3.0"
+    readable-stream: "npm:^4.5.2"
+    string_decoder: "npm:^1.3.0"
+    util: "npm:^0.12.5"
+  checksum: 10/065ad3d8d539235a33b29ac7ba4beb9272bd8c9cb39633574ec7c702c9e538886a385de8557272444f982c05c226fb68f1f7066ae65b1192c5d7b4f11f31016d
   languageName: node
   linkType: hard
 
@@ -28829,7 +28883,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^4.7.0":
+"readable-stream@npm:^4.5.2, readable-stream@npm:^4.7.0":
   version: 4.7.0
   resolution: "readable-stream@npm:4.7.0"
   dependencies:
@@ -32431,6 +32485,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"util@npm:^0.12.5":
+  version: 0.12.5
+  resolution: "util@npm:0.12.5"
+  dependencies:
+    inherits: "npm:^2.0.3"
+    is-arguments: "npm:^1.0.4"
+    is-generator-function: "npm:^1.0.7"
+    is-typed-array: "npm:^1.1.3"
+    which-typed-array: "npm:^1.1.2"
+  checksum: 10/61a10de7753353dd4d744c917f74cdd7d21b8b46379c1e48e1c4fd8e83f8190e6bd9978fc4e5102ab6a10ebda6019d1b36572fa4a325e175ec8b789a121f6147
+  languageName: node
+  linkType: hard
+
 "utils-merge@npm:1.0.1":
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
@@ -32801,7 +32868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"which-typed-array@npm:^1.1.16, which-typed-array@npm:^1.1.18":
+"which-typed-array@npm:^1.1.16, which-typed-array@npm:^1.1.18, which-typed-array@npm:^1.1.2":
   version: 1.1.19
   resolution: "which-typed-array@npm:1.1.19"
   dependencies:

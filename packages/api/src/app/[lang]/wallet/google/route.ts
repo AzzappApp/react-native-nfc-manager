@@ -8,13 +8,19 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import {
   buildDefaultContactCard,
+  getContactCardAccessById,
+  getProfileById,
   getProfileByUserAndWebCard,
   getWebCardById,
+  updateContactCardAccessHasGooglePass,
   updateHasGooglePass,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
-import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
+import {
+  buildUserUrlWithContactCard,
+  buildUserUrlWithKey,
+} from '@azzapp/shared/urlHelpers';
 import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
@@ -33,7 +39,16 @@ const getGoogleWalletPass = async (
     params: { lang: string };
   },
 ) => {
-  const webCardId = new URL(req.url).searchParams.get('webCardId')!;
+  const searchParams = new URL(req.url).searchParams;
+
+  const webCardId = searchParams.get('webCardId');
+
+  const contactCardAccessId = searchParams.get('contactCardAccessId');
+
+  const key = searchParams.get('key');
+
+  const hasPassData = contactCardAccessId && key;
+
   let currentUserId: string | undefined;
   try {
     const { userId } = (await getSessionData()) ?? {};
@@ -44,7 +59,20 @@ const getGoogleWalletPass = async (
       );
     }
     currentUserId = userId;
-    const profile = await getProfileByUserAndWebCard(userId, webCardId);
+
+    let profile;
+
+    if (hasPassData) {
+      const contactCardAccess =
+        await getContactCardAccessById(contactCardAccessId);
+
+      if (contactCardAccess && !contactCardAccess.isRevoked) {
+        profile = await getProfileById(contactCardAccess.profileId);
+      }
+    } else if (webCardId) {
+      profile = await getProfileByUserAndWebCard(userId, webCardId);
+    }
+
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },
@@ -86,13 +114,28 @@ const getGoogleWalletPass = async (
 
     const webCard = await getWebCardById(profile.webCardId);
 
+    if (!webCard) {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_REQUEST },
+        { status: 422 },
+      );
+    }
+
     let contactCard = profile.contactCard;
 
-    if (!contactCard && webCard) {
+    if (!contactCard) {
       contactCard = await buildDefaultContactCard(webCard, currentUserId);
     }
 
-    if (contactCard) {
+    let barCodeUrl;
+
+    if (hasPassData) {
+      barCodeUrl = buildUserUrlWithKey({
+        userName: webCard?.userName ?? '',
+        contactCardAccessId,
+        key,
+      });
+    } else {
       const { data, signature } = await serializeAndSignContactCard(
         webCard?.userName ?? '',
         profile.id,
@@ -101,95 +144,101 @@ const getGoogleWalletPass = async (
         webCard?.isMultiUser ? webCard?.commonInformation : undefined,
       );
 
-      const objectData: GenericObject = {
-        // Define the object data
-        cardTitle: {
-          defaultValue: {
-            language: lang,
-            value: 'Azzapp Contact Card',
-          },
+      barCodeUrl = buildUserUrlWithContactCard(
+        webCard?.userName ?? '',
+        data,
+        signature,
+      );
+    }
+
+    const objectData: GenericObject = {
+      // Define the object data
+      cardTitle: {
+        defaultValue: {
+          language: lang,
+          value: 'Azzapp Contact Card',
         },
-        header: {
-          defaultValue: {
-            language: lang,
-            value:
-              `${contactCard?.firstName ?? ''} ${
-                contactCard?.lastName ?? ''
-              }`.trim() ||
-              webCard?.commonInformation?.company?.trim() ||
-              contactCard?.company?.trim() ||
-              webCard?.userName ||
-              ' ', // empty string is not allowed
-          },
+      },
+      header: {
+        defaultValue: {
+          language: lang,
+          value:
+            `${contactCard?.firstName ?? ''} ${
+              contactCard?.lastName ?? ''
+            }`.trim() ||
+            webCard?.commonInformation?.company?.trim() ||
+            contactCard?.company?.trim() ||
+            webCard?.userName ||
+            ' ', // empty string is not allowed
         },
-        genericType: GenericTypeEnum.GENERIC_OTHER,
-        barcode: {
-          type: BarcodeTypeEnum.QR_CODE,
-          value: buildUserUrlWithContactCard(
-            webCard?.userName ?? '',
-            data,
-            signature,
-          ),
-          alternateText: '',
+      },
+      genericType: GenericTypeEnum.GENERIC_OTHER,
+      barcode: {
+        type: BarcodeTypeEnum.QR_CODE,
+        value: barCodeUrl,
+        alternateText: '',
+      },
+      classId: classData.id,
+      id: passId,
+      hexBackgroundColor: webCard?.cardColors?.primary ?? '#000000',
+      state: StateEnum.ACTIVE,
+      logo: {
+        sourceUri: {
+          uri: 'https://i.ibb.co/pbt44Sd/Union.png', //todo set public url for logo
         },
-        classId: classData.id,
-        id: passId,
-        hexBackgroundColor: webCard?.cardColors?.primary ?? '#000000',
-        state: StateEnum.ACTIVE,
-        logo: {
-          sourceUri: {
-            uri: 'https://i.ibb.co/pbt44Sd/Union.png', //todo set public url for logo
-          },
+      },
+    };
+
+    if (contactCard.title) {
+      objectData.subheader = {
+        defaultValue: {
+          language: lang,
+          value: contactCard?.title ?? ' ',
         },
       };
-
-      if (contactCard.title) {
-        objectData.subheader = {
-          defaultValue: {
-            language: lang,
-            value: contactCard?.title ?? ' ',
-          },
-        };
-      }
-
-      if (contactCard?.company) {
-        objectData.textModulesData = [
-          {
-            id: 'company',
-            body: contactCard?.company,
-          },
-        ];
-      }
-
-      let genericObject = await genericClient.getObject(issuerId, objectId);
-      if (!genericObject) {
-        genericObject = await genericClient.createObject(objectData);
-      } else {
-        // Update the object data
-        genericObject = await genericClient.patchObject(objectData);
-      }
-      await updateHasGooglePass(profile.id, true);
-
-      const token = jwt.sign(
-        {
-          iss: credentials.client_email,
-          aud: 'google',
-          origins: [new URL(process.env.NEXT_PUBLIC_URL ?? '').hostname],
-          typ: 'savetowallet',
-          payload: {
-            // The listed classes and objects will be created
-            genericClasses: [genericClass],
-            genericObjects: [genericObject],
-          },
-        },
-        credentials.private_key,
-        {
-          algorithm: 'RS256',
-        },
-      );
-
-      return NextResponse.json({ token });
     }
+
+    if (contactCard?.company) {
+      objectData.textModulesData = [
+        {
+          id: 'company',
+          body: contactCard?.company,
+        },
+      ];
+    }
+
+    let genericObject = await genericClient.getObject(issuerId, objectId);
+    if (!genericObject) {
+      genericObject = await genericClient.createObject(objectData);
+    } else {
+      // Update the object data
+      genericObject = await genericClient.patchObject(objectData);
+    }
+    if (hasPassData) {
+      await updateContactCardAccessHasGooglePass(contactCardAccessId, true);
+    } else {
+      await updateHasGooglePass(profile.id, true);
+    }
+
+    const token = jwt.sign(
+      {
+        iss: credentials.client_email,
+        aud: 'google',
+        origins: [new URL(process.env.NEXT_PUBLIC_URL ?? '').hostname],
+        typ: 'savetowallet',
+        payload: {
+          // The listed classes and objects will be created
+          genericClasses: [genericClass],
+          genericObjects: [genericObject],
+        },
+      },
+      credentials.private_key,
+      {
+        algorithm: 'RS256',
+      },
+    );
+
+    return NextResponse.json({ token });
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json({ message: e.message }, { status: 401 });
@@ -199,8 +248,6 @@ const getGoogleWalletPass = async (
       { status: 400 },
     );
   }
-
-  return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
 };
 
 export const { GET } = { GET: withPluginsRoute(getGoogleWalletPass) };

@@ -246,14 +246,12 @@ const MultiUserAddModal = (
                 ?.map<ContactCardPhoneNumber>(a => ({
                   label: normalizePhoneMailLabel(a.label),
                   number: a.number || '',
-                  selected: true,
                 }))
                 .map(parseContactCardPhoneNumber) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
                 address: a.email,
-                selected: true,
               })) ?? [],
             title: contact.jobTitle,
             company: contact.company ?? undefined,
@@ -263,7 +261,6 @@ const MultiUserAddModal = (
                   a.url
                     ? {
                         address: a.url,
-                        selected: true,
                       }
                     : null,
                 )
@@ -278,7 +275,6 @@ const MultiUserAddModal = (
                       contact.birthday.month,
                       contact.birthday.day,
                     ).toISOString(),
-                    selected: true,
                   }
                 : undefined,
             avatar: contact?.image?.uri
@@ -292,7 +288,6 @@ const MultiUserAddModal = (
               return {
                 label: addr.label,
                 address: formatExpoAddress(addr),
-                selected: true,
               };
             }),
             socials: contact.socialProfiles?.map(social => {
