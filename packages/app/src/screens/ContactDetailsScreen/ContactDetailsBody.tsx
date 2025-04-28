@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -104,24 +104,6 @@ const ContactDetailsBody = ({
     `,
     details?.webCard,
   );
-
-  const date = useMemo(() => {
-    if (!details || !details.createdAt) {
-      return '';
-    }
-
-    const lowercase = new Date(details.createdAt).toLocaleDateString(
-      undefined,
-      {
-        dateStyle: 'long',
-      },
-    );
-
-    return lowercase
-      .split(' ')
-      .map(section => section[0].toUpperCase() + section.substring(1))
-      .join(' ');
-  }, [details]);
 
   const avatar = details?.avatar?.uri || details.logo?.uri;
 
@@ -393,17 +375,6 @@ const ContactDetailsBody = ({
               content={social.url}
             />
           ))}
-          {date ? (
-            <ContactDetailItem
-              key="scanDate"
-              icon="calendar"
-              label={intl.formatMessage({
-                defaultMessage: 'Date of Contact',
-                description: 'ContactDetailsModal - Label for date item',
-              })}
-              content={date}
-            />
-          ) : undefined}
         </View>
       </ScrollView>
       {details ? (
