@@ -1,0 +1,13 @@
+diff --git a/lib/src/hooks/useSlideAnimation.js b/lib/src/hooks/useSlideAnimation.js
+index a780f888ffcad96b7ff39ad3e8afee413d79f079..f1af56e2dd3c4d6506d2aba2e114297205d7363b 100644
+--- a/lib/src/hooks/useSlideAnimation.js
++++ b/lib/src/hooks/useSlideAnimation.js
+@@ -11,7 +11,7 @@ export function translateYOutputRangeFor({ position, height, topOffset, bottomOf
+ }
+ const useNativeDriver = Platform.select({
+     ios: true,
+-    default: false
++    default: true
+ });
+ export function useSlideAnimation({ position, height, topOffset, bottomOffset, keyboardOffset, avoidKeyboard }) {
+     const animatedValue = React.useRef(new Animated.Value(0));
