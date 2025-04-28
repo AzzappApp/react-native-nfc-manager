@@ -1,3 +1,7 @@
+## 1.10.0-canary.150
+
+* **fix:**  - email not exported in contacts ([#8559](https://github.com/AzzappApp/azzapp/pull/8559))
+
 ## 1.10.0-canary.149
 
 * **fix:**  - remove date of contact in contact detail ([#8555](https://github.com/AzzappApp/azzapp/pull/8555))
