@@ -18,7 +18,7 @@ import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
 import type { Profile, WebCard } from '@azzapp/data';
 
 const getCoverUrl = (webCard: WebCard, size: number) =>
-  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
+  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&height=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
 
 export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
 
@@ -89,9 +89,9 @@ export const buildApplePass = async ({
     const thumbnails: Record<string, Buffer> = {};
 
     if (media) {
-      const thumbnail = await getCoverUrl(webCard, 90);
-      const thumbnail2x = await getCoverUrl(webCard, 90 * 2);
-      const thumbnail3x = await getCoverUrl(webCard, 90 * 3);
+      const thumbnail = getCoverUrl(webCard, 90);
+      const thumbnail2x = getCoverUrl(webCard, 90 * 2);
+      const thumbnail3x = getCoverUrl(webCard, 90 * 3);
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] = thumbnail
         ? await Promise.allSettled([
             fetch(thumbnail).then(res => res.arrayBuffer()),

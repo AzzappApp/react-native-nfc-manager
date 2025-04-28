@@ -67,11 +67,12 @@ export const buildCoverImageUrl = async (
     width: number;
     height: number;
     crop?: Crop | null;
+    radius?: number | null;
   },
 ) => {
   const { coverMediaId, coverPreviewPositionPercentage } = webCard;
 
-  const { width, height, crop } = options;
+  const { width, height, crop, radius } = options;
 
   if (coverMediaId) {
     const [media] = await getMediasByIds([coverMediaId]);
@@ -80,7 +81,7 @@ export const buildCoverImageUrl = async (
       media?.kind === 'video' ? 'video' : 'image'
     }/upload${media?.kind === 'video' ? `/so_${coverPreviewPositionPercentage ?? DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p` : ''}${
       crop ? `/c_${crop}` : '/c_fit'
-    },g_east,w_${width},h_${height},ar_1:1/${coverMediaId}.png`;
+    },g_east,w_${width},h_${height}${radius ? `,r_${radius}` : ''},ar_1:1/${coverMediaId}.png`;
   }
   return undefined;
 };
