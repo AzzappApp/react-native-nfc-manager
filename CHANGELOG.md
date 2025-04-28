@@ -1,3 +1,7 @@
+## 1.10.0-canary.153
+
+* **fix:**  - recreate avatar image inside scan modal ([#8565](https://github.com/AzzappApp/azzapp/pull/8565))
+
 ## 1.10.0-canary.152
 
 * **build:**  - upgrade deps ([#8562](https://github.com/AzzappApp/azzapp/pull/8562))
