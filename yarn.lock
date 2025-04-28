@@ -553,6 +553,7 @@ __metadata:
     inngest-cli: "npm:^1.5.7"
     jest: "npm:^29.7.0"
     jose: "npm:^6.0.10"
+    jwt-decode: "npm:^4.0.0"
     libphonenumber-js: "npm:^1.11.17"
     lodash: "npm:^4.17.21"
     lz-string: "npm:^1.5.0"

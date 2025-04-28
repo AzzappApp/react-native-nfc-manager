@@ -48,7 +48,6 @@ const notifyApplePassWallet = async (pushToken: string) => {
     });
 
     request.on('end', () => {
-      console.log(responseData);
       client.close();
       resolve(new Response(responseData, { status: statusCode }));
     });

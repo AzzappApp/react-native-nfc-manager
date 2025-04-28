@@ -76,7 +76,6 @@ const verifySignApi = async (req: Request) => {
     getProfileById(foundContactCard.profileId),
     getWebCardById(foundContactCard.webCardId),
   ]);
-
   if (isValid && storedProfile) {
     const avatarUrl = await buildAvatarUrl(storedProfile, webCard);
 

@@ -41,6 +41,7 @@
     "graphql-yoga": "^5.13.4",
     "inngest": "^3.35.0",
     "jose": "^6.0.10",
+    "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.11.17",
     "lodash": "^4.17.21",
     "lz-string": "^1.5.0",
