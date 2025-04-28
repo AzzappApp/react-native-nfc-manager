@@ -1,3 +1,7 @@
+## 1.10.0-canary.151
+
+* **fix:**  - failed avatar export when already imported ([#8563](https://github.com/AzzappApp/azzapp/pull/8563))
+
 ## 1.10.0-canary.150
 
 * **fix:**  - email not exported in contacts ([#8559](https://github.com/AzzappApp/azzapp/pull/8559))
