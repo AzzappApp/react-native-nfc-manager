@@ -72,7 +72,7 @@ export const buildExpoContact = async (
       label,
     })),
     emails: contact.emails?.map(({ address, label }) => ({
-      address,
+      email: address,
       label,
     })),
     image,
