@@ -144,4 +144,6 @@ export const parseContactCard = (contactCardData: string) => {
 export const AVATAR_MAX_WIDTH = 2048;
 export const LOGO_MAX_WIDTH = 2048;
 
-export const CONTACTCARD_ASSET_SIZES = [112];
+export const CONTACT_CARD_AVATAR_SIZES = [112, 224, 448];
+
+export const CONTACT_CARD_LOGO_SIZES = [180, 360, 720];

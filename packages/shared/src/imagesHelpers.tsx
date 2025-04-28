@@ -207,7 +207,7 @@ export const resizeTransforms = (
   }
   width = Math.ceil(width * pixelRatio);
   if (pregeneratedSizes) {
-    const index = pregeneratedSizes.findIndex(size => size >= width!);
+    const index = pregeneratedSizes.findIndex(size => size >= width);
     if (index === -1) {
       if (height != null) {
         const aspectRatio = Math.round((width * 1000) / height) / 1000;

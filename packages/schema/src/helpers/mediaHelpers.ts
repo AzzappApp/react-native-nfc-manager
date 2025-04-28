@@ -1,5 +1,8 @@
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
-import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
+import {
+  CONTACT_CARD_AVATAR_SIZES,
+  CONTACT_CARD_LOGO_SIZES,
+} from '@azzapp/shared/contactCardHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
   DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
@@ -53,18 +56,31 @@ export const uriResolver =
     if (raw) {
       return getCloudinaryAssetURL(id, kind);
     }
-    const pregeneratedSizes =
-      assetKind === 'cover' || assetKind === 'rawCover'
-        ? COVER_ASSET_SIZES
-        : assetKind === 'module'
-          ? MODULE_IMAGES_SIZES
-          : assetKind === 'contactCard'
-            ? CONTACTCARD_ASSET_SIZES
-            : assetKind === 'post'
-              ? kind === 'image'
-                ? POST_IMAGES_SIZES
-                : POST_VIDEO_SIZES
-              : null;
+
+    let pregeneratedSizes;
+    switch (assetKind) {
+      case 'cover':
+      case 'rawCover':
+      case 'coverPreview':
+        pregeneratedSizes = COVER_ASSET_SIZES;
+        break;
+      case 'module':
+        pregeneratedSizes = MODULE_IMAGES_SIZES;
+        break;
+      case 'contactCard':
+        pregeneratedSizes = CONTACT_CARD_AVATAR_SIZES;
+        break;
+      case 'post':
+        pregeneratedSizes =
+          kind === 'image' ? POST_IMAGES_SIZES : POST_VIDEO_SIZES;
+        break;
+      case 'logo':
+        pregeneratedSizes = CONTACT_CARD_LOGO_SIZES;
+        break;
+      default:
+        pregeneratedSizes = null;
+    }
+
     return uriGenerator({
       id,
       width,
