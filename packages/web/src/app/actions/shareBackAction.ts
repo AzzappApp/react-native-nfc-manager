@@ -141,6 +141,7 @@ export const processShareBackSubmission = async (
     }
 
     let phone = submission.value.phone?.number || '';
+    const email = submission?.value?.email || '';
 
     try {
       const { number } = parsePhoneNumberWithError(
@@ -161,8 +162,9 @@ export const processShareBackSubmission = async (
 
     await saveShareBack(profile.id, {
       ...submission.payload,
-      phoneNumbers: [{ label: 'Home', number: phone }],
-      emails: [{ label: 'Main', address: submission.payload.email }],
+      phoneNumbers:
+        phone.trim() !== '' ? [{ label: 'Home', number: phone }] : [],
+      emails: email.trim() !== '' ? [{ label: 'Main', address: email }] : [],
       meetingLocation: decodedToken.geolocation?.location,
       meetingPlace: decodedToken.geolocation?.address,
     } as NewContact);
