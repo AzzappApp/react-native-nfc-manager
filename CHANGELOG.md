@@ -1,3 +1,7 @@
+## 1.9.13-rc.7
+
+* **feat:**  - remove selected flags in contact card ([#8554](https://github.com/AzzappApp/azzapp/pull/8554))
+
 ## 1.9.13-rc.6
 
 * **fix:**  - **pass:** [#8551](https://github.com/AzzappApp/azzapp/pull/8551) set correct cover aspect ratio ([#8556](https://github.com/AzzappApp/azzapp/pull/8556))
