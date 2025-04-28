@@ -1,3 +1,7 @@
+## 1.9.13-rc.9
+
+* **fix:**  - **contact:** [#8571](https://github.com/AzzappApp/azzapp/pull/8571) don’t download full size avatars ([#8567](https://github.com/AzzappApp/azzapp/pull/8567))
+
 ## 1.9.13-rc.8
 
 
