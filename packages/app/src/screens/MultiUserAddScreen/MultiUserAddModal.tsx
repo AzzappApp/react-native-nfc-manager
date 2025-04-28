@@ -49,7 +49,6 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ContactCardPhoneNumber } from '#helpers/phoneNumbersHelper';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
-import type { MultiUserAddModal_profile$key } from '#relayArtifacts/MultiUserAddModal_profile.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
@@ -85,7 +84,6 @@ type MultiUserAddModalProps = {
   beforeClose: () => void;
   onCompleted: () => void;
   webCard: MultiUserAddModal_webCard$key;
-  profile: MultiUserAddModal_profile$key | null;
 };
 
 export type MultiUserAddModalActions = {
@@ -143,24 +141,6 @@ const MultiUserAddModal = (
     props.webCard,
   );
 
-  const profile = useFragment(
-    graphql`
-      fragment MultiUserAddModal_profile on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
-        logo {
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-          id
-        }
-      }
-    `,
-    props.profile,
-  );
-
   const { beforeClose, onCompleted } = props;
   const [visible, setVisible] = useState(false);
 
@@ -196,7 +176,7 @@ const MultiUserAddModal = (
     resolver: zodResolver(multiUserAddFormSchema),
     defaultValues: {
       role: 'user',
-      logo: webCard?.logo || profile?.logo,
+      logo: webCard?.logo,
     },
     mode: 'onSubmit',
   });
@@ -314,7 +294,7 @@ const MultiUserAddModal = (
                 selected: true,
               };
             }),
-            logo: webCard?.logo || profile?.logo,
+            logo: webCard?.logo,
           },
           { keepDirty: true },
         );
@@ -328,7 +308,7 @@ const MultiUserAddModal = (
                 : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
-          logo: webCard?.logo || profile?.logo,
+          logo: webCard?.logo,
         });
         setIsManual(isManual);
         setContact(undefined);
