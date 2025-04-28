@@ -22,6 +22,9 @@ import {
   stringToContactEmailLabelType,
   stringToContactPhoneNumberLabelType,
 } from '#helpers/contactListHelpers';
+import { isFileURL } from '#helpers/fileHelpers';
+import { prepareAvatarForUpload } from '#helpers/imageHelpers';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import useBoolean from '#hooks/useBoolean';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -93,8 +96,22 @@ const AddContactModal = ({
   const [show, open, close] = useBoolean(false);
   const router = useRouter();
 
-  const getContactInput = useCallback(() => {
+  const getContactInput = useCallback(async () => {
     if (!scanned || !viewer) return;
+
+    let uploadedAvatarId: string | undefined;
+    if (isFileURL(scanned.avatar?.uri) && scanned.avatar?.uri) {
+      const { file, uploadURL, uploadParameters } =
+        await prepareAvatarForUpload(scanned.avatar?.uri);
+
+      uploadedAvatarId = await uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      ).promise.then(({ public_id }) => {
+        return public_id;
+      });
+    }
 
     const addresses = scanned.addresses;
     const emails = scanned.emails;
@@ -117,6 +134,7 @@ const AddContactModal = ({
       birthday: scanned?.birthday,
       urls,
       socials,
+      avatarId: uploadedAvatarId,
     };
   }, [scanned, viewer, withShareBack]);
 
@@ -183,9 +201,9 @@ const AddContactModal = ({
     );
   }, [scanned, webCard.userName, intl, onInviteContact, router]);
 
-  const onAddContactToProfile = useCallback(() => {
+  const onAddContactToProfile = useCallback(async () => {
     if (!scanned || !viewer) return;
-    const input = getContactInput();
+    const input = await getContactInput();
     if (!input) return;
     commit({
       variables: {
