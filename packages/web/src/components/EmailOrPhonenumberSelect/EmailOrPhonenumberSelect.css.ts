@@ -8,7 +8,7 @@ export const selectContainer = style({
 });
 
 export const openedContainer = style({
-  minWidth: 250,
+  minWidth: 'min(255px, max(calc(60vw - 20px), 150px))',
   height: 400,
 });
 
