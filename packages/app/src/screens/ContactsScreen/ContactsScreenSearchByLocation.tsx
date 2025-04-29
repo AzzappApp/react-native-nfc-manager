@@ -28,27 +28,24 @@ const ContactsScreenSearchByLocation = ({
   const intl = useIntl();
 
   const sections = useMemo(() => {
-    return contacts
+    const contactsWithoutLocation: ContactType[] = [];
+
+    const contactsWithLocation = contacts
       ?.reduce(
         (accumulator, contact) => {
-          const title =
-            getFriendlyNameFromLocation(contact.meetingPlace) ??
-            intl.formatMessage({
-              defaultMessage: 'Unknown',
-              description:
-                'ContactsScreenSearchByLocation - Title for unknown location',
-            });
-
-          const existingSection = accumulator.find(
-            section => section.title === title,
-          );
-
-          if (!existingSection) {
-            accumulator.push({ title, data: [contact] });
+          const title = getFriendlyNameFromLocation(contact.meetingPlace);
+          if (!title) {
+            contactsWithoutLocation.push(contact);
           } else {
-            existingSection.data.push(contact);
+            const existingSection = accumulator.find(
+              section => section.title === title,
+            );
+            if (!existingSection) {
+              accumulator.push({ title, data: [contact] });
+            } else {
+              existingSection.data.push(contact);
+            }
           }
-
           return accumulator;
         },
         [] as Array<{ title: string; data: ContactType[] }>,
@@ -56,6 +53,20 @@ const ContactsScreenSearchByLocation = ({
       .sort((item1, item2) =>
         item1.title.toLowerCase() > item2.title.toLowerCase() ? 1 : -1,
       );
+
+    // ensure Contacts without location are at the end of the list
+    if (contactsWithoutLocation.length > 0) {
+      contactsWithLocation.push({
+        title: intl.formatMessage({
+          defaultMessage: 'No location data',
+          description:
+            'ContactsScreenSearchByLocation - Title for unknown location',
+        }),
+        data: contactsWithoutLocation,
+      });
+    }
+
+    return contactsWithLocation;
   }, [contacts, intl]);
 
   const router = useRouter();

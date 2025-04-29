@@ -212,16 +212,7 @@ export const searchContacts = async (
          NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
          NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), '')
        ) = ${filterBy.value}`
-          : orderBy === 'location'
-            ? sql`
-        COALESCE(
-          NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
-          NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
-          NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
-          NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), '')
-        ) IS NOT NULL
-      `
-            : undefined,
+          : undefined,
       ),
     )
     .orderBy(...orders)
