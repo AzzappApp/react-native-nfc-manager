@@ -62,13 +62,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow azzapp to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
+            "value" : "Allow azzapp to access your contacts to quickly add new connections to your phone book — or easily invite contacts to a multi-user WebCard."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Autorisez azzapp à accéder à vos contacts pour inviter facilement des amis à rejoindre une WebCard multi-utilisateurs."
+            "value" : "Autorisez azzapp à accéder à vos contacts pour ajouter rapidement de nouvelles connexions à votre répertoire — ou inviter facilement des contacts à une WebCard multi-utilisateurs."
           }
         }
       }

@@ -54,8 +54,7 @@
 	<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing
 		within the app.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your contacts to easily invite friends to join a
-		multi-user WebCard.</string>
+	<string>Allow $(PRODUCT_NAME) to access your contacts to quickly add new connections to your phone book — or easily invite contacts to a multi-user WebCard.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your microphone to record audio for video content within
 		the app.</string>

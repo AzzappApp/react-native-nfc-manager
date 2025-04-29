@@ -995,3 +995,5 @@
 
 ## 1.9.2-canary.2
 
+* **build:**  - update payment client generation
+* **build:**  - update payment client generation
