@@ -112,7 +112,6 @@ jobs:
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
           pwd
-          ls -l drizzle
           rm -fr drizzle && echo "drizzle deleted" || echo "failed to delete drizzle"
 
       - name: PlanetScale - Extract branch name
