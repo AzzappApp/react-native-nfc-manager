@@ -17,6 +17,8 @@ jobs:
       TURBO_TEAM: azzapp
       NODE_OPTIONS: --max-old-space-size=4096
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
+      PAYMENT_API_DOCS_USERNAME: ${{ secrets.PAYMENT_API_DOCS_USERNAME }}
+      PAYMENT_API_DOCS_PASSWORD: ${{ secrets.PAYMENT_API_DOCS_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
