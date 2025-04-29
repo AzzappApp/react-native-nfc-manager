@@ -1,3 +1,8 @@
+## 1.10.0-canary.159
+
+* **fix:**  - **web:** make country selector width more dynamic ([#8584](https://github.com/AzzappApp/azzapp/pull/8584))
+* **build:**  - remove traces
+
 ## 1.10.0-canary.158
 
 
