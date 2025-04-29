@@ -1,3 +1,12 @@
+## 1.10.0-canary.157
+
+* **build:**  - remove drizzle directory after check
+* **build:**  - put back planetscale steps ([#8581](https://github.com/AzzappApp/azzapp/pull/8581))
+* **feat:**  - display contacts without location ([#8578](https://github.com/AzzappApp/azzapp/pull/8578))
+* **feat:**  - **payment:** [#8057](https://github.com/AzzappApp/azzapp/pull/8057) add refund in backoffice ([#8564](https://github.com/AzzappApp/azzapp/pull/8564))
+* **build:**  - add authent on payment api doc ([#8575](https://github.com/AzzappApp/azzapp/pull/8575))
+* **fix:**  - wording in widget configuration ([#8579](https://github.com/AzzappApp/azzapp/pull/8579))
+
 ## 1.10.0-canary.156
 
 * **fix:**  - keep png format for upload ([#8571](https://github.com/AzzappApp/azzapp/pull/8571))
