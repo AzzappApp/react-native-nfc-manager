@@ -58,7 +58,6 @@ const ContactEditScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
-  const profileId = getAuthState().profileInfos?.profileId;
 
   const [commit, loading] = useMutation<ContactEditScreenMutation>(graphql`
     mutation ContactEditScreenMutation(
@@ -163,6 +162,8 @@ const ContactEditScreen = ({
   const submit = () => {
     Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
+      const profileId = getAuthState().profileInfos?.profileId;
+
       if (!profileId || !params.contact.id) {
         return;
       }
