@@ -28,6 +28,7 @@ type Payment {
 enum PaymentStatus {
   paid
   failed
+  refunded
 }
 
 """

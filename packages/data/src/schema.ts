@@ -404,7 +404,7 @@ export const PaymentTable = cols.table(
     amount: cols.int('amount').notNull(),
     taxes: cols.int('taxes').notNull(),
     currency: cols.defaultVarchar('currency').notNull().default('EUR'),
-    status: cols.enum('status', ['paid', 'failed']).notNull(),
+    status: cols.enum('status', ['paid', 'failed', 'refunded']).notNull(),
     paymentMeanId: cols.defaultVarchar('paymentMeanId').notNull(),
     rebillManagerId: cols.defaultVarchar('rebillManagerId'),
     transactionId: cols.defaultVarchar('transactionId'),
@@ -422,6 +422,11 @@ export const PaymentTable = cols.table(
     invoicePdfUrl: cols.defaultVarchar('invoiceUrl'),
     subscriptionId: cols.cuid('subscriptionId').notNull(),
     userId: cols.cuid('userId').notNull(),
+    refundedAt: cols.dateTime('refundedAt'),
+    refundedBy: cols.cuid('refundedBy'),
+    refundOrderId: cols.cuid('refundOrderId'),
+    transactionAlias: cols.text('transactionAlias'),
+    pspAccountId: cols.defaultVarchar('pspAccountId'),
   },
   table => {
     return {

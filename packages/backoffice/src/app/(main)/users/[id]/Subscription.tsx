@@ -7,7 +7,9 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
+  Link,
   MenuItem,
+  Paper,
   Select,
   Snackbar,
   Switch,
@@ -76,140 +78,149 @@ export const Subscription = ({
       : 'web.monthly';
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
-      <TextField
-        sx={{ width: 250 }}
-        value={userSubscription.issuer}
-        label="Platform"
-        slotProps={{
-          htmlInput: {
-            readOnly: true,
-          },
-        }}
-        disabled
-      />
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <Box display="flex" flexDirection="column" gap={2}>
+        <Typography variant="subtitle1" color="GrayText">
+          Subscription <b>{userSubscription.subscriptionId}</b> started at
+          {userSubscription.startAt.toDateString()}
+        </Typography>
+        <TextField
+          sx={{ width: 250 }}
+          value={userSubscription.issuer}
+          label="Platform"
+          slotProps={{
+            htmlInput: {
+              readOnly: true,
+            },
+          }}
+          disabled
+        />
 
-      <Typography variant="subtitle1" color="GrayText" sx={{ mt: 5, mb: 5 }}>
-        Subscription <b>{userSubscription.subscriptionId}</b> started at
-        {userSubscription.startAt.toDateString()}
-      </Typography>
-
-      <Box display="flex" gap={2}>
-        {userSubscription.issuer === 'web' &&
-        userSubscription.subscriptionPlan !== 'web.lifetime' ? (
-          <>
+        <Box display="flex" gap={2}>
+          {userSubscription.issuer === 'web' &&
+          userSubscription.subscriptionPlan !== 'web.lifetime' ? (
+            <>
+              <TextField
+                sx={{ width: 250 }}
+                value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
+                label="Billed for (+taxes)"
+                slotProps={{
+                  htmlInput: {
+                    readOnly: true,
+                  },
+                }}
+              />
+            </>
+          ) : (
             <TextField
               sx={{ width: 250 }}
-              value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
-              label="Billed for (+taxes)"
+              value={`${userSubscription.profilesCount} / ${totalSeats}`}
+              label="Seats"
+              error={userSubscription.profilesCount > totalSeats}
               slotProps={{
                 htmlInput: {
                   readOnly: true,
                 },
               }}
             />
-          </>
-        ) : (
-          <TextField
-            sx={{ width: 250 }}
-            value={`${userSubscription.profilesCount} / ${totalSeats}`}
-            label="Seats"
-            error={userSubscription.profilesCount > totalSeats}
-            slotProps={{
-              htmlInput: {
-                readOnly: true,
-              },
+          )}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={userSubscription.status === 'active'}
+                color="success"
+                onChange={toggleSubscriptionStatus}
+                disabled={
+                  userSubscription.issuer === 'apple' ||
+                  userSubscription.issuer === 'google' ||
+                  (userSubscription.subscriptionPlan !== 'web.lifetime' &&
+                    userSubscription.status !== 'active')
+                }
+              />
+            }
+            label={`${userSubscription.status.replace('_', ' ')}`}
+            style={{
+              textTransform: 'capitalize',
             }}
           />
-        )}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={userSubscription.status === 'active'}
-              color="success"
-              onChange={toggleSubscriptionStatus}
-              disabled={
-                userSubscription.issuer === 'apple' ||
-                userSubscription.issuer === 'google' ||
-                (userSubscription.subscriptionPlan !== 'web.lifetime' &&
-                  userSubscription.status !== 'active')
-              }
-            />
-          }
-          label={`${userSubscription.status.replace('_', ' ')}`}
-          style={{
-            textTransform: 'capitalize',
-          }}
-        />
-      </Box>
-      <Box display="flex" gap={2}>
-        <FormControl sx={{ width: 250 }}>
-          <InputLabel id="type">Type</InputLabel>
-          <Select
-            labelId="type"
-            id="type"
-            value={subscriptionPlan}
-            label="Type"
-            onChange={() => {}}
-            disabled={!userSubscription.subscriptionPlan}
-          >
-            <MenuItem value="web.monthly">Monthly</MenuItem>
-            <MenuItem value="web.yearly">Yearly</MenuItem>
-            <MenuItem value="web.lifetime">LifeTime</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          sx={{ width: 250 }}
-          value={freeSeats || 0}
-          label="Additional seats"
-          type="number"
-          disabled={userSubscription.subscriptionPlan === 'web.monthly'}
-          onChange={onUpdateFreeSeats}
-        />
-        {userSubscription.canceledAt && (
+        </Box>
+        <Box display="flex" gap={2}>
+          <FormControl sx={{ width: 250 }}>
+            <InputLabel id="type">Type</InputLabel>
+            <Select
+              labelId="type"
+              id="type"
+              value={subscriptionPlan}
+              label="Type"
+              onChange={() => {}}
+              disabled={!userSubscription.subscriptionPlan}
+            >
+              <MenuItem value="web.monthly">Monthly</MenuItem>
+              <MenuItem value="web.yearly">Yearly</MenuItem>
+              <MenuItem value="web.lifetime">LifeTime</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             sx={{ width: 250 }}
-            value={userSubscription.canceledAt.toDateString()}
-            label="Canceled at"
+            value={freeSeats || 0}
+            label="Additional seats"
+            type="number"
+            disabled={userSubscription.subscriptionPlan === 'web.monthly'}
+            onChange={onUpdateFreeSeats}
+          />
+          {userSubscription.canceledAt && (
+            <TextField
+              sx={{ width: 250 }}
+              value={userSubscription.canceledAt.toDateString()}
+              label="Canceled at"
+              slotProps={{
+                htmlInput: {
+                  readOnly: true,
+                  style: {
+                    color: 'red',
+                  },
+                },
+              }}
+            />
+          )}
+          <TextField
+            sx={{ width: 250 }}
+            value={userSubscription.endAt.toDateString()}
+            label="End at"
             slotProps={{
               htmlInput: {
                 readOnly: true,
                 style: {
-                  color: 'red',
+                  color: new Date() > userSubscription.endAt ? 'red' : 'black',
                 },
               },
             }}
           />
-        )}
-        <TextField
-          sx={{ width: 250 }}
-          value={userSubscription.endAt.toDateString()}
-          label="End at"
-          slotProps={{
-            htmlInput: {
-              readOnly: true,
-              style: {
-                color: new Date() > userSubscription.endAt ? 'red' : 'black',
-              },
-            },
+        </Box>
+
+        <Link
+          href={`/users/${userSubscription.userId}/subscription/${userSubscription.id}`}
+          underline="none"
+        >
+          See payments
+        </Link>
+
+        <Backdrop
+          sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
+          open={pending}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          open={!!message}
+          onClose={() => {
+            setMessage(null);
           }}
+          message={message}
         />
       </Box>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
-        open={pending}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        open={!!message}
-        onClose={() => {
-          setMessage(null);
-        }}
-        message={message}
-      />
-    </Box>
+    </Paper>
   );
 };
 

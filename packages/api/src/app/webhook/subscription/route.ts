@@ -22,6 +22,8 @@ const subscriptionPostSchema = z.object({
   provider_response: z.string(),
   rebill_manager_state: z.string(),
   HASH: z.string(),
+  ALIAS: z.string(),
+  MULTIPSP_PSP_ACCOUNT_ULID: z.string(),
 });
 
 export const POST = withPluginsRoute(async (req: Request) => {
@@ -36,13 +38,15 @@ export const POST = withPluginsRoute(async (req: Request) => {
   let subscription;
 
   if (data.status === 'OK') {
-    const result = await acknowledgeRecurringPayment(
-      data.rebill_manager_external_reference,
-      data.rebill_manager_id,
-      data.transaction_id,
-      parseInt(data.amount_cnts, 10),
-      data.provider_response,
-    );
+    const result = await acknowledgeRecurringPayment({
+      subscriptionId: data.rebill_manager_external_reference,
+      rebillManagerId: data.rebill_manager_id,
+      transactionId: data.transaction_id,
+      amount: parseInt(data.amount_cnts, 10),
+      paymentProviderResponse: data.provider_response,
+      pspAccountId: data.MULTIPSP_PSP_ACCOUNT_ULID,
+      transactionAlias: data.ALIAS,
+    });
     subscription = result.subscription;
     const paymentId = result.paymentId;
     if (paymentId) {

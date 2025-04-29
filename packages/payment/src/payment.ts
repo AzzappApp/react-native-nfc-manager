@@ -7,6 +7,8 @@ import {
   updatePayment,
   createId,
   getUserSubscriptions,
+  getPaymentById,
+  getUserById,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -510,4 +512,81 @@ export const generateInvoice = async (
   });
 
   return result.data.invoicePdfPath;
+};
+
+export const refundPayment = async (paymentId: string, userId: string) => {
+  const payment = await getPaymentById(paymentId);
+
+  if (!payment) {
+    throw new Error('Payment not found');
+  }
+
+  const subscription = await getSubscriptionById(payment.subscriptionId);
+
+  if (!subscription) {
+    throw new Error('Subscription not found');
+  }
+
+  if (
+    payment.status !== 'paid' ||
+    !payment.transactionId ||
+    !payment.pspAccountId ||
+    !payment.transactionAlias
+  ) {
+    throw new Error('Payment not refundable');
+  }
+
+  const token = await login();
+
+  const orderId = createId();
+
+  const result = await client.POST(
+    '/api/client-payment-requests/refund-transaction',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        MULTIPSP_A_ULID: payment.pspAccountId,
+        MULTIPSP_C_ULID: payment.paymentMeanId,
+        TRANSACTIONID: payment.transactionId,
+        AMOUNT: `${payment.amount + payment.taxes}`,
+        CLIENTEMAIL:
+          subscription?.subscriberEmail ??
+          (await getUserById(payment.userId))?.email ??
+          '',
+        CLIENTIP: '127.0.0.1', //refund or rebill we put localhost according to Constantin
+        ALIAS: payment.transactionAlias,
+        ORDERID: orderId,
+        EXTRADATA: JSON.stringify({
+          refundedBy: payment.userId,
+        }),
+        REASON: `Refund requested by ${userId}`,
+      },
+    },
+  );
+
+  if (result.error) {
+    throw new Error('Refund failed', { cause: result.error });
+  }
+
+  const data = result.data;
+  let updates;
+  if (data?.MULTIPSP_UNIFIED_STATUS === 'OK') {
+    updates = {
+      status: 'refunded',
+      refundedBy: userId,
+      refundedAt: new Date(),
+      refundOrderId: orderId,
+    } as const;
+    await updatePayment(payment.id, updates);
+  } else {
+    throw new Error(
+      data?.MESSAGE ||
+        data?.MULTIPSP_UNIFIED_STATUS ||
+        'Refund failed, please contact support for more information',
+    );
+  }
+
+  return { ...payment, ...updates };
 };

@@ -17,6 +17,8 @@ const paymentCallbackBody = z.object({
   MESSAGE: z.string().optional(),
   HASH: z.string(),
   EXTRADATA: z.string().optional(),
+  ALIAS: z.string(),
+  MULTIPSP_PSP_ACCOUNT_ULID: z.string(),
 });
 
 export const POST = withPluginsRoute(async (req: Request) => {
@@ -38,6 +40,8 @@ export const POST = withPluginsRoute(async (req: Request) => {
       transactionId: data.TRANSACTIONID,
       paymentProviderResponse: data.MESSAGE,
       webCardId: extraData.webCardId,
+      pspAccountId: data.MULTIPSP_PSP_ACCOUNT_ULID,
+      transactionAlias: data.ALIAS,
     });
 
     if (result) {
