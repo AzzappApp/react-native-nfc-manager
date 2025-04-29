@@ -1,5 +1,6 @@
 import {
   deleteRedirection,
+  getContactCardAccessWithHasGooglePass,
   getProfilesWithHasGooglePass,
   getPushTokensFromWebCardId,
   getRedirectWebCardByUserName,
@@ -19,6 +20,7 @@ jest.mock('@azzapp/data', () => ({
   deleteRedirection: jest.fn(),
   getPushTokensFromWebCardId: jest.fn(),
   getProfilesWithHasGooglePass: jest.fn(),
+  getContactCardAccessWithHasGooglePass: jest.fn(),
 }));
 
 jest.mock('#externals', () => ({
@@ -90,6 +92,7 @@ describe('notifyRelatedWalletPasses', () => {
       'token2',
     ]);
     (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+    (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
 
     await notifyRelatedWalletPasses('webcard-123');
 
@@ -103,14 +106,21 @@ describe('notifyRelatedWalletPasses', () => {
       { profileId: 'profile-1', userLocale: 'fr' },
       { profileId: 'profile-2', userLocale: null },
     ]);
+    (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([
+      { contactCardAccessId: 'contactCardAccess-3', userLocale: null },
+    ]);
 
     await notifyRelatedWalletPasses('webcard-123');
 
     expect(notifyApplePassWallet).not.toHaveBeenCalled();
-    expect(notifyGooglePassWallet).toHaveBeenCalledTimes(2);
+    expect(notifyGooglePassWallet).toHaveBeenCalledTimes(3);
     expect(notifyGooglePassWallet).toHaveBeenCalledWith('profile-1', 'fr');
     expect(notifyGooglePassWallet).toHaveBeenCalledWith(
       'profile-2',
+      DEFAULT_LOCALE,
+    );
+    expect(notifyGooglePassWallet).toHaveBeenCalledWith(
+      'contactCardAccess-3',
       DEFAULT_LOCALE,
     );
   });
@@ -120,6 +130,7 @@ describe('notifyRelatedWalletPasses', () => {
     (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([
       { profileId: 'profile-1', userLocale: 'fr' },
     ]);
+    (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
 
     await notifyRelatedWalletPasses('webcard-123');
 
@@ -139,6 +150,7 @@ describe('notifyRelatedWalletPasses', () => {
   test('should not notify any Wallet if there are no push tokens or Google passes', async () => {
     (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue([]);
     (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+    (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
 
     await notifyRelatedWalletPasses('webcard-123');
 

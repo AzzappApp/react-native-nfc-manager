@@ -37,11 +37,9 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             company
             phoneNumbers {
               number
-              selected
             }
             emails {
               address
-              selected
             }
           }
           logo {
@@ -56,11 +54,9 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           company
           phoneNumbers {
             number
-            selected
           }
           emails {
             address
-            selected
           }
         }
         avatar {
@@ -78,11 +74,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
 
   const phones = (
     (webCard?.isMultiUser ? webCard?.commonInformation?.phoneNumbers : []) ?? []
-  ).concat(contactCard?.phoneNumbers?.filter(p => p.selected) ?? []);
+  ).concat(contactCard?.phoneNumbers ?? []);
 
   const mails = (
     (webCard?.isMultiUser ? webCard?.commonInformation?.emails : []) ?? []
-  ).concat(contactCard?.emails?.filter(p => p.selected) ?? []);
+  ).concat(contactCard?.emails ?? []);
 
   const company =
     (webCard?.isMultiUser && webCard?.commonInformation?.company) ||

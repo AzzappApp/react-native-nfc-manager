@@ -1055,3 +1055,29 @@ export const PassRegistrationTable = cols.table(
 );
 
 export type PassRegistration = InferSelectModel<typeof PassRegistrationTable>;
+
+export const ContactCardAccessTable = cols.table(
+  'ContactCardAccess',
+  {
+    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
+    deviceId: cols.defaultVarchar('deviceId').notNull(),
+    profileId: cols.cuid('profileId').notNull(),
+    signature: cols.defaultVarchar('signature').notNull(),
+    isRevoked: cols.boolean('isRevoked').default(false).notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    lastReadAt: cols
+      .dateTime('lastReadAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE)
+      .$onUpdate(() => new Date()),
+    hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
+  },
+  table => ({
+    pk: cols
+      .uniqueIndex('deviceId_profileId_idx')
+      .on(table.deviceId, table.profileId),
+  }),
+);

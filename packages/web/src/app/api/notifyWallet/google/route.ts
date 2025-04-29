@@ -3,6 +3,7 @@ import { BarcodeTypeEnum } from 'google-wallet/lib/cjs/generic';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
+  getContactCardAccessById,
   getProfileById,
   getWebCardById,
   updateHasGooglePass,
@@ -15,7 +16,7 @@ import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
 
 const NotifyGooglePassWalletSchema = z.object({
-  profileId: z.string(),
+  serial: z.string(),
   locale: z.string(),
 });
 
@@ -23,21 +24,43 @@ export const POST = withPluginsRoute(async (req: Request) => {
   try {
     await checkServerAuth();
     const body = await req.json();
-    const { profileId, locale } = NotifyGooglePassWalletSchema.parse(body);
+    const { serial, locale } = NotifyGooglePassWalletSchema.parse(body);
 
     const { objectId, issuerId, genericClient } =
-      generateGooglePassInfos(profileId);
+      generateGooglePassInfos(serial);
 
     // Check if the pass exists on google wallet
     const currentPass = await genericClient.getObject(issuerId, objectId);
 
     if (!currentPass) {
-      await updateHasGooglePass(profileId, false);
+      await updateHasGooglePass(serial, false);
 
       return NextResponse.json({ message: 'removed' }, { status: 200 });
     }
 
-    const profile = await getProfileById(profileId);
+    let profile;
+
+    const contactCardAccess = await getContactCardAccessById(serial);
+    if (contactCardAccess) {
+      if (contactCardAccess.isRevoked) {
+        await updateHasGooglePass(serial, false);
+        return NextResponse.json(
+          { message: ERRORS.FORBIDDEN },
+          { status: 403 },
+        );
+      }
+
+      profile = await getProfileById(contactCardAccess.profileId);
+      if (!profile) {
+        return NextResponse.json(
+          { message: ERRORS.INVALID_REQUEST },
+          { status: 400 },
+        );
+      }
+    }
+    if (!profile) {
+      profile = await getProfileById(serial);
+    }
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.INVALID_REQUEST },
@@ -58,13 +81,22 @@ export const POST = withPluginsRoute(async (req: Request) => {
     }
 
     if (contactCard) {
-      const { data, signature } = await serializeAndSignContactCard(
-        webCard?.userName ?? '',
-        profile.id,
-        profile.webCardId,
-        contactCard,
-        webCard?.isMultiUser ? webCard?.commonInformation : undefined,
-      );
+      let barCodeUrl;
+      if (!contactCardAccess) {
+        const { data, signature } = await serializeAndSignContactCard(
+          webCard?.userName ?? '',
+          profile.id,
+          profile.webCardId,
+          contactCard,
+          webCard?.isMultiUser ? webCard?.commonInformation : undefined,
+        );
+
+        barCodeUrl = buildUserUrlWithContactCard(
+          webCard?.userName ?? '',
+          data,
+          signature,
+        );
+      }
 
       const objectData = {
         ...currentPass,
@@ -82,18 +114,16 @@ export const POST = withPluginsRoute(async (req: Request) => {
               ' ', // empty string is not allowed
           },
         },
-
-        barcode: {
-          type: BarcodeTypeEnum.QR_CODE,
-          value: buildUserUrlWithContactCard(
-            webCard?.userName ?? '',
-            data,
-            signature,
-          ),
-          alternateText: '',
-        },
         hexBackgroundColor: webCard?.cardColors?.primary ?? '#000000',
       };
+
+      if (barCodeUrl) {
+        objectData.barcode = {
+          type: BarcodeTypeEnum.QR_CODE,
+          value: barCodeUrl,
+          alternateText: '',
+        };
+      }
 
       if (contactCard.title) {
         objectData.subheader = {

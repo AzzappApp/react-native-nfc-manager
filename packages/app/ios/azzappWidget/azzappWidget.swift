@@ -19,7 +19,7 @@ struct Provider: AppIntentTimelineProvider {
         let userDefaults = UserDefaults(suiteName: sharedGroup )
         if let savedData = userDefaults?.value(forKey: "azzapp-qrcode-widget_v1") as? String {
             let decoder = JSONDecoder()
-            if let data = savedData.data(using: .ascii) {
+            if let data = savedData.data(using: .utf8) {
                 do {
                   storedData = try decoder.decode([WidgetData].self, from: data)
                 } catch {

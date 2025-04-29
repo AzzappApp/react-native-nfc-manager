@@ -2,7 +2,10 @@ require('#helpers/reactIntlPolyfillHelper');
 import 'react-native-url-polyfill/auto';
 import messaging from '@react-native-firebase/messaging';
 import { AppRegistry } from 'react-native';
+import { install } from 'react-native-quick-crypto';
 import App from './src/App';
+
+install();
 
 messaging().setBackgroundMessageHandler(async () => {
   //function is here only to avoid warning

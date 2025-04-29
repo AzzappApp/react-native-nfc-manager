@@ -72,7 +72,12 @@ export const buildLocalContact = async (
     if ('avatar' in contact) {
       contactAvatar = contact?.avatar;
     }
-    if ('contactProfile' in contact && contact.contactProfile?.avatar?.uri) {
+    if (
+      !contactAvatar &&
+      'contactProfile' in contact &&
+      contact.contactProfile?.avatar?.uri
+    ) {
+      contact = { ...contact, avatar: contact.contactProfile.avatar };
       contactAvatar = contact.contactProfile?.avatar;
     }
     if (!contactAvatar && 'logo' in contact) {

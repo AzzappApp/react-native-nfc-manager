@@ -31,7 +31,6 @@ import {
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import { get as QRCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -87,14 +86,11 @@ const ContactCardEditScreen = ({
       $profileId: ID!
       $contactCard: ContactCardInput!
       $pixelRatio: Float!
-      $width: Int!
     ) {
       saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
           ...ContactCardEditFormFragment_profile
             @arguments(pixelRatio: $pixelRatio)
-          contactCardUrl
-          contactCardQrCode(width: $width)
           lastContactCardUpdate
           createdAt
         }
@@ -217,7 +213,6 @@ const ContactCardEditScreen = ({
           logoId: !webCard?.isMultiUser || !webCard?.logo ? logoId : undefined,
         },
         pixelRatio: CappedPixelRatio(),
-        width: QRCodeWidth(),
       },
       onCompleted: () => {
         setProgressIndicator(null);

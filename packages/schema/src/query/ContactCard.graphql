@@ -15,33 +15,33 @@ type ContactCard {
 type ContactCardEmail {
   address: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type ContactCardPhoneNumber {
   number: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type ContactCardUrl {
   address: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type ContactCardAddress {
   address: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type ContactCardBirthday {
   birthday: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }
 
 type ContactCardSocial {
   url: String!
   label: String!
-  selected: Boolean
+  selected: Boolean @deprecated(reason: "not used anymore")
 }

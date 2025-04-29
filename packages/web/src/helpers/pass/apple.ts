@@ -2,20 +2,23 @@ import { PKPass } from 'passkit-generator';
 import {
   getMediasByIds,
   buildDefaultContactCard,
-  getProfileWithWebCardById,
+  getWebCardById,
 } from '@azzapp/data';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
-import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
+import {
+  buildUserUrlWithContactCard,
+  buildUserUrlWithKey,
+} from '@azzapp/shared/urlHelpers';
 import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
 import icon2x from '@azzapp/web/public/pass/ICON_PADDING_15@2x.png';
 import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
 import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
-import type { WebCard } from '@azzapp/data';
+import type { Profile, WebCard } from '@azzapp/data';
 
 const getCoverUrl = (webCard: WebCard, size: number) =>
-  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
+  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&height=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
 
 export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
 
@@ -45,20 +48,40 @@ export const checkAuthorization = async (req: Request, serial: string) => {
     throw new Error('Unauthorized');
   }
 
-  const profileId = await unseal(
+  const data = await unseal(
     authorization,
     process.env.APPLE_TOKEN_PASSWORD ?? '',
   );
+  if (typeof data === 'object' && data) {
+    const { contactCardAccessId, key } = data as {
+      contactCardAccessId: string;
+      key: string;
+    };
 
-  if (profileId !== serial) {
+    if (serial !== contactCardAccessId) {
+      throw new Error('Unauthorized');
+    }
+    return { contactCardAccessId, key };
+  } else if (data !== serial) {
     throw new Error('Unauthorized');
   }
+
+  return data;
 };
 
-export const buildApplePass = async (profileId: string, locale: string) => {
-  const res = await getProfileWithWebCardById(profileId);
-  if (res) {
-    const { webCard, profile } = res;
+export const buildApplePass = async ({
+  profile,
+  locale,
+  contactCardAccessId,
+  key,
+}: {
+  profile: Profile;
+  locale: string;
+  contactCardAccessId?: string | null;
+  key?: string | null;
+}) => {
+  const webCard = await getWebCardById(profile.webCardId);
+  if (webCard) {
     const [media] = webCard.coverMediaId
       ? await getMediasByIds([webCard.coverMediaId])
       : [];
@@ -66,9 +89,9 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     const thumbnails: Record<string, Buffer> = {};
 
     if (media) {
-      const thumbnail = await getCoverUrl(webCard, 90);
-      const thumbnail2x = await getCoverUrl(webCard, 90 * 2);
-      const thumbnail3x = await getCoverUrl(webCard, 90 * 3);
+      const thumbnail = getCoverUrl(webCard, 90);
+      const thumbnail2x = getCoverUrl(webCard, 90 * 2);
+      const thumbnail3x = getCoverUrl(webCard, 90 * 3);
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] = thumbnail
         ? await Promise.allSettled([
             fetch(thumbnail).then(res => res.arrayBuffer()),
@@ -139,19 +162,33 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         backgroundColor,
         labelColor: convertHexToRGBA(getTextColor(backgroundColor)),
         suppressStripShine: false,
-        serialNumber: profileId,
-        webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,
+        serialNumber: contactCardAccessId ?? profile.id,
+        webServiceURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${locale}/wallet/apple/`,
         authenticationToken: await seal(
-          profileId,
+          key
+            ? {
+                contactCardAccessId,
+                key,
+              }
+            : profile.id,
           process.env.APPLE_TOKEN_PASSWORD ?? '',
         ),
       },
     );
 
-    if (contactCard) {
+    if (contactCardAccessId && key) {
+      pass.setBarcodes({
+        message: buildUserUrlWithKey({
+          userName: webCard?.userName ?? '',
+          contactCardAccessId,
+          key,
+        }),
+        format: 'PKBarcodeFormatQR',
+      });
+    } else {
       const { data, signature } = await serializeAndSignContactCard(
         webCard.userName ?? '',
-        profileId,
+        profile.id,
         webCard.id,
         contactCard,
         webCard.isMultiUser ? webCard.commonInformation : undefined,

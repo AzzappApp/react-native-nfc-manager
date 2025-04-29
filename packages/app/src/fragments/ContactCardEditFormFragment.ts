@@ -44,30 +44,24 @@ export const contactCardFormFragment = graphql`
       emails {
         label
         address
-        selected
       }
       phoneNumbers {
         label
         number
-        selected
       }
       urls {
         address
-        selected
       }
       addresses {
         address
         label
-        selected
       }
       birthday {
         birthday
-        selected
       }
       socials {
         url
         label
-        selected
       }
     }
     avatar {

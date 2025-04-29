@@ -26,7 +26,10 @@ export type Option<T extends number | string> = {
 
 const getCountryOption = (countryCode: CountryCode) => {
   const callingCode = getCountryCallingCode(countryCode);
-  const locale = new Intl.DisplayNames([countryCode], { type: 'region' });
+  const locale = new Intl.DisplayNames(['en-US'], {
+    type: 'region',
+    localeMatcher: 'lookup',
+  });
   const countryName = locale.of(countryCode);
 
   return {

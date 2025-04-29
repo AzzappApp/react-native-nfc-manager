@@ -1,0 +1,28 @@
+extend type Mutation {
+  """
+  Save the current user's contact card access.
+  """
+  saveContactCardAccess(input : SaveContactCardAccessInput!): SaveContactCardAccessPayload!
+}
+
+input SaveContactCardAccessInput {
+  """
+  The profile id of the contact card
+  """
+  profileId: ID!
+  """
+  The device id of the contact card
+  """
+  deviceId: String!
+  """
+  The signature of the profile id
+  """
+  signature: String!
+}
+
+type SaveContactCardAccessPayload {
+  """
+  The concerned profile
+  """
+  profile: Profile!
+}

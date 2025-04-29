@@ -60,6 +60,10 @@ type Profile implements Node {
   Returns summary of statistics
   """
   statsSummary: [ProfileStatistic!]
+  """
+  True when the encrypted profile has been stored for the device
+  """
+  contactCardAccessId(deviceId: String!): ID
 
   contactCardQrCode(
     width: Int!
@@ -67,9 +71,11 @@ type Profile implements Node {
     address: AddressInput
     dark: String
     light: String
-  ): String!
+    deviceId: String
+    key: String
+  ): String! @deprecated(reason: "Use contact card url builder instead")
 
-  contactCardUrl: String!
+  contactCardUrl(deviceId:String, key:String): String! @deprecated(reason: "Use contact card url builder instead")
 
   serializedContactCard: String!
     @deprecated(reason: "Use contactCardUrl instead")

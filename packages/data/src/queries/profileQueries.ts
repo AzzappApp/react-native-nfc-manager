@@ -2,6 +2,7 @@ import { and, asc, count, eq, gt, inArray, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import {
+  ContactCardAccessTable,
   ContactTable,
   MediaTable,
   ProfileTable,
@@ -558,20 +559,48 @@ export const getProfilesWhereUserBIsOwner = async (
 
 /**
  *
- * @param profileIds collection of profile ids
+ * @param serials collection of serials
  * @param date is the date to compare the lastContactCardUpdate field
  * @returns filtered profiles that have a lastContactCardUpdate greater than the date
  */
-export const getUpdatedProfiles = async (profileIds: string[], date?: Date) => {
-  return db()
-    .select()
+export const getAppleWalletSerialsOfUpdateProfiles = async (
+  serials: string[],
+  date?: Date,
+) => {
+  const contactCardAccessPasses = db()
+    .select({
+      serial: ContactCardAccessTable.id,
+    })
     .from(ProfileTable)
+    .innerJoin(
+      ContactCardAccessTable,
+      eq(ContactCardAccessTable.profileId, ProfileTable.id),
+    )
     .where(
       and(
-        inArray(ProfileTable.id, profileIds),
+        inArray(ContactCardAccessTable.id, serials),
+        eq(ProfileTable.deleted, false),
+        eq(ContactCardAccessTable.isRevoked, false),
         date ? gt(ProfileTable.lastContactCardUpdate, date) : undefined,
       ),
     );
+
+  const oldPasses = db()
+    .select({ serial: ProfileTable.id })
+    .from(ProfileTable)
+    .where(
+      and(
+        inArray(ProfileTable.id, serials),
+        date ? gt(ProfileTable.lastContactCardUpdate, date) : undefined,
+      ),
+    ); //legacy passes
+
+  const result = await Promise.all([contactCardAccessPasses, oldPasses]).then(
+    ([contactCardAccessPasses, oldPasses]) =>
+      [...contactCardAccessPasses, ...oldPasses].map(({ serial }) => serial),
+  );
+
+  return result;
 };
 
 export const updateHasGooglePass = async (

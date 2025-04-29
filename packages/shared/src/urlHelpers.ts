@@ -1,5 +1,6 @@
 import { compressToEncodedURIComponent } from 'lz-string';
 import { isDefined } from './isDefined';
+import type { Geolocation } from './geolocationHelpers';
 /**
  * Builds a user URL from a user name.
  */
@@ -61,7 +62,7 @@ export function buildUserUrlWithContactCard(
       subregion?: string | null;
       region?: string | null;
     } | null;
-  },
+  } | null,
 ) {
   const compressedData = compressToEncodedURIComponent(
     JSON.stringify(
@@ -72,22 +73,92 @@ export function buildUserUrlWithContactCard(
   return `${buildUserUrl(userName)}?c=${compressedData}`;
 }
 
+export const deserializeGeolocation = (
+  geolocation?: [
+    number | null,
+    number | null,
+    string | null,
+    string | null,
+    string | null,
+    string | null,
+  ],
+): Geolocation | null => {
+  return geolocation
+    ? {
+        location:
+          geolocation[0] && geolocation[1]
+            ? {
+                latitude: geolocation[0],
+                longitude: geolocation[1],
+              }
+            : null,
+        address: {
+          city: geolocation[2],
+          subregion: geolocation[3],
+          region: geolocation[4],
+          country: geolocation[5],
+        },
+      }
+    : null;
+};
+
+/**
+ *
+ * @param userName is the webCard userName
+ * @param key is the
+ * @returns the url to share the contact card
+ */
+export function buildUserUrlWithKey({
+  userName,
+  contactCardAccessId,
+  key,
+  geolocation,
+}: {
+  userName: string;
+  contactCardAccessId?: string;
+  key: string;
+  geolocation?: Geolocation | null;
+}) {
+  const geolocationTrimmed = geolocation
+    ? [
+        geolocation.location?.latitude,
+        geolocation.location?.longitude,
+        geolocation.address?.city,
+        geolocation.address?.subregion,
+        geolocation.address?.region,
+        geolocation.address?.country,
+      ]
+    : undefined;
+
+  const dataWithKey = compressToEncodedURIComponent(
+    JSON.stringify([contactCardAccessId, key, geolocationTrimmed]),
+  );
+
+  return `${buildUserUrl(userName)}?k=${dataWithKey}`;
+}
+
+export function buildEmailSignatureGenerationUrlWithKey(
+  userName: string,
+  serializedKey: string,
+  signature: string,
+) {
+  const compressedData = compressToEncodedURIComponent(
+    JSON.stringify([serializedKey, signature]),
+  );
+
+  return `${buildUserUrl(userName)}/emailsignature?k=${compressedData}`;
+}
+
 export function buildEmailSignatureGenerationUrl(
   userName: string,
   serializedEmail: string,
   signature: string,
-  serializedContactCard: string,
-  signatureContactCard: string,
 ) {
   const compressedData = compressToEncodedURIComponent(
     JSON.stringify([serializedEmail, signature]),
   );
 
-  const compressedContactCardData = compressToEncodedURIComponent(
-    JSON.stringify([serializedContactCard, signatureContactCard]),
-  );
-
-  return `${buildUserUrl(userName)}/emailsignature?e=${compressedData}&c=${compressedContactCardData}`;
+  return `${buildUserUrl(userName)}/emailsignature?e=${compressedData}`;
 }
 
 export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';

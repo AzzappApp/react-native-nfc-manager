@@ -21,13 +21,10 @@ import type { MultiUserAddModalActions } from './MultiUserAddModal';
 import type * as Contacts from 'expo-contacts';
 
 const multiUserAddScreenQuery = graphql`
-  query MultiUserAddScreenQuery($webCardId: ID!, $profileId: ID!) {
+  query MultiUserAddScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       ...MultiUserAddModal_webCard
       ...MultiUserAddScreen_webCard
-    }
-    profile: node(id: $profileId) {
-      ...MultiUserAddModal_profile
     }
   }
 `;
@@ -40,7 +37,7 @@ const MultiUserAddScreen = ({
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
 
-  const { webCard, profile } = usePreloadedQuery(
+  const { webCard } = usePreloadedQuery(
     multiUserAddScreenQuery,
     preloadedQuery,
   );
@@ -228,7 +225,6 @@ const MultiUserAddScreen = ({
         <MultiUserAddModal
           onCompleted={router.back}
           webCard={webCard}
-          profile={profile}
           beforeClose={() => setSearchValue('')}
           ref={ref}
         />

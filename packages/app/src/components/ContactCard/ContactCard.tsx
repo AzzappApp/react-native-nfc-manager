@@ -8,7 +8,8 @@ import {
   fitbox,
   rect,
 } from '@shopify/react-native-skia';
-import { memo, useCallback, useMemo } from 'react';
+import { toString } from 'qrcode';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -17,14 +18,15 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
-import { useFragment, graphql } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildUserUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useContactCardAccess from '#hooks/useContactCardAccess';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import type {
@@ -40,6 +42,7 @@ type ContactCardProps = {
   height: number;
   edit?: boolean;
   rotation?: SharedValue<number>;
+  qrCodeKey?: string | null;
 };
 
 const ContactCard = ({
@@ -48,12 +51,13 @@ const ContactCard = ({
   style,
   edit,
   rotation,
+  qrCodeKey,
 }: ContactCardProps) => {
-  const { contactCard, contactCardQrCode, webCard, avatar } = useFragment(
+  const data = useFragment(
     graphql`
       fragment ContactCard_profile on Profile
+      @refetchable(queryName: "ContactCard_profileQuery")
       @argumentDefinitions(
-        width: { type: "Int!", provider: "qrCodeWidth.relayprovider" }
         pixelRatio: {
           type: "Float!"
           provider: "CappedPixelRatio.relayprovider"
@@ -79,13 +83,45 @@ const ContactCard = ({
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
-        # contactCardUrl and contactCardQrCode to ensure coherent behavior
-        contactCardQrCode(width: $width)
-        contactCardUrl
+        ...useContactCardAccess_profile
       }
     `,
     profileKey,
   );
+
+  const { contactCard, avatar, webCard } = data;
+
+  const contactCardAccessData = useContactCardAccess(data);
+
+  const [contactCardSvg, setContactCardSvg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (
+      data?.webCard?.userName &&
+      contactCardAccessData?.contactCardAccessId &&
+      qrCodeKey
+    ) {
+      toString(
+        buildUserUrlWithKey({
+          userName: data.webCard?.userName,
+          contactCardAccessId: contactCardAccessData.contactCardAccessId,
+          key: qrCodeKey,
+        }),
+        {
+          errorCorrectionLevel: 'L',
+          width: 80,
+          type: 'svg',
+          color: {
+            dark: '#000',
+            light: '#0000',
+          },
+          margin: 0,
+        },
+      ).then(svg => {
+        setContactCardSvg(svg);
+      });
+    }
+  }, [data, contactCardAccessData?.contactCardAccessId, qrCodeKey]);
 
   const router = useRouter();
   const onEdit = useMemo(
@@ -106,7 +142,7 @@ const ContactCard = ({
       height={height}
       style={style}
       contactCard={contactCard}
-      contactCardQrCode={contactCardQrCode}
+      contactCardQrCode={contactCardSvg}
       avatar={avatar}
       onEdit={onEdit}
       rotation={rotation}
@@ -122,7 +158,7 @@ type ContactCardComponentProps = {
   height: number;
   style?: StyleProp<ViewStyle>;
   contactCard?: ContactCard | null;
-  contactCardQrCode?: string;
+  contactCardQrCode?: string | null;
   avatar?: ContactCard_profile$data['avatar'];
   onEdit?: (() => void) | null;
   rotation?: SharedValue<number>;

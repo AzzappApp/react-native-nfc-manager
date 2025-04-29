@@ -6,6 +6,7 @@ import {
 } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardExportVcf from '../ContactCardExportVcf';
 import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardExportVcfTestQuery.graphql';
@@ -33,28 +34,24 @@ const contactCard = {
     {
       address: 'test@mail.com',
       label: 'Work',
-      selected: true,
     },
   ],
   phoneNumbers: [
     {
       number: '123456789',
       label: 'Mobile',
-      selected: true,
     },
   ],
   urls: [
     {
       address: 'https://www.google.com',
       label: 'Website',
-      selected: true,
     },
   ],
   socials: [
     {
       url: 'https://www.facebook.com',
       label: 'Facebook',
-      selected: true,
     },
   ],
 };
@@ -77,8 +74,11 @@ describe('ContactCardExportVcf', () => {
       return MockPayloadGenerator.generate(operation, {
         Profile() {
           return {
-            contactCardUrl: 'contactCardUrl',
+            contactCardAccessId: 'contactCardAccessId',
             contactCard,
+            webCard: {
+              userName: 'userName',
+            },
           };
         },
       });
@@ -98,7 +98,11 @@ describe('ContactCardExportVcf', () => {
 
       return (
         data.profile && (
-          <ContactCardExportVcf profile={data.profile} {...props} />
+          <ContactCardExportVcf
+            profile={data.profile}
+            publicKey="publicKey"
+            {...props}
+          />
         )
       );
     };
@@ -133,7 +137,11 @@ describe('ContactCardExportVcf', () => {
       title: 'John Doe',
       subject: 'John Doe',
       failOnCancel: false,
-      message: 'contactCardUrl',
+      message: buildUserUrlWithKey({
+        userName: 'userName',
+        contactCardAccessId: 'contactCardAccessId',
+        key: 'publicKey',
+      }),
     });
   });
 });

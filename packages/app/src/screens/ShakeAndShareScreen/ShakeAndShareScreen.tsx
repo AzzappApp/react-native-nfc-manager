@@ -11,24 +11,21 @@ import {
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { startTransition, Suspense, useCallback, useEffect } from 'react';
+import { toString } from 'qrcode';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   ActivityIndicator,
   Dimensions,
   Platform,
-  useColorScheme,
   View,
   ScrollView,
+  StyleSheet,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import {
-  graphql,
-  useMutation,
-  usePreloadedQuery,
-  useRefetchableFragment,
-} from 'react-relay';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
+import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors, shadow } from '#theme';
 import AddToWalletButton from '#components/AddToWalletButton';
@@ -37,14 +34,14 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ToastUi from '#components/Toast';
 import { logEvent } from '#helpers/analytics';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import downloadQrCode from '#helpers/DownloadQrCode';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
+import useContactCardAccess from '#hooks/useContactCardAccess';
 import { useCurrentLocation } from '#hooks/useLocation';
+import useQRCodeKey, { getQRCodeDeviceId } from '#hooks/useQRCodeKey';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
-import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import IosAddWidgetPopup from '#screens/ShakeAndShareScreen/IosAddWidgetPopup';
 import SignaturePreview from '#screens/ShakeAndShareScreen/SignaturePreview';
 import Container from '#ui/Container';
@@ -55,9 +52,8 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import IosAddLockScreenWidgetPopup from './IosAddLockScreenWidgetPopup';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { ShakeAndShareScreen_profile$key } from '#relayArtifacts/ShakeAndShareScreen_profile.graphql';
-import type { ShakeAndShareScreen_profileQuery } from '#relayArtifacts/ShakeAndShareScreen_profileQuery.graphql';
 import type { ShakeAndShareScreenQuery } from '#relayArtifacts/ShakeAndShareScreenQuery.graphql';
+import type { useContactCardAccess_profile$key } from '#relayArtifacts/useContactCardAccess_profile.graphql';
 import type { ShakeAndShareRoute } from '#routes';
 
 const ShakeAndShareScreen = ({
@@ -79,6 +75,8 @@ const ShakeAndShareScreen = ({
     }
   }, [profile, router, webCard?.cardIsPublished]);
 
+  const publicKey = useQRCodeKey(profile);
+
   const [popupIosWidgetVisible, showIosWidgetPopup, hideIosWidgetPopup] =
     useBoolean(false);
   const [
@@ -87,24 +85,39 @@ const ShakeAndShareScreen = ({
     hideIosLockScreenWidgetPopup,
   ] = useBoolean(false);
 
+  const data = useContactCardAccess(profile);
+
+  const contactCardUrl =
+    data?.webCard?.userName && data.contactCardAccessId && publicKey
+      ? buildUserUrlWithKey({
+          userName: data.webCard?.userName,
+          contactCardAccessId: data?.contactCardAccessId,
+          key: publicKey,
+        })
+      : null;
+
   const onDownloadQrCode = useCallback(() => {
-    if (profile?.contactCardQrCodeWithoutLocation) {
-      downloadQrCode(
-        profile.webCard?.userName || profile.id,
-        profile.contactCardQrCodeWithoutLocation,
-      );
+    if (contactCardUrl) {
+      toString(contactCardUrl, {
+        errorCorrectionLevel: 'L',
+        width: 80,
+        type: 'svg',
+        color: {
+          dark: '#FFFFFF',
+          light: '#000000',
+        },
+        margin: 0,
+      }).then(svg => {
+        downloadQrCode(data?.webCard?.userName || '', svg);
+      });
     }
-  }, [
-    profile?.contactCardQrCodeWithoutLocation,
-    profile?.id,
-    profile?.webCard?.userName,
-  ]);
+  }, [contactCardUrl, data?.webCard?.userName]);
 
   const [commit, isGeneratingEmail] = useMutation(graphql`
     mutation ShakeAndShareScreenGenerateEmailSignatureMutation(
-      $profileId: ID!
+      $input: GenerateEmailSignatureWithKeyInput!
     ) {
-      generateEmailSignature(profileId: $profileId) {
+      generateEmailSignatureWithKey(input: $input) {
         url
       }
     }
@@ -129,7 +142,11 @@ const ShakeAndShareScreen = ({
       logEvent('generate_email_signature');
       commit({
         variables: {
-          profileId: profile.id,
+          input: {
+            key: publicKey,
+            profileId: profile.id,
+            deviceId: getQRCodeDeviceId(),
+          },
         },
         onCompleted: () => {
           Toast.show({
@@ -170,11 +187,15 @@ const ShakeAndShareScreen = ({
         },
       });
     }
-  }, [commit, currentUser?.email, intl, profile?.id, router, webCard?.id]);
-
-  const styles = useStyleSheet(styleSheet);
-
-  const colorScheme = useColorScheme();
+  }, [
+    commit,
+    currentUser?.email,
+    intl,
+    profile?.id,
+    publicKey,
+    router,
+    webCard?.id,
+  ]);
 
   const { bottom } = useScreenInsets();
   const { height, width } = useScreenDimensions();
@@ -199,7 +220,9 @@ const ShakeAndShareScreen = ({
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
               <Suspense>
-                <QRCode profile={node?.profile} />
+                {profile && publicKey && (
+                  <QRCode profile={profile} publicKey={publicKey} />
+                )}
               </Suspense>
             </View>
             <Text style={styles.subtitle} appearance="dark" variant="button">
@@ -214,11 +237,13 @@ const ShakeAndShareScreen = ({
                   profile={profile}
                   appearance="dark"
                   style={styles.button}
+                  publicKey={publicKey}
                 />
               )}
-              {webCard && (
+              {data?.contactCardAccessId && publicKey && (
                 <AddToWalletButton
-                  webCardId={webCard.id}
+                  contactCardAccessId={data.contactCardAccessId}
+                  publicKey={publicKey}
                   style={styles.button}
                   appearance="light"
                 />
@@ -232,45 +257,40 @@ const ShakeAndShareScreen = ({
                 })}
                 style={styles.button}
                 onPress={() => {
-                  Clipboard.setStringAsync(profile?.contactCardUrl ?? '').then(
-                    () => {
-                      Toast.show({
-                        type: 'info',
-                        text1: intl.formatMessage({
-                          defaultMessage: 'Copied to clipboard',
-                          description:
-                            'Toast info message that appears when the user copies the contact card url to the clipboard',
-                        }),
-                      });
-                    },
-                  );
+                  Clipboard.setStringAsync(contactCardUrl ?? '').then(() => {
+                    Toast.show({
+                      type: 'info',
+                      text1: intl.formatMessage({
+                        defaultMessage: 'Copied to clipboard',
+                        description:
+                          'Toast info message that appears when the user copies the contact card url to the clipboard',
+                      }),
+                    });
+                  });
                 }}
               />
               <PressableNative
                 ripple={{
                   foreground: true,
-                  color:
-                    colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                  color: colors.grey900,
                 }}
-                style={[styles.button, styles.addToWalletButton]}
+                style={[styles.button, styles.smartEmailButton]}
                 onPress={generateEmailSignature}
               >
                 {isGeneratingEmail ? (
                   <ActivityIndicator
-                    color={colorScheme === 'dark' ? 'black' : 'white'}
-                    style={styles.addToWalletIcon}
+                    color="white"
+                    style={styles.smartEmailIcon}
                   />
                 ) : (
                   <Icon
                     icon="signature"
                     style={styles.sharedIcon}
                     size={24}
-                    tintColor={
-                      colorScheme === 'dark' ? colors.black : colors.white
-                    }
+                    tintColor={colors.white}
                   />
                 )}
-                <Text variant="button" style={styles.addToWalletButtonText}>
+                <Text variant="button" style={styles.smartEmailButtonText}>
                   <FormattedMessage
                     defaultMessage="Smart email Signature"
                     description="Generate an email Signature button label"
@@ -374,67 +394,70 @@ const ShakeAndShareScreen = ({
 
 const QRCode = ({
   profile,
+  publicKey,
 }: {
-  profile?: ShakeAndShareScreen_profile$key | null;
+  profile: useContactCardAccess_profile$key;
+  publicKey: string | null;
 }) => {
-  const [data, refetch] = useRefetchableFragment<
-    ShakeAndShareScreen_profileQuery,
-    ShakeAndShareScreen_profile$key
-  >(
-    graphql`
-      fragment ShakeAndShareScreen_profile on Profile
-      @refetchable(queryName: "ShakeAndShareScreen_profileQuery")
-      @argumentDefinitions(
-        width: { type: "Int!", provider: "qrCodeWidth.relayprovider" }
-        location: { type: "LocationInput" }
-        address: { type: "AddressInput" }
-      ) {
-        contactCardQrCode(width: $width, location: $location, address: $address)
-      }
-    `,
-    profile,
-  );
+  const data = useContactCardAccess(profile);
 
   const currentLocation = useCurrentLocation();
 
   const { location, address } = currentLocation ?? {};
 
-  useEffect(() => {
-    startTransition(() => {
-      refetch({
-        location: location
-          ? {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }
-          : null,
-        address: address
-          ? {
-              country: address.country,
-              city: address.city,
-              subregion: address.subregion,
-              region: address.region,
-            }
-          : null,
-      });
-    });
-  }, [address, location, refetch]);
+  const [contactCardSvg, setContactCardSvg] = useState<string | null>(null);
 
-  const svg = data?.contactCardQrCode
-    ? Skia.SVG.MakeFromString(data.contactCardQrCode)
-    : null;
+  useEffect(() => {
+    if (data?.webCard?.userName && data.contactCardAccessId && publicKey) {
+      toString(
+        buildUserUrlWithKey({
+          userName: data.webCard?.userName,
+          contactCardAccessId: data?.contactCardAccessId,
+          key: publicKey,
+          geolocation: {
+            location: location
+              ? {
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                }
+              : null,
+            address: address
+              ? {
+                  country: address.country,
+                  city: address.city,
+                  subregion: address.subregion,
+                  region: address.region,
+                }
+              : null,
+          },
+        }),
+        {
+          errorCorrectionLevel: 'L',
+          width: 80,
+          type: 'svg',
+          color: {
+            dark: '#000',
+            light: '#0000',
+          },
+          margin: 0,
+        },
+      ).then(svg => {
+        setContactCardSvg(svg);
+      });
+    }
+  }, [publicKey, data, location, address]);
+
+  const svg = contactCardSvg ? Skia.SVG.MakeFromString(contactCardSvg) : null;
 
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
-
-  const styles = useStyleSheet(styleSheet);
 
   return svg ? (
     <Canvas style={styles.canvas}>
       <Group
         layer={
           <Paint>
-            <BlendColor color="white" mode="srcATop" />
+            <BlendColor color="black" mode="srcATop" />
           </Paint>
         }
         transform={fitbox('contain', src, dst)}
@@ -447,9 +470,9 @@ const QRCode = ({
 
 const { width } = Dimensions.get('window');
 
-const QR_CODE_WIDTH = Math.round(width * 0.5);
+const QR_CODE_WIDTH = Math.round(width * 0.57);
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
     borderColor: 'white',
@@ -471,45 +494,43 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 200,
   },
   qrCodeContainer: {
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: '#FFF',
     borderRadius: 23,
     borderCurve: 'continuous',
     width: QR_CODE_WIDTH + 40,
     height: QR_CODE_WIDTH + 40,
   },
-  addToWalletButton: {
+  smartEmailButton: {
     width: '100%',
     height: 47,
     borderRadius: 12,
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    backgroundColor: colors.black,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addToWalletIcon: {
+  smartEmailIcon: {
     width: 38,
     height: 37,
     position: 'absolute',
     left: 10,
     marginVertical: 'auto',
   },
-  addToWalletButtonText: {
-    color: appearance === 'light' ? colors.white : colors.black,
+  smartEmailButtonText: {
+    color: colors.white,
   },
   sharedIcon: {
     position: 'absolute',
     left: 10,
     marginVertical: 'auto',
   },
-  signaturePreview: [
-    {
-      width: '100%',
-      backgroundColor: 'white',
-      padding: 15,
-      borderRadius: 16,
-      transform: [{ scale: 0.85 }, { translateY: -20 }],
-    },
-    shadow({ appearance: 'light', direction: 'bottom' }),
-  ],
+  signaturePreview: {
+    width: '100%',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 16,
+    transform: [{ scale: 0.85 }, { translateY: -20 }],
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
+  },
   viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
   canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH, margin: 20 },
   linear: {
@@ -527,11 +548,6 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 0,
     position: 'fixed',
     top: 0,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
   },
   subtitle: {
     textAlign: 'center',
@@ -558,42 +574,23 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: colors.white,
   },
-  backgroundTopTransparent: {
-    height: 300,
-    backgroundColor: 'transparent',
-  },
-  backgroundBottomBlack: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-}));
+});
 
 const shakeAndShareQuery = graphql`
-  query ShakeAndShareScreenQuery(
-    $profileId: ID!
-    $width: Int!
-    $dark: String
-    $light: String
-  ) {
+  query ShakeAndShareScreenQuery($profileId: ID!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
         invited
         webCard {
           id
-          userName
           cardIsPublished
           ...CoverRenderer_webCard
         }
-        contactCardUrl
-        contactCardQrCodeWithoutLocation: contactCardQrCode(
-          width: $width
-          dark: $dark
-          light: $light
-        )
-        ...ContactCardExportVcf_card
         ...SignaturePreview_profile
-        ...ShakeAndShareScreen_profile
+        ...useQRCodeKey_profile
+        ...ContactCardExportVcf_card
+        ...useContactCardAccess_profile
       }
     }
     currentUser {
@@ -608,9 +605,6 @@ export default relayScreen(ShakeAndShareScreen, {
   query: shakeAndShareQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId,
-    width: qrCodeWidth(),
-    dark: '#FFFFFF',
-    light: '#000000',
   }),
   getScreenOptions: () => ({
     stackPresentation: Platform.OS === 'ios' ? 'formSheet' : 'fullScreenModal',

@@ -37,30 +37,24 @@ export type ContactCard = {
   phoneNumbers?: Array<{
     label: string;
     number: string;
-    selected?: boolean | null;
   }> | null;
   emails?: Array<{
     label: string;
     address: string;
-    selected?: boolean | null;
   }> | null;
   urls?: Array<{
     address: string;
-    selected?: boolean | null;
   }> | null;
   addresses?: Array<{
     label: string;
     address: string;
-    selected?: boolean | null;
   }> | null;
   birthday?: {
     birthday: string;
-    selected?: boolean | null;
   } | null;
   socials?: Array<{
     url: string;
     label: string;
-    selected?: boolean | null;
   }> | null;
 };
 
@@ -94,15 +88,15 @@ export const serializeContactCard = (
     (commonInformation?.company || card?.company) ?? '',
     card?.title ?? '',
     (commonInformation?.phoneNumbers ?? [])
-      .concat(card?.phoneNumbers?.filter(p => p.selected) ?? [])
+      .concat(card?.phoneNumbers ?? [])
       .map(({ label, number }) => [label, number]),
     (commonInformation?.emails ?? [])
-      .concat(card?.emails?.filter(e => e.selected) ?? [])
+      .concat(card?.emails ?? [])
       .map(({ label, address }) => [label, address]),
     (commonInformation?.addresses ?? [])
-      .concat(card?.addresses?.filter(address => address.selected) ?? [])
+      .concat(card?.addresses ?? [])
       .map(({ label, address }) => [label, address]),
-    card?.birthday?.selected ? card?.birthday.birthday : undefined,
+    card?.birthday?.birthday,
   ];
 
   return json2csv([serializedContactCard], { header: false });
@@ -150,4 +144,6 @@ export const parseContactCard = (contactCardData: string) => {
 export const AVATAR_MAX_WIDTH = 2048;
 export const LOGO_MAX_WIDTH = 2048;
 
-export const CONTACTCARD_ASSET_SIZES = [112];
+export const CONTACT_CARD_AVATAR_SIZES = [112, 224, 448];
+
+export const CONTACT_CARD_LOGO_SIZES = [180, 360, 720];

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getSerialsForDevice, getUpdatedProfiles } from '@azzapp/data';
+import {
+  getSerialsForDevice,
+  getAppleWalletSerialsOfUpdateProfiles,
+} from '@azzapp/data';
 import { withPluginsRoute } from '#helpers/queries';
 import type { NextRequest } from 'next/server';
 
@@ -38,12 +41,12 @@ const getUpdatedPasses = async (
 
   const lastUpdated = new Date();
 
-  const profiles = await getUpdatedProfiles(
+  const serials = await getAppleWalletSerialsOfUpdateProfiles(
     passes.map(pass => pass.serial),
     passesUpdatedDate,
   );
 
-  if (profiles.length === 0) {
+  if (serials.length === 0) {
     return new Response(null, {
       status: 204, //204 is not supported by NextResponse
       headers: {
@@ -54,7 +57,7 @@ const getUpdatedPasses = async (
 
   return NextResponse.json(
     {
-      serialNumbers: profiles.map(profile => profile.id),
+      serialNumbers: serials,
       lastUpdated: lastUpdated.toISOString(),
     },
     {
