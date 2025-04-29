@@ -1,3 +1,7 @@
+## 1.10.0-canary.156
+
+* **fix:**  - keep png format for upload ([#8571](https://github.com/AzzappApp/azzapp/pull/8571))
+
 ## 1.10.0-canary.155
 
 
