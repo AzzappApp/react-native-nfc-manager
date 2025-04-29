@@ -9,6 +9,7 @@ import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
+import ContactEditScreen from '#screens/ContactEditScreen/ContactEditScreen';
 import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
 import ContactsScreen from '#screens/ContactsScreen';
 import CookieContentScreen from '#screens/CookieConsentsScreen';
@@ -65,6 +66,7 @@ const screens = {
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONTACT_CARD_CREATE: ContactCardCreateScreen,
   CONTACT_CREATE: ContactCreateScreen,
+  CONTACT_EDIT: ContactEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,

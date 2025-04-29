@@ -983,6 +983,11 @@ export const ContactTable = cols.table(
       region?: string | null;
       country?: string | null;
     }>(),
+    meetingDate: cols
+      .dateTime('meetingDate')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    note: cols.text(),
   },
   table => {
     return {

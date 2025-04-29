@@ -187,8 +187,8 @@ export const searchContacts = async (
           )`,
         ]
       : orderBy === 'location'
-        ? [desc(locationExpr), desc(ContactTable.createdAt)]
-        : [desc(ContactTable.createdAt)];
+        ? [desc(locationExpr), desc(ContactTable.meetingDate)]
+        : [desc(ContactTable.meetingDate)];
 
   const contacts = await db()
     .select()

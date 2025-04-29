@@ -4,50 +4,55 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import ContactEditField from '#components/Contact/ContactEditField';
-import { contactEditStyleSheet } from '#helpers/contactHelpers';
+import {
+  contactEditStyleSheet,
+  useContactEmailLabels,
+} from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
-const ContactEditUrls = ({
+const ContactEditEmails = ({
   control,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'urls',
+    name: 'emails',
   });
 
   const intl = useIntl();
+
+  const labelValues = useContactEmailLabels();
 
   const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
-      {fields.map((url, index) => (
-        <Fragment key={url.id}>
+      {fields.map((email, index) => (
+        <Fragment key={email.id}>
           <ContactEditField
             control={control}
-            valueKey={`urls.${index}.url`}
+            labelKey={`emails.${index}.label`}
+            valueKey={`emails.${index}.address`}
             deleteField={() => remove(index)}
-            keyboardType="url"
+            keyboardType="email-address"
             autoCapitalize="none"
+            labelValues={labelValues}
             placeholder={intl.formatMessage({
-              defaultMessage: 'Enter a URL',
-              description:
-                'ContactEditUrls  - Placeholder for URL inside contact card',
+              defaultMessage: 'Enter an email',
+              description: 'Placeholder for email inside contact card',
             })}
             errorMessage={intl.formatMessage({
-              defaultMessage: 'Please enter a valid url',
+              defaultMessage: 'Please enter a valid email',
               description:
-                'ContactEditUrls - Error message when a url is wrongly formatted',
+                'Edit Contact Card - Error message when an email is wrongly formatted',
             })}
-            trim
             returnKeyType="done"
           />
           <Separation small />
@@ -57,14 +62,17 @@ const ContactEditUrls = ({
         <PressableNative
           style={styles.addButton}
           onPress={() => {
-            append({ url: '' });
+            append({
+              label: 'Home',
+              address: '',
+            });
           }}
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
           <Text variant="smallbold">
             <FormattedMessage
-              defaultMessage="Add URL"
-              description="ContactEditUrls  - Add URL to the contact card"
+              defaultMessage="Add email address"
+              description="Add email address to the contact card"
             />
           </Text>
         </PressableNative>
@@ -73,4 +81,4 @@ const ContactEditUrls = ({
   );
 };
 
-export default ContactEditUrls;
+export default ContactEditEmails;

@@ -48,6 +48,9 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
+        {rightElement
+          ? (leftElement ?? <View style={styles.element} />)
+          : leftElement}
         <View
           style={[styles.headerMiddle, middleElementStyle]}
           pointerEvents="box-none"
@@ -60,8 +63,9 @@ const Header = ({
             <View>{middleElement}</View>
           ) : undefined}
         </View>
-        {rightElement ? (leftElement ?? <View />) : leftElement}
-        {rightElement}
+        {leftElement
+          ? (rightElement ?? <View style={styles.element} />)
+          : rightElement}
       </View>
     </Container>
   );
@@ -87,15 +91,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  element: {
+    flex: 1,
+  },
   headerMiddle: {
-    position: 'absolute',
-    left: 0,
-    width: '100%',
+    flex: 2,
+    textOverflow: 'hidden',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 10,
   },
   title: {
     textAlign: 'center',
+    textOverflow: 'ellipsis',
   },
 });

@@ -2,23 +2,23 @@ import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactDateField from '#components/Contact/ContactEditDateField';
+import ContactEditDateStringField from '#components/Contact/ContactEditDateStringField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
 const ContactEditBirthday = ({
   control,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
 }) => {
   const { field } = useController({
     control,
-    name: 'birthday',
+    name: 'birthday.birthday',
   });
   const intl = useIntl();
 
@@ -27,7 +27,7 @@ const ContactEditBirthday = ({
   return (
     <>
       {field.value && (
-        <ContactDateField
+        <ContactEditDateStringField
           control={control}
           valueKey="birthday.birthday"
           deleteField={() => field.onChange(null)}

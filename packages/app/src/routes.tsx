@@ -272,6 +272,13 @@ export type ContactCreateRoute = {
   };
 };
 
+export type ContactEditRoute = {
+  route: 'CONTACT_EDIT';
+  params: {
+    contact: ContactType;
+  };
+};
+
 export type MultiUserDetailRoute = {
   route: 'MULTI_USER_DETAIL';
   params: {
@@ -342,6 +349,7 @@ export type Route =
   | ContactCardEditRoute
   | ContactCreateRoute
   | ContactDetailsRoute
+  | ContactEditRoute
   | ContactsRoute
   | CookieConsentRoute
   | CookieSettingsRoute

@@ -3,6 +3,7 @@ import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import VCard from 'vcard-creator';
+import * as z from 'zod';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
   addressLabelToVCardLabel,
@@ -11,6 +12,7 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
+import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 import { prefixWithHttp } from './contactListHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import type { ContactMeetingPlaceType, ContactType } from './contactTypes';
@@ -321,3 +323,66 @@ export const getFriendlyNameFromLocation = (
     meetingPlace?.country
   );
 };
+
+export const contactSchema = z
+  .object({
+    firstName: z.string().nullable().optional(),
+    lastName: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    company: z.string().nullable().optional(),
+    note: z.string().nullable().optional(),
+    phoneNumbers: z.array(phoneNumberSchema),
+    emails: z.array(
+      z.object({
+        label: z.string(),
+        address: z.string(),
+      }),
+    ),
+    urls: z.array(
+      z.object({
+        url: z.string(),
+      }),
+    ),
+    addresses: z.array(
+      z.object({
+        label: z.string(),
+        address: z.string(),
+      }),
+    ),
+    // @todo need to change birthday behaviour
+    birthday: z
+      .object({
+        birthday: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    meetingDate: z.date().optional(),
+    socials: z.array(
+      z.object({
+        url: z.string(),
+        label: z.string(),
+      }),
+    ),
+    avatar: z
+      .object({
+        uri: z.string(),
+        id: z.string().optional(),
+        local: z.boolean().optional(),
+      })
+      .optional()
+      .nullable(),
+    logo: z
+      .object({
+        uri: z.string(),
+        id: z.string().optional(),
+        local: z.boolean().optional(),
+      })
+      .optional()
+      .nullable(),
+  })
+  .refine(
+    data => !!data.firstName || !!data.lastName || !!data.company,
+    'Either one of firstname or lastname or company name should be filled in.',
+  );
+
+export type contactFormValues = z.infer<typeof contactSchema>;

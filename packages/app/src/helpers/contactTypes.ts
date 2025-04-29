@@ -59,12 +59,12 @@ export type ContactType = {
   avatar?: ContactMediaType | null;
   birthday?: string | null;
   company?: string;
-  createdAt: Date;
   emails?: ContactEmailType[] | null;
   firstName?: string | null;
   lastName?: string | null;
   logo?: ContactMediaType | null;
   meetingPlace?: ContactMeetingPlaceType | null;
+  meetingDate: Date;
   phoneNumbers?: ContactPhoneNumberType[] | null;
   socials?: ContactSocialType[] | null;
   title?: string | null;
@@ -78,4 +78,5 @@ export type ContactType = {
   profileId?: string | null;
   webCardUserName?: string | null;
   webCardPreview?: ContactMediaType | null;
+  note?: string | null;
 };

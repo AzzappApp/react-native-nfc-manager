@@ -10,7 +10,6 @@ type Contact implements Node {
   lastName: String!
   company: String!
   title: String!
-  createdAt: DateTime!
   type: String!
   birthday: String
   phoneNumbers: [ContactPhoneNumber!]!
@@ -22,6 +21,8 @@ type Contact implements Node {
   deleted: Boolean
   logo: Media
   meetingPlace: Address
+  meetingDate: DateTime
+  note: String
 }
 
 type Address {

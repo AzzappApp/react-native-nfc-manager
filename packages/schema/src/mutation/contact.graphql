@@ -1,0 +1,77 @@
+extend type Mutation {
+  saveContact(profileId: ID!, contactId: ID!, input: ContactInput!): Contact
+
+  createContact(
+    profileId: ID!
+    input: ContactInput!
+    scanUsed: Boolean
+    notify: Boolean
+    withShareBack: Boolean!
+  ): ContactPayload
+
+  removeContacts(
+    profileId: ID!
+    input: RemoveContactsInput!
+  ): RemoveContactPayload
+}
+
+input ContactInput {
+  contactProfileId: ID
+  firstname: String
+  lastname: String
+  company: String
+  title: String
+  birthday: String
+  avatarId: String
+  phoneNumbers: [ContactPhoneNumberInput!]
+  emails: [ContactEmailInput!]
+  addresses: [ContactAddressInput!]
+  socials: [ContactSocialInput!]
+  urls: [ContactUrlInput!]
+  logoId: String
+  note: String
+  location: LocationInput
+  address: AddressInput
+  meetingDate: DateTime
+}
+
+input ContactSocialInput {
+  url: String!
+  label: String!
+}
+
+input ContactUrlInput {
+  url: String!
+}
+
+input ContactPhoneNumberInput {
+  label: String!
+  number: String!
+}
+
+input ContactEmailInput {
+  label: String!
+  address: String!
+}
+
+input ContactAddressInput {
+  label: String!
+  address: String!
+}
+
+type ContactPayload {
+  contact: Contact!
+}
+
+enum ContactType {
+  contact
+  shareback
+}
+
+input RemoveContactsInput {
+  contactIds: [ID!]!
+}
+
+type RemoveContactPayload {
+  removedContactIds: [ID!]!
+}

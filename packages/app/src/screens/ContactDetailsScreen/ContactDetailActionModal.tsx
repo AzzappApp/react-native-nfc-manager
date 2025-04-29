@@ -16,6 +16,7 @@ type ContactDetailActionModalProps = {
   visible?: boolean;
   onSaveContact: () => void;
   onShare: () => void;
+  onEdit: () => void;
   details?: ContactType;
 };
 
@@ -26,11 +27,20 @@ const ContactDetailActionModal = ({
   onRemoveContacts,
   onSaveContact,
   onShare,
+  onEdit,
 }: ContactDetailActionModalProps) => {
   const intl = useIntl();
 
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
     return [
+      {
+        icon: 'edit' as Icons,
+        text: intl.formatMessage({
+          defaultMessage: 'Edit Contact details',
+          description: 'ContactsScreen - More option alert - edit',
+        }),
+        onPress: onEdit,
+      },
       {
         icon: 'share' as Icons,
         text: intl.formatMessage({
@@ -48,7 +58,7 @@ const ContactDetailActionModal = ({
         onPress: onSaveContact,
       },
     ];
-  }, [intl, onSaveContact, onShare]);
+  }, [intl, onSaveContact, onShare, onEdit]);
 
   return (
     <BottomSheetModal

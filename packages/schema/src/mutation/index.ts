@@ -3,6 +3,7 @@ import acceptOwnership from './acceptOwnership';
 import acceptTermsOfUse from './acceptTermsOfUse';
 import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
+import * as contact from './contact';
 import createContactCard from './createContactCard';
 import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
@@ -36,7 +37,6 @@ import {
 import * as payment from './payment';
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
-import removeContacts from './removeContacts';
 import removeContactsFromWebCard from './removeContactsFromWebCard';
 import removeFollower from './removeFollower';
 import removeUsersFromWebCard from './removeUsersFromWebCard';
@@ -122,7 +122,6 @@ export const Mutation: MutationResolvers = {
   deletePost,
   deleteUser,
   addContact,
-  removeContacts,
   removeContactsFromWebCard,
   saveFCMToken,
   deleteFCMToken,
@@ -134,6 +133,7 @@ export const Mutation: MutationResolvers = {
   sendEmailSignatures,
   saveContactCardAccess,
   ...payment,
+  ...contact,
 };
 
 export default Mutation;

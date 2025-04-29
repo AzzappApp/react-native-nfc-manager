@@ -10,7 +10,7 @@ import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInputWithPrefix from '#ui/TextInputWithPrefix';
-import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 export type PhoneInput = {
@@ -18,7 +18,7 @@ export type PhoneInput = {
   number: string;
 };
 
-const ContactEditPhoneField = <TFieldValues extends FieldValues>({
+const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
   deleteField,
   keyboardType,
   control,
@@ -136,4 +136,4 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default ContactEditPhoneField;
+export default ContactCardEditPhoneField;

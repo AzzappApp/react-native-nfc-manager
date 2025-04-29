@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { colors } from '#theme';
-import ContactCardEditPhoneField from '#components/Contact/ContactEditPhoneField';
+import ContactCardEditPhoneField from '#components/ContactCard/ContactCardEditPhoneField';
 import {
   contactEditStyleSheet,
   useContactPhoneLabels,

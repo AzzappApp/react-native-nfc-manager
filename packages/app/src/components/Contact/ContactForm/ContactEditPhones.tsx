@@ -14,13 +14,13 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
 const ContactEditPhones = ({
   control,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
 }) => {
   const locales = getLocales();
   const { fields, append, remove } = useFieldArray({

@@ -54,8 +54,6 @@ const ContactSearchByNameItem = ({
     return ['', '', ''];
   }, [contact.firstName, contact.lastName, contact.webCardUserName]);
 
-  console.log('contact', contact, avatarSource);
-
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
     <View key={contact.id} style={styles.contact}>
@@ -99,7 +97,7 @@ const ContactSearchByNameItem = ({
             )}
           {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}
           <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
-            {new Date(contact.createdAt).toLocaleDateString()}
+            {new Date(contact.meetingDate).toLocaleDateString()}
             {location ? ` - ${location}` : ''}
           </Text>
         </View>

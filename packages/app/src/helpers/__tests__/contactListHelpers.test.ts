@@ -29,7 +29,7 @@ describe('buildExpoContact', () => {
       emails: [],
       firstName: 'John',
       lastName: 'Doe',
-      createdAt: new Date('2012-12-21'),
+      meetingDate: new Date('2012-12-21'),
     });
     expect(result.emails?.length).toBe(0);
   });
@@ -38,7 +38,7 @@ describe('buildExpoContact', () => {
       emails: [{ address: 'a@a.com', label: 'Work' }],
       firstName: 'John',
       lastName: 'Doe',
-      createdAt: new Date('2012-12-21'),
+      meetingDate: new Date('2012-12-21'),
     });
     expect(result.emails?.length).toBe(1);
     expect(result.emails?.[0].email).toBe('a@a.com');
@@ -48,7 +48,7 @@ describe('buildExpoContact', () => {
     const result = await buildExpoContact({
       firstName: 'John',
       lastName: 'Doe',
-      createdAt: new Date('2012-12-21'),
+      meetingDate: new Date('2012-12-21'),
       avatar: {
         uri: 'https://example.com/avatar.jpg',
       },

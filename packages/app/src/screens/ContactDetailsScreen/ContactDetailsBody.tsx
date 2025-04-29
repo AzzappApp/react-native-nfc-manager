@@ -23,6 +23,7 @@ import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
+import NoteItem from './NoteItem';
 import type { ContactType } from '#helpers/contactTypes';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
@@ -121,8 +122,8 @@ const ContactDetailsBody = ({
   const meetingPlace = details?.meetingPlace
     ? getFriendlyNameFromLocation(details.meetingPlace)
     : undefined;
-  const meetingDate = details.createdAt
-    ? new Date(details.createdAt).toLocaleDateString(undefined, {
+  const meetingDate = details.meetingDate
+    ? new Date(details.meetingDate).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
@@ -145,7 +146,17 @@ const ContactDetailsBody = ({
       return;
     }
     removeContact([details.id], profileId);
-  }, [removeContact, details.id]);
+  }, [details.id, removeContact]);
+
+  const onEditContact = useCallback(() => {
+    hideMore();
+    router.push({
+      route: 'CONTACT_EDIT',
+      params: {
+        contact: details,
+      },
+    });
+  }, [details, hideMore, router]);
 
   return (
     <Container style={styles.container}>
@@ -270,6 +281,7 @@ const ContactDetailsBody = ({
                   )}
             </Text>
           )}
+          <NoteItem contact={details} />
           {details.phoneNumbers?.map((phoneNumber, index) => (
             <ContactDetailItem
               key={'phone' + index + '' + phoneNumber.number}
@@ -385,6 +397,7 @@ const ContactDetailsBody = ({
           onSaveContact={onSave}
           onShare={onShare}
           details={details}
+          onEdit={onEditContact}
         />
       ) : undefined}
     </Container>

@@ -7,7 +7,7 @@ const contactMock: ContactType = {
   logo: null,
   birthday: null,
   company: '',
-  createdAt: new Date('2012-12-21'),
+  meetingDate: new Date('2012-12-21'),
   emails: [],
   firstName: '',
   id: '',

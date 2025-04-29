@@ -12,14 +12,14 @@ import Text from '#ui/Text';
 import {
   contactEditStyleSheet,
   useContactAddressLabels,
-} from '../../helpers/contactHelpers';
-import type { ContactFormValues } from './ContactSchema';
+} from '../../../helpers/contactHelpers';
+import type { contactFormValues } from '../../../helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
 const ContactEditAddresses = ({
   control,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,

@@ -21,6 +21,7 @@ import {
 
 import { emitContactAddedToProfile } from '#helpers/addContactHelper';
 import { getAuthState } from '#helpers/authStore';
+import { contactSchema, type contactFormValues } from '#helpers/contactHelpers';
 import {
   getVCardAddresses,
   getVCardBirthday,
@@ -49,6 +50,7 @@ import {
 import useBoolean from '#hooks/useBoolean';
 import { useCurrentLocation } from '#hooks/useLocation';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -56,7 +58,6 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCreateForm from './ContactCreateForm';
-import { contactSchema, type ContactFormValues } from './ContactSchema';
 import type {
   NativeScreenProps,
   ScreenOptions,
@@ -82,19 +83,16 @@ const ContactCreateScreen = ({
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(
       $profileId: ID!
-      $contact: AddContactInput!
+      $contact: ContactInput!
       $notify: Boolean!
       $scanUsed: Boolean!
-      $location: LocationInput
-      $address: AddressInput
     ) {
-      addContact(
+      createContact(
         profileId: $profileId
         input: $contact
         notify: $notify
         scanUsed: $scanUsed
-        location: $location
-        address: $address
+        withShareBack: false
       ) {
         contact {
           id
@@ -106,30 +104,31 @@ const ContactCreateScreen = ({
   const intl = useIntl();
   const router = useRouter();
   const profileId = getAuthState().profileInfos?.profileId;
+  const [notify, toggleNotify] = useToggle(true);
+  const [scanUsed, setScan] = useBoolean(false);
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting, isValid, isDirty },
     setValue,
-  } = useForm<ContactFormValues>({
+  } = useForm<contactFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      notify: true,
-      scanUsed: false,
+      meetingDate: new Date(),
     },
   });
 
-  const submit = () => {
+  const submit = useCallback(() => {
     setNotifyError(false);
     Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
       if (!profileId) {
         return;
       }
-      if (data.notify && data.emails.length <= 0) {
+      if (notify && data.emails.length <= 0) {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -208,8 +207,8 @@ const ContactCreateScreen = ({
       commit({
         variables: {
           profileId,
-          scanUsed: data.scanUsed,
-          notify: data.notify,
+          scanUsed,
+          notify,
           contact: {
             avatarId,
             logoId,
@@ -235,29 +234,32 @@ const ContactCreateScreen = ({
             lastname: data.lastName || '',
             title: data.title || '',
             birthday: data.birthday?.birthday || '',
-            withShareBack: false,
+            note: data.note || '',
+            location: location
+              ? {
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                }
+              : null,
+            address: address
+              ? {
+                  country: address.country,
+                  city: address.city,
+                  subregion: address.subregion,
+                  region: address.region,
+                }
+              : null,
+            meetingDate: data.meetingDate
+              ? new Date(data.meetingDate)
+              : new Date(),
           },
-          location: location
-            ? {
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              }
-            : null,
-          address: address
-            ? {
-                country: address.country,
-                city: address.city,
-                subregion: address.subregion,
-                region: address.region,
-              }
-            : null,
         },
         onCompleted: () => {
           emitContactAddedToProfile();
           router.back();
         },
         updater: (store, response) => {
-          if (response && response.addContact && profileId) {
+          if (response && response.createContact && profileId) {
             const profile = store.get(profileId);
             const nbContacts = profile?.getValue('nbContacts');
 
@@ -281,7 +283,17 @@ const ContactCreateScreen = ({
         },
       });
     })();
-  };
+  }, [
+    address,
+    commit,
+    handleSubmit,
+    intl,
+    location,
+    notify,
+    profileId,
+    router,
+    scanUsed,
+  ]);
 
   useEffect(() => {
     return Toast.hide;
@@ -406,7 +418,7 @@ const ContactCreateScreen = ({
       setScanImage(image);
       setValue('firstName', data?.firstName);
       setValue('lastName', data?.lastName);
-      setValue('scanUsed', true);
+      setScan();
       if (data?.title) {
         setValue('title', capitalize(data?.title));
       } else {
@@ -469,7 +481,7 @@ const ContactCreateScreen = ({
         setValue('addresses', []);
       }
     },
-    [setValue],
+    [setScan, setValue],
   );
 
   const [showScanner, openScanner, closeScanner] = useBoolean(
@@ -528,6 +540,8 @@ const ContactCreateScreen = ({
           control={control}
           scanImage={scanImage}
           notifyError={notifyError}
+          notify={notify}
+          toggleNotify={toggleNotify}
         />
         <ScreenModal
           visible={!!progressIndicator}

@@ -28,7 +28,8 @@ const query = graphql`
         lastName
         company
         title
-        createdAt
+        meetingDate
+        note
         emails {
           label
           address

@@ -484,7 +484,7 @@ const buildContactFromContactCard = async (
       uri: image?.uri,
     },
     profileId,
-    createdAt: new Date(),
+    meetingDate: new Date(),
   };
 
   return { contact };
@@ -563,7 +563,7 @@ const buildContact = async (
       uri: image?.uri,
     },
     profileId,
-    createdAt: new Date(),
+    meetingDate: new Date(),
   };
   return contact;
 };

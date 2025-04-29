@@ -3,13 +3,15 @@ import { fromGlobalId, toGlobalId } from 'graphql-relay';
 
 import {
   checkMedias,
-  createContact,
+  createContact as createNewContact,
   getContactByProfiles,
+  getWebcardsMediaFromContactIds,
   incrementContactsImportFromScan,
   incrementImportFromScan,
   incrementShareBacks,
   incrementShareBacksTotal,
   referencesMedias,
+  removeContacts as deleteContact,
   transaction,
   updateContact,
 } from '@azzapp/data';
@@ -19,14 +21,20 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader, webCardLoader } from '#loaders';
+import {
+  contactLoader,
+  profileLoader,
+  userLoader,
+  webCardLoader,
+} from '#loaders';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Contact, ContactRow } from '@azzapp/data';
 
-const addContact: MutationResolvers['addContact'] = async (
+export const createContact: MutationResolvers['createContact'] = async (
   _,
-  { profileId: gqlProfileId, input, notify, scanUsed, location, address },
+  { profileId: gqlProfileId, input, notify, scanUsed, withShareBack },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -41,10 +49,10 @@ const addContact: MutationResolvers['addContact'] = async (
   }
   const webCard = await webCardLoader.load(profile.webCardId);
 
-  const existingContact = input.profileId
+  const existingContact = input.contactProfileId
     ? await getContactByProfiles({
         owner: profileId,
-        contact: input.profileId,
+        contact: input.contactProfileId,
       })
     : null;
 
@@ -56,26 +64,26 @@ const addContact: MutationResolvers['addContact'] = async (
 
   const contactToCreate: Omit<Contact, 'deletedAt' | 'id'> = {
     avatarId: input.avatarId ?? null,
-    addresses: input.addresses,
-    contactProfileId: input.profileId ?? null,
-    emails: input.emails,
+    addresses: input.addresses ?? [],
+    contactProfileId: input.contactProfileId ?? null,
+    emails: input.emails ?? [],
     ownerProfileId: profileId,
-    phoneNumbers: input.phoneNumbers,
+    phoneNumbers: input.phoneNumbers ?? [],
     type: 'contact',
     birthday: input.birthday || null,
-    company: input.company,
-    firstName: input.firstname,
-    lastName: input.lastname,
-    title: input.title,
+    company: input.company || '',
+    firstName: input.firstname || '',
+    lastName: input.lastname || '',
+    title: input.title || '',
     deleted: false,
     urls: input.urls || null,
     socials: input.socials || null,
     createdAt: new Date(),
     logoId: input.logoId ?? null,
-    meetingLocation: location ?? null,
-    meetingPlace: address ?? null,
-    note: '',
-    meetingDate: new Date(),
+    meetingLocation: input.location ?? null,
+    meetingPlace: input.address ?? null,
+    note: input.note ?? '',
+    meetingDate: input.meetingDate ? new Date(input.meetingDate) : new Date(),
   };
 
   let contact: Contact;
@@ -88,7 +96,7 @@ const addContact: MutationResolvers['addContact'] = async (
       ...contactToCreate,
     };
   } else {
-    const id = await createContact(contactToCreate);
+    const id = await createNewContact(contactToCreate);
 
     contact = {
       id,
@@ -105,7 +113,7 @@ const addContact: MutationResolvers['addContact'] = async (
     await incrementImportFromScan(profileId, true);
   }
 
-  if (input.withShareBack && input.profileId) {
+  if (withShareBack && input.contactProfileId) {
     const commonInformation = webCard?.isMultiUser
       ? webCard?.commonInformation
       : undefined;
@@ -157,7 +165,7 @@ const addContact: MutationResolvers['addContact'] = async (
     };
 
     const shareBackToCreate: ContactRow = {
-      ownerProfileId: input.profileId,
+      ownerProfileId: input.contactProfileId,
       contactProfileId: profileId,
       createdAt: new Date(),
       type: 'shareback' as const,
@@ -175,21 +183,21 @@ const addContact: MutationResolvers['addContact'] = async (
       deleted: false,
       urls: commonInformationToMerge.urls.concat(urls),
       socials: commonInformationToMerge.socials.concat(socials),
-      meetingLocation: location ?? null,
-      meetingPlace: address ?? null,
+      meetingLocation: input.location ?? null,
+      meetingPlace: input.address ?? null,
     };
 
     const existingShareBack = await getContactByProfiles({
-      owner: input.profileId,
+      owner: input.contactProfileId,
       contact: profileId,
     });
 
-    const inputProfileId = input.profileId;
+    const inputProfileId = input.contactProfileId;
 
     if (inputProfileId) {
       if (!existingShareBack) {
         await transaction(async () => {
-          await createContact(shareBackToCreate);
+          await createNewContact(shareBackToCreate);
           await incrementShareBacksTotal(inputProfileId);
           await incrementShareBacks(inputProfileId, true);
         });
@@ -202,7 +210,7 @@ const addContact: MutationResolvers['addContact'] = async (
       }
     }
 
-    const profileToNotify = await profileLoader.load(input.profileId);
+    const profileToNotify = await profileLoader.load(input.contactProfileId);
 
     if (profileToNotify) {
       const userToNotify = await userLoader.load(profileToNotify?.userId);
@@ -220,7 +228,14 @@ const addContact: MutationResolvers['addContact'] = async (
     }
   }
 
-  if (notify && input.emails.length > 0 && webCard) {
+  if (
+    notify &&
+    input.firstname &&
+    input.lastname &&
+    input.emails &&
+    input.emails.length > 0 &&
+    webCard
+  ) {
     const user = await userLoader.load(profile?.userId);
     await notifyUsers(
       'email',
@@ -243,4 +258,82 @@ const addContact: MutationResolvers['addContact'] = async (
   };
 };
 
-export default addContact;
+export const saveContact: MutationResolvers['saveContact'] = async (
+  _,
+  { profileId: gqlProfileId, contactId: gqlContactId, input },
+) => {
+  const { userId } = getSessionInfos();
+
+  if (!userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  const profileId = fromGlobalId(gqlProfileId).id;
+  const profile = await profileLoader.load(profileId);
+
+  if (!profile || profile.userId !== userId || !gqlContactId) {
+    throw new GraphQLError(ERRORS.FORBIDDEN);
+  }
+
+  const data = [input.avatarId, input.logoId].filter(isDefined);
+  if (data.length) {
+    await checkMedias(data);
+    await referencesMedias(data, null);
+  }
+
+  const contactToUpdate: Partial<Contact> = {
+    avatarId: input.avatarId,
+    addresses: input.addresses || [],
+    emails: input.emails || [],
+    phoneNumbers: input.phoneNumbers || [],
+    birthday: input.birthday || null,
+    company: input.company || '',
+    firstName: input.firstname || '',
+    lastName: input.lastname || '',
+    title: input.title || '',
+    urls: input.urls,
+    socials: input.socials,
+    logoId: input.logoId,
+    note: input.note || '',
+    meetingDate: input.meetingDate ? new Date(input.meetingDate) : undefined,
+  };
+
+  const contactId = fromGlobalId(gqlContactId).id;
+
+  await updateContact(contactId, contactToUpdate);
+
+  const contact = await contactLoader.load(contactId);
+
+  return contact;
+};
+
+export const removeContacts: MutationResolvers['removeContacts'] = async (
+  _,
+  { profileId: gqlProfileId, input },
+) => {
+  const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+
+  const { userId } = getSessionInfos();
+  if (!userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const profile = await profileLoader.load(profileId);
+
+  if (profile?.userId !== userId) {
+    throw new GraphQLError(ERRORS.FORBIDDEN);
+  }
+
+  const contactIdsToRemove = input.contactIds.map(contactIdToRemove =>
+    fromGlobalIdWithType(contactIdToRemove, 'Contact'),
+  );
+
+  const data = await getWebcardsMediaFromContactIds(contactIdsToRemove);
+  if (data.length) {
+    await referencesMedias([], data);
+  }
+  await deleteContact(profileId, contactIdsToRemove);
+
+  return {
+    removedContactIds: input.contactIds,
+  };
+};

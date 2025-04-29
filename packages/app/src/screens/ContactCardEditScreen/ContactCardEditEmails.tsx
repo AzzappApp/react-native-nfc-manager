@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactEditField from '#components/Contact/ContactEditField';
+import ContactCardEditField from '#components/ContactCard/ContactCardEditField';
 import {
   contactEditStyleSheet,
   useContactEmailLabels,
@@ -36,7 +36,7 @@ const ContactCardEditModalEmails = ({
     <>
       {fields.map((email, index) => (
         <Fragment key={email.id}>
-          <ContactEditField
+          <ContactCardEditField
             control={control}
             labelKey={`emails.${index}.label`}
             valueKey={`emails.${index}.address`}

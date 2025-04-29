@@ -74,7 +74,8 @@ const ContactsScreenLists = ({
                 lastName
                 company
                 title
-                createdAt
+                meetingDate
+                note
                 emails {
                   label
                   address

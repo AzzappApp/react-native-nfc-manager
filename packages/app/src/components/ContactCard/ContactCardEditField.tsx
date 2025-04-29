@@ -5,10 +5,10 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import TextInput from '#ui/TextInput';
-import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
-const ContactEditField = <TFieldValues extends FieldValues>({
+const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   keyboardType,
@@ -94,4 +94,4 @@ const stylesheet = createStyleSheet(appearance => ({
   ...buildContactStyleSheet(appearance),
 }));
 
-export default ContactEditField;
+export default ContactCardEditField;

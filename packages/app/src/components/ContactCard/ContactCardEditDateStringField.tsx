@@ -14,9 +14,9 @@ import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
 
-const ContactCardEditDateField = <TFieldValues extends FieldValues>({
+const ContactCardEditDateStringField = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   valueKey,
@@ -118,4 +118,4 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default ContactCardEditDateField;
+export default ContactCardEditDateStringField;

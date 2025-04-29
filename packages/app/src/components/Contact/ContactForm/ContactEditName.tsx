@@ -6,13 +6,13 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
 const ContactEditName = ({
   control,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
 }) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();

@@ -140,7 +140,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       alignItems: 'center',
       borderRadius: 12,
       borderCurve: 'continuous',
-      paddingHorizontal: 20,
+      paddingHorizontal: 15,
       overflow: 'hidden',
     },
     labelContainer: {

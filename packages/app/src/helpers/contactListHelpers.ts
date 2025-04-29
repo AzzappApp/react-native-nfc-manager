@@ -179,7 +179,7 @@ export const buildContactTypeFromContactNode = (
   }
   const contact: ContactType = {
     id: inputContact.id,
-    createdAt: inputContact.createdAt || new Date(),
+    meetingDate: inputContact.meetingDate || new Date(),
     firstName: inputContact.firstName,
     lastName: inputContact.lastName,
     title: inputContact.title,
@@ -248,6 +248,7 @@ export const buildContactTypeFromContactNode = (
               ?.webcardThumbnail,
           }
         : undefined,
+    note: inputContact.note,
   };
   return contact;
 };

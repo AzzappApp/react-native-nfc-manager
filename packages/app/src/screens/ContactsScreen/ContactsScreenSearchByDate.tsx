@@ -29,7 +29,7 @@ const ContactsScreenSearchByDate = ({
     const today = new Date().toDateString();
     return contacts?.reduce(
       (accumulator, contact) => {
-        const date = new Date(contact.createdAt);
+        const date = new Date(contact.meetingDate);
         const isToday = date.toDateString() === today;
 
         const title = isToday

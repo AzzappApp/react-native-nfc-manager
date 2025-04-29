@@ -7,14 +7,14 @@ import { AVATAR_WIDTH } from '#screens/MultiUserScreen/Avatar';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
 const ContactEditAvatar = ({
   control,
   onPickerRequested,
 }: {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
   onPickerRequested: () => void;
 }) => {
   const styles = useStyleSheet(styleSheet);

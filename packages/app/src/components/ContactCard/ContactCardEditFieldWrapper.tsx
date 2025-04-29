@@ -29,7 +29,7 @@ import type { PropsWithChildren } from 'react';
 import type { FieldValues, Control, FieldPath } from 'react-hook-form';
 import type { LayoutRectangle } from 'react-native';
 
-const ContactEditFieldWrapper = <TFieldValues extends FieldValues>({
+const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   control,
@@ -242,4 +242,4 @@ const stylesheet = createStyleSheet(appearance => ({
   ...buildContactStyleSheet(appearance),
 }));
 
-export default ContactEditFieldWrapper;
+export default ContactCardEditFieldWrapper;

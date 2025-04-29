@@ -2,7 +2,7 @@ import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditDateField from '#components/Contact/ContactEditDateField';
+import ContactCardEditDateStringField from '#components/ContactCard/ContactCardEditDateStringField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -27,7 +27,7 @@ const ContactCardEditModalBirthdays = ({
   return (
     <>
       {field.value && (
-        <ContactCardEditDateField
+        <ContactCardEditDateStringField
           control={control}
           valueKey="birthday.birthday"
           deleteField={() => field.onChange(null)}
