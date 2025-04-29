@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["patches/*.patch", "!packages/data/drizzle/**"],
+  "globalDependencies": ["patches/*.patch"],
   "tasks": {
     "clean": { "dependsOn": [] },
     "build": { "dependsOn": [] },

@@ -111,6 +111,7 @@ jobs:
               HAS_CHANGE="true"
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+          rm -fr drizzle
 
       - name: PlanetScale - Extract branch name
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
