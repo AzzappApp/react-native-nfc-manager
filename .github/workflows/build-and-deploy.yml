@@ -111,7 +111,9 @@ jobs:
               HAS_CHANGE="true"
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
-          rm -fr drizzle
+          pwd
+          ls -l drizzle
+          rm -fr drizzle && echo "drizzle deleted" || echo "failed to delete drizzle"
 
       - name: PlanetScale - Extract branch name
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
