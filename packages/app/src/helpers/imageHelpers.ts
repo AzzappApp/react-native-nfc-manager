@@ -37,11 +37,15 @@ export const prepareLogoForUpload = async (logoPath: string) => {
 
 export const prepareAvatarForUpload = async (avatarPath: string) => {
   const fileName = getFileName(avatarPath);
-  const compressedFileUri = await ImageCompressor.compress(avatarPath);
+  const type = mime.lookup(fileName) || 'image/jpeg';
+
+  const compressedFileUri = await ImageCompressor.compress(avatarPath, {
+    output: type === 'image/jpeg' ? 'jpg' : 'png',
+  });
   const file: any = {
     name: fileName,
     uri: compressedFileUri,
-    type: mime.lookup(fileName) || 'image/jpeg',
+    type,
   };
 
   const { uploadURL, uploadParameters } = await uploadSign({
@@ -58,11 +62,14 @@ export const prepareAvatarForUpload = async (avatarPath: string) => {
 
 export const prepareBannerForUpload = async (bannerPath: string) => {
   const fileName = getFileName(bannerPath);
-  const compressedFileUri = await ImageCompressor.compress(bannerPath);
+  const type = mime.lookup(fileName) || 'image/jpeg';
+  const compressedFileUri = await ImageCompressor.compress(bannerPath, {
+    output: type === 'image/jpeg' ? 'jpg' : 'png',
+  });
   const file: any = {
     name: fileName,
     uri: compressedFileUri,
-    type: mime.lookup(fileName) || 'image/jpeg',
+    type,
   };
 
   const { uploadURL, uploadParameters } = await uploadSign({
