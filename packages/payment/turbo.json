@@ -10,7 +10,11 @@
       "inputs": ["src/**"]
     },
     "payment-api-client": {
-      "passThroughEnv": ["PAYMENT_API_URL"],
+      "passThroughEnv": [
+        "PAYMENT_API_URL",
+        "PAYMENT_API_DOCS_USERNAME",
+        "PAYMENT_API_DOCS_PASSWORD"
+      ],
       "dependsOn": [],
       "inputs": [],
       "cache": false
