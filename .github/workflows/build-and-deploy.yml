@@ -16,6 +16,8 @@ env:
   TURBO_TEAM: 'azzapp'
   PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
   PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
+  PAYMENT_API_DOCS_USERNAME: ${{ secrets.PAYMENT_API_DOCS_USERNAME }}
+  PAYMENT_API_DOCS_PASSWORD: ${{ secrets.PAYMENT_API_DOCS_PASSWORD }}
 jobs:
   test-and-update-app:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
