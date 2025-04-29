@@ -233,6 +233,13 @@ export type SocialLinkItem = {
   position: number;
 };
 
+export const SOCIAL_NETWORK_LINKS_LABELS = SOCIAL_NETWORK_LINKS.map(
+  socialLink => ({
+    key: socialLink.id as string,
+    value: socialLink.label,
+  }),
+);
+
 // bluesky & parler & Weibo can also be added
 export type SocialLinkCategory = { id: string; item: SocialLinkItemType[] };
 export const SocialLinksByCategory: SocialLinkCategory[] = [

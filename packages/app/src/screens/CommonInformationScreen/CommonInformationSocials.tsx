@@ -1,13 +1,13 @@
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import {
+  SOCIAL_NETWORK_LINKS,
+  SOCIAL_NETWORK_LINKS_LABELS,
+} from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import ContactEditField from '#components/Contact/ContactEditField';
-import {
-  contactEditStyleSheet,
-  useSocialLinkLabels,
-} from '#helpers/contactHelpers';
+import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -27,8 +27,6 @@ const CommonInformationSocials = ({
 
   const intl = useIntl();
 
-  const labelValues = useSocialLinkLabels();
-
   const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
@@ -39,7 +37,7 @@ const CommonInformationSocials = ({
           control={control}
           labelKey={`socials.${index}.label`}
           valueKey={`socials.${index}.url`}
-          labelValues={labelValues}
+          labelValues={SOCIAL_NETWORK_LINKS_LABELS}
           deleteField={() => remove(index)}
           keyboardType="default"
           placeholder={intl.formatMessage({

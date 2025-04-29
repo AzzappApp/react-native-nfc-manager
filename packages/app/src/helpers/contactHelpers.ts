@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import VCard from 'vcard-creator';
 import * as z from 'zod';
-import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
   addressLabelToVCardLabel,
   emailLabelToVCardLabel,
@@ -218,19 +217,6 @@ export const useContactPhoneLabels = () => {
       },
     ],
     [intl],
-  );
-
-  return labelValues;
-};
-
-export const useSocialLinkLabels = () => {
-  const labelValues = useMemo(
-    () =>
-      SOCIAL_NETWORK_LINKS.map(socialLink => ({
-        key: socialLink.id as string,
-        value: socialLink.label,
-      })),
-    [],
   );
 
   return labelValues;
