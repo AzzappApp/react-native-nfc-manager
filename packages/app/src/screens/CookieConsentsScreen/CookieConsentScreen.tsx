@@ -22,7 +22,6 @@ const CookieContentScreen = () => {
           cookiePreferences {
             analytics
             functional
-            marketing
           }
         }
       }
@@ -38,7 +37,7 @@ const CookieContentScreen = () => {
           input: {
             analytics: consent,
             functional: consent,
-            marketing: consent,
+            marketing: false,
           },
         },
         onError: () => {

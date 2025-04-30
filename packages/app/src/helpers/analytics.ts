@@ -13,11 +13,10 @@ export function setAnalyticsUserId(userId: string) {
 
 export async function setAnalyticsConsent(consents: {
   analytics: boolean;
-  marketing: boolean;
   functional: boolean;
 }) {
   await setConsent(firebase.analytics(), {
-    ad_storage: consents.marketing,
+    ad_storage: false,
     analytics_storage: consents.analytics,
     functional_storage: consents.functional,
     security_storage: true,
