@@ -1,4 +1,11 @@
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
@@ -70,13 +77,14 @@ const CoverEditorLinksModal = ({
     [openAddLink],
   );
 
+  const wasVisible = useRef(visible);
   useEffect(() => {
     // allow to select the list of link when opeing the pannel for the first time
-    if (visible && links.length === 0) {
+    if (!wasVisible.current && visible && links.length === 0) {
       openAddLink();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+    wasVisible.current = visible;
+  }, [visible, links.length, openAddLink]);
 
   const onDismiss = () => {
     // reset local links on dismiss

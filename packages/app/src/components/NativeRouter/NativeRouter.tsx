@@ -168,10 +168,13 @@ export const useNativeRouter = (init: RouterInit) => {
     [dispatch],
   );
 
+  const previousInitId = useRef(init.id);
   useEffect(() => {
-    replaceAll(init);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [init.id]);
+    if (previousInitId.current !== init.id) {
+      replaceAll(init);
+    }
+    previousInitId.current = init.id;
+  }, [init, init.id, replaceAll]);
 
   const router = useMemo<NativeRouter>(() => {
     function addListener<T>(listeners: T[], listener: T) {

@@ -83,7 +83,7 @@ const TextAreaModal = ({
   }, [onClose, value]);
 
   const onChangeTextInternal = (newText: string) => {
-    textSharedValueLength.value = newText.length;
+    textSharedValueLength.set(newText.length);
     internalText.current = newText;
   };
 
@@ -99,10 +99,10 @@ const TextAreaModal = ({
 
   useEffect(() => {
     if (visible) {
-      textSharedValueLength.value = value.length;
+      textSharedValueLength.set(value.length);
       internalText.current = value;
     } else {
-      textSharedValueLength.value = 0;
+      textSharedValueLength.set(0);
       internalText.current = '';
     }
   }, [textSharedValueLength, value, visible]);

@@ -13,6 +13,7 @@ import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
+import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -93,17 +94,17 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   const ref = useRef(null);
 
+  const onPressLatest = useLatestCallback(onPress);
   useEffect(() => {
     registerTooltip('profileLink', {
       ref,
-      onPress,
+      onPress: onPressLatest,
     });
 
     return () => {
       unregisterTooltip('profileLink');
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registerTooltip, unregisterTooltip]);
+  }, [onPressLatest, registerTooltip, unregisterTooltip]);
 
   return (
     <Animated.View ref={ref} style={[styles.container, opacityStyle]}>

@@ -15,6 +15,7 @@ import { DoneHeaderButton } from '#components/commonsButtons';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
+import useLatestCallback from '#hooks/useLatestCallback';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
@@ -66,6 +67,8 @@ const ContactCardEditCompanyColor = ({
     detail: colors.green,
   });
 
+  //onChange cannot be in dependency because it will rerender and block selection of primary color
+  const onChangeLatest = useLatestCallback(onChange);
   const setColors = useCallback(
     (colors: ImageColorsResult) => {
       if (Platform.OS === 'ios') {
@@ -87,11 +90,9 @@ const ContactCardEditCompanyColor = ({
         secondary: secondary !== primary ? secondary : undefined,
         detail: detail !== primary && detail !== secondary ? detail : undefined,
       });
-      onChange(primary);
+      onChangeLatest(primary);
     },
-    //onChange cannot be in dependency because it will rerender and block selection of primary color
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onChangeExpendableColor],
+    [onChangeLatest, onChangeExpendableColor],
   );
 
   useEffect(() => {

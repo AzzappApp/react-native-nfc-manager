@@ -28,11 +28,11 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
 
   const reset = useCallback(() => {
     'worklet';
-    lastShakeTimestamp.value = 0;
-    numShakes.value = 0;
-    accelX.value = 0;
-    accelY.value = 0;
-    accelZ.value = 0;
+    lastShakeTimestamp.set(0);
+    numShakes.set(0);
+    accelX.set(0);
+    accelY.set(0);
+    accelZ.set(0);
   }, [accelX, accelY, accelZ, lastShakeTimestamp, numShakes]);
 
   const gyroscope = useAnimatedSensor(SensorType.ACCELEROMETER);
@@ -40,7 +40,7 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
   const recordShake = useCallback(
     (timestamp: number) => {
       'worklet';
-      lastShakeTimestamp.value = timestamp;
+      lastShakeTimestamp.set(timestamp);
       numShakes.value++;
     },
     [lastShakeTimestamp, numShakes],
@@ -56,7 +56,7 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
 
       if (numShakes.value >= 8) {
         reset();
-        lastCallbackTimestamp.value = timestamp;
+        lastCallbackTimestamp.set(timestamp);
         runOnJS(callback)();
       }
 
@@ -84,13 +84,13 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
 
         if (atLeastRequiredForce(ax) && ax * accelX.value <= 0) {
           recordShake(timeStamp);
-          accelX.value = ax;
+          accelX.set(ax);
         } else if (atLeastRequiredForce(ay) && ay * accelY.value <= 0) {
           recordShake(timeStamp);
-          accelX.value = ay;
+          accelX.set(ay);
         } else if (atLeastRequiredForce(az) && az * accelZ.value <= 0) {
           recordShake(timeStamp);
-          accelX.value = az;
+          accelX.set(az);
         }
 
         maybeDispatchShake(timeStamp);
@@ -101,7 +101,7 @@ export const useShakeDetector = (callback: () => void, activated = true) => {
 
   const resetCoolDown = useCallback(() => {
     'worklet';
-    lastCallbackTimestamp.value = 0;
+    lastCallbackTimestamp.set(0);
     reset();
   }, [lastCallbackTimestamp, reset]);
 

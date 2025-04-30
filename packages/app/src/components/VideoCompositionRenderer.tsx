@@ -13,7 +13,7 @@ import type {
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
 import type { SkImage } from '@shopify/react-native-skia';
-import type { MutableRefObject } from 'react';
+import type { RefObject } from 'react';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   composition: VideoComposition | null;
@@ -22,7 +22,7 @@ export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   width: number;
   height: number;
   // This value store position on umount and restore it on mount
-  restorePositionOnMountRef?: MutableRefObject<number>;
+  restorePositionOnMountRef?: RefObject<number>;
 };
 
 const VideoCompositionRenderer = ({
@@ -60,6 +60,7 @@ const VideoCompositionRenderer = ({
         restorePositionOnMountRef.current > 0
       ) {
         framesExtractor.seekTo(restorePositionOnMountRef.current);
+        // eslint-disable-next-line react-compiler/react-compiler
         restorePositionOnMountRef.current = -1;
       }
     }

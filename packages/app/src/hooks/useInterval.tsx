@@ -37,9 +37,7 @@ const useInterval = (func: () => void, time: number, leading = false) => {
         clearTimeout(timeoutId);
       }
     };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time]);
+  }, [leading, time]);
 };
 
 export default useInterval;

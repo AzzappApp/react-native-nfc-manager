@@ -205,33 +205,41 @@ const WebCardEditBlockContainer = ({
       Gesture.Pan()
         .activeOffsetX([-10, 10])
         .onStart(() => {
-          dragXStartValue.value = dragX.value;
-          panGestureActive.value = true;
+          dragXStartValue.set(dragX.value);
+          panGestureActive.set(true);
         })
         .enabled(displayEditionButtons && !selectionMode)
         .onChange(e => {
-          dragX.value = Math.min(
-            dragRightLimit,
-            Math.max(dragXStartValue.value + e.translationX, dragLeftLimit),
+          dragX.set(
+            Math.min(
+              dragRightLimit,
+              Math.max(dragXStartValue.value + e.translationX, dragLeftLimit),
+            ),
           );
         })
         .onEnd(() => {
           if (dragX.value > dragRightLimit / 2) {
-            dragX.value = withTiming(dragRightLimit, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(dragRightLimit, {
+                duration: 120,
+              }),
+            );
           } else if (dragX.value < dragLeftLimit / 2) {
-            dragX.value = withTiming(dragLeftLimit, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(dragLeftLimit, {
+                duration: 120,
+              }),
+            );
           } else {
-            dragX.value = withTiming(0, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(0, {
+                duration: 120,
+              }),
+            );
           }
         })
         .onFinalize(() => {
-          panGestureActive.value = false;
+          panGestureActive.set(false);
         }),
     [
       displayEditionButtons,
@@ -250,13 +258,13 @@ const WebCardEditBlockContainer = ({
       Gesture.Tap()
         .enabled(activeSection === 'none')
         .onBegin(() => {
-          touchActive.value = withTiming(1);
+          touchActive.set(withTiming(1));
         })
         .onStart(() => {
           runOnJS(onModulePress)();
         })
         .onFinalize(() => {
-          touchActive.value = withTiming(0);
+          touchActive.set(withTiming(0));
         }),
     [activeSection, onModulePress, touchActive],
   );

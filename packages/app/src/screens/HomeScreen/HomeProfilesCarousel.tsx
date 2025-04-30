@@ -77,6 +77,7 @@ const HomeProfilesCarousel = (
   { user: userKey }: HomeProfilesCarouselProps,
   forwardedRef: ForwardedRef<CarouselSelectListHandle>,
 ) => {
+  'use no memo';
   const {
     onCurrentProfileIndexChange,
     currentIndexSharedValue,
@@ -189,6 +190,7 @@ const HomeProfilesCarousel = (
       setSelectedIndex(newIndex);
     }
     // No need to refresh when index change. Here we handle only profiles list update
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profiles]);
 

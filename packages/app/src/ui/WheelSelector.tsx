@@ -39,6 +39,7 @@ const WheelSelector = ({
   withHaptics = true,
   animatedValue,
 }: WheelSelectorProps) => {
+  'use no memo';
   const factor = variant === 'small' ? 0.5 : 1;
   const itemWidth = (interval ? interval : defaultInterval) * factor;
   const steps = range(min, max + step, step).map(value =>
@@ -112,6 +113,7 @@ const WheelSelector = ({
         animated: false,
       });
     }
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flatListRef?.current, layoutWidth]);
 

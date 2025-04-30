@@ -98,6 +98,8 @@ const CoverPreview = ({
   onOpenLinksModal,
   ...props
 }: CoverPreviewProps) => {
+  'use no memo';
+
   // #region Data and state
   const coverEditorState = useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
@@ -173,6 +175,7 @@ const CoverPreview = ({
       MAX_DISPLAY_DECODER_RESOLUTION,
       true,
     );
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, compositionDependencies);
 

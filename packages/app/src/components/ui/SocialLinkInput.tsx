@@ -1,8 +1,9 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, TextInput as NativeTextInput } from 'react-native';
 
 import { useDebouncedCallback } from 'use-debounce';
 import { colors, textStyles } from '#theme';
+import useEffectOnce from '#hooks/useEffectOnce';
 import Input from '#ui/Input';
 import type { SocialLinkItemType } from '@azzapp/shared/socialLinkHelpers';
 import type {
@@ -70,11 +71,10 @@ const SocialLinkInput = ({
 
   const [localValue, setLocalValue] = useState(cleanUpLinkUrl(defaultValue));
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // To ensure parent component
     onChangeLink(localValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const debouncedChangeLink = useDebouncedCallback(onChangeLink, 500, {
     leading: true,

@@ -314,10 +314,10 @@ const ContactCardDetector = ({
 
   const onSelectImage = useCallback(
     (params: ImagePickerResult) => {
-      translateX.value = 0;
-      translateY.value = 0;
-      scale.value = 1;
-      rotation.value = 0;
+      translateX.set(0);
+      translateY.set(0);
+      scale.set(1);
+      rotation.set(0);
       //resize width and height to fit the screen dimension, portrait use height screen dimension, landscape use width screen dimension
       const imageSize =
         params.aspectRatio > 1

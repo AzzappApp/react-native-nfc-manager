@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useLazyLoadQuery } from 'react-relay';
@@ -7,6 +7,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import Skeleton from '#components/Skeleton';
 import { keyExtractor } from '#helpers/idHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useEffectOnce from '#hooks/useEffectOnce';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import type {
   AddContactModalProfilesQuery,
@@ -83,10 +84,9 @@ const AddContactModalProfiles = ({ onSelectProfile }: Props) => {
     [],
   );
 
-  useEffect(() => {
+  useEffectOnce(() => {
     onSelectedIndexChange(initialProfileIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return (
     <CarouselSelectList<(typeof data)[number]>

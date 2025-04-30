@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { CardModuleDimension } from '#components/cardModules/cardModuleEditorType';
 import type { Animated } from 'react-native';
 const isInsideViewport = (
@@ -33,8 +33,9 @@ const useIsModuleItemInViewPort = (
 ) => {
   const [isVisible, setIsVisible] = useState(false);
 
+  const wasReady = useRef(false);
   useEffect(() => {
-    if (isLayoutReady) {
+    if (isLayoutReady && !wasReady.current) {
       setIsVisible(
         isInsideViewport(
           //@ts-expect-error - __getValue is private but we need it
@@ -45,9 +46,8 @@ const useIsModuleItemInViewPort = (
         ),
       );
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLayoutReady]);
+    wasReady.current = isLayoutReady;
+  }, [componentheight, dimension.height, isLayoutReady, itemStartY, scrollY]);
 
   useEffect(() => {
     const listener = scrollY.addListener(({ value }) => {

@@ -25,14 +25,17 @@ const PressableNative = (
   const onLayout = (e: LayoutChangeEvent) => {
     setWidth(e.nativeEvent.layout.width);
   };
-  const androidRiple = ripple ?? { borderless: false, color: colors.grey400 };
-  if (!androidRiple.radius && androidRiple.borderless) {
-    androidRiple.radius = width / 2 + 2;
+  let androidRipple = ripple ?? { borderless: false, color: colors.grey400 };
+  if (!androidRipple.radius && androidRipple.borderless) {
+    androidRipple = {
+      ...androidRipple,
+      radius: width / 2,
+    };
   }
   return (
     <Pressable
       ref={ref}
-      android_ripple={androidRiple}
+      android_ripple={androidRipple}
       onLayout={onLayout}
       {...props}
     />

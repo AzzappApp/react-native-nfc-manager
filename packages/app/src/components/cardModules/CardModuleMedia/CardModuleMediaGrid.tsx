@@ -31,6 +31,7 @@ const CardModuleMediaGrid = ({
   webCardViewMode,
   ...props
 }: CardModuleMediaGridProps) => {
+  'use no memo';
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
 
@@ -84,6 +85,8 @@ const CardModuleMediaGrid = ({
           columnWidth * (item.media.height / item.media.width);
       });
     }
+    // TODO THIS IS COMPLETELY WRONG AND NEEDS TO BE FIXED AZZAPPPP :p
+    // eslint-disable-next-line react-compiler/react-compiler
     setItemYStartPoint(offsetY);
 
     if (webCardViewMode === 'edit' && nbColumns === 1 && result[0]) {

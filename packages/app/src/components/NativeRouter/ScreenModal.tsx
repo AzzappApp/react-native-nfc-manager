@@ -77,14 +77,19 @@ const ScreenModal = ({
     };
   }, [router, id, onRequestCloseLatest]);
 
+  const shown = useRef(false);
   useEffect(() => {
+    if (shown.current === visible) {
+      return;
+    }
     if (visible) {
       routerRef.current.showModal(descriptor, children);
+      shown.current = true;
     } else {
       routerRef.current.hideModal(id);
+      shown.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, visible]);
+  }, [children, descriptor, id, visible]);
 
   useEffect(() => {
     routerRef.current.updateModal(id, {

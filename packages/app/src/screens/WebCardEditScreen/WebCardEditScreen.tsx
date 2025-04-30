@@ -273,7 +273,13 @@ const WebCardEditScreen = ({
   //#region Edit toast
   const intl = useIntl();
   const { bottom } = useScreenInsets();
+  const wasEditing = useRef(false);
   useEffect(() => {
+    if (editing === wasEditing.current) {
+      return;
+    }
+    wasEditing.current = editing;
+
     // ensure we display the toast only once
     const hasDisplayConfigureModuleToast =
       storage.getBoolean(MMKVS_HAS_DISPLAY_CONFIGURE_MODULE_TOAST) ?? false;
@@ -309,8 +315,13 @@ const WebCardEditScreen = ({
     return () => {
       Toast.hide();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing]);
+  }, [
+    bottom,
+    editing,
+    intl,
+    webCard?.cardIsPublished,
+    webCard?.cardModules?.length,
+  ]);
   //#endregion
 
   const { width: windowWidth } = useScreenDimensions();

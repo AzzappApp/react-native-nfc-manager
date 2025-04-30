@@ -1,11 +1,5 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
+import useEffectOnce from '#hooks/useEffectOnce';
 import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
@@ -174,12 +168,11 @@ const ImagePicker = ({
     [media, propSteps],
   );
 
-  useEffect(() => {
+  useEffectOnce(() => {
     propSteps.forEach(step => {
       step.preload?.();
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const isFirstStep = stepIndex === 0;
 

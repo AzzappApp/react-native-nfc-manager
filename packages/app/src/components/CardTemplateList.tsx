@@ -24,6 +24,7 @@ import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import useEffectOnce from '#hooks/useEffectOnce';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
@@ -204,10 +205,9 @@ const CardTemplateList = (
     [data?.cardTemplates?.edges, profile],
   );
 
-  useEffect(() => {
+  useEffectOnce(() => {
     onSelectTemplate?.(templates[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onScroll = useCallback(
     ({

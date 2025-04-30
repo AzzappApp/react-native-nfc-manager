@@ -203,7 +203,7 @@ export const ContactCardComponent = ({
   const layoutWidth = useSharedValue(0);
 
   const onTextLayout = ({ nativeEvent }: LayoutChangeEvent) => {
-    layoutWidth.value = nativeEvent.layout.width - 40; // remove the margins
+    layoutWidth.set(nativeEvent.layout.width - 40); // remove the margins
   };
 
   const animatedFooterWidth = useAnimatedStyle(() => ({

@@ -221,9 +221,11 @@ const renderComponent = ({
   let getValues: UseFormGetValues<ContactCardFormValues>;
 
   const Wrapper = () => {
+    'use no memo';
     const form = useForm<ContactCardFormValues>({
       defaultValues: initialValues,
     });
+    // eslint-disable-next-line react-compiler/react-compiler
     getValues = form.getValues;
     return <ContactCardEditForm control={form.control} webCard={webCard} />;
   };

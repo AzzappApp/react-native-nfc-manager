@@ -156,35 +156,35 @@ const VideoTimelineEditor = ({
         if (ctx.left) {
           const leftPos = Math.max(0, ctx.startX + event.translationX);
           if (leftPos <= sliderWidth - minDurationPixel) {
-            leftPosition.value = leftPos;
+            leftPosition.set(leftPos);
             if (ctx.endX - leftPos <= minDurationPixel) {
-              rightPosition.value = leftPos + minDurationPixel;
+              rightPosition.set(leftPos + minDurationPixel);
             } else if (ctx.endX - leftPos > maxDuration * secondPixel) {
-              rightPosition.value = leftPos + maxDuration * secondPixel;
+              rightPosition.set(leftPos + maxDuration * secondPixel);
             }
           }
         } else if (ctx.right) {
           const rightPos = Math.min(sliderWidth, ctx.endX + event.translationX);
           if (rightPos >= minDurationPixel) {
-            rightPosition.value = rightPos;
+            rightPosition.set(rightPos);
             if (rightPos - ctx.startX <= minDurationPixel) {
-              leftPosition.value = rightPos - minDurationPixel;
+              leftPosition.set(rightPos - minDurationPixel);
             } else if (rightPos - ctx.startX > maxDuration * secondPixel) {
-              leftPosition.value = rightPos - maxDuration * secondPixel;
+              leftPosition.set(rightPos - maxDuration * secondPixel);
             }
           }
         } else if (
           ctx.startX + event.translationX >= 0 &&
           ctx.endX + event.translationX <= sliderWidth
         ) {
-          leftPosition.value = ctx.startX + event.translationX;
-          rightPosition.value = ctx.endX + event.translationX;
+          leftPosition.set(ctx.startX + event.translationX);
+          rightPosition.set(ctx.endX + event.translationX);
         } else if (ctx.startX + event.translationX <= 0) {
-          leftPosition.value = 0;
-          rightPosition.value = ctx.endX - ctx.startX;
+          leftPosition.set(0);
+          rightPosition.set(ctx.endX - ctx.startX);
         } else if (ctx.endX + event.translationX >= sliderWidth) {
-          leftPosition.value = ctx.startX - (ctx.endX - sliderWidth);
-          rightPosition.value = sliderWidth;
+          leftPosition.set(ctx.startX - (ctx.endX - sliderWidth));
+          rightPosition.set(sliderWidth);
         }
       },
       onEnd: (_, ctx) => {

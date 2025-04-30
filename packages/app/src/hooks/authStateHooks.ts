@@ -11,22 +11,24 @@ export const useIsAuthenticated = () => {
 };
 
 export const useProfileInfos = () => {
-  const profileInfosStore = useMemo(() => {
-    let profileInfos = getAuthState().profileInfos;
-    return {
-      get: () => profileInfos,
-      subscribe: (onStoreChange: () => void) =>
-        addAuthStateListener(newState => {
-          const newProfileInfos = newState.profileInfos;
-          if (!isEqual(newProfileInfos, profileInfos)) {
-            profileInfos = newProfileInfos;
-            onStoreChange();
-          }
-        }),
-    };
-  }, []);
+  const profileInfosStore = useMemo(() => createProfileInfosStore(), []);
   return useSyncExternalStore(
     profileInfosStore.subscribe,
     profileInfosStore.get,
   );
+};
+
+const createProfileInfosStore = () => {
+  let profileInfos = getAuthState().profileInfos;
+  return {
+    get: () => profileInfos,
+    subscribe: (onStoreChange: () => void) =>
+      addAuthStateListener(newState => {
+        const newProfileInfos = newState.profileInfos;
+        if (!isEqual(newProfileInfos, profileInfos)) {
+          profileInfos = newProfileInfos;
+          onStoreChange();
+        }
+      }),
+  };
 };

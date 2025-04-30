@@ -41,6 +41,7 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
       }
     `,
   );
+  const intl = useIntl();
 
   if (!comment) return null;
 
@@ -48,8 +49,6 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
     progress,
     onClose,
   }: SwipeableRowActionsProps) => {
-    const intl = useIntl();
-
     const onDelete = () => {
       const { profileInfos } = getAuthState();
       if (profileInfoHasEditorRight(profileInfos) && profileInfos?.webCardId) {

@@ -75,7 +75,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.6",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^6.0.0-rc.1",
     "eslint-plugin-react-native": "^5.0.0",
     "git-spawned-stream": "^1.0.1",
     "globals": "^15.13.0",
@@ -99,6 +99,7 @@
     "source-map-explorer@npm:^2.5.3": "patch:source-map-explorer@npm%3A2.5.3#~/.yarn/patches/source-map-explorer-npm-2.5.3-1f901669e9.patch"
   },
   "dependencies": {
+    "eslint-plugin-react-compiler": "^19.1.0-rc.1",
     "node-gyp": "^10.1.0"
   }
 }

@@ -110,7 +110,7 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
   const useFlatList = expectedHeight > maxHeight;
 
   const onPressDelete = useCallback(() => {
-    deleteMode.value = !deleteMode.value;
+    deleteMode.set(!deleteMode.value);
     if (layout) {
       openDeleteButton(layout);
     }

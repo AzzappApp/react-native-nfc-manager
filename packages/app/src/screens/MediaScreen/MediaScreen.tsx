@@ -182,7 +182,7 @@ const MediaScreen = ({
   }
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    scrollListOffset.value = event.nativeEvent.contentOffset.y;
+    scrollListOffset.set(event.nativeEvent.contentOffset.y);
   };
 
   const tabs: Array<{ id: TAB; element: ReactElement }> = [

@@ -29,12 +29,12 @@ const BottomSheetTextInput = (
   //#endregion
 
   const onFocusInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    shouldHandleKeyboardEvents.value = true;
+    shouldHandleKeyboardEvents.set(true);
     onFocus?.(e);
   };
 
   const onBlurInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    shouldHandleKeyboardEvents.value = false;
+    shouldHandleKeyboardEvents.set(false);
     onBlur?.(e);
   };
 
@@ -42,7 +42,7 @@ const BottomSheetTextInput = (
   useEffect(() => {
     return () => {
       // Reset the flag on unmount
-      shouldHandleKeyboardEvents.value = false;
+      shouldHandleKeyboardEvents.set(false);
     };
   }, [shouldHandleKeyboardEvents]);
   //#endregion

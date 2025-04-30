@@ -186,7 +186,7 @@ function CarouselSelectList<TItem = any>(
           return;
         }
         if (!animated) {
-          scrollIndex.value = index;
+          scrollIndex.set(index);
         }
         listRef.current?.scrollToOffset({
           offset: index * itemWidth,
@@ -234,9 +234,9 @@ function CarouselSelectList<TItem = any>(
         return;
       }
       const index = event.contentOffset.x / itemWidth;
-      scrollIndex.value = index;
+      scrollIndex.set(index);
       if (currentProfileIndexSharedValue) {
-        currentProfileIndexSharedValue.value = index;
+        currentProfileIndexSharedValue.set(index);
       }
     },
   });
@@ -250,7 +250,7 @@ function CarouselSelectList<TItem = any>(
         currentProfileIndexSharedValue &&
         currentProfileIndexSharedValue.value !== Math.round(index)
       ) {
-        currentProfileIndexSharedValue.value = Math.round(index);
+        currentProfileIndexSharedValue.set(Math.round(index));
       }
     },
     [currentProfileIndexSharedValue, itemWidth, onSelectedIndexChange],

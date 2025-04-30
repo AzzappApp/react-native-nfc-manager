@@ -41,17 +41,21 @@ const PressableOpacity = (
   });
 
   const onFadeIn = useCallback(() => {
-    opacityValue.value = withTiming(activeOpacity, {
-      duration: animationDuration,
-      easing,
-    });
+    opacityValue.set(
+      withTiming(activeOpacity, {
+        duration: animationDuration,
+        easing,
+      }),
+    );
   }, [activeOpacity, animationDuration, easing, opacityValue]);
 
   const onFadeOut = useCallback(() => {
-    opacityValue.value = withTiming(1, {
-      duration: animationDuration,
-      easing,
-    });
+    opacityValue.set(
+      withTiming(1, {
+        duration: animationDuration,
+        easing,
+      }),
+    );
   }, [animationDuration, easing, opacityValue]);
 
   return (
