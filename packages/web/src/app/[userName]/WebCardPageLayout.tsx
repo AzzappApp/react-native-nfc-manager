@@ -2,6 +2,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { displayName } from '@azzapp/shared/contactCardHelpers';
@@ -27,6 +28,13 @@ type WebCardPageLayoutProps = PropsWithChildren<{
   isAzzappPlus: boolean;
   cardStyle: CardStyle;
 }>;
+
+const AppIntlProvider = dynamic(
+  () => import('../../components/AppIntlProvider'),
+  {
+    ssr: false,
+  },
+);
 
 const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
   const {
@@ -127,7 +135,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
   }
 
   return (
-    <>
+    <AppIntlProvider>
       {step === 0 && (
         <WebCardPreview
           media={media}
@@ -163,7 +171,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
         onClose={onShareBackClose}
         onReady={handleModalReady}
       />
-    </>
+    </AppIntlProvider>
   );
 };
 

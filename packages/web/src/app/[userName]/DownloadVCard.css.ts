@@ -30,17 +30,17 @@ const dialog = style({
   alignItems: 'center',
   flexDirection: 'column',
   rowGap: '20px',
-  transform: 'translate(0,0)',
   transition: 'all 450ms cubic-bezier(0.32,1,0.23,1) 0ms',
   width: '100%',
 });
 
-const closedDialog = style([
-  {
-    transform: 'translate(0, 100%)',
-    display: 'none',
-  },
-]);
+const closedDialog = style({
+  transform: 'translate(0, 120%)',
+});
+
+const openDialog = style({
+  transform: 'translate(0,0)',
+});
 
 const message = style({
   display: 'flex',
@@ -164,6 +164,7 @@ const styles = {
   closeButton,
   openedOverlay,
   closedDialog,
+  openDialog,
   avatarContainer,
   addContact,
   buttonLink,

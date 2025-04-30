@@ -3,7 +3,6 @@
 import cx from 'classnames';
 import parsePhoneNumberFromString from 'libphonenumber-js';
 import { decompressFromEncodedURIComponent } from 'lz-string';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -29,13 +28,6 @@ import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-
-const AppIntlProvider = dynamic(
-  () => import('../../components/AppIntlProvider'),
-  {
-    ssr: false,
-  },
-);
 
 type DownloadVCardProps = {
   step: number;
@@ -300,12 +292,13 @@ const DownloadVCard = ({
   const contactInitials = `${(contact?.firstName?.length ?? 0 > 0) ? contact?.firstName[0] : ''}${(contact?.lastName?.length ?? 0 > 0) ? contact?.lastName[0] : ''}`;
 
   return (
-    <AppIntlProvider>
+    <>
       <div
         ref={ref}
-        className={cx(styles.dialog, {
-          [styles.closedDialog]: !opened,
-        })}
+        className={cx(
+          styles.dialog,
+          opened ? styles.openDialog : styles.closedDialog,
+        )}
         role="dialog"
         aria-label={intl.formatMessage({
           defaultMessage: 'Modal with contact card download link',
@@ -493,7 +486,7 @@ const DownloadVCard = ({
           />
         </Link>
       )}
-    </AppIntlProvider>
+    </>
   );
 };
 
