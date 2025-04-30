@@ -1,3 +1,7 @@
+## 1.10.0-canary.165
+
+* **perf:**  - do not preload modal in country flag & contact Field Wrappers ([#8610](https://github.com/AzzappApp/azzapp/pull/8610))
+
 ## 1.10.0-canary.164
 
 * **build:**  - upgrade to rn 0.79 - expo 53 ([#8590](https://github.com/AzzappApp/azzapp/pull/8590))
