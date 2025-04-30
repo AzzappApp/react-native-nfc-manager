@@ -1,3 +1,7 @@
+## 1.10.0-canary.161
+
+* **fix:**  - remove unnecessary state to avoid refresh ([#8589](https://github.com/AzzappApp/azzapp/pull/8589))
+
 ## 1.10.0-canary.160
 
 * **fix:**  - do not recompute Social link label in every component ([#8586](https://github.com/AzzappApp/azzapp/pull/8586))
