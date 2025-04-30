@@ -192,7 +192,7 @@ const AccountDetailsPhoneNumberForm = ({
     }
   });
 
-  const phoneNumberInputRef = useRef<NativeTextInput>(null);
+  const phoneNumberInputRef = useRef<NativeTextInput | null>(null);
 
   return (
     <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>

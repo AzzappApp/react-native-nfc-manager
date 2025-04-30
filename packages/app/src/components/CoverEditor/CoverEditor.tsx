@@ -78,7 +78,7 @@ import type {
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
-import type { ForwardedRef, Reducer } from 'react';
+import type { ForwardedRef } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 export type CoverEditorProps = Omit<ViewProps, 'children'> & {
@@ -206,8 +206,9 @@ const CoverEditorCore = (
 
   // #region Store
   const [coverEditorState, dispatch] = useReducer<
-    Reducer<CoverEditorState, CoverEditorAction>,
-    null
+    CoverEditorState,
+    null,
+    [CoverEditorAction]
   >(coverEditorReducer, null, () => {
     const data = coverTemplate?.data;
 

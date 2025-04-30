@@ -25,7 +25,7 @@ type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
   options: Array<CountryCodeListOption<T>>;
   phoneSectionTitle: string;
   value: CountryCode | T;
-  inputRef?: RefObject<TextInput>;
+  inputRef?: RefObject<TextInput | null>;
   onChange: (value: CountryCode | T) => void;
   onOpen?: () => void;
   onClose?: () => void;

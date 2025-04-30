@@ -1,5 +1,4 @@
-import { act } from '@testing-library/react-hooks';
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 import { IntlProvider } from 'react-intl';
 import {
   graphql,

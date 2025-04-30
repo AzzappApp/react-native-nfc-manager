@@ -1,7 +1,5 @@
-import mockRNDeviceInfo from 'react-native-device-info/jest/react-native-device-info-mock';
 const { jest } = require('@jest/globals');
 const { Platform } = require('react-native');
-
 process.env.EXPO_OS = Platform.OS;
 
 //#region Expect Extensions
@@ -36,7 +34,9 @@ jest.mock('react-native-permissions', () =>
 );
 
 // mock react-native-device-info
-jest.mock('react-native-device-info', () => mockRNDeviceInfo);
+jest.mock('react-native-device-info', () =>
+  require('react-native-device-info/jest/react-native-device-info-mock'),
+);
 
 // React Native Safe Area Context Mock
 jest.mock(

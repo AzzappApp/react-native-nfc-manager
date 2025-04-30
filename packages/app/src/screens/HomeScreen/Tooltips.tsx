@@ -10,6 +10,7 @@ import {
 } from '#helpers/TooltipContext';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
+import type { Component, RefObject } from 'react';
 
 type TooltipPosition = {
   x: number;
@@ -69,7 +70,7 @@ const Tooltips = () => {
           Platform.OS === 'ios' ? PopoverMode.RN_MODAL : PopoverMode.JS_MODAL
         }
         offset={Platform.OS === 'ios' ? -10 : 30}
-        from={tooltips['profileLink']?.ref}
+        from={tooltips['profileLink']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         header={
           <FormattedMessage
@@ -134,7 +135,7 @@ Get your QR code scanned to share both contact details and digital profile."
         />
       )}
       <Tooltip
-        from={tooltips['profileEdit']?.ref}
+        from={tooltips['profileEdit']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         offset={Platform.OS === 'ios' ? -10 : 30}
         header={
@@ -154,7 +155,7 @@ Get your QR code scanned to share both contact details and digital profile."
         onPress={onCloseToolTipEdit}
       />
       <Tooltip
-        from={tooltips['profileMulti']?.ref}
+        from={tooltips['profileMulti']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         offset={Platform.OS === 'ios' ? -10 : 30}
         header={

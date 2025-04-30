@@ -55,7 +55,7 @@ type WebCardEditScreenProps = {
   fromCreation: boolean;
   editing: boolean;
   editTransition: DerivedValue<number>;
-  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle | null>;
   transitionInfos: Record<string, ModuleTransitionInfo> | null;
   onDone: () => void;
 };

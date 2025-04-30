@@ -7,6 +7,7 @@ import {
 } from '#helpers/TooltipContext';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Tooltip from '#ui/Tooltip';
+import type { Component, RefObject } from 'react';
 
 type TooltipPosition = {
   x: number;
@@ -44,7 +45,7 @@ const Tooltips = () => {
     <>
       <Tooltip
         offset={-20}
-        from={tooltips['editFooter']?.ref}
+        from={tooltips['editFooter']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         description={
           <FormattedMessage
@@ -57,7 +58,7 @@ const Tooltips = () => {
       />
       <Tooltip
         offset={-50}
-        from={tooltips['cover']?.ref}
+        from={tooltips['cover']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         description={
           <FormattedMessage

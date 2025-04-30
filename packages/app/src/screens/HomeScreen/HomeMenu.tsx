@@ -121,6 +121,5 @@ const styles = StyleSheet.create({
   menuContainerStyle: { flexGrow: 1, flexShrink: 0 },
   menuLabelStyle: {
     color: colors.white,
-    textOverflow: 'ellipsis',
   },
 });

@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   coverStyle: {
     marginBottom: 0,
     borderRadius: 0,
-    position: 'fixed',
+    position: 'absolute',
     top: 0,
   },
   subtitle: {

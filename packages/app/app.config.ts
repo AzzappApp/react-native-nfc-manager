@@ -16,6 +16,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'com.azzapp.app',
   },
   plugins: [
+    'expo-asset',
+    'expo-font',
+    'expo-web-browser',
     [
       '@sentry/react-native/expo',
       {

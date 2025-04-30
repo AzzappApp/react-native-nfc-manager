@@ -27,7 +27,9 @@ jest.mock('#components/NativeRouter', () => {
 
 const mockShare = jest.fn();
 jest.mock('react-native/Libraries/Share/Share', () => ({
-  share: mockShare,
+  default: {
+    share: mockShare,
+  },
 }));
 
 jest.mock('#helpers/authStore', () => ({
@@ -128,6 +130,7 @@ describe('PostRendererActionBar', () => {
     act(() => {
       fireEvent.press(likeButton);
     });
+
     expect(mockShare).toHaveBeenCalled();
   });
 });

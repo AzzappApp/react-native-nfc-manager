@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { useCurrentLocation } from '../useLocation';
 
@@ -47,18 +47,16 @@ describe('useCurrentLocation', () => {
     mockGetLastKnownPosition.mockResolvedValue(fakeLocation);
     mockReverseGeocode.mockResolvedValue([]);
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useCurrentLocation(),
+    const { result } = renderHook(() => useCurrentLocation());
+
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        value: {
+          location: fakeLocation,
+        },
+        locationSearched: true,
+      }),
     );
-
-    await waitForNextUpdate();
-
-    expect(result.current).toEqual({
-      value: {
-        location: fakeLocation,
-      },
-      locationSearched: true,
-    });
   });
 
   test('returns location with address if reverse geocoding is successful', async () => {
@@ -78,18 +76,16 @@ describe('useCurrentLocation', () => {
     mockGetLastKnownPosition.mockResolvedValue(fakeLocation);
     mockReverseGeocode.mockResolvedValue([fakeAddress]);
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useCurrentLocation(),
+    const { result } = renderHook(() => useCurrentLocation());
+
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        value: {
+          location: fakeLocation,
+          address: fakeAddress,
+        },
+        locationSearched: true,
+      }),
     );
-
-    await waitForNextUpdate();
-
-    expect(result.current).toEqual({
-      value: {
-        location: fakeLocation,
-        address: fakeAddress,
-      },
-      locationSearched: true,
-    });
   });
 });

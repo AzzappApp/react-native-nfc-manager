@@ -177,7 +177,7 @@ export const SocialLinksAddOrEditModal = ({
 
   // local link url & countryCode put in ref to avoid refreshes.
   // will be apply only when link cretion is finish
-  const countryCodeRef = useRef<CountryCode>();
+  const countryCodeRef = useRef<CountryCode>(undefined);
   const linkUrlRef = useRef('');
 
   const pickedItemType =

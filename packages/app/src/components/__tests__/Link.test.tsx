@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, View } from 'react-native';
+import { RelayEnvironmentProvider } from 'react-relay';
+import { createMockEnvironment } from 'relay-test-utils';
 import Link from '../Link';
 
 const mockRouter = {
@@ -16,6 +18,8 @@ jest.mock('#components/NativeRouter', () => ({
 
 jest.mock('#helpers/ScreenPrefetcher');
 
+const environment = createMockEnvironment();
+
 describe('Link', () => {
   afterEach(() => {
     mockRouter.push.mockReset();
@@ -25,9 +29,12 @@ describe('Link', () => {
 
   test('should set accessiblity role on given children', () => {
     render(
-      <Link route="HOME">
-        <Pressable testID="pressable" />
-      </Link>,
+      <RelayEnvironmentProvider environment={environment}>
+        <Link route="HOME">
+          <Pressable testID="pressable" />
+        </Link>
+        ,
+      </RelayEnvironmentProvider>,
     );
     expect(screen.queryByTestId('pressable')).toHaveProp(
       'accessibilityRole',
@@ -37,9 +44,11 @@ describe('Link', () => {
 
   test('should push route when pressed', () => {
     render(
-      <Link route="WEBCARD" params={{ userName: 'hello' }}>
-        <Pressable testID="pressable" />
-      </Link>,
+      <RelayEnvironmentProvider environment={environment}>
+        <Link route="WEBCARD" params={{ userName: 'hello' }}>
+          <Pressable testID="pressable" />
+        </Link>
+      </RelayEnvironmentProvider>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
@@ -51,9 +60,11 @@ describe('Link', () => {
 
   test('should not push route if event is default prevented', () => {
     render(
-      <Link route="WEBCARD" params={{ userName: 'hello' }}>
-        <Pressable testID="pressable" />
-      </Link>,
+      <RelayEnvironmentProvider environment={environment}>
+        <Link route="WEBCARD" params={{ userName: 'hello' }}>
+          <Pressable testID="pressable" />
+        </Link>
+      </RelayEnvironmentProvider>,
     );
     fireEvent.press(screen.getByTestId('pressable'), {
       isDefaultPrevented() {
@@ -65,9 +76,11 @@ describe('Link', () => {
 
   test('should replace router  when pressed and replace is true', () => {
     render(
-      <Link route="WEBCARD" replace params={{ userName: 'hello' }}>
-        <Pressable testID="pressable" />
-      </Link>,
+      <RelayEnvironmentProvider environment={environment}>
+        <Link route="WEBCARD" replace params={{ userName: 'hello' }}>
+          <Pressable testID="pressable" />
+        </Link>
+      </RelayEnvironmentProvider>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -79,9 +92,11 @@ describe('Link', () => {
 
   test('should push route when children is a view', () => {
     render(
-      <Link route="WEBCARD" params={{ userName: 'hello' }}>
-        <View testID="pressable" />
-      </Link>,
+      <RelayEnvironmentProvider environment={environment}>
+        <Link route="WEBCARD" params={{ userName: 'hello' }}>
+          <View testID="pressable" />
+        </Link>
+      </RelayEnvironmentProvider>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({

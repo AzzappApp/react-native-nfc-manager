@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
@@ -58,17 +57,15 @@ describe('CommonInformationScreen - isPremium flag', () => {
     );
 
     const TestRenderer = () => (
-      <Suspense>
-        <CommonInformationScreen
-          preloadedQuery={preloadedQuery}
-          screenId=""
-          hasFocus={false}
-          route={{
-            route: 'COMMON_INFORMATION',
-            params: undefined,
-          }}
-        />
-      </Suspense>
+      <CommonInformationScreen
+        preloadedQuery={preloadedQuery}
+        screenId=""
+        hasFocus={false}
+        route={{
+          route: 'COMMON_INFORMATION',
+          params: undefined,
+        }}
+      />
     );
 
     return render(
@@ -80,11 +77,10 @@ describe('CommonInformationScreen - isPremium flag', () => {
 
   test('Should pass isPremium as true to ContactCardEditCompanyLogo', async () => {
     renderCommonInformationScreen(true);
-    await flushPromises();
 
     expect(ContactCardEditCompanyLogo).toHaveBeenCalledWith(
       expect.objectContaining({ isPremium: true }),
-      {},
+      undefined,
     );
   });
 
@@ -94,7 +90,7 @@ describe('CommonInformationScreen - isPremium flag', () => {
 
     expect(ContactCardEditCompanyLogo).toHaveBeenCalledWith(
       expect.objectContaining({ isPremium: false }),
-      {},
+      undefined,
     );
   });
 });

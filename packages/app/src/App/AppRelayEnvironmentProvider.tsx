@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import type { ReactNode } from 'react';
 
 type AppRelayEnvironmentProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 const AppRelayEnvironmentProvider = ({
@@ -13,7 +14,7 @@ const AppRelayEnvironmentProvider = ({
 
   return (
     <RelayEnvironmentProvider environment={environment}>
-      {children}
+      {children as any /* remove this cast once all projects are on react 19 */}
     </RelayEnvironmentProvider>
   );
 };

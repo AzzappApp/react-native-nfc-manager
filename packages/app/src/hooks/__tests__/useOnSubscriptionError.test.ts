@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-native';
 import Toast from 'react-native-toast-message';
 import ERRORS from '@azzapp/shared/errors';
 import { useRouter } from '#components/NativeRouter';

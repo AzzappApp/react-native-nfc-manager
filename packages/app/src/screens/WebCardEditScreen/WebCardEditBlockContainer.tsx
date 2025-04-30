@@ -318,7 +318,7 @@ const WebCardEditBlockContainer = ({
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const containerRef = useScrollViewChildRef(id);
-  const ref = useRef(null);
+  const ref = useRef<View>(null);
 
   useEffect(() => {
     if (id === 'cover') {

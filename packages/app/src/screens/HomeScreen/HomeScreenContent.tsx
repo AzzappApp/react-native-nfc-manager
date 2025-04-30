@@ -85,7 +85,7 @@ const HomeScreenContent = ({
 
   const router = useRouter();
 
-  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const redirectDeepLink = useCallback(
     (notification: PushNotificationType) => {

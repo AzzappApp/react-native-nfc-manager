@@ -3,10 +3,9 @@ import { cloneElement, isValidElement, useMemo, useRef } from 'react';
 import { Animated } from 'react-native';
 import type { ReactElement } from 'react';
 import type { ScrollViewProps } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleEditionScrollHandlerProps = ScrollViewProps & {
-  children: ReactElement<{ scrollPosition: SharedValue }>;
+  children: ReactElement<{ scrollPosition: Animated.Value }>;
   scrollPosition?: Animated.Value;
 };
 

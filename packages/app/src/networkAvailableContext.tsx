@@ -53,7 +53,7 @@ export const useNetworkAvailableFetcher = () => {
     backendReachable: true,
   });
 
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const enableBackendFetcher = () => {
     if (intervalRef.current) {
@@ -102,7 +102,7 @@ export const useNetworkAvailableFetcher = () => {
   };
 
   ///// Device monitoring management
-  const deviceMonitoringUnsubscribeRef = useRef<NetInfoSubscription>();
+  const deviceMonitoringUnsubscribeRef = useRef<NetInfoSubscription>(undefined);
 
   const enableDeviceMonitoring = () => {
     if (!deviceMonitoringUnsubscribeRef.current) {

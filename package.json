@@ -58,7 +58,6 @@
     "@parcel/watcher": "^2.5.1",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-hooks": "^8.0.1",
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",

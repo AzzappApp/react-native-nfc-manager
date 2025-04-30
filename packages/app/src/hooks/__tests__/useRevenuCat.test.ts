@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-native';
 import Purchases from 'react-native-purchases';
 import * as authStore from '#helpers/authStore';
 import { useRevenueCat } from '../useRevenueCat';
@@ -26,9 +26,10 @@ describe('useRevenueCat', () => {
     });
 
     const listeners: any[] = [];
-    (authStore.addAuthStateListener as jest.Mock).mockImplementation(cb =>
-      listeners.push(cb),
-    );
+    (authStore.addAuthStateListener as jest.Mock).mockImplementation(cb => {
+      listeners.push(cb);
+      return () => {};
+    });
 
     renderHook(() => useRevenueCat());
 
@@ -48,9 +49,10 @@ describe('useRevenueCat', () => {
     mockIsAnonymous.mockResolvedValue(true);
 
     const listeners: any[] = [];
-    (authStore.addAuthStateListener as jest.Mock).mockImplementation(cb =>
-      listeners.push(cb),
-    );
+    (authStore.addAuthStateListener as jest.Mock).mockImplementation(cb => {
+      listeners.push(cb);
+      return () => {};
+    });
 
     renderHook(() => useRevenueCat());
 

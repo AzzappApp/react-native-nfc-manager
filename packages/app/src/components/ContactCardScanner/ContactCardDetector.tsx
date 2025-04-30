@@ -42,6 +42,7 @@ import type {
   ContactCardDetectorMutation$data,
 } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { vCard } from '@lepirlouit/vcard-parser';
+import type { RefObject } from 'react';
 import type { Point } from 'react-native-vision-camera';
 
 const horizontal = require('./assets/orientation_horizontal.png');
@@ -341,7 +342,7 @@ const ContactCardDetector = ({
   const extractDataFromGalleryMedia = useCallback(async () => {
     try {
       showLoading();
-      const image = await makeImageFromView(ref);
+      const image = await makeImageFromView(ref as RefObject<View>);
       if (image) {
         const pngData = image.encodeToBytes(3, 100);
         const base64Data = image.encodeToBase64(3, 100);

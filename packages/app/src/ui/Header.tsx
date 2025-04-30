@@ -3,6 +3,7 @@ import Text from '#ui/Text';
 import Container from './Container';
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
+
 export type HeaderProps = Omit<ViewProps, 'children'> & {
   /**
    * The title to display in the header.
@@ -56,7 +57,12 @@ const Header = ({
           pointerEvents="box-none"
         >
           {typeof middleElement === 'string' || Array.isArray(middleElement) ? (
-            <Text variant="large" style={styles.title} numberOfLines={1}>
+            <Text
+              variant="large"
+              style={styles.title}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {middleElement}
             </Text>
           ) : middleElement != null ? (
@@ -96,7 +102,6 @@ const styles = StyleSheet.create({
   },
   headerMiddle: {
     flex: 2,
-    textOverflow: 'hidden',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -104,6 +109,5 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    textOverflow: 'ellipsis',
   },
 });
