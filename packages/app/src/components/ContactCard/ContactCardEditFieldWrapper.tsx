@@ -166,7 +166,7 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
             pointerEvents="auto"
             onPress={deleteField}
           >
-            <Text variant="button" style={{ color: colors.white }}>
+            <Text variant="button" style={styles.deleteButtonText}>
               <FormattedMessage
                 defaultMessage="Delete"
                 description="Delete email or phone number"
@@ -175,7 +175,7 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
           </PressableNative>
         </View>
         {errorMessage && (
-          <Text variant="error" style={{ paddingHorizontal: 20 }}>
+          <Text variant="error" style={styles.errorText}>
             {errorMessage}
           </Text>
         )}
@@ -239,6 +239,9 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomSheetStyle: { padding: 16 },
   switch: { marginRight: -8 },
+  errorText: { paddingHorizontal: 20 },
+  deleteButtonText: { color: colors.white },
+
   ...buildContactStyleSheet(appearance),
 }));
 
