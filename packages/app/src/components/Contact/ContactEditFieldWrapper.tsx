@@ -180,7 +180,7 @@ const ContactEditFieldWrapper = <TFieldValues extends FieldValues>({
           </Text>
         )}
       </Animated.View>
-      {labelKey && (
+      {labelKey && visible && (
         <BottomSheetModal
           visible={visible}
           onDismiss={close}

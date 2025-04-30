@@ -94,47 +94,49 @@ const CountryCodeListWithOptions = <T extends string>({
         )}
         <Icon icon="arrow_down" style={styles.chevronDown} />
       </PressableNative>
-      <BottomSheetModal
-        visible={showDropdown}
-        height={windowHeight - 120}
-        onDismiss={onRequestClose}
-        dismissKeyboardOnOpening
-      >
-        <CountrySelector
-          value={isSelectorType() ? null : (value as CountryCode)}
-          onChange={onSelect}
-          ListHeaderComponent={
-            <View>
-              {otherSectionTitle ? (
+      {showDropdown && (
+        <BottomSheetModal
+          visible={showDropdown}
+          height={windowHeight - 120}
+          onDismiss={onRequestClose}
+          dismissKeyboardOnOpening
+        >
+          <CountrySelector
+            value={isSelectorType() ? null : (value as CountryCode)}
+            onChange={onSelect}
+            ListHeaderComponent={
+              <View>
+                {otherSectionTitle ? (
+                  <Text variant="large" style={styles.section}>
+                    {otherSectionTitle}
+                  </Text>
+                ) : null}
+                {options.map(({ type, title, icon }) => {
+                  return (
+                    <PressableBackground
+                      key={type}
+                      highlightColor={colors.grey400}
+                      onPress={() => onSelect(type)}
+                      style={[
+                        styles.emailItem,
+                        value === type && styles.emailItemSelected,
+                      ]}
+                    >
+                      <Icon icon={icon} />
+                      <Text variant="button" style={styles.emailItemName}>
+                        {title}
+                      </Text>
+                    </PressableBackground>
+                  );
+                })}
                 <Text variant="large" style={styles.section}>
-                  {otherSectionTitle}
+                  {phoneSectionTitle}
                 </Text>
-              ) : null}
-              {options.map(({ type, title, icon }) => {
-                return (
-                  <PressableBackground
-                    key={type}
-                    highlightColor={colors.grey400}
-                    onPress={() => onSelect(type)}
-                    style={[
-                      styles.emailItem,
-                      value === type && styles.emailItemSelected,
-                    ]}
-                  >
-                    <Icon icon={icon} />
-                    <Text variant="button" style={styles.emailItemName}>
-                      {title}
-                    </Text>
-                  </PressableBackground>
-                );
-              })}
-              <Text variant="large" style={styles.section}>
-                {phoneSectionTitle}
-              </Text>
-            </View>
-          }
-        />
-      </BottomSheetModal>
+              </View>
+            }
+          />
+        </BottomSheetModal>
+      )}
     </>
   );
 };
