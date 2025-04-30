@@ -51,7 +51,9 @@ const DownloadVCard = ({
   onClose,
 }: DownloadVCardProps) => {
   const intl = useIntl();
-  const [deviceType, setDeviceType] = useState<DeviceType | null>(null);
+  const deviceType = getDeviceType();
+  const appClipIsSupported = isAppClipSupported();
+
   const searchParams = useSearchParams();
 
   const [fileUrl, setFileUrl] = useState<string | undefined>();
@@ -71,13 +73,6 @@ const DownloadVCard = ({
   const [token, setToken] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-
-  const [appClipIsSupported, setAppClipIsSupported] = useState(false);
-
-  useEffect(() => {
-    setAppClipIsSupported(isAppClipSupported());
-    setDeviceType(getDeviceType());
-  }, []);
 
   const processContact = useCallback(
     async (compressedContactCard: string) => {
