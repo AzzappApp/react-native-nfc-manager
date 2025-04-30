@@ -1,3 +1,7 @@
+## 1.10.0-canary.166
+
+* **build:**  - update gemfile.lock
+
 ## 1.10.0-canary.165
 
 * **perf:**  - do not preload modal in country flag & contact Field Wrappers ([#8610](https://github.com/AzzappApp/azzapp/pull/8610))
