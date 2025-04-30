@@ -10,14 +10,16 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CoverTemplateForm from '../CoverTemplatesForm';
 
 type CoverTemplatePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-const CoverTemplatePage = async ({
-  params: { id },
-}: CoverTemplatePageProps) => {
+const CoverTemplatePage = async (props: CoverTemplatePageProps) => {
+  const params = await props.params;
+
+  const { id } = params;
+
   const labelsMap = (
     await getLocalizationMessagesByLocale(DEFAULT_LOCALE)
   ).reduce(

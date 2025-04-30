@@ -2,8 +2,8 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { sendGAEvent } from '@next/third-parties/google';
 import cx from 'classnames';
-import { useEffect, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useRef, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CheckRoundIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
@@ -39,7 +39,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
     title: useRef<HTMLInputElement>(null),
   };
 
-  const [lastResult, action] = useFormState(
+  const [lastResult, action] = useActionState(
     shareBackActionWithUserIdAndToken,
     undefined,
   );

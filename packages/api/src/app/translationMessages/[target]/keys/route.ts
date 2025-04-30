@@ -26,7 +26,7 @@ export const GET = withPluginsRoute(
     },
   ) => {
     try {
-      await checkServerAuth(headers());
+      await checkServerAuth(await headers());
     } catch (e) {
       if ((e as Error).message === ERRORS.INVALID_TOKEN) {
         return NextResponse.json(
@@ -45,16 +45,30 @@ export const GET = withPluginsRoute(
       const entityIdsWithKind = await Promise.all([
         // CardStyleTable
         getAllCardStyles().then(cardStyles =>
-          cardStyles.map(({ id }) => ({ id, kind: 'CardStyle' }) as const),
+          cardStyles.map(
+            ({ id }) =>
+              ({
+                id,
+                kind: 'CardStyle',
+              }) as const,
+          ),
         ),
         getAllCardTemplates().then(cardTemplates =>
           cardTemplates.map(
-            ({ id }) => ({ id, kind: 'CardTemplate' }) as const,
+            ({ id }) =>
+              ({
+                id,
+                kind: 'CardTemplate',
+              }) as const,
           ),
         ),
         getCardTemplateTypes().then(cardTemplateTypes =>
           cardTemplateTypes.map(
-            ({ id }) => ({ id, kind: 'CardTemplateType' }) as const,
+            ({ id }) =>
+              ({
+                id,
+                kind: 'CardTemplateType',
+              }) as const,
           ),
         ),
         getCoverTemplateTags().then(coverTemplateTags =>
@@ -68,7 +82,11 @@ export const GET = withPluginsRoute(
         ),
         getCoverTemplateTypes().then(coverTemplateTypes =>
           coverTemplateTypes.map(
-            ({ id }) => ({ id, kind: 'CoverTemplateType' }) as const,
+            ({ id }) =>
+              ({
+                id,
+                kind: 'CoverTemplateType',
+              }) as const,
           ),
         ),
       ]);

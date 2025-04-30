@@ -21,7 +21,7 @@ export const loadProfilePosts = async (
   offset: number,
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   return getWebCardPosts(profileId, limit, offset);
 };
 
@@ -32,7 +32,7 @@ export const loadOtherPosts = async (
   before?: Date,
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   return getWebCardsPostsWithMedias(webCardId, limit, excludedId, before);
 };
 
@@ -42,7 +42,7 @@ export const loadProfilePostsWithTopComment = async (
   offset = 0,
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   return getProfilesPostsWithTopComment(profileId, limit, offset);
 };
 
@@ -52,7 +52,7 @@ export const loadPostCommentsWithProfile = async (
   before?: Date,
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   const post = await getPostById(postId);
   if (!post?.allowComments) return [];
 
@@ -61,13 +61,13 @@ export const loadPostCommentsWithProfile = async (
 
 export const loadPostById = async (id: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   return getPostByIdWithMedia(id);
 };
 
 export const loadWebCardStats = async (webCardId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
+  await headers();
   const webCard = await getWebCardById(webCardId);
   if (!webCard) {
     return null;

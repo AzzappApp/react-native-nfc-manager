@@ -1,4 +1,4 @@
-import { waitUntil } from '@vercel/functions';
+import { waitUntil, geolocation } from '@vercel/functions';
 import { NextRequest } from 'next/server';
 import {
   isEdgeRuntime,
@@ -19,9 +19,9 @@ export const withPluginsRoute = (handler: NextHandler): NextHandler =>
 
 function withAxiomRouteHandler(handler: NextHandler): NextHandler {
   return async (req: NextRequest | Request, arg: any) => {
-    let region = '';
+    let region: string | undefined = undefined;
     if ('geo' in req) {
-      region = req.geo?.region ?? '';
+      ({ region } = geolocation(req));
     }
 
     let pathname = '';

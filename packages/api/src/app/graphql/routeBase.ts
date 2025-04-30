@@ -252,7 +252,7 @@ const { handleRequest } = createYoga({
           return false;
         }
         try {
-          await checkServerAuth(headers());
+          await checkServerAuth(await headers());
           return false;
         } catch {
           return true;
@@ -275,7 +275,7 @@ const { handleRequest } = createYoga({
         }
 
         try {
-          await checkServerAuth(headers());
+          await checkServerAuth(await headers());
           return true;
         } catch {
           return false;

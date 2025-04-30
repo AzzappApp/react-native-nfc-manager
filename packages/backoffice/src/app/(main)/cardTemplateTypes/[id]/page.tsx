@@ -7,13 +7,13 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 
 type CardTemplatePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const CardTemplatePage = async (props: CardTemplatePageProps) => {
-  const { params } = props;
+  const params = await props.params;
 
   const [template, labels] = await Promise.all([
     getCardTemplateTypeById(params.id),

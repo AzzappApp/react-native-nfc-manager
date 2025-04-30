@@ -99,7 +99,7 @@ const SimpleCarousel = ({
   const [translation, setTranslation] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const targetTranslationRef = useRef<number>();
+  const targetTranslationRef = useRef<number>(undefined);
   const dimensions = useDimensions(containerRef);
 
   const screenWidth = dimensions?.width || 0;
@@ -198,8 +198,8 @@ const SimpleCarousel = ({
     }
   };
 
-  const wheelXTimeout = useRef<ReturnType<typeof setTimeout>>();
-  const wheelYTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const wheelXTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const wheelYTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // function called to reset wheel slide X management
   const onWheelXTimeout = useCallback(() => {

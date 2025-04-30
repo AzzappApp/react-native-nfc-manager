@@ -29,12 +29,14 @@ const fontExtraBold = fetch(
 
 export const GET = async (
   req: NextRequest,
-  {
-    params: { userName },
-  }: {
-    params: { userName: string };
+  props: {
+    params: Promise<{ userName: string }>;
   },
 ) => {
+  const params = await props.params;
+
+  const { userName } = params;
+
   const [lightFontData, extraBoldFontData] = await Promise.all([
     fontLight,
     fontExtraBold,

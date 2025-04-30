@@ -29,17 +29,16 @@ import SignatureNotice from './SignatureNotice';
 import StoreLinks from './StoreLinks';
 
 type EmailSignatureProps = {
-  params: {
+  params: Promise<{
     userName: string;
-  };
-  searchParams: Record<string, string> | undefined;
+  }>;
+  searchParams: Promise<any> | undefined;
 };
 
-const EmailSignaturePage = async ({
-  params,
-  searchParams,
-}: EmailSignatureProps) => {
-  const { isMobileDevice } = getDeviceInfo(headers().get('user-agent'));
+const EmailSignaturePage = async (props: EmailSignatureProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const { isMobileDevice } = getDeviceInfo((await headers()).get('user-agent'));
 
   const webCard = await cachedGetWebCardByUserName(params.userName);
   if (!webCard || !webCard.userName || webCard.deleted) {

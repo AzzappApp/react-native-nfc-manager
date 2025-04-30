@@ -15,8 +15,9 @@ const percentDiffHeight = ((bgHeight - OG_HEIGHT) / bgHeight) * 50;
 
 export async function GET(
   _request: Request,
-  { params }: { params: { userName: string } },
+  props: { params: Promise<{ userName: string }> },
 ) {
+  const params = await props.params;
   const userName = params.userName.toLowerCase();
   const webCard = await getWebCardByUserName(userName);
 

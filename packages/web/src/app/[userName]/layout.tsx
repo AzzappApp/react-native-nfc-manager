@@ -17,19 +17,20 @@ const plusJakarta = Plus_Jakarta_Sans({
   preload: false,
 });
 
-const RootLayout = async ({
-  children,
-  params: { userName } = {},
-}: {
+const RootLayout = async (props: {
   children: ClientWrapperProps['children'];
-  params?: { userName?: string };
+  params?: Promise<{ userName?: string }>;
 }) => {
+  const userName = (await props.params)?.userName;
+
+  const { children } = props;
+
   const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
 
   let locale = webCard?.locale;
   if (locale == null) {
     locale =
-      headers()
+      (await headers())
         .get('accept-language')
         ?.split(',')?.[0]
         .split('-')?.[0]

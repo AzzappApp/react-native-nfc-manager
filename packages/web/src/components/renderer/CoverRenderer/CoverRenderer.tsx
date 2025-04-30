@@ -75,10 +75,8 @@ const CoverRenderer = ({
   const cover = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const current = cover.current;
-
     const onCoverSizeChange = () => {
-      if (current) {
+      if (cover.current) {
         setCoverSize({
           width: cover.current.clientWidth,
           height: cover.current.clientHeight,

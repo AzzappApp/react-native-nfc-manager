@@ -32,10 +32,8 @@ const Slideshow = ({
   const slideshow = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const current = slideshow.current;
-
     const onSlideshowSizeChange = () => {
-      if (current) {
+      if (slideshow.current) {
         setSize({
           width: slideshow.current.clientWidth,
           height: slideshow.current.clientHeight,

@@ -13,28 +13,28 @@ export type SortColumn = 'mediaCount' | 'name' | 'type';
 export type StatusFilter = 'All' | 'Disabled' | 'Enabled';
 
 type CoverTemplatesPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     sort?: string;
     order?: string;
     s?: string;
     st?: string;
-  };
+  }>;
 };
 
-const CoverTemplatesPage = async ({
-  searchParams = {},
-}: CoverTemplatesPageProps) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+const CoverTemplatesPage = async (props: CoverTemplatesPageProps) => {
+  const searchParams = await props.searchParams;
+  let page = searchParams?.page ? parseInt(searchParams?.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sortField = searchParams.sort === 'type' ? 'type' : 'name';
+  const sortField = searchParams?.sort === 'type' ? 'type' : 'name';
 
-  const sortOrder = searchParams.order === 'desc' ? 'desc' : 'asc';
-  const search = searchParams.s ?? null;
+  const sortOrder = searchParams?.order === 'desc' ? 'desc' : 'asc';
+  const search = searchParams?.s ?? null;
   const statusFilter =
-    searchParams.st && ['Disabled', 'Enabled', 'All'].includes(searchParams.st)
-      ? (searchParams.st as StatusFilter)
+    searchParams?.st &&
+    ['Disabled', 'Enabled', 'All'].includes(searchParams?.st)
+      ? (searchParams?.st as StatusFilter)
       : 'All';
 
   const { items, count } = await getCoverTemplatesWithTypeLabel({
@@ -48,7 +48,7 @@ const CoverTemplatesPage = async ({
 
   const coverTemplates = items
     .sort(({ coverTemplate: c1 }, { coverTemplate: c2 }) => {
-      if (searchParams.sort !== 'mediaCount') {
+      if (searchParams?.sort !== 'mediaCount') {
         return 0;
       }
 
@@ -70,7 +70,7 @@ const CoverTemplatesPage = async ({
       count={count}
       page={page}
       pageSize={PAGE_SIZE}
-      sortField={searchParams.sort === 'mediaCount' ? 'mediaCount' : sortField}
+      sortField={searchParams?.sort === 'mediaCount' ? 'mediaCount' : sortField}
       sortOrder={sortOrder}
       search={search}
       statusFilter={statusFilter}

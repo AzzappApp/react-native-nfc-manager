@@ -16,13 +16,13 @@ export type Filters = {
 };
 
 type ModerationPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     sort?: string;
     order?: string;
     status?: string;
     kind?: string;
-  };
+  }>;
 };
 
 const sortColumns = [
@@ -44,25 +44,26 @@ const reportKind = ['all', 'comment', 'post', 'webCard'] as const;
 
 export type ReportKind = (typeof reportKind)[number];
 
-const ModerationPage = async ({ searchParams = {} }: ModerationPageProps) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+const ModerationPage = async (props: ModerationPageProps) => {
+  const searchParams = await props.searchParams;
+  let page = searchParams?.page ? parseInt(searchParams?.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
   const sortField: SortFields =
-    searchParams.sort && sortColumns.includes(searchParams.sort as any)
-      ? (searchParams.sort as SortFields)
+    searchParams?.sort && sortColumns.includes(searchParams?.sort as any)
+      ? (searchParams?.sort as SortFields)
       : 'latestReport';
 
-  const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
+  const sortOrder = searchParams?.order === 'asc' ? 'asc' : 'desc';
 
   const statusFilter =
-    searchParams.status && reportStatus.includes(searchParams.status as any)
-      ? (searchParams.status as ReportStatus)
+    searchParams?.status && reportStatus.includes(searchParams?.status as any)
+      ? (searchParams?.status as ReportStatus)
       : 'all';
 
   const kindFilter =
-    searchParams.kind && reportKind.includes(searchParams.kind as any)
-      ? (searchParams.kind as ReportKind)
+    searchParams?.kind && reportKind.includes(searchParams?.kind as any)
+      ? (searchParams?.kind as ReportKind)
       : 'all';
 
   const { reports: moderationReports, count } = await getReportsByTarget({

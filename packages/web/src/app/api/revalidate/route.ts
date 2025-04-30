@@ -12,7 +12,7 @@ const RevalidateSchema = z.object({
 
 export const POST = async (req: Request) => {
   try {
-    await checkServerAuth(headers());
+    await checkServerAuth(await headers());
     const body = await req.json();
     const input = RevalidateSchema.parse(body);
 

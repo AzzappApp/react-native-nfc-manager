@@ -11,20 +11,21 @@ export type CardStyleItem = {
 export type SortColumn = 'label';
 
 type CardStylesPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     sort?: string;
     order?: string;
     s?: string;
-  };
+  }>;
 };
 
-const CardStylesPage = async ({ searchParams = {} }: CardStylesPageProps) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 0;
+const CardStylesPage = async (props: CardStylesPageProps) => {
+  const searchParams = await props.searchParams;
+  let page = searchParams?.page ? parseInt(searchParams.page, 10) : 0;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
-  const search = searchParams.s ?? null;
+  const order = searchParams?.order === 'desc' ? 'desc' : 'asc';
+  const search = searchParams?.s ?? null;
   const { cardStyles, count } = await getCardStylesWithLabel({
     offset: (page - 1) * PAGE_SIZE,
     limit: PAGE_SIZE,

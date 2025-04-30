@@ -17,13 +17,14 @@ import {
 import { PaymentList } from './PaymentList';
 
 const SubscriptionPage = async ({
-  params: { id: userId, subscriptionId },
+  params,
 }: {
-  params: {
+  params: Promise<{
     id: string;
     subscriptionId: string;
-  };
+  }>;
 }) => {
+  const { id: userId, subscriptionId } = await params;
   const user = await getUserById(userId);
   if (!user) {
     return notFound();

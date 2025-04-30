@@ -4,18 +4,20 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardStyleForm from '../CardStyleForm';
 
 type CardStylePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     saved?: string;
-  };
+  }>;
 };
 
-const CardStylePage = async ({
-  params: { id },
-  searchParams,
-}: CardStylePageProps) => {
+const CardStylePage = async (props: CardStylePageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { id } = params;
+
   const cardStyle = await getCardStyleById(id);
 
   if (!cardStyle) {

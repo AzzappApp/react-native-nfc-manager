@@ -28,30 +28,31 @@ const sortsColumns = ['label', 'type', 'personalEnabled', 'businessEnabled'];
 export type SortColumn = (typeof sortsColumns)[number];
 
 type Props = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     sort?: string;
     order?: string;
     s?: string;
     ps?: string;
     bs?: string;
-  };
+  }>;
 };
 
-const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+const CardTemplatesPage = async (props: Props) => {
+  const searchParams = await props.searchParams;
+  let page = searchParams?.page ? parseInt(searchParams?.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
   const sort =
-    searchParams.sort && Object.keys(sortsColumns).includes(searchParams.sort)
-      ? searchParams.sort
+    searchParams?.sort && Object.keys(sortsColumns).includes(searchParams?.sort)
+      ? searchParams?.sort
       : 'label';
 
-  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
-  const search = searchParams.s ?? null;
+  const order = searchParams?.order === 'desc' ? 'desc' : 'asc';
+  const search = searchParams?.s ?? null;
   const filters: Filters = {
-    personalStatus: (searchParams.ps as Status) || 'All',
-    businessStatus: (searchParams.bs as Status) || 'All',
+    personalStatus: (searchParams?.ps as Status) || 'All',
+    businessStatus: (searchParams?.bs as Status) || 'All',
   };
 
   const [cardTemplates, labels] = await Promise.all([

@@ -56,7 +56,7 @@ export const processShareBackSubmission = async (
   prevState: unknown,
   formData: FormData,
 ): Promise<SubmissionResult | null | undefined> => {
-  headers();
+  await headers();
 
   const submission = parseWithZod(formData, {
     schema: ShareBackFormSchema,

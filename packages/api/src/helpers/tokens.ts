@@ -37,7 +37,7 @@ export const refreshTokens = async (refreshToken: string) => {
 };
 
 export const getSessionData = async (): Promise<SessionData | null> => {
-  const token = headers().get('authorization')?.split(' ')?.[1] ?? null;
+  const token = (await headers()).get('authorization')?.split(' ')?.[1] ?? null;
   if (token) {
     try {
       const { userId } = await verifyToken(token);

@@ -3,7 +3,7 @@ import type { Media } from '@azzapp/data';
 import type { RefObject } from 'react';
 
 const useMediaCarousel = (
-  carousel: RefObject<HTMLElement>,
+  carousel: RefObject<HTMLElement | null>,
   medias: Media[],
   height: number,
   gap: number,

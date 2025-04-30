@@ -28,12 +28,13 @@ import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
 type ProfilePageProps = {
-  params: {
+  params: Promise<{
     userName: string;
-  };
+  }>;
 };
 
-const ProfilePage = async ({ params }: ProfilePageProps) => {
+const ProfilePage = async (props: ProfilePageProps) => {
+  const params = await props.params;
   const userName = params.userName;
 
   const webCard = await cachedGetWebCardByUserName(userName);
@@ -180,9 +181,10 @@ export default ProfilePage;
 
 export const dynamic = 'force-static';
 
-export async function generateMetadata({
-  params,
-}: ProfilePageProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: ProfilePageProps,
+): Promise<Metadata> {
+  const params = await props.params;
   const webCard = await cachedGetWebCardByUserName(params.userName);
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`

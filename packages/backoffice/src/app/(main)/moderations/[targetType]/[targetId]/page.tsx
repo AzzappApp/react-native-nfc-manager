@@ -33,13 +33,13 @@ import ReportsList from './ReportsList';
 import type { ReportStatus } from '../../page';
 
 type ReportPageProps = {
-  params: {
+  params: Promise<{
     targetId: string;
     targetType: ReportTargetType;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 };
 
 type Item = {
@@ -112,10 +112,12 @@ const getStatus = (reports: Report[]): ReportStatus => {
   return treated.treatedAt.getTime() <= lastReportDate ? 'open' : 'closed';
 };
 
-const ReportPage = async ({
-  params: { targetId, targetType },
-  searchParams,
-}: ReportPageProps) => {
+const ReportPage = async (props: ReportPageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { targetId, targetType } = params;
+
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 

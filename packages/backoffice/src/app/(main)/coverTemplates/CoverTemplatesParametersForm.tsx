@@ -25,8 +25,13 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFormState } from 'react-dom';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useActionState,
+} from 'react';
 import MediaInput from '#components/MediaInput';
 import { uploadMedia } from '#helpers/mediaHelper';
 import CoverOverlayForm from './CoverOverlayForm';
@@ -67,7 +72,7 @@ const CoverTemplatesParametersForm = ({
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [error, setError] = useState<string>();
   const [tags, setTags] = useState<string[]>([...(coverTemplate?.tags || [])]);
-  const [lastResult, action] = useFormState(saveCoverTemplate, undefined);
+  const [lastResult, action] = useActionState(saveCoverTemplate, undefined);
   const [enabled, setEnabled] = useState(
     coverTemplate ? coverTemplate.enabled : true,
   );
