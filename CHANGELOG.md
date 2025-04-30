@@ -1,3 +1,7 @@
+## 1.10.0-canary.162
+
+* **fix:**  - correct download Vcard banner transition ([#8591](https://github.com/AzzappApp/azzapp/pull/8591))
+
 ## 1.10.0-canary.161
 
 * **fix:**  - remove unnecessary state to avoid refresh ([#8589](https://github.com/AzzappApp/azzapp/pull/8589))
