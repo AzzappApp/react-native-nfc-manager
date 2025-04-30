@@ -51,24 +51,19 @@
 		<true />
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing
-		within the app.</string>
+	<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing within the app.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to access your contacts to quickly add new connections to your phone book — or easily invite contacts to a multi-user WebCard.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your microphone to record audio for video content within
-		the app.</string>
+	<string>$(PRODUCT_NAME) needs access to your microphone to record audio for video content within the app.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses motion detection to optimize the display of your contact card based
-		on your device’s orientation.</string>
+	<string>$(PRODUCT_NAME) uses motion detection to optimize the display of your contact card based on your device’s orientation.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to your photo library, in order to create your WebCard,
-		share and upload media.</string>
+	<string>$(PRODUCT_NAME) requires access to your photo library, in order to create your WebCard, share and upload media.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>$(PRODUCT_NAME) wants to send you notifications.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with
-		others.</string>
+	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with others.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true />
 	<key>UIAppFonts</key>
