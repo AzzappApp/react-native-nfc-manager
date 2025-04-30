@@ -1,3 +1,7 @@
+## 1.9.18
+
+* **fix:**  - formatting of message for permissions
+
 ## 1.9.17
 
 
