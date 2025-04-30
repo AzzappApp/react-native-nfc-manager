@@ -1,3 +1,7 @@
+## 1.9.19
+
+* **fix:**  - remove marketing cookie for apple approval ([#8605](https://github.com/AzzappApp/azzapp/pull/8605))
+
 ## 1.9.18
 
 * **fix:**  - formatting of message for permissions
