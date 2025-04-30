@@ -1,3 +1,7 @@
+## 1.10.0-canary.164
+
+* **build:**  - upgrade to rn 0.79 - expo 53 ([#8590](https://github.com/AzzappApp/azzapp/pull/8590))
+
 ## 1.10.0-canary.163
 
 
