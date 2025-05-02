@@ -1,3 +1,7 @@
+## 1.10.0-canary.169
+
+* **fix:**  - increase lineHeight on avatar display to avoid truncated text ([#8623](https://github.com/AzzappApp/azzapp/pull/8623))
+
 ## 1.10.0-canary.168
 
 * **fix:**  - improve contact edit screen loading (and multiUserDetails) ([#8620](https://github.com/AzzappApp/azzapp/pull/8620))
