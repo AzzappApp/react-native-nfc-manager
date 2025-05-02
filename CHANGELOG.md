@@ -1,3 +1,61 @@
+## 1.10.0-canary.167
+
+* **feat:**  - add phone number chooser before opening whatsapp ([#8577](https://github.com/AzzappApp/azzapp/pull/8577))
+* **build:**  - update gemfile.lock
+* **perf:**  - do not preload modal in country flag & contact Field Wrappers ([#8610](https://github.com/AzzappApp/azzapp/pull/8610))
+* **build:**  - upgrade to rn 0.79 - expo 53 ([#8590](https://github.com/AzzappApp/azzapp/pull/8590))
+* **fix:**  - correct download Vcard banner transition ([#8591](https://github.com/AzzappApp/azzapp/pull/8591))
+* **fix:**  - remove unnecessary state to avoid refresh ([#8589](https://github.com/AzzappApp/azzapp/pull/8589))
+* **fix:**  - do not recompute Social link label in every component ([#8586](https://github.com/AzzappApp/azzapp/pull/8586))
+* **fix:**  - change getAuthState by useProfileInfos in render ([#8585](https://github.com/AzzappApp/azzapp/pull/8585))
+* **fix:**  - **web:** make country selector width more dynamic ([#8584](https://github.com/AzzappApp/azzapp/pull/8584))
+* **build:**  - remove traces
+* **build:**  - remove drizzle directory after check
+* **build:**  - put back planetscale steps ([#8581](https://github.com/AzzappApp/azzapp/pull/8581))
+* **feat:**  - display contacts without location ([#8578](https://github.com/AzzappApp/azzapp/pull/8578))
+* **feat:**  - **payment:** [#8057](https://github.com/AzzappApp/azzapp/pull/8057) add refund in backoffice ([#8564](https://github.com/AzzappApp/azzapp/pull/8564))
+* **build:**  - add authent on payment api doc ([#8575](https://github.com/AzzappApp/azzapp/pull/8575))
+* **fix:**  - wording in widget configuration ([#8579](https://github.com/AzzappApp/azzapp/pull/8579))
+* **fix:**  - keep png format for upload ([#8571](https://github.com/AzzappApp/azzapp/pull/8571))
+* **fix:**  - recreate avatar image inside scan modal ([#8565](https://github.com/AzzappApp/azzapp/pull/8565))
+* **build:**  - upgrade deps ([#8562](https://github.com/AzzappApp/azzapp/pull/8562))
+* **fix:**  - failed avatar export when already imported ([#8563](https://github.com/AzzappApp/azzapp/pull/8563))
+* **fix:**  - email not exported in contacts ([#8559](https://github.com/AzzappApp/azzapp/pull/8559))
+* **fix:**  - remove date of contact in contact detail ([#8555](https://github.com/AzzappApp/azzapp/pull/8555))
+* **fix:**  - ensure email and phone are not blank before adding them during web shareback ([#8557](https://github.com/AzzappApp/azzapp/pull/8557))
+* **feat:**  - Appclip shareback ([#8468](https://github.com/AzzappApp/azzapp/pull/8468))
+* **fix:**  - missing / in url for verifySign ([#8529](https://github.com/AzzappApp/azzapp/pull/8529))
+* **fix:**  - **signin:** fix sigin in new api system
+* **fix:**  - wrong used urls ([#8490](https://github.com/AzzappApp/azzapp/pull/8490))
+* **fix:**  - limit middleware and fix revalidate path ([#8492](https://github.com/AzzappApp/azzapp/pull/8492))
+* **fix:**  - android build
+* **fix:**  - middleware is called before  the rewrites ([#8482](https://github.com/AzzappApp/azzapp/pull/8482))
+* **fix:**  - reduce item gaps in contact details ([#8447](https://github.com/AzzappApp/azzapp/pull/8447))
+* **feat:**  - **banner:** [#8124](https://github.com/AzzappApp/azzapp/pull/8124) add banner support
+* **fix:**  - replace bottomSheet for contact detail by a screen ([#8245](https://github.com/AzzappApp/azzapp/pull/8245))
+* **fix:**  - keep logo in png
+* **fix:**  - **shakeAndShare:** [#8385](https://github.com/AzzappApp/azzapp/pull/8385) enhance qr code transition ([#8405](https://github.com/AzzappApp/azzapp/pull/8405))
+* **fix:**  - add meeting place and update scrollView behavior ([#8336](https://github.com/AzzappApp/azzapp/pull/8336))
+* **fix:**  - **offlineData:** [#8358](https://github.com/AzzappApp/azzapp/pull/8358) clean of logout ([#8390](https://github.com/AzzappApp/azzapp/pull/8390))
+* **fix:**  - **oauth:** apple token generation
+* **feat:**  - change stats displayed to include from scanner stat ([#8319](https://github.com/AzzappApp/azzapp/pull/8319))
+* **fix:**  - add blured contactimage in background of contact screen ([#8330](https://github.com/AzzappApp/azzapp/pull/8330))
+* **fix:**  - **oAuth:** use post for apple ([#8329](https://github.com/AzzappApp/azzapp/pull/8329))
+* **fix:**  - avoid transparent background on webcard error screen ([#8322](https://github.com/AzzappApp/azzapp/pull/8322))
+* **build:**  - upgrade deps ([#8313](https://github.com/AzzappApp/azzapp/pull/8313))
+* **fix:**  - do not force saveToFile ([#8316](https://github.com/AzzappApp/azzapp/pull/8316))
+* **fix:**  - remove expo-device ([#8311](https://github.com/AzzappApp/azzapp/pull/8311))
+* **fix:**  - filter out invalid numbers (whatsapp use case) ([#8301](https://github.com/AzzappApp/azzapp/pull/8301))
+* **fix:**  - multiUserContact card update synchronization ([#8293](https://github.com/AzzappApp/azzapp/pull/8293))
+* **fix:**  - align libphonenumber-js dependencies ([#8282](https://github.com/AzzappApp/azzapp/pull/8282))
+* **fix:**  - remove expo-sensor (replaced by reanimated sensors management) ([#8275](https://github.com/AzzappApp/azzapp/pull/8275))
+* **fix:**  - remove unused package @react-native-masked-view/masked-view ([#8273](https://github.com/AzzappApp/azzapp/pull/8273))
+* **fix:**  - move dev packages to devDependencies ([#8272](https://github.com/AzzappApp/azzapp/pull/8272))
+* **fix:**  - clean up webCard categories ([#8019](https://github.com/AzzappApp/azzapp/pull/8019))
+* **fix:**  - remove multiline and fix done button on url, social and Email ([#8268](https://github.com/AzzappApp/azzapp/pull/8268))
+* **fix:**  - add a Toast when network connectivity is bad ([#8262](https://github.com/AzzappApp/azzapp/pull/8262))
+* **fix:**  - change the way carousel handle click to avoid incorect gesture i… ([#8260](https://github.com/AzzappApp/azzapp/pull/8260))
+
 ## 1.10.0-canary.166
 
 * **build:**  - update gemfile.lock
