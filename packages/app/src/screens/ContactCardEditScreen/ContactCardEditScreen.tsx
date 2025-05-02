@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Sentry from '@sentry/react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -131,17 +131,17 @@ const ContactCardEditScreen = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
-    reset,
   } = useForm<ContactCardFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
     resolver: zodResolver(contactCardSchema),
     defaultValues,
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
   });
-
-  useEffect(() => {
-    reset(defaultValues);
-  }, [defaultValues, reset]);
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);

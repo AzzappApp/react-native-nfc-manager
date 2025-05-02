@@ -143,17 +143,17 @@ const MultiUserDetailsScreen = ({
     watch,
     handleSubmit,
     formState: { dirtyFields, isSubmitting },
-    reset,
   } = useForm<MultiUserDetailFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(multiUserDetailsSchema),
     shouldFocusError: true,
     defaultValues,
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
   });
-
-  useEffect(() => {
-    reset(defaultValues);
-  }, [defaultValues, reset]);
 
   const [commit, saving] =
     useMutation<MultiUserDetailsScreen_UpdateProfileMutation>(graphql`
