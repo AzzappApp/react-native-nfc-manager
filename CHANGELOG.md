@@ -1,3 +1,7 @@
+## 1.9.21
+
+* **fix:**  - **router:** [#8612](https://github.com/AzzappApp/azzapp/pull/8612) don’t route from home until screen is focused ([#8616](https://github.com/AzzappApp/azzapp/pull/8616))
+
 ## 1.9.20
 
 
