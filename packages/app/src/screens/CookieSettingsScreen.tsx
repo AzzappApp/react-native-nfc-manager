@@ -43,8 +43,8 @@ const CookieSettingsScreen = ({
   const [consents, setConsents] = useState(
     currentUser?.cookiePreferences ?? {
       analytics: true,
-      marketing: true,
       functional: true,
+      marketing: false,
     },
   );
   const router = useRouter();
@@ -74,7 +74,7 @@ const CookieSettingsScreen = ({
           description: 'Cookie settings screen performance cookies information',
         }),
       },
-      marketing: {
+      /* marketing: {
         title: intl.formatMessage({
           defaultMessage: 'Marketing Cookies',
           description: 'Cookie settings screen marketing cookies title',
@@ -84,7 +84,7 @@ const CookieSettingsScreen = ({
             'These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites. They do not store directly personal information, but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will experience less targeted advertising.',
           description: 'Cookie settings screen marketing cookies information',
         }),
-      },
+      }, */
       functional: {
         title: intl.formatMessage({
           defaultMessage: 'Functional Cookies',
@@ -101,7 +101,7 @@ const CookieSettingsScreen = ({
   );
 
   const [displayedInformation, setDisplayedInformation] = useState<
-    'analytics' | 'functional' | 'marketing' | 'necessary' | null
+    'analytics' | 'functional' | 'necessary' | null
   >(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -177,7 +177,7 @@ const CookieSettingsScreen = ({
   const onAccept = useCallback(() => {
     onSave({
       analytics: true,
-      marketing: true,
+      marketing: false,
       functional: true,
     });
   }, [onSave]);
@@ -257,7 +257,7 @@ const CookieSettingsScreen = ({
             />
           </View>
         </View>
-        <View style={styles.cookieRow}>
+        {/* <View style={styles.cookieRow}>
           <View style={styles.cookieRowControl}>
             <Text variant="large">{cookieDescriptions.marketing.title}</Text>
             <IconButton
@@ -271,7 +271,7 @@ const CookieSettingsScreen = ({
             value={consents.marketing}
             onValueChange={value => onCookieSettingChange('marketing', value)}
           />
-        </View>
+        </View> */}
         <View style={styles.cookieRow}>
           <View style={styles.cookieRowControl}>
             <Text variant="large">{cookieDescriptions.functional.title}</Text>
