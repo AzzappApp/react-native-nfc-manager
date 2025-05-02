@@ -1,3 +1,7 @@
+## 1.10.0-canary.168
+
+* **fix:**  - improve contact edit screen loading (and multiUserDetails) ([#8620](https://github.com/AzzappApp/azzapp/pull/8620))
+
 ## 1.10.0-canary.167
 
 * **feat:**  - add phone number chooser before opening whatsapp ([#8577](https://github.com/AzzappApp/azzapp/pull/8577))
