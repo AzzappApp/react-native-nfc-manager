@@ -103,7 +103,7 @@ const ContactSearchByNameItem = ({
         </View>
       </PressableNative>
       <View style={styles.actions}>
-        <WhatsappButton phoneNumber={contact?.phoneNumbers} />
+        <WhatsappButton phoneNumbers={contact?.phoneNumbers} />
         <PressableNative onPress={onMore}>
           <Icon icon="more" />
         </PressableNative>

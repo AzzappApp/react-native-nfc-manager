@@ -4,6 +4,8 @@ import parsePhoneNumberFromString, {
 } from 'libphonenumber-js';
 import { memo } from 'react';
 import { Linking, StyleSheet } from 'react-native';
+import useBoolean from '#hooks/useBoolean';
+import ContactPhoneNumberPicker from '#screens/ContactsScreen/ContactPhoneNumberPicker';
 import {
   getWhatsAppUrl,
   useIsWhatsAppSupportedContext,
@@ -13,24 +15,17 @@ import type { ContactPhoneNumberType } from '#helpers/contactTypes';
 import type { PressableNativeProps } from '#ui/PressableNative';
 
 const WhatsappButton = ({
-  phoneNumber: contactPhoneNumber,
+  phoneNumbers,
   ...props
 }: PressableNativeProps & {
-  phoneNumber?: ContactPhoneNumberType[] | null;
+  phoneNumbers?: ContactPhoneNumberType[] | null;
 }) => {
   // check whatsapp is installed
   const isWhatsappSupported = useIsWhatsAppSupportedContext();
+  const [pickerDisplayed, showPicker, hidePicker] = useBoolean(false);
 
-  // check contact has phone number
-  if (
-    !isWhatsappSupported ||
-    !contactPhoneNumber ||
-    contactPhoneNumber.length === 0
-  ) {
-    return undefined;
-  }
-  // check contact has valid phone number
-  const phoneNumber = contactPhoneNumber.find(
+  // filter out invalid phone numbers
+  const validPhoneNumbers = phoneNumbers?.filter(
     (number: ContactPhoneNumberType) => {
       const parsedNumber = parsePhoneNumberFromString(number.number);
       if (!parsedNumber) {
@@ -42,18 +37,38 @@ const WhatsappButton = ({
       return true;
     },
   );
-  if (!phoneNumber) return undefined;
 
+  // check contact has phone number
+  if (
+    !isWhatsappSupported ||
+    !validPhoneNumbers ||
+    validPhoneNumbers.length === 0
+  ) {
+    return undefined;
+  }
   // get whatsapp deeplink
   const handleClick = () => {
-    const url = getWhatsAppUrl(phoneNumber.number);
-    Linking.openURL(url);
+    if (validPhoneNumbers.length > 1) {
+      showPicker();
+      return;
+    } else if (validPhoneNumbers.length === 1) {
+      const url = getWhatsAppUrl(validPhoneNumbers[0].number);
+      Linking.openURL(url);
+    }
   };
 
   return (
-    <PressableNative onPress={handleClick} {...props}>
-      <Image style={styles.image} source={require('#assets/whatsapp.svg')} />
-    </PressableNative>
+    <>
+      <PressableNative onPress={handleClick} {...props}>
+        <Image style={styles.image} source={require('#assets/whatsapp.svg')} />
+      </PressableNative>
+      {pickerDisplayed && (
+        <ContactPhoneNumberPicker
+          hidePicker={hidePicker}
+          phoneNumbers={validPhoneNumbers}
+        />
+      )}
+    </>
   );
 };
 
