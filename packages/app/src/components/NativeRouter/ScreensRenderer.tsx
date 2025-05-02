@@ -27,7 +27,7 @@ import type { ReactNode, ComponentType } from 'react';
 export type ScreenMap = Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
 
 type TabsMap = Partial<
-  Record<string, ComponentType<TabsState & { id: string }>>
+  Record<string, ComponentType<TabsState & { id: string; hasFocus?: boolean }>>
 >;
 
 export type ScreensRendererProps = {
@@ -309,8 +309,10 @@ const TabsRenderer = ({
 
   const tabsList = useMemo(
     () =>
-      TabsListRenderer ? <TabsListRenderer id={id} {...tabState} /> : null,
-    [TabsListRenderer, id, tabState],
+      TabsListRenderer ? (
+        <TabsListRenderer id={id} {...tabState} hasFocus={hasFocus} />
+      ) : null,
+    [TabsListRenderer, id, tabState, hasFocus],
   );
 
   return (

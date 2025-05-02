@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Platform,
@@ -24,6 +24,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
+import type { Route } from '#routes';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { ReactNode } from 'react';
 
@@ -56,9 +57,11 @@ export const getMainTabBarOpacity = () => {
 const MainTabBar = ({
   currentIndex,
   style,
+  hasFocus,
 }: {
   currentIndex: number;
   style?: StyleProp<ViewStyle>;
+  hasFocus?: boolean;
 }) => {
   const router = useRouter();
 
@@ -83,6 +86,15 @@ const MainTabBar = ({
 
   const intl = useIntl();
 
+  const pendingNavigationRef = useRef<Route | null>(null);
+
+  useEffect(() => {
+    if (hasFocus && pendingNavigationRef.current) {
+      router.push(pendingNavigationRef.current);
+      pendingNavigationRef.current = null;
+    }
+  }, [hasFocus, router]);
+
   const onItemPress = useCallback(
     (key: string) => {
       const hasFinishedTransition = mainTabBarOpacity.value > 0.99;
@@ -102,7 +114,6 @@ const MainTabBar = ({
               showCardScanner: true,
             },
           });
-
           break;
         case 'MEDIA':
           {
@@ -143,17 +154,23 @@ const MainTabBar = ({
                 type: 'info',
                 text1: toastMessage as string,
               });
-            } else {
+            } else if (hasFocus) {
               router.push({ route: key as any });
+            } else {
+              pendingNavigationRef.current = { route: key as any };
             }
           }
           break;
         default:
-          router.push({ route: key as any });
+          if (hasFocus) {
+            router.push({ route: key as any });
+          } else {
+            pendingNavigationRef.current = { route: key as any };
+          }
           break;
       }
     },
-    [intl, router],
+    [intl, router, hasFocus],
   );
 
   const currentRoute = ['HOME', 'CONTACTS', 'MEDIA'][currentIndex];
