@@ -5,16 +5,34 @@
       "comment" : "Bundle display name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp -  Digital Business Card"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp -  Digital Business Card"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp"
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Azzapp"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp -  Digital Business Card"
           }
         }
       }
@@ -23,15 +41,33 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp"
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
+            "value" : "azzapp"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "azzapp"
           }
         }
@@ -41,16 +77,34 @@
       "comment" : "Privacy - Camera Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp benötigt Zugriff auf deine Kamera, um Fotos und Videos aufzunehmen und in der App zu teilen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp needs access to your camera to capture photos and videos for sharing within the app."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp necesita acceso a tu cámara para capturar fotos y videos y compartirlos en la aplicación."
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "azzapp a besoin d’accéder à votre caméra pour capturer des photos et des vidéos et les partager dans l’application."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp necessita l’accesso alla tua fotocamera per scattare foto e registrare video da condividere nell’app."
           }
         }
       }
@@ -59,16 +113,70 @@
       "comment" : "Privacy - Contacts Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube azzapp den Zugriff auf deine Kontakte, um neue Verbindungen schnell in deinem Telefonbuch zu speichern oder die Multi-User-Lösung für dein Unternehmen zu nutzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow azzapp to access your contacts to quickly add new connections to your phone book — or easily invite contacts to a multi-user WebCard."
+            "value" : "Allow azzapp to access your contacts to quickly add new connections to your phone book, or use the Multi-User solution for your company."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite que azzapp acceda a tus contactos para añadir rápidamente nuevas conexiones a tu agenda o utilizar la solución Multi-Usuario para tu empresa."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autorisez azzapp à accéder à vos contacts pour ajouter rapidement de nouvelles connexions à votre répertoire — ou inviter facilement des contacts à une WebCard multi-utilisateurs."
+            "state" : "translated",
+            "value" : "Autorisez azzapp à accéder à vos contacts pour ajouter rapidement de nouvelles connexions à votre répertoire, ou pour utiliser la fonction Multi-Utilisateur pour votre compagnie."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti ad azzapp di accedere ai tuoi contatti per aggiungere rapidamente nuove connessioni alla rubrica o utilizzare la soluzione Multi-Utente per la tua azienda."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Privacy - Location when in use Usage Description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp verwendet deinen Standort, um zu speichern, wo du Kontaktdaten ausgetauscht hast, damit du später leichter wieder Kontakt aufnehmen kannst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp uses your location to save where you exchanged contact information, making it easy to reconnect later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp usa tu ubicación para guardar dónde intercambiaste información de contacto, facilitando volver a conectar más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp utilise votre position pour enregistrer où vous étiez lorsque vous avez échangé vos coordonnées, de manière à retrouver vos contacts plus facilement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp utilizza la tua posizione per salvare dove hai scambiato i contatti, rendendo più facile riconnettersi in seguito."
           }
         }
       }
@@ -77,16 +185,34 @@
       "comment" : "Privacy - Microphone Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp benötigt Zugriff auf dein Mikrofon, um Audio für Videoinhalte innerhalb der App aufzunehmen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp needs access to your microphone to record audio for video content within the app."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp necesita acceso a tu micrófono para grabar audio en contenido de video dentro de la app."
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "azzapp a besoin d’accéder à votre microphone pour enregistrer de l’audio pour du contenu vidéo dans l’application."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp ha bisogno dell'accesso al tuo microfono per registrare audio nei contenuti video all'interno dell'app."
           }
         }
       }
@@ -95,16 +221,34 @@
       "comment" : "Privacy - Motion Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp verwendet Bewegungserkennung, um die Anzeige deiner Kontaktkarte basierend auf der Ausrichtung deines Geräts zu optimieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp uses motion detection to optimize the display of your contact card based on your device’s orientation."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp usa la detección de movimiento para optimizar la visualización de tu tarjeta de contacto según la orientación de tu dispositivo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "azzapp utilise la détection de mouvement pour optimiser l’affichage de votre ContactCard en fonction de l’orientation de votre appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp utilizza il rilevamento del movimento per ottimizzare la visualizzazione del tuo biglietto da visita in base all’orientamento del dispositivo."
           }
         }
       }
@@ -113,16 +257,34 @@
       "comment" : "Privacy - Photo Library Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp benötigt Zugriff auf deine Fotomediathek, um deine WebCard zu erstellen, Medien zu teilen und hochzuladen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "azzapp requires access to your photo library, in order to create your WebCard, share and upload media."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp necesita acceso a tu biblioteca de fotos para crear tu WebCard, compartir y subir contenido."
+          }
+        },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "azzapp nécessite l’accès à votre bibliothèque de photos pour télécharger et partager des photos dans l’application."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp necessita l’accesso alla tua libreria foto per creare la tua WebCard, condividere e caricare contenuti."
           }
         }
       }
@@ -131,16 +293,34 @@
       "comment" : "Privacy - User Notifications Usage Description",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp möchte dir Benachrichtigungen senden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "azzapp wants to send you notifications"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp quiere enviarte notificaciones."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "azzapp shouaite vous envoyer des notifications"
+            "value" : "azzapp souhaite vous envoyer des notifications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp desidera inviarti notifiche."
           }
         }
       }
