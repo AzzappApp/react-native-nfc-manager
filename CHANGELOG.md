@@ -1,3 +1,7 @@
+## 1.9.26
+
+* **fix:**  - phone argentina problem
+
 ## 1.9.25
 
 * **fix:**  - remove android app banner
