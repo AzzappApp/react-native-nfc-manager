@@ -1,10 +1,10 @@
 import { Skia } from '@shopify/react-native-skia';
 import pick from 'lodash/pick';
-import BufferLoader from '@azzapp/react-native-buffer-loader';
-import type { SkImage } from '@shopify/react-native-skia';
 import { Platform } from 'react-native';
 import { runOnUI } from 'react-native-reanimated';
+import BufferLoader from '@azzapp/react-native-buffer-loader';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
+import type { SkImage } from '@shopify/react-native-skia';
 
 // would be cool to have weak ref and finalization registry here to clean up images
 // we will do it manually for now waiting for react-native
@@ -76,7 +76,7 @@ const loadImageWithCache = async (
   if (!androidSkiaInitialized) {
     runOnUI(() => {
       'worklet';
-      let surface=  Skia.Surface.MakeOffscreen(1, 1);
+      const surface = Skia.Surface.MakeOffscreen(1, 1);
       surface?.getCanvas().clear(Skia.Color('#00000000'));
       surface?.flush();
       surface?.dispose();
