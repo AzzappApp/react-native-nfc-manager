@@ -164,6 +164,7 @@ const WelcomeRelayScreen = relayScreen(WelcomeScreen, {
   profileBound: false,
   canGoBack: false,
   pollInterval: 30000,
+  refreshOnFocus: true,
 });
 
 WelcomeRelayScreen.getScreenOptions = (): ScreenOptions => ({
