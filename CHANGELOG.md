@@ -1,3 +1,7 @@
+## 1.9.25
+
+* **fix:**  - remove android app banner
+
 ## 1.9.24
 
 * **fix:**  - **Android:** initialize skia before using buffer loader
