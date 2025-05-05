@@ -38,12 +38,14 @@ export const uriResolver =
     {
       width,
       height,
+      radius,
       pixelRatio,
       raw,
       format,
     }: {
       width?: number | null;
       height?: number | null;
+      radius?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
       format?: string | null;
@@ -85,6 +87,7 @@ export const uriResolver =
       id,
       width,
       height,
+      radius,
       pixelRatio,
       pregeneratedSizes,
       previewPositionPercentage,

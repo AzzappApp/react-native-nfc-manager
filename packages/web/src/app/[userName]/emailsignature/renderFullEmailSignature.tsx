@@ -3,7 +3,7 @@ import {
   getEmailSignatureTitleColor,
   colors,
 } from '@azzapp/shared/colorsHelpers';
-import { getRoundImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
 import type { Profile, WebCard } from '@azzapp/data';
@@ -26,10 +26,11 @@ const renderFullEmailSignature = ({
   isPreview?: boolean;
 }) => {
   const avatar = profile.avatarId
-    ? getRoundImageURLForSize({
+    ? getImageURLForSize({
         id: profile.avatarId,
         height: 120,
         width: 120,
+        radius: 100,
         format: 'png',
       })
     : null;

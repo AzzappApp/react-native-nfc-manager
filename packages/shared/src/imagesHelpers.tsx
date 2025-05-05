@@ -35,6 +35,7 @@ export type UrLForSizeParam = {
   id: string;
   width?: number | null;
   height?: number | null;
+  radius?: number | null;
   pixelRatio?: number | null;
   pregeneratedSizes?: number[] | null;
   format?: string | null;
@@ -48,6 +49,7 @@ export type UrLForSizeParam = {
  * @param id the id of the cloudinary file
  * @param width the desired image width
  * @param height the desired height
+ * @param radius the desired radius percent
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed image
  */
@@ -56,6 +58,7 @@ export const getImageURLForSize = ({
   id,
   width,
   height,
+  radius,
   pixelRatio = 1,
   pregeneratedSizes,
   format,
@@ -64,38 +67,10 @@ export const getImageURLForSize = ({
   const transforms = resizeTransforms(
     width,
     height,
+    radius,
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'image', transforms, format ?? 'avif');
-};
-
-/**
- * Helpers used to create cloudinary url for a round image given cloudinary id and size parameters
- *
- * @param id the id of the cloudinary file
- * @param width the desired image width
- * @param height the desired height
- * @param pixelRatio the desired pixeld density - default 1
- * @returns the url of a transformed image
- */
-
-export const getRoundImageURLForSize = ({
-  id,
-  width,
-  height,
-  pixelRatio = 1,
-  pregeneratedSizes,
-  format,
-}: UrLForSizeParam) => {
-  assetNotRN('getImageURLForSize');
-  let transforms = resizeTransforms(
-    width,
-    height,
-    pixelRatio,
-    pregeneratedSizes,
-  );
-  transforms += ',r_max';
   return assembleCloudinaryUrl(id, 'image', transforms, format ?? 'avif');
 };
 
@@ -130,6 +105,7 @@ export const getVideoUrlForSize = ({
   id,
   width,
   height,
+  radius,
   pixelRatio = 1,
   pregeneratedSizes,
   format,
@@ -139,6 +115,7 @@ export const getVideoUrlForSize = ({
   const transforms = resizeTransforms(
     width,
     height,
+    radius,
     pixelRatio,
     pregeneratedSizes,
   );
@@ -165,6 +142,7 @@ export const getVideoThumbnailURL = ({
   id,
   width,
   height,
+  radius,
   pixelRatio = 1,
   pregeneratedSizes,
   previewPositionPercentage,
@@ -173,6 +151,7 @@ export const getVideoThumbnailURL = ({
   const transforms = resizeTransforms(
     width,
     height,
+    radius,
     pixelRatio,
     pregeneratedSizes,
   );
@@ -196,11 +175,15 @@ export const getVideoThumbnailURL = ({
 export const resizeTransforms = (
   width?: number | null,
   height?: number | null,
+  radius?: number | null,
   pixelRatio?: number | null,
   pregeneratedSizes?: number[] | null,
 ) => {
   pixelRatio = pixelRatio ?? 1;
   const result: string[] = [];
+  if (radius != null) {
+    result.push(`r_${radius}`);
+  }
 
   if (width == null) {
     return result.join(',');

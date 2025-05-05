@@ -7,6 +7,7 @@ interface Media {
     pixelRatio: Float
     height: Float
     width: Float
+    radius: Int
     raw: Boolean
     format: MediaFormat
   ): String!
@@ -24,6 +25,7 @@ type MediaVideo implements Media {
     pixelRatio: Float
     height: Float
     width: Float
+    radius: Int
     raw: Boolean
     format: MediaFormat
   ): String!
@@ -31,6 +33,7 @@ type MediaVideo implements Media {
     pixelRatio: Float
     height: Float
     width: Float
+    radius: Int
     videoDurationPercentage: Int
       @deprecated(reason: "Use coverPreviewPositionPercentage instead")
   ): String!
@@ -49,6 +52,7 @@ type MediaImage implements Media {
     pixelRatio: Float
     height: Float
     width: Float
+    radius: Int
     raw: Boolean
     format: MediaFormat
   ): String!
