@@ -2,9 +2,9 @@ import { GraphQLError } from 'graphql';
 import { getProfileWithWebCardById } from '@azzapp/data';
 import { generateEmailSignature } from '@azzapp/service/emailSignatureServices';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import { generateEmailSignature as generateEmailSignatureMutation } from '../generateEmailSignature';
 import type { GraphQLContext } from '#GraphQLContext';
 
@@ -15,10 +15,6 @@ jest.mock('@azzapp/data', () => ({
 
 jest.mock('@azzapp/service/emailSignatureServices', () => ({
   generateEmailSignature: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
@@ -42,12 +38,12 @@ describe('generateEmailSignatureMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId });
+    mockUser(userId);
     (fromGlobalIdWithType as jest.Mock).mockReturnValue(profileId);
   });
 
   test('should throw UNAUTHORIZED if user is not logged in', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       generateEmailSignatureMutation(

@@ -14,7 +14,7 @@ import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
@@ -24,13 +24,13 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
   { cardTemplateId: gqlCardTemplateID, webCardId: gqlWebCardId },
 ) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   const profile = await profileByWebCardIdAndUserIdLoader.load({
-    userId,
+    userId: user.id,
     webCardId,
   });
 

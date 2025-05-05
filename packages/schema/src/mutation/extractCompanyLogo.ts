@@ -1,17 +1,15 @@
 import { captureException } from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
-
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import type { MutationResolvers } from '#__generated__/types';
 
 const apiKey = process.env.BRANDFETCH_CLIENT_ID;
 
 export const extractCompanyLogo: MutationResolvers['extractCompanyLogo'] =
   async (_parent, args) => {
-    const { userId } = getSessionInfos();
-
-    if (!userId) {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     try {

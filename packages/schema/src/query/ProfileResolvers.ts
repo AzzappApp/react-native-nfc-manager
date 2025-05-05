@@ -186,7 +186,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       };
     }
     const user = await userLoader.load(profile.userId);
-    if (!user) {
+    if (!user || user.deleted) {
       // TODO schema error, the field should be nullable, but it's not until we
       // can change the schema, we return a fake user here
       return {
@@ -198,7 +198,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   },
   avatar: async profile => {
     const { userId } = getSessionInfos();
-
     if (
       profileIsAssociatedToCurrentUser(profile) ||
       (await hasWebCardProfileRight(profile.webCardId)) ||
@@ -453,7 +452,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return emptyConnection;
     }
     const { userId } = getSessionInfos();
-    if (profile.userId !== userId) {
+    if (!userId || profile.userId !== userId) {
       return emptyConnection;
     }
     const webCard = profile?.webCardId

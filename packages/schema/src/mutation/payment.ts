@@ -18,7 +18,7 @@ import {
   estimateUpdateSubscriptionForWebCard,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -74,11 +74,10 @@ export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSu
 
 export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
   async (_, { intent }) => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
     const webCardId = intent.webCardId
       ? fromGlobalIdWithType(intent.webCardId, 'WebCard')
       : undefined;
@@ -90,7 +89,7 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
       const result = await createPaymentRequest({
         ...intent,
         webCardId,
-        userId,
+        userId: user.id,
       });
 
       if (!result?.clientRedirectUrl) {
@@ -104,23 +103,22 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
 
 export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscriptionFromPaymentMean'] =
   async (_, { intent, paymentMeanId }) => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
     const paymentMean = await getPaymentMeanById(
       fromGlobalIdWithType(paymentMeanId, 'PaymentMean'),
     );
 
-    if (paymentMean?.userId !== userId) {
+    if (paymentMean?.userId !== user.id) {
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
     const result = await createSubscriptionRequest({
       ...intent,
       paymentMean,
-      userId,
+      userId: user.id,
     });
 
     return result;
@@ -130,14 +128,13 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
   _,
   { locale, redirectUrlSuccess, redirectUrlCancel, customer },
 ) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
   const result = await createNewPaymentMean({
     customer,
-    userId,
+    userId: user.id,
     locale,
     redirectUrlSuccess,
     redirectUrlCancel,
@@ -152,11 +149,10 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
 
 export const generatePaymentInvoice: MutationResolvers<GraphQLContext>['generatePaymentInvoice'] =
   async (_, { paymentId }, { intl }) => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
     const payment = await getPaymentById(
       fromGlobalIdWithType(paymentId, 'Payment'),
     );
@@ -165,7 +161,7 @@ export const generatePaymentInvoice: MutationResolvers<GraphQLContext>['generate
       throw new GraphQLError(ERRORS.NOT_FOUND);
     }
 
-    if (payment.userId !== userId) {
+    if (payment.userId !== user.id) {
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
@@ -305,19 +301,18 @@ export const renewSubscription: MutationResolvers['renewSubscription'] = async (
 };
 
 const checkSubscription = async (subscriptionId: string) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
   const subscription = await getSubscriptionById(subscriptionId);
 
   if (!subscription) {
     throw new GraphQLError(ERRORS.NOT_FOUND);
   }
 
-  if (subscription.userId !== userId) {
+  if (subscription.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
-  return { subscription, userId };
+  return { subscription, userId: user.id };
 };

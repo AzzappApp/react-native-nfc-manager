@@ -20,7 +20,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import {
   contactLoader,
   profileLoader,
@@ -36,15 +36,14 @@ export const createContact: MutationResolvers['createContact'] = async (
   _,
   { profileId: gqlProfileId, input, notify, scanUsed, withShareBack },
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
   const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
   const webCard = await webCardLoader.load(profile.webCardId);
@@ -106,7 +105,7 @@ export const createContact: MutationResolvers['createContact'] = async (
   }
 
   if (scanUsed) {
-    await validateCurrentSubscription(userId, {
+    await validateCurrentSubscription(user.id, {
       action: 'ADD_CONTACT_WITH_SCAN',
     });
     await incrementContactsImportFromScan(profileId);
@@ -262,15 +261,14 @@ export const saveContact: MutationResolvers['saveContact'] = async (
   _,
   { profileId: gqlProfileId, contactId: gqlContactId, input },
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
   const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== userId || !gqlContactId) {
+  if (!profile || profile.userId !== user.id || !gqlContactId) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
@@ -312,14 +310,13 @@ export const removeContacts: MutationResolvers['removeContacts'] = async (
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
 
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
   const profile = await profileLoader.load(profileId);
 
-  if (profile?.userId !== userId) {
+  if (profile?.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 

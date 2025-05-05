@@ -7,7 +7,6 @@ import {
   updateProfileForUserAndWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
   userLoader,
@@ -18,6 +17,7 @@ import {
   updateMonthlySubscription,
   validateCurrentSubscription,
 } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import acceptOwnership from '../acceptOwnership';
 
 // Mock dependencies
@@ -26,10 +26,6 @@ jest.mock('@azzapp/data', () => ({
   transaction: jest.fn(callback => callback()),
   updateProfile: jest.fn(),
   updateProfileForUserAndWebCard: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -73,7 +69,7 @@ describe('acceptOwnership', () => {
     promotedAsOwner: true,
   };
 
-  const mockUser = {
+  const mockedUser = {
     id: 'user-1',
   };
 
@@ -90,9 +86,9 @@ describe('acceptOwnership', () => {
   });
 
   test('should successfully accept ownership', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue(mockOwner);
     (getWebCardCountProfile as jest.Mock).mockResolvedValue(3);
@@ -108,7 +104,6 @@ describe('acceptOwnership', () => {
 
     expect(fromGlobalId).toHaveBeenCalledWith('global-profile-123');
     expect(profileLoader.load).toHaveBeenCalledWith('profile-123');
-    expect(userLoader.load).toHaveBeenCalledWith('user-1');
     expect(webCardLoader.load).toHaveBeenCalledWith('webcard-456');
     expect(webCardOwnerLoader.load).toHaveBeenCalledWith('webcard-456');
     expect(validateCurrentSubscription).toHaveBeenCalledWith('user-1', {
@@ -140,8 +135,7 @@ describe('acceptOwnership', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
-
+    mockUser();
     await expect(
       acceptOwnership(
         {},
@@ -155,7 +149,7 @@ describe('acceptOwnership', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not the profile owner', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-2' });
+    mockUser('user-2');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
 
     await expect(
@@ -171,7 +165,7 @@ describe('acceptOwnership', () => {
   });
 
   test('should throw INVALID_REQUEST if profile does not exist or is not promoted as owner', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (profileLoader.load as jest.Mock).mockResolvedValue({
       ...mockProfile,
       promotedAsOwner: false,
@@ -188,7 +182,7 @@ describe('acceptOwnership', () => {
   });
 
   test('should throw INVALID_REQUEST if webCard does not exist', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(null);
 
@@ -203,9 +197,9 @@ describe('acceptOwnership', () => {
   });
 
   test('should throw INTERNAL_SERVER_ERROR if transaction fails', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getWebCardCountProfile as jest.Mock).mockResolvedValue(3);
     (validateCurrentSubscription as jest.Mock).mockResolvedValue(undefined);

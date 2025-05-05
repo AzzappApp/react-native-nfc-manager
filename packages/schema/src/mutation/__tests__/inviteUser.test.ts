@@ -8,7 +8,6 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
   userLoader,
@@ -16,6 +15,7 @@ import {
   webCardOwnerLoader,
 } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import inviteUserMutation from '../inviteUser';
 
 // Mock dependencies
@@ -50,10 +50,6 @@ jest.mock('@azzapp/shared/stringHelpers', () => ({
 jest.mock('#externals', () => ({
   notifyUsers: jest.fn(),
   sendPushNotification: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -100,10 +96,10 @@ describe('inviteUserMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-1');
   });
 
   test('should successfully invite a new user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-123');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
@@ -158,7 +154,7 @@ describe('inviteUserMutation', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       inviteUserMutation(
@@ -177,8 +173,6 @@ describe('inviteUserMutation', () => {
   });
 
   test('should throw INVALID_REQUEST if email and phone are missing', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-
     await expect(
       inviteUserMutation(
         {},
@@ -196,8 +190,6 @@ describe('inviteUserMutation', () => {
   });
 
   test('should throw INVALID_REQUEST if profileRole is owner', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-
     await expect(
       inviteUserMutation(
         {},
@@ -216,7 +208,6 @@ describe('inviteUserMutation', () => {
   });
 
   test('should throw INVALID_REQUEST if webCard, owner, or user is missing', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(null);
 
@@ -238,7 +229,6 @@ describe('inviteUserMutation', () => {
   });
 
   test('should throw PROFILE_ALREADY_EXISTS if user already has a profile on the webCard', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getUserByEmailPhoneNumber as jest.Mock).mockResolvedValue({
@@ -266,7 +256,6 @@ describe('inviteUserMutation', () => {
   });
 
   test('should recreate deleted user and update old user as replaced', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-123');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue({

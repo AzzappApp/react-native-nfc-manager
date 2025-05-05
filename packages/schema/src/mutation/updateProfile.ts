@@ -11,7 +11,7 @@ import {
   profileHasAdminRight,
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
   profileLoader,
@@ -27,7 +27,10 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
   { profileId: gqlProfileId, input: { profileRole, contactCard } },
 ) => {
-  const { userId } = getSessionInfos();
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
   const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const targetProfile = await profileLoader.load(targetProfileId);
 
@@ -36,9 +39,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   }
 
   const currentProfile =
-    userId &&
+    user.id &&
     (await profileByWebCardIdAndUserIdLoader.load({
-      userId,
+      userId: user.id,
       webCardId: targetProfile.webCardId,
     }));
 

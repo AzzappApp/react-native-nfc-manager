@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { refreshContactsLastView } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
@@ -12,9 +12,8 @@ const updateContactsLastView: Mutation = async (
   { profileId: gqlProfileId },
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   await refreshContactsLastView(profileId);

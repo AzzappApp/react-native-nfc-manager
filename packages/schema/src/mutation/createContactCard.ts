@@ -12,8 +12,8 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
-import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader } from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCardTable } from '@azzapp/data/src/schema';
@@ -31,16 +31,13 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     publishWebCard,
   },
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  const user = await userLoader.load(userId);
   let defaultCover = null;
 
-  //w don't need a default cover if we got a coverMediId
+  //w don't need a default cover if we got a coverMediaId
   if (!coverMediaId) {
     defaultCover = await pickRandomPredefinedCover();
   }
@@ -56,10 +53,10 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
     }
   }
-  await validateCurrentSubscription(userId, {
+  await validateCurrentSubscription(user.id, {
     webCardKind,
     action: 'CREATE_CONTACT_CARD',
-    alreadyPublished: await getPublishedWebCardCount(userId),
+    alreadyPublished: await getPublishedWebCardCount(user.id),
     webCardIsPublished: publishWebCard ?? true,
     contactCardHasCompanyName: !!contactCard.company,
     contactCardHasUrl: !!contactCard.urls?.length,
@@ -107,7 +104,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       const webCardId = await createWebCard(inputWebCard);
       const id = await createProfile({
         webCardId,
-        userId,
+        userId: user.id,
         contactCard,
         lastContactCardUpdate: new Date(
           currentDate.setMinutes(currentDate.getMinutes() + 1),

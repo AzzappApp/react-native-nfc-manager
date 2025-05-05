@@ -2,18 +2,14 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { createReport, getReport } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
 import { postLoader, webCardLoader } from '#loaders';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import sendReport from '../sendReport';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
   createReport: jest.fn(),
   getReport: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -52,10 +48,10 @@ describe('sendReport', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-1');
   });
 
   test('should successfully create a report for a Post', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'post-123',
       type: 'Post',
@@ -89,7 +85,7 @@ describe('sendReport', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       sendReport({}, { id: 'global-post-123' }, mockContext, mockInfo),
@@ -99,7 +95,6 @@ describe('sendReport', () => {
   });
 
   test('should throw INVALID_REQUEST if target type is unknown', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'unknown-123',
       type: 'UnknownType',
@@ -117,7 +112,6 @@ describe('sendReport', () => {
       userId: 'user-1',
     };
 
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'post-123',
       type: 'Post',
@@ -146,7 +140,6 @@ describe('sendReport', () => {
       deletedBy: 'admin-1',
     };
 
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'post-123',
       type: 'Post',
@@ -181,7 +174,6 @@ describe('sendReport', () => {
   });
 
   test('should throw an error if createReport fails and no report exists', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'post-123',
       type: 'Post',
@@ -196,7 +188,6 @@ describe('sendReport', () => {
   });
 
   test('should create a report for a WebCard', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalId as jest.Mock).mockReturnValue({
       id: 'webcard-456',
       type: 'WebCard',

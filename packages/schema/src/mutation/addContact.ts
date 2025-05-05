@@ -18,7 +18,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -28,15 +28,14 @@ const addContact: MutationResolvers['addContact'] = async (
   _,
   { profileId: gqlProfileId, input, notify, scanUsed, location, address },
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
   const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
   const webCard = await webCardLoader.load(profile.webCardId);
@@ -98,7 +97,7 @@ const addContact: MutationResolvers['addContact'] = async (
   }
 
   if (scanUsed) {
-    await validateCurrentSubscription(userId, {
+    await validateCurrentSubscription(user.id, {
       action: 'ADD_CONTACT_WITH_SCAN',
     });
     await incrementContactsImportFromScan(profileId);

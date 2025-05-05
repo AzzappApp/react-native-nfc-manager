@@ -6,6 +6,7 @@ import {
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import { Query } from '../QueryResolvers';
 
 jest.mock('@sentry/nextjs', () => ({
@@ -35,6 +36,7 @@ describe('Query Resolvers ', () => {
   describe('getProposedUserName Resolver ', () => {
     beforeEach(() => {
       jest.clearAllMocks();
+      mockUser('user-1');
     });
 
     test('should return null if no webcard found', async () => {

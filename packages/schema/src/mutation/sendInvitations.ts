@@ -5,8 +5,8 @@ import { getUsersFromWebCard, updateWebCardProfiles } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
-import { userLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -58,13 +58,10 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     });
   }
 
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  const user = await userLoader.load(userId);
-
   const { withEmail, withPhoneNumbers } = users.reduce<{
     withEmail: typeof users;
     withPhoneNumbers: typeof users;

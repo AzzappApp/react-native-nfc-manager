@@ -9,8 +9,7 @@ import {
   getWebCardByUserNamePrefixWithRedirection,
   pickRandomPredefinedCover,
 } from '@azzapp/data';
-import { getSessionInfos } from '#GraphQLContext';
-import { userLoader } from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
@@ -19,11 +18,8 @@ import type { QueryResolvers } from '#/__generated__/types';
 
 export const Query: QueryResolvers = {
   currentUser: async _root => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
-      return null;
-    }
-    return userLoader.load(userId);
+    const user = await getSessionUser();
+    return user || null;
   },
 
   node: (_, { id }) => fetchNode(id),

@@ -21,13 +21,8 @@ import {
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
-import {
-  profileLoader,
-  userLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -38,11 +33,14 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   { profileId: gqlProfileId, invited, sendInvite },
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-  const { userId } = getSessionInfos();
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
   const { email, phoneNumber: rawPhoneNumber } = invited;
 
   const profile = await profileLoader.load(profileId);
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
@@ -75,10 +73,9 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   }
 
   const owner = await webCardOwnerLoader.load(profile.webCardId);
-  const user = await userLoader.load(userId);
   const webCard = await webCardLoader.load(profile.webCardId);
 
-  if (!owner || !user || !webCard) {
+  if (!owner || !webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 

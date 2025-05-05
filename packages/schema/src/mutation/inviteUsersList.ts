@@ -19,13 +19,8 @@ import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
-import {
-  profileLoader,
-  userLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type {
@@ -39,21 +34,17 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  const user = await userLoader.load(userId);
-
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await profileLoader.load(profileId));
   if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  if (profile.userId !== userId) {
+  if (profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   if (!profileHasAdminRight(profile.profileRole)) {

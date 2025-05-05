@@ -8,9 +8,9 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import addContact from '../addContact';
 
 // Mock dependencies
@@ -38,10 +38,6 @@ jest.mock('@azzapp/shared/urlHelpers', () => ({
 jest.mock('#externals', () => ({
   notifyUsers: jest.fn(),
   sendPushNotification: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -89,8 +85,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
-
+    mockUser();
     await expect(
       addContact(
         {},
@@ -116,7 +111,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should throw FORBIDDEN if profile does not belong to the user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-999' });
+    mockUser('user-999');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
 
     await expect(
@@ -144,7 +139,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should create a new contact if no existing contact found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getContactByProfiles as jest.Mock).mockResolvedValue(null);
@@ -186,7 +181,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should validate subscription if scan is used', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getContactByProfiles as jest.Mock).mockResolvedValue(null);
@@ -221,7 +216,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should send email notification if notify is true', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (userLoader.load as jest.Mock).mockResolvedValue({

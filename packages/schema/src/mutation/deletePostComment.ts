@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { removeComment } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { postCommentLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -15,8 +15,11 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
   const commentId = fromGlobalId(gqlCommentId).id;
   const comment = await postCommentLoader.load(commentId);
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  const { userId } = getSessionInfos();
-  if (comment?.webCardId !== webCardId || !userId) {
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  if (comment?.webCardId !== webCardId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -28,7 +31,7 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
-    await removeComment(commentId, originalComment.postId, userId);
+    await removeComment(commentId, originalComment.postId, user.id);
     postCommentLoader.clear(commentId);
 
     return {

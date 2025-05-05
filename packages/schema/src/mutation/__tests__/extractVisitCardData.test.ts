@@ -1,17 +1,13 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
-import { getSessionInfos } from '#GraphQLContext';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import { extractVisitCardData } from '../extractVisitCardData';
 
 // Mock dependencies
 jest.mock('@sentry/nextjs', () => ({
   captureMessage: jest.fn(),
   captureException: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#helpers/subscriptionHelpers', () => ({
@@ -32,10 +28,11 @@ describe('extractVisitCardData', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-123');
   });
 
   test('should throw UNAUTHORIZED error if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       extractVisitCardData({}, mockArgs, mockContext, mockInfo),
@@ -46,8 +43,6 @@ describe('extractVisitCardData', () => {
   });
 
   test('should validate subscription if `createContactCard` is false', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
-
     await extractVisitCardData({}, mockArgs, mockContext, mockInfo);
 
     expect(validateCurrentSubscription).toHaveBeenCalledWith('user-123', {
@@ -56,8 +51,6 @@ describe('extractVisitCardData', () => {
   });
 
   test('should return extracted business card data on valid API response', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
-
     const mockApiResponse = {
       choices: [
         {
@@ -96,8 +89,6 @@ describe('extractVisitCardData', () => {
   });
 
   test('should return extracted business card data on valid API response', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
-
     const mockApiResponse = {
       choices: [
         {
@@ -133,8 +124,6 @@ describe('extractVisitCardData', () => {
   });
 
   test('should log exceptions to Sentry if fetch request fails', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
-
     (global.fetch as jest.Mock).mockRejectedValue(new Error('Network Error'));
 
     const result = await extractVisitCardData(

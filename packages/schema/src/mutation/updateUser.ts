@@ -22,7 +22,6 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
   if (!userId) {
     return null;
   }
-
   const { email, phoneNumber, currentPassword, newPassword, token } =
     args.input;
 
@@ -32,7 +31,6 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
   if (!dbUser) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-
   if (phoneNumber && phoneNumber !== dbUser.phoneNumber) {
     if (!token) {
       throw new GraphQLError(ERRORS.INVALID_TOKEN);

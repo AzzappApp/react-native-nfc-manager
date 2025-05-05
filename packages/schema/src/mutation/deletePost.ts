@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { markPostAsDeleted } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { postLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -12,11 +12,10 @@ const deletePostMutation: MutationResolvers['deletePost'] = async (
   _,
   { postId: gqlPostId },
 ) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
   const post = await postLoader.load(postId);
   if (!post) {
@@ -31,7 +30,7 @@ const deletePostMutation: MutationResolvers['deletePost'] = async (
   await checkWebCardProfileEditorRight(webCard.id);
 
   try {
-    await markPostAsDeleted(postId, userId);
+    await markPostAsDeleted(postId, user.id);
   } catch (error) {
     console.error(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

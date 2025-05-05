@@ -4,7 +4,6 @@ import {
   checkMedias,
   getContactCardAccessForProfile,
   getPushTokens,
-  getUserById,
   referencesMedias,
   transaction,
   updateProfile,
@@ -12,7 +11,7 @@ import {
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -23,17 +22,16 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
   { profileId: gqlProfileId, contactCard },
 ) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-  const user = await getUserById(userId);
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = await profileLoader.load(profileId);
   if (!profile) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  if (profile.userId !== userId) {
+  if (profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
@@ -45,7 +43,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
 
   const contactCardUpdates: Partial<ContactCard> = {
     ...(profile.contactCard ??
-      (await buildDefaultContactCard(webCard, userId))),
+      (await buildDefaultContactCard(webCard, user.id))),
     ...contactCard,
   };
 

@@ -2,10 +2,10 @@ import { GraphQLError } from 'graphql';
 import { markPostAsDeleted } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { postLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import deletePostMutation from '../deletePost';
 
 // Mock dependencies
@@ -16,10 +16,6 @@ jest.mock('@azzapp/data', () => ({
 jest.mock('#externals', () => ({
   invalidatePost: jest.fn(),
   invalidateWebCard: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -54,10 +50,10 @@ describe('deletePostMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-1');
   });
 
   test('should delete a post successfully', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('post-123');
     (postLoader.load as jest.Mock).mockResolvedValue(mockPost);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
@@ -83,7 +79,7 @@ describe('deletePostMutation', () => {
   });
 
   test('should throw an error if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       deletePostMutation(
@@ -99,7 +95,6 @@ describe('deletePostMutation', () => {
   });
 
   test('should throw an error if post does not exist', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('post-123');
     (postLoader.load as jest.Mock).mockResolvedValue(null);
 
@@ -117,7 +112,6 @@ describe('deletePostMutation', () => {
   });
 
   test('should throw an error if webCard does not exist', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('post-123');
     (postLoader.load as jest.Mock).mockResolvedValue(mockPost);
     (webCardLoader.load as jest.Mock).mockResolvedValue(null);
@@ -136,7 +130,6 @@ describe('deletePostMutation', () => {
   });
 
   test('should throw an error if markPostAsDeleted fails', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('post-123');
     (postLoader.load as jest.Mock).mockResolvedValue(mockPost);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);

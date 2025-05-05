@@ -81,10 +81,8 @@ export const fetchNode = async (gqlId: string): Promise<any> => {
       const profile = await profileLoader.load(contact?.ownerProfileId);
       if (!profile) return null;
 
-      const sessionUserId = getSessionInfos().userId;
-      if (!sessionUserId) return null;
-
-      if (profile.userId !== sessionUserId) {
+      const { userId: sessionUserId } = getSessionInfos();
+      if (sessionUserId && profile.userId !== sessionUserId) {
         // The current profile is not the profile associated to the contact
         // load the profile from the session
         const profileSession = await profileByWebCardIdAndUserIdLoader.load({

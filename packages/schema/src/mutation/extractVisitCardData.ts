@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import { getProfileById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -24,9 +24,8 @@ const businessCardSchema = z.object({
 
 export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
   async (_parent, args) => {
-    const { userId } = getSessionInfos();
-
-    if (!userId) {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     if (!args.config?.createContactCard) {
@@ -52,7 +51,7 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
           action: 'USE_SCAN',
         });
       } else {
-        await validateCurrentSubscription(userId, {
+        await validateCurrentSubscription(user.id, {
           action: 'USE_SCAN',
         });
       }
