@@ -1,3 +1,7 @@
+## 1.9.24
+
+* **fix:**  - **Android:** initialize skia before using buffer loader
+
 ## 1.9.23
 
 * **feat:**  - add translations on permissions
