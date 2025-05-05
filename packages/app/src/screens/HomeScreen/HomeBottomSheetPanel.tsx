@@ -89,6 +89,11 @@ const HomeBottomSheetPanel = ({
     userKey ?? null,
   );
 
+  const isSubscriptionOnSamePlatform =
+    (user?.userSubscription?.issuer === 'google' &&
+      Platform.OS === 'android') ||
+    (user?.userSubscription?.issuer === 'apple' && Platform.OS === 'ios');
+
   const { bottom } = useScreenInsets();
   const intl = useIntl();
   const deleteFcmToken = useDeleteNotifications();
@@ -285,6 +290,7 @@ const HomeBottomSheetPanel = ({
         },
         user?.isPremium &&
         user.userSubscription?.issuer !== 'web' &&
+        isSubscriptionOnSamePlatform &&
         ENABLE_MULTI_USER
           ? {
               type: 'row',

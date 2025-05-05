@@ -14,8 +14,15 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
+import Purchases, {
+  INTRO_ELIGIBILITY_STATUS,
+  PRORATION_MODE,
+} from 'react-native-purchases';
 import { commitLocalUpdate, graphql, usePreloadedQuery } from 'react-relay';
+import {
+  extractSeatsFromSubscriptionId,
+  getSubscriptionChangeStatus,
+} from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -36,7 +43,10 @@ import Text from '#ui/Text';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { UserPayWallScreenQuery } from '#relayArtifacts/UserPayWallScreenQuery.graphql';
 import type { UserPayWallRoute } from '#routes';
-import type { PurchasesPackage } from 'react-native-purchases';
+import type {
+  MakePurchaseResult,
+  PurchasesPackage,
+} from 'react-native-purchases';
 
 const TERMS_OF_SERVICE =
   Platform.OS === 'ios'
@@ -189,10 +199,44 @@ const UserPayWallScreen = ({
     }
     try {
       setProcessing(true);
+      let res: MakePurchaseResult | null = null;
+      if (
+        !currentSubscription ||
+        currentSubscription?.status !== 'active' ||
+        Platform.OS !== 'android'
+      ) {
+        //no upgrande or downgrade becasue the user as not active subscription
+        res = await Purchases.purchasePackage(selectedPurchasePackage!);
+      } else {
+        //only for android
+        const isUpgrade = getSubscriptionChangeStatus(
+          currentSubscription?.subscriptionId,
+          selectedPurchasePackage.product.identifier,
+          currentSubscription?.subscriptionPlan === 'monthly' ? 'P1M' : 'P1Y',
+          selectedPurchasePackage.product.subscriptionPeriod,
+        );
+        try {
+          res = await Purchases.purchasePackage(
+            selectedPurchasePackage!,
+            null,
+            {
+              oldProductIdentifier: currentSubscription.subscriptionId.replace(
+                ':base',
+                '',
+              ),
+              prorationMode:
+                isUpgrade === -1
+                  ? PRORATION_MODE.DEFERRED
+                  : PRORATION_MODE.IMMEDIATE_WITH_TIME_PRORATION,
+            },
+          );
+        } catch (error) {
+          console.log({ error });
+        }
+      }
 
-      const res = await Purchases.purchasePackage(selectedPurchasePackage!);
       // Update Relay cache temporary
-      if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
+      if (res && res.customerInfo.entitlements.active?.multiuser?.isActive) {
         const subscriptionId =
           res.customerInfo.entitlements.active?.multiuser.productIdentifier;
         setWaitedSubscriptionId(subscriptionId);
@@ -255,8 +299,7 @@ const UserPayWallScreen = ({
     }
   }, [
     activateMultiUser,
-    currentSubscription?.availableSeats,
-    currentSubscription?.totalSeats,
+    currentSubscription,
     intl,
     router,
     selectedPurchasePackage,
@@ -779,12 +822,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-function extractSeatsFromSubscriptionId(id: string) {
-  const parts = id.split('.');
-  const number = parts.pop();
-  if (number) {
-    return parseInt(number, 10);
-  }
-  return 0;
-}
