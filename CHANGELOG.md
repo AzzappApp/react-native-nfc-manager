@@ -1,3 +1,7 @@
+## 1.10.0-canary.174
+
+* **fix:**  - ensure welcome screen refresh onFocus ([#8657](https://github.com/AzzappApp/azzapp/pull/8657))
+
 ## 1.10.0-canary.173
 
 
