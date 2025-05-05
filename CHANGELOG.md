@@ -1,3 +1,7 @@
+## 1.10.0-canary.172
+
+* **fix:**  - ensure deleted user cannot access to anything ([#8627](https://github.com/AzzappApp/azzapp/pull/8627))
+
 ## 1.10.0-canary.171
 
 * **fix:**  - restore boxShadows ([#8645](https://github.com/AzzappApp/azzapp/pull/8645))
