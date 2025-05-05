@@ -1,3 +1,7 @@
+## 1.10.0-canary.170
+
+* **fix:**  - add missing translation label in location ([#8640](https://github.com/AzzappApp/azzapp/pull/8640))
+
 ## 1.10.0-canary.169
 
 * **fix:**  - increase lineHeight on avatar display to avoid truncated text ([#8623](https://github.com/AzzappApp/azzapp/pull/8623))
