@@ -101,6 +101,7 @@ export const buildExpoContact = async (
             : number.label,
       };
     }),
+    note: contact.note || undefined,
   };
 };
 

@@ -138,7 +138,10 @@ const ContactsScreen = ({
           />
           <RoundedMenuComponent
             selected={searchBy === 'location'}
-            label="Location"
+            label={intl.formatMessage({
+              defaultMessage: 'Location',
+              description: 'Location selector label in ContactsScreen',
+            })}
             id="location"
             onSelect={() => setSearchBy('location')}
           />
