@@ -139,8 +139,8 @@ export const shadow = ({
                 : direction === 'center'
                   ? 0
                   : -height / 2,
-            blurRadius: '10',
-            spreadDistance: '0',
+            blurRadius: 10,
+            spreadDistance: 0,
             color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a ?? (appearance === 'dark' ? 0.4 : 0.2)})`,
           },
         ],
