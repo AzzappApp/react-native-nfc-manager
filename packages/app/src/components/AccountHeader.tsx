@@ -5,7 +5,6 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import { useRouter } from './NativeRouter';
 import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
@@ -52,7 +51,7 @@ const AccountHeader = ({
           />
         )
       }
-      middleElement={<Text variant="large">{title}</Text>}
+      middleElement={title}
       rightElement={
         webCard && (
           <PressableNative

@@ -102,19 +102,14 @@ const ContactsScreen = ({
           <AccountHeader
             leftIcon={null}
             webCard={profile?.webCard}
-            title={
-              <Text variant="large">
-                <FormattedMessage
-                  description="ContactsScreen - Title"
-                  defaultMessage="{contacts, plural,
-                =0 {# contacts received}
-                =1 {# contact received}
-                other {# contacts received}
-        }"
-                  values={{ contacts: profile?.nbContacts ?? 0 }}
-                />
-              </Text>
-            }
+            title={intl.formatMessage(
+              {
+                defaultMessage:
+                  '{contacts, plural,=0 {# contacts received}=1 {# contact received}other {# contacts received}}',
+                description: 'ContactsScreen - Title',
+              },
+              { contacts: profile?.nbContacts ?? 0 },
+            )}
           />
         )}
         <View style={styles.menu}>
