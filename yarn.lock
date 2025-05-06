@@ -470,7 +470,7 @@ __metadata:
     react-native-pager-view: "npm:^6.7.0"
     react-native-permissions: "npm:^5.3.0"
     react-native-popover-view: "npm:^6.1.0"
-    react-native-purchases: "npm:^8.9.1"
+    react-native-purchases: "npm:^8.9.5"
     react-native-quick-base64: "npm:^2.1.2"
     react-native-quick-crypto: "npm:^0.7.13"
     react-native-reanimated: "npm:^3.17.2"
@@ -10743,10 +10743,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@revenuecat/purchases-typescript-internal@npm:13.26.0":
-  version: 13.26.0
-  resolution: "@revenuecat/purchases-typescript-internal@npm:13.26.0"
-  checksum: 10/7af3d8c6cb27704e318e382df02f5ec9d8053bd2920ee2bcc009b5adf894b2e796a25c016420934517c5b6f54470b5cd8a88501b7dff5fed97ff6d7ac2eaf299
+"@revenuecat/purchases-typescript-internal@npm:13.29.1":
+  version: 13.29.1
+  resolution: "@revenuecat/purchases-typescript-internal@npm:13.29.1"
+  checksum: 10/7cd5e5b26085f9da4b080dd83f2a7ac933fb84ed8a64bfa65ffdf89868c90229f05cbbc0f94c065fc4e48c70f51aea8c887529c5ac05a1a58d6a6333b0460893
   languageName: node
   linkType: hard
 
@@ -25915,15 +25915,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-purchases@npm:^8.9.1":
-  version: 8.9.1
-  resolution: "react-native-purchases@npm:8.9.1"
+"react-native-purchases@npm:^8.9.5":
+  version: 8.9.6
+  resolution: "react-native-purchases@npm:8.9.6"
   dependencies:
-    "@revenuecat/purchases-typescript-internal": "npm:13.26.0"
+    "@revenuecat/purchases-typescript-internal": "npm:13.29.1"
   peerDependencies:
     react: ">= 16.6.3"
     react-native: "*"
-  checksum: 10/49ffa55e00886eb5cc261cc4defc0a724ac7296422cc5bba25d11db8ce9b7785d6ef83ff65ac45e964d2821876ddc373457f36710be9d70fd49130cc578be8c4
+  checksum: 10/a9107f0dfacdb33746e581f4f8ff5bca72e65d2c96eb193f7f97425ef966a9c9c3b457ea3e230320e51dd39ee11cd29fd73289548374b1ac2c4b31554ecb6c4d
   languageName: node
   linkType: hard
 
