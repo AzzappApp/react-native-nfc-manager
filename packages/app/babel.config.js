@@ -44,6 +44,18 @@ module.exports = {
         idInterpolationPattern: '[sha1:contenthash:base64:6]',
       },
     ],
+    [
+      'react-compiler',
+      {
+        sources: filename => {
+          return (
+            !filename.endsWith('.test.tsx') && !filename.endsWith('.test.ts') && !filename.includes('useUnsafeRef_DEPRECATED')
+          );
+        },
+        enableReanimatedCheck: true,
+        target: '19',
+      },
+    ],
     'react-native-reanimated/plugin',
   ],
 };
