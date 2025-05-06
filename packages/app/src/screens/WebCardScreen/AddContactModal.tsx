@@ -138,15 +138,26 @@ const AddContactModal = ({
     return {
       addresses: addresses ?? [],
       company: scanned.company ?? '',
-      emails: emails ?? [],
+      emails:
+        emails?.map(email => ({
+          label: email.label,
+          address: email.address,
+        })) ?? [],
       firstname: scanned.firstName ?? '',
       lastname: scanned.lastName ?? '',
-      phoneNumbers: phoneNumbers ?? [],
+      phoneNumbers:
+        phoneNumbers?.map(number => ({
+          label: number.label,
+          number: number.number,
+        })) ?? [],
       title: scanned.title ?? '',
       birthday: scanned?.birthday,
       contactProfileId: scanned.profileId,
       urls: urls.map(url => ({ url: url.url })),
-      socials,
+      socials: socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+      })),
       avatarId: uploadedAvatarId,
       location: geolocation?.location,
       address: geolocation?.address,
