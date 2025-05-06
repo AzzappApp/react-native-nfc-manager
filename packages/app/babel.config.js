@@ -49,7 +49,9 @@ module.exports = {
       {
         sources: filename => {
           return (
-            !filename.endsWith('.test.tsx') && !filename.endsWith('.test.ts') && !filename.includes('useUnsafeRef_DEPRECATED')
+            !filename.endsWith('.test.tsx') && !filename.endsWith('.test.ts') && 
+              // a file in react/relay that breaks the build
+              !filename.includes('useUnsafeRef_DEPRECATED')
           );
         },
         enableReanimatedCheck: true,
