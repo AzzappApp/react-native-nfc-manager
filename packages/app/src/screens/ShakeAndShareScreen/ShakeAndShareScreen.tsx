@@ -71,10 +71,15 @@ const ShakeAndShareScreen = ({
   const router = useRouter();
 
   useEffect(() => {
-    if (!profile || profile.invited || !webCard?.cardIsPublished) {
+    if (
+      !profile ||
+      profile.invited ||
+      !webCard?.cardIsPublished ||
+      !webCard?.userName
+    ) {
       router.back();
     }
-  }, [profile, router, webCard?.cardIsPublished]);
+  }, [profile, router, webCard?.cardIsPublished, webCard?.userName]);
 
   const publicKey = useQRCodeKey(profile);
 
@@ -586,6 +591,7 @@ const shakeAndShareQuery = graphql`
         webCard {
           id
           cardIsPublished
+          userName
           ...CoverRenderer_webCard
         }
         ...SignaturePreview_profile
