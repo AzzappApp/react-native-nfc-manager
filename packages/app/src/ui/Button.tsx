@@ -18,7 +18,7 @@ import type {
 } from 'react-native';
 
 export type ButtonProps = PressableProps & {
-  label: ReactNode;
+  label?: ReactNode;
   variant?: 'little_round_inverted' | 'little_round' | 'primary' | 'secondary';
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
@@ -72,13 +72,15 @@ const Button = (
     ) : (
       <View style={variantStyles.labelContainer}>
         {leftElement}
-        <Text
-          variant="button"
-          style={[variantStyles.label, textStyle]}
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            variant="button"
+            style={[variantStyles.label, textStyle]}
+            numberOfLines={1}
+          >
+            {label}
+          </Text>
+        )}
         {rightElement}
       </View>
     ),

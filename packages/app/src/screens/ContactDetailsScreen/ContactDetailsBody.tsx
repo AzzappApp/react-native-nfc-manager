@@ -240,7 +240,7 @@ const ContactDetailsBody = ({
               onPress={onSave}
             />
             <Button
-              label={
+              leftElement={
                 <Icon
                   icon="more"
                   style={styles.more}
