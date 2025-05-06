@@ -13,7 +13,6 @@ import {
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { PAYMENT_IS_ENABLED } from '#Config';
 import {
   preventModalDismiss,
   useRouter,
@@ -241,18 +240,8 @@ const ContactCardEditScreen = ({
         setProgressIndicator(null);
         console.error(e);
         if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-          if (PAYMENT_IS_ENABLED) {
-            router.push({ route: 'USER_PAY_WALL' });
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'You can’t create such type of contact cards.',
-                description:
-                  'Error toast message when user tries to create a premium contact card on android without a subscription',
-              }),
-            });
-          }
+          router.push({ route: 'USER_PAY_WALL' });
+
           return;
         }
         Toast.show({

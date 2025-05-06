@@ -2,7 +2,6 @@ import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
@@ -66,22 +65,20 @@ const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
           }}
         />
       </TabBarMenuItem>
-      {ENABLE_MULTI_USER && (
-        <TabBarMenuItem
-          selected={selected === 'MULTI_USER'}
-          onPress={onPressMultiUser}
-          selectedBackgroundColor={END_GRADIENT_COLOR}
-          backgroundColor={CLEAR_GRADIENT_COLOR}
-          labelStyle={styles.menuLabelStyle}
-          selectedLabelColor={colors.white}
-          style={styles.menuContainerStyle}
-        >
-          <FormattedMessage
-            defaultMessage="Multi-user"
-            description="Home Screen menu - Multi user"
-          />
-        </TabBarMenuItem>
-      )}
+      <TabBarMenuItem
+        selected={selected === 'MULTI_USER'}
+        onPress={onPressMultiUser}
+        selectedBackgroundColor={END_GRADIENT_COLOR}
+        backgroundColor={CLEAR_GRADIENT_COLOR}
+        labelStyle={styles.menuLabelStyle}
+        selectedLabelColor={colors.white}
+        style={styles.menuContainerStyle}
+      >
+        <FormattedMessage
+          defaultMessage="Multi-user"
+          description="Home Screen menu - Multi user"
+        />
+      </TabBarMenuItem>
       <TabBarMenuItem
         selected={selected === 'STATS'}
         onPress={() => setSelected('STATS')}

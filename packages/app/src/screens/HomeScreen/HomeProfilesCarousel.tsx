@@ -21,7 +21,6 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
 import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
@@ -511,7 +510,7 @@ const ItemRenderComponent = ({
                 </BlurView>
               </PressableNative>
             )}
-            {isMultiUser && ENABLE_MULTI_USER && (
+            {isMultiUser && (
               <PressableNative
                 style={styles.multiUserContainer}
                 onPress={onPressMultiUser}

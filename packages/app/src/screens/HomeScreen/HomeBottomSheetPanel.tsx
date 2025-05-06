@@ -14,7 +14,6 @@ import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
-import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { logEvent } from '#helpers/analytics';
@@ -244,7 +243,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !user?.isPremium && ENABLE_MULTI_USER
+        !user?.isPremium
           ? {
               type: 'row',
               icon: 'plus',
@@ -290,8 +289,7 @@ const HomeBottomSheetPanel = ({
         },
         user?.isPremium &&
         user.userSubscription?.issuer !== 'web' &&
-        isSubscriptionOnSamePlatform &&
-        ENABLE_MULTI_USER
+        isSubscriptionOnSamePlatform
           ? {
               type: 'row',
               icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
@@ -330,8 +328,7 @@ const HomeBottomSheetPanel = ({
           : null,
         !profile?.invited &&
         profileInfoHasAdminRight(profile) &&
-        profile?.webCard?.hasCover &&
-        ENABLE_MULTI_USER
+        profile?.webCard?.hasCover
           ? {
               type: 'row',
               icon: 'shared_webcard',
