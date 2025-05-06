@@ -1,3 +1,13 @@
+## 1.10.0-canary.180
+
+* **fix:**  - clear form when leaving business webcard ([#8683](https://github.com/AzzappApp/azzapp/pull/8683))
+* **merge:**  - stable into main
+* **fix:**  - phone argentina problem
+* **fix:**  - remove android app banner
+* **fix:**  - **Android:** initialize skia before using buffer loader
+* **feat:**  - add translations on permissions
+* **fix:**  - [#8635](https://github.com/AzzappApp/azzapp/pull/8635) don’t return webcard without username ([#8636](https://github.com/AzzappApp/azzapp/pull/8636))
+
 ## 1.10.0-canary.179
 
 
