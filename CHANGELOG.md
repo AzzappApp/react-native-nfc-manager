@@ -1,3 +1,7 @@
+## 1.9.26-rc.1
+
+* **fix:**  - lint
+
 ## 1.9.26
 
 * **fix:**  - phone argentina problem
