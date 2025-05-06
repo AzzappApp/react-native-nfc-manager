@@ -16,7 +16,7 @@ import {
   useNativeRouter,
 } from '#components/NativeRouter';
 import { setAnalyticsConsent, setAnalyticsUserId } from '#helpers/analytics';
-import { hasBeenSignedIn } from '#helpers/authStore';
+import { getAuthState, hasBeenSignedIn } from '#helpers/authStore';
 import {
   addGlobalEventListener,
   GLOBAL_EVENT_HIGH_PRIORITY,
@@ -168,9 +168,19 @@ const MainRouter = () => {
     if (shakeAndShareOpened.current) {
       router.back();
     } else {
-      router.push({
-        route: 'SHAKE_AND_SHARE',
-      });
+      const currentRoute = router.getCurrentRoute();
+      const profileInfos = getAuthState().profileInfos;
+
+      if (
+        profileInfos?.profileId && // no webcard available
+        !profileInfos?.invited && // invitation not validated
+        !!profileInfos?.webCardUserName && // creation not finished
+        currentRoute?.route !== 'CONTACT_CARD_CREATE' // new contact card creation
+      ) {
+        router.push({
+          route: 'SHAKE_AND_SHARE',
+        });
+      }
     }
   }, [router]);
 
