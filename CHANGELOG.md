@@ -1,3 +1,9 @@
+## 1.10.0-canary.176
+
+* **fix:**  - correct addContactModal call and replace addContact by createContact ([#8639](https://github.com/AzzappApp/azzapp/pull/8639))
+* **fix:**  - disable optimistic update on webcard parameter as it causes glit… ([#8654](https://github.com/AzzappApp/azzapp/pull/8654))
+* **fix:**  - block shakeShare on unnamed webcard ([#8665](https://github.com/AzzappApp/azzapp/pull/8665))
+
 ## 1.10.0-canary.175
 
 * **fix:**  - disable dismiss on backdroptouch on BottomSheetPopup ([#8664](https://github.com/AzzappApp/azzapp/pull/8664))
