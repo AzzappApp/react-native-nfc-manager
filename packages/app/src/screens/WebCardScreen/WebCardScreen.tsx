@@ -372,12 +372,12 @@ export const WebCardScreen = ({
               />
             </Container>
           </Animated.View>
-          <Animated.View
-            style={[styles.back, borderRadiusStyle, backStyle]}
-            pointerEvents={showPost ? 'box-none' : 'none'}
-          >
-            <Suspense>
-              {(showPost || ready) && (
+          {(showPost || ready) && (
+            <Animated.View
+              style={[styles.back, borderRadiusStyle, backStyle]}
+              pointerEvents={showPost ? 'box-none' : 'none'}
+            >
+              <Suspense>
                 <WebCardPostsList
                   toggleFlip={toggleFlip}
                   isViewer={isViewer}
@@ -385,9 +385,9 @@ export const WebCardScreen = ({
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
                 />
-              )}
-            </Suspense>
-          </Animated.View>
+              </Suspense>
+            </Animated.View>
+          )}
         </View>
       </GestureDetector>
       <WebCardScreenButtonBar

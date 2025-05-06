@@ -283,17 +283,19 @@ const PostRenderer = (
           </PressableNative>
         )}
       </View>
-      <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
-        <PostRendererBottomPanel
-          openModal={handleOpenModal}
-          closeModal={handleCloseModal}
-          showModal={showModal}
-          post={post}
-          actionEnabled={actionEnabled}
-          onActionDisabled={onActionDisabled}
-          onDeleted={onDeleted}
-        />
-      </Suspense>
+      {showModal && (
+        <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
+          <PostRendererBottomPanel
+            openModal={handleOpenModal}
+            closeModal={handleCloseModal}
+            showModal={showModal}
+            post={post}
+            actionEnabled={actionEnabled}
+            onActionDisabled={onActionDisabled}
+            onDeleted={onDeleted}
+          />
+        </Suspense>
+      )}
     </View>
   );
 };

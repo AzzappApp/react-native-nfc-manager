@@ -137,7 +137,7 @@ const ParallaxItem = ({
         dimension={dimension}
         media={cardModuleMedia.media}
         index={index}
-        key={`${cardModuleMedia.media.id}_{index}`}
+        key={`${cardModuleMedia.media.id}_${index}`}
         disableParallax={disableParallax}
         canPlay={canPlay}
       >
