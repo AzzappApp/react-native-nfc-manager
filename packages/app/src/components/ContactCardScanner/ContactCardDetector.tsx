@@ -21,7 +21,6 @@ import {
 } from 'react-native-vision-camera';
 import { graphql, useMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { ScreenModal, useOnFocus, useRouter } from '#components/NativeRouter';
@@ -136,18 +135,8 @@ const ContactCardDetector = ({
         onError: e => {
           closeLoading();
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            if (PAYMENT_IS_ENABLED) {
-              router.push({ route: 'USER_PAY_WALL' });
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'You have reached the limit of scans.',
-                  description:
-                    'Error toast message when reaching the limit of scans on android',
-                }),
-              });
-            }
+            router.push({ route: 'USER_PAY_WALL' });
+
             return;
           }
           Toast.show({
