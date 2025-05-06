@@ -42,7 +42,10 @@ import AddContactModalProfiles, {
 import type { ContactType } from '#helpers/contactTypes';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
-import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type {
+  AddContactModalMutation,
+  ContactInput,
+} from '#relayArtifacts/AddContactModalMutation.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -80,15 +83,15 @@ const AddContactModal = ({
   const [commit, saving] = useMutation<AddContactModalMutation>(graphql`
     mutation AddContactModalMutation(
       $profileId: ID!
-      $input: AddContactInput!
-      $location: LocationInput
-      $address: AddressInput
+      $contact: ContactInput!
+      $withShareBack: Boolean!
     ) {
-      addContact(
+      createContact(
         profileId: $profileId
-        input: $input
-        location: $location
-        address: $address
+        input: $contact
+        notify: false
+        scanUsed: false
+        withShareBack: $withShareBack
       ) {
         contact {
           id
@@ -105,7 +108,9 @@ const AddContactModal = ({
   const [show, open, close] = useBoolean(false);
   const router = useRouter();
 
-  const getContactInput = useCallback(async () => {
+  const getContactInput = useCallback(async (): Promise<
+    ContactInput | undefined
+  > => {
     if (!scanned || !viewer) return;
 
     let uploadedAvatarId: string | undefined;
@@ -137,15 +142,17 @@ const AddContactModal = ({
       firstname: scanned.firstName ?? '',
       lastname: scanned.lastName ?? '',
       phoneNumbers: phoneNumbers ?? [],
-      profileId: scanned.profileId ?? '',
       title: scanned.title ?? '',
-      withShareBack: withShareBack === 'checked',
       birthday: scanned?.birthday,
-      urls,
+      contactProfileId: scanned.profileId,
+      urls: urls.map(url => ({ url: url.url })),
       socials,
       avatarId: uploadedAvatarId,
+      location: geolocation?.location,
+      address: geolocation?.address,
+      meetingDate: new Date(),
     };
-  }, [scanned, viewer, withShareBack]);
+  }, [geolocation, scanned, viewer]);
 
   const onInviteContact = useOnInviteContact();
 
@@ -212,17 +219,16 @@ const AddContactModal = ({
 
   const onAddContactToProfile = useCallback(async () => {
     if (!scanned || !viewer) return;
-    const input = await getContactInput();
-    if (!input) return;
+    const contact = await getContactInput();
+    if (!contact) return;
     commit({
       variables: {
-        input,
         profileId: viewer,
-        location: geolocation?.location,
-        address: geolocation?.address,
+        contact,
+        withShareBack: withShareBack === 'checked',
       },
       updater: (store, response) => {
-        if (response && response.addContact) {
+        if (response && response.createContact) {
           const profile = store.get(viewer);
           const nbContacts = profile?.getValue('nbContacts');
 
@@ -263,16 +269,7 @@ const AddContactModal = ({
         });
       },
     });
-  }, [
-    scanned,
-    viewer,
-    getContactInput,
-    commit,
-    geolocation?.location,
-    geolocation?.address,
-    close,
-    intl,
-  ]);
+  }, [scanned, viewer, getContactInput, commit, withShareBack, close, intl]);
 
   useEffect(() => {
     (async () => {
