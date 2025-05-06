@@ -397,6 +397,7 @@ export const getRecommendedWebCards = async (
       and(
         ne(WebCardTable.id, webCardId),
         isNull(FollowTable.followerId),
+        isNotNull(WebCardTable.userName),
         eq(WebCardTable.cardIsPublished, true),
         eq(WebCardTable.deleted, false),
         eq(WebCardTable.coverIsPredefined, false),

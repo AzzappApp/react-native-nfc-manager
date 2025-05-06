@@ -64,13 +64,18 @@ const EmailOrPhonenumberSelect = ({
   withEmail = false,
 }: Props) => {
   const intl = useIntl();
+  let language =
+    (typeof navigator !== 'undefined' ? navigator.language : null) ??
+    DEFAULT_LOCALE;
+  language = LANG_MAP[language] ?? language;
+  if (/.*[0-9]+.*/.test(language)) {
+    language = language.split('-')[0];
+  }
+  if (/.*[0-9]+.*/.test(language)) {
+    language = 'en-US';
+  }
   const browserCountryCode =
-    new Intl.Locale(
-      (typeof navigator !== 'undefined'
-        ? navigator
-        : { language: DEFAULT_LOCALE }
-      )?.language,
-    ).region?.toUpperCase() || 'FR';
+    new Intl.Locale(language).region?.toUpperCase() || 'US';
 
   useEffect(() => {
     if (!value) {
@@ -119,3 +124,11 @@ const EmailOrPhonenumberSelect = ({
 };
 
 export default EmailOrPhonenumberSelect;
+
+const LANG_MAP: Record<string, string> = {
+  'es-419': 'es-AR', // Spanish (Latin America)
+  'ar-001': 'ar-EG', // Arabic (Egypt)
+  'en-001': 'en-US', // English (United States)
+  'en-150': 'en-GB', // English (United Kingdom)
+  'yi-001': 'yi', // Yiddish
+};

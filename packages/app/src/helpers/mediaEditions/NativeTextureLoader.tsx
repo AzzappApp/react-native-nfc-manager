@@ -1,6 +1,9 @@
 import { Skia } from '@shopify/react-native-skia';
 import pick from 'lodash/pick';
+import { Platform } from 'react-native';
+import { runOnUI } from 'react-native-reanimated';
 import BufferLoader from '@azzapp/react-native-buffer-loader';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import type { SkImage } from '@shopify/react-native-skia';
 
 // would be cool to have weak ref and finalization registry here to clean up images
@@ -57,6 +60,8 @@ type ImageLoader = (
   ) => void,
 ) => void;
 
+let androidSkiaInitialized = Platform.OS !== 'android';
+
 const loadImageWithCache = async (
   key: string,
   loader: ImageLoader,
@@ -64,6 +69,20 @@ const loadImageWithCache = async (
   if (textures.has(key)) {
     const ref = textures.get(key)!;
     return pick(ref, ['texture', 'width', 'height']);
+  }
+  // If Skia has never been initialized on android, the OpenGL context is not
+  // created yet, and we need to create a dummy surface to trigger the creation
+  // of the OpenGL context. we should find a better way to do this in the future.
+  if (!androidSkiaInitialized) {
+    runOnUI(() => {
+      'worklet';
+      const surface = Skia.Surface.MakeOffscreen(1, 1);
+      surface?.getCanvas().clear(Skia.Color('#00000000'));
+      surface?.flush();
+      surface?.dispose();
+    })();
+    await waitTime(10);
+    androidSkiaInitialized = true;
   }
   if (!loadImageTasks.has(key)) {
     loadImageTasks.set(
