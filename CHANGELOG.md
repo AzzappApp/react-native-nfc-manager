@@ -1,3 +1,9 @@
+## 1.10.0-canary.181
+
+* **fix:**  - filter out props before creating contact ([#8687](https://github.com/AzzappApp/azzapp/pull/8687))
+* **fix:**  - check Shake Share availability before displaying the screen ([#8686](https://github.com/AzzappApp/azzapp/pull/8686))
+* **fix:**  - display of more button on android ([#8685](https://github.com/AzzappApp/azzapp/pull/8685))
+
 ## 1.10.0-canary.180
 
 * **fix:**  - clear form when leaving business webcard ([#8683](https://github.com/AzzappApp/azzapp/pull/8683))
