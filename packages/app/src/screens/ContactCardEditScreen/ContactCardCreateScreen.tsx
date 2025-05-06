@@ -688,7 +688,11 @@ const ContactCardCreateScreen = ({
           style={styles.scanBusinessCardButton}
         />
 
-        <ContactCardCreateForm control={control} user={currentUser} />
+        <ContactCardCreateForm
+          control={control}
+          user={currentUser}
+          setValue={setValue}
+        />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}

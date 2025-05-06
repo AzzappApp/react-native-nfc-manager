@@ -1,6 +1,6 @@
 import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
-import { Controller, useController, useWatch } from 'react-hook-form';
+import { Controller, useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
@@ -41,13 +41,14 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardCreateForm_user$key } from '#relayArtifacts/ContactCardCreateForm_user.graphql';
 import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ReactNode } from 'react';
-import type { Control } from 'react-hook-form';
+import type { Control, UseFormSetValue } from 'react-hook-form';
 
 type ContactCardCreateFormProps = {
   control: Control<ContactCardFormValues>;
   children?: ReactNode;
   footer?: ReactNode;
   user: ContactCardCreateForm_user$key | null;
+  setValue: UseFormSetValue<ContactCardFormValues>;
 };
 
 const ContactCardCreateForm = ({
@@ -55,6 +56,7 @@ const ContactCardCreateForm = ({
   children,
   footer,
   user: userKey,
+  setValue,
 }: ContactCardCreateFormProps) => {
   const user = useFragment(
     graphql`
@@ -178,6 +180,12 @@ const ContactCardCreateForm = ({
                     Toast.hide();
                     const newValue =
                       value === 'business' ? 'personal' : 'business';
+                    if (newValue === 'personal') {
+                      logoField.onChange(null);
+                      setValue('company', null);
+                      setValue('companyActivityLabel', null);
+                      setValue('urls', []);
+                    }
                     onChange(newValue);
                   }}
                 />
