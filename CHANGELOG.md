@@ -1,3 +1,7 @@
+## 1.10.0-canary.178
+
+
+
 ## 1.10.0-canary.177
 
 * **fix:**  - minor perf enhancement on webcard ([#8674](https://github.com/AzzappApp/azzapp/pull/8674))
