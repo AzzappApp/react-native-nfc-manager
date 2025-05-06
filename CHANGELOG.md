@@ -1,3 +1,7 @@
+## 1.10.0-canary.175
+
+* **fix:**  - disable dismiss on backdroptouch on BottomSheetPopup ([#8664](https://github.com/AzzappApp/azzapp/pull/8664))
+
 ## 1.10.0-canary.174
 
 * **fix:**  - ensure welcome screen refresh onFocus ([#8657](https://github.com/AzzappApp/azzapp/pull/8657))
