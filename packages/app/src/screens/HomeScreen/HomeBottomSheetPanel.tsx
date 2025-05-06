@@ -439,13 +439,14 @@ const HomeBottomSheetPanel = ({
         },
       ]),
     [
-      close,
-      intl,
-      onLogout,
-      onShare,
-      profile,
-      user?.userSubscription?.issuer,
       user?.isPremium,
+      user?.userSubscription?.issuer,
+      intl,
+      close,
+      isSubscriptionOnSamePlatform,
+      profile,
+      onShare,
+      onLogout,
     ],
   );
 
