@@ -64,6 +64,7 @@ const BottomSheetPopup = ({
         snapPoints={[fullScreen ? height : height / 1.25, height / 1.1]}
         keyboardBehavior="extend"
         style={styles.container}
+        closeOnBackdropTouch={false}
       >
         <Animated.View style={animatedStyle}>{children}</Animated.View>
       </BottomSheetModal>
