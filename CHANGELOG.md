@@ -1,3 +1,7 @@
+## 1.10.0-canary.177
+
+* **fix:**  - minor perf enhancement on webcard ([#8674](https://github.com/AzzappApp/azzapp/pull/8674))
+
 ## 1.10.0-canary.176
 
 * **fix:**  - correct addContactModal call and replace addContact by createContact ([#8639](https://github.com/AzzappApp/azzapp/pull/8639))
