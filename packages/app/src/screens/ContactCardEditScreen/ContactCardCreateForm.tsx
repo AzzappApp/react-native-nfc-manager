@@ -1,6 +1,6 @@
 import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
-import { Controller, useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { Controller, useController, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
