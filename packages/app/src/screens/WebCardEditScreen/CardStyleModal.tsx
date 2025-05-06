@@ -56,11 +56,11 @@ type CardStyleItem = CardStyle & {
  */
 const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const profileInfos = useProfileInfos();
-  const { profile } = useLazyLoadQuery<CardStyleModalQuery>(
+  const { node } = useLazyLoadQuery<CardStyleModalQuery>(
     graphql`
       query CardStyleModalQuery($profileId: ID!) {
-        profile: node(id: $profileId) {
-          ... on Profile {
+        node(id: $profileId) {
+          ... on Profile @alias(as: "profile") {
             webCard {
               id
               cardStyle {
@@ -86,6 +86,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
       profileId: profileInfos?.profileId ?? '',
     },
   );
+  const profile = node?.profile;
   const intl = useIntl();
 
   const styles = useStyleSheet(styleSheet);

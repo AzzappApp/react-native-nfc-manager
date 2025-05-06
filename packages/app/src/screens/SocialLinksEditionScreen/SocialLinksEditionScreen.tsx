@@ -214,7 +214,7 @@ const SocialLinksEditionScreen = ({
               kind
               visible
               variant
-              ...SocialLinksEditionScreen_module
+              ...SocialLinksEditionScreen_module @alias(as: "socialLinks")
             }
           }
         }

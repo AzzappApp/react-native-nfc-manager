@@ -37,8 +37,8 @@ import type { ForwardedRef } from 'react';
 
 const mediaTextLinkModuleWebCardEditionScreenQuery = graphql`
   query MediaTextLinkModuleWebCardEditionScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         webCard {
           ...withCardModule_webCard
           cardModules {
@@ -47,6 +47,7 @@ const mediaTextLinkModuleWebCardEditionScreenQuery = graphql`
             # module: cardModule(moduleId: $moduleId) {
             id
             ...MediaTextLinkModuleWebCardEditionScreen_module
+              @alias(as: "mediaTextLinkModule")
           }
         }
       }
@@ -160,6 +161,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
               visible
               variant
               ...MediaTextLinkModuleWebCardEditionScreen_module
+                @alias(as: "mediaTextLinkModule")
             }
           }
         }

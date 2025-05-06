@@ -1,5 +1,4 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_SIMPLE_BUTTON } from '@azzapp/shared/cardModuleHelpers';
 import SimpleButtonEditionScreen from '#screens/SimpleButtonEditionScreen';
 import type { SimpleButtonEditionMobileScreenQuery } from '#relayArtifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import type { SimpleButtonEditionScreen_module$key } from '#relayArtifacts/SimpleButtonEditionScreen_module.graphql';
@@ -24,18 +23,16 @@ const SimpleButtonEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: SimpleButtonEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(SimpleButtonQuery, preloadedQuery);
-
+  const { node } = usePreloadedQuery(SimpleButtonQuery, preloadedQuery);
   let module: SimpleButtonEditionScreen_module$key | null = null;
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(
-        module =>
-          module?.id === moduleId && module?.kind === MODULE_KIND_SIMPLE_BUTTON,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.simpleButtonModule ?? null;
     if (!module) {
       // TODO
     }
@@ -46,14 +43,14 @@ const SimpleButtonEditionMobileScreen = ({
 
 const SimpleButtonQuery = graphql`
   query SimpleButtonEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...SimpleButtonEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
-            ...SimpleButtonEditionScreen_module
+            ...SimpleButtonEditionScreen_module @alias(as: "simpleButtonModule")
           }
         }
       }

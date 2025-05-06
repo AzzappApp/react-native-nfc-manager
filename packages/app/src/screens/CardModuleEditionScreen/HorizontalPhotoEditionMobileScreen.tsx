@@ -1,5 +1,4 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_HORIZONTAL_PHOTO } from '@azzapp/shared/cardModuleHelpers';
 import HorizontalPhotoEditionScreen from '#screens/HorizontalPhotoEditionScreen';
 import type { HorizontalPhotoEditionMobileScreenQuery } from '#relayArtifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import type { HorizontalPhotoEditionScreen_module$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_module.graphql';
@@ -24,7 +23,8 @@ const HorizontalPhotoEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: HorizontalPhotoEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(HorizontalPhotoQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(HorizontalPhotoQuery, preloadedQuery);
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
@@ -32,11 +32,8 @@ const HorizontalPhotoEditionMobileScreen = ({
   let module: HorizontalPhotoEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(
-        module =>
-          module?.id === moduleId &&
-          module?.kind === MODULE_KIND_HORIZONTAL_PHOTO,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.horizontalPhotoModule ?? null;
     if (!module) {
       // TODO
     }
@@ -47,14 +44,15 @@ const HorizontalPhotoEditionMobileScreen = ({
 
 const HorizontalPhotoQuery = graphql`
   query HorizontalPhotoEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...HorizontalPhotoEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
             ...HorizontalPhotoEditionScreen_module
+              @alias(as: "horizontalPhotoModule")
           }
         }
       }

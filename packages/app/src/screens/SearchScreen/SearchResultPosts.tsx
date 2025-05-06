@@ -15,8 +15,10 @@ import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultPostsQuery = graphql`
   query SearchResultPostsQuery($search: String!, $profileId: ID!) {
-    profile: node(id: $profileId) {
-      ...SearchResultPosts_profile @arguments(search: $search)
+    node(id: $profileId) {
+      ...SearchResultPosts_profile
+        @arguments(search: $search)
+        @alias(as: "profile")
     }
   }
 `;
@@ -63,7 +65,7 @@ const SearchResultPosts = ({
           }
         }
       `,
-      preloadedQuery.profile,
+      preloadedQuery.node?.profile,
     );
 
   const [refreshing, setRefreshing] = useState(false);

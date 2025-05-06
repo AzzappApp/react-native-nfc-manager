@@ -11,14 +11,16 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import SafeAreaView from '#ui/SafeAreaView';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { LikedPostsScreen_profile$key } from '#relayArtifacts/LikedPostsScreen_profile.graphql';
+import type { LikedPostsScreen_webCard$key } from '#relayArtifacts/LikedPostsScreen_webCard.graphql';
 import type { LikedPostsScreenQuery } from '#relayArtifacts/LikedPostsScreenQuery.graphql';
 import type { LikedPostsRoute } from '#routes';
 
 const likedPostsScreenQuery = graphql`
   query LikedPostsScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      ...LikedPostsScreen_profile @arguments(viewerWebCardId: $webCardId)
+    node(id: $webCardId) {
+      ...LikedPostsScreen_webCard
+        @arguments(viewerWebCardId: $webCardId)
+        @alias(as: "webCard")
     }
   }
 `;
@@ -34,11 +36,11 @@ const LikedPostsScreen = ({
     router.back();
   };
 
-  const { webCard } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment LikedPostsScreen_profile on WebCard
+        fragment LikedPostsScreen_webCard on WebCard
         @refetchable(queryName: "LikedPostListScreenQuery")
         @argumentDefinitions(
           viewerWebCardId: { type: "ID!" }
@@ -60,7 +62,7 @@ const LikedPostsScreen = ({
           }
         }
       `,
-      webCard as LikedPostsScreen_profile$key,
+      (node?.webCard ?? null) as LikedPostsScreen_webCard$key | null,
     );
 
   const [refreshing, setRefreshing] = useState(false);
@@ -88,12 +90,12 @@ const LikedPostsScreen = ({
 
   const posts = useMemo(
     () =>
-      data.likedPosts?.edges
+      data?.likedPosts?.edges
         ? convertToNonNullArray(
             data.likedPosts.edges.map(edge => edge?.node ?? null),
           )
         : [],
-    [data.likedPosts.edges],
+    [data?.likedPosts.edges],
   );
 
   return (

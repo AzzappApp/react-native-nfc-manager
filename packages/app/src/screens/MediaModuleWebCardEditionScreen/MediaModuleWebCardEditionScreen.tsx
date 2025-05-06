@@ -36,8 +36,8 @@ import type { ForwardedRef } from 'react';
 
 const mediaModuleWebCardEditionScreenQuery = graphql`
   query MediaModuleWebCardEditionScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         webCard {
           companyActivityLabel
           id
@@ -47,7 +47,7 @@ const mediaModuleWebCardEditionScreenQuery = graphql`
             # and relay is not able to find it properly
             # module: cardModule(moduleId: $moduleId) {
             id
-            ...MediaModuleWebCardEditionScreen_module
+            ...MediaModuleWebCardEditionScreen_module @alias(as: "mediaModule")
           }
         }
       }
@@ -156,7 +156,7 @@ const MediaModuleWebCardScreen = (
             kind
             visible
             variant
-            ...MediaModuleWebCardEditionScreen_module
+            ...MediaModuleWebCardEditionScreen_module @alias(as: "mediaModule")
           }
         }
       }

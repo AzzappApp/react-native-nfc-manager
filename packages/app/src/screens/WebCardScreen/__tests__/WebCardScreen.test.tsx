@@ -53,7 +53,7 @@ describe('WebCardScreen', () => {
     const testQuery = graphql`
       query WebCardScreenTestPartialRenderQuery {
         node(id: "webCardId-1") {
-          ... on WebCard {
+          ... on WebCard @alias(as: "webCard") {
             id
             userName
             cardIsPublished

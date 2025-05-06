@@ -21,7 +21,7 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
     graphql`
       query HomeIconQuery($webCardId: ID!) {
         node(id: $webCardId) {
-          ...CoverRenderer_webCard
+          ...CoverRenderer_webCard @alias(as: "webCard")
         }
       }
     `,
@@ -42,7 +42,7 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
 
   return (
     <CoverRenderer
-      webCard={data.node}
+      webCard={data.node?.webCard}
       width={HOME_ICON_COVER_WIDTH}
       canPlay={false}
     />

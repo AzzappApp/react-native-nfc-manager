@@ -37,15 +37,19 @@ describe('HomeBottomSheetPopupPanel', () => {
       const data = useLazyLoadQuery<HomeBottomSheetPopupPanelTestQuery>(
         graphql`
           query HomeBottomSheetPopupPanelTestQuery @relay_test_operation {
-            profile: node(id: "test-post") {
-              id
-              ...HomeBottomSheetPopupPanel_profile
+            node(id: "test-post") {
+              ... on Profile @alias(as: "profile") {
+                id
+                ...HomeBottomSheetPopupPanel_profile
+              }
             }
           }
         `,
         {},
       );
-      return <HomeBottomSheetPopupPanel {...props} profile={data.profile!} />;
+      return data.node?.profile ? (
+        <HomeBottomSheetPopupPanel {...props} profile={data.node.profile} />
+      ) : null;
     };
     const component = render(
       <IntlProvider locale="en">

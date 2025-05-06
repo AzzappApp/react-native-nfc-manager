@@ -27,8 +27,8 @@ import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         id
         nbContacts
         ...ContactsScreenLists_contacts
@@ -47,7 +47,8 @@ const ContactsScreen = ({
   refreshQuery,
 }: RelayScreenProps<ContactsRoute, ContactsScreenQuery>) => {
   const router = useRouter();
-  const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
+  const profile = node?.profile;
 
   const styles = useStyleSheet(stylesheet);
 

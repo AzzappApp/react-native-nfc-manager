@@ -149,9 +149,11 @@ const StockMediaListQueryRenderer = ({
             ...StockMediaList_photos
               @arguments(search: $search)
               @include(if: $isImage)
+              @alias(as: "searchStockPhotos")
             ...StockMediaList_video
               @arguments(search: $search)
               @skip(if: $isImage)
+              @alias(as: "searchStockVideos")
           }
         }
       }
@@ -163,15 +165,18 @@ const StockMediaListQueryRenderer = ({
     },
   );
 
+  const stockListProfile =
+    data.node?.searchStockPhotos ?? data.node?.searchStockVideos;
+
   // TODO handle with new relay system for nullability
-  if (!data.node) {
+  if (!stockListProfile) {
     return null;
   }
 
   return (
     <StockMediaListGridRenderer
       kind={kind}
-      profile={data.node}
+      profile={stockListProfile}
       selectedMediasIds={selectedMediasIds}
       onStockMediaSelect={onStockMediaSelect}
     />

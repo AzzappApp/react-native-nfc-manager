@@ -72,16 +72,17 @@ export const WebCardScreen = ({
   WebCardScreenByIdQuery | WebCardScreenByUserNameQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
+  const webCard = 'node' in data ? data.node?.webCard : data.webCard;
   const styles = useStyleSheet(styleSheet);
 
-  useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
+  useWebCardViewStatistic(params.webCardId ?? webCard?.id);
 
   const ready = useDidAppear();
 
   const router = useRouter();
 
   const profileInfos = useProfileInfos();
-  const isViewer = profileInfos?.webCardId === data.webCard?.id;
+  const isViewer = profileInfos?.webCardId === webCard?.id;
   const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
   const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
   const isAdmin = isViewer && profileInfoHasAdminRight(profileInfos);
@@ -92,11 +93,11 @@ export const WebCardScreen = ({
   const [commit] = useMutation(UPDATE_CONTACT_CARD_SCANS);
 
   useEffect(() => {
-    if (params.contactData && data.webCard?.id) {
+    if (params.contactData && webCard?.id) {
       const contactData = parseContactCard(params.contactData);
 
       if (
-        contactData.webCardId === fromGlobalId(data.webCard?.id).id &&
+        contactData.webCardId === fromGlobalId(webCard?.id).id &&
         scannedContactCard.current !== contactData.profileId
       ) {
         scannedContactCard.current = contactData.profileId;
@@ -110,7 +111,7 @@ export const WebCardScreen = ({
         });
       }
     }
-  }, [commit, data.webCard?.id, params.contactData]);
+  }, [commit, webCard?.id, params.contactData]);
 
   const [showWebcardModal, openWebcardModal, closeWebcardModal] =
     useBoolean(false);
@@ -325,7 +326,7 @@ export const WebCardScreen = ({
 
   // #end region
 
-  if (!data.webCard) {
+  if (!webCard) {
     return (
       <View style={styles.deletedCaseContainer}>
         <Text variant="large">
@@ -351,7 +352,7 @@ export const WebCardScreen = ({
   return (
     <View style={styles.container}>
       <Suspense>
-        <WebCardBackground webCard={data.webCard} />
+        <WebCardBackground webCard={webCard} />
       </Suspense>
       <GestureDetector gesture={pan}>
         <View style={styles.container}>
@@ -359,7 +360,7 @@ export const WebCardScreen = ({
             <Container style={styles.container}>
               <WebCardScreenContent
                 ready={ready}
-                webCard={data.webCard}
+                webCard={webCard}
                 editScrollViewRef={editScrollViewRef}
                 scrollViewRef={scrollViewRef}
                 canEdit={canEdit}
@@ -381,9 +382,9 @@ export const WebCardScreen = ({
                 <WebCardPostsList
                   toggleFlip={toggleFlip}
                   isViewer={isViewer}
-                  webCardId={data.webCard.id}
+                  webCardId={webCard.id}
                   hasFocus={hasFocus && showPost && ready}
-                  userName={data.webCard.userName!}
+                  userName={webCard.userName!}
                 />
               </Suspense>
             </Animated.View>
@@ -391,7 +392,7 @@ export const WebCardScreen = ({
         </View>
       </GestureDetector>
       <WebCardScreenButtonBar
-        webCard={data.webCard}
+        webCard={webCard}
         isViewer={isViewer}
         onHome={router.backToTop}
         isWebCardDisplayed={!showPost}
@@ -403,12 +404,12 @@ export const WebCardScreen = ({
         editTransition={editTransition}
       />
 
-      <AddContactModal webCard={data.webCard} params={params} />
+      <AddContactModal webCard={webCard} params={params} />
 
       <Suspense fallback={null}>
         <WebCardMenu
           visible={showWebcardModal}
-          webCard={data.webCard}
+          webCard={webCard}
           close={closeWebcardModal}
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
@@ -425,17 +426,19 @@ const getQuery = (params: WebCardRoute['params']) =>
 
 const webCardScreenByIdQuery = graphql`
   query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      id
-      ... on WebCard {
-        userName
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
+        id
+        ... on WebCard {
+          userName
+        }
+        ...WebCardScreenContent_webCard
+        ...WebCardScreenButtonBar_webCard
+          @arguments(viewerWebCardId: $viewerWebCardId)
+        ...WebCardBackground_webCard
+        ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+        ...AddContactModal_webCard
       }
-      ...WebCardScreenContent_webCard
-      ...WebCardScreenButtonBar_webCard
-        @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardBackground_webCard
-      ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
-      ...AddContactModal_webCard
     }
   }
 `;

@@ -44,14 +44,14 @@ import type { ReactNode } from 'react';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
-    webCard: node(id: $webCardId) {
-      ...WebCardParametersScreen_webCard
-      ... on WebCard {
+    webCardNode: node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
         isPremium
+        ...WebCardParametersScreen_webCard
       }
     }
-    profile: node(id: $profileId) {
-      ... on Profile {
+    profileNode: node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         profileRole
       }
     }
@@ -65,15 +65,15 @@ const WebCardParametersScreen = ({
   preloadedQuery,
 }: RelayScreenProps<WebCardParametersRoute, WebCardParametersScreenQuery>) => {
   const {
-    webCard: webCardKey,
-    profile,
+    webCardNode,
+    profileNode,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
 
   const isWebCardOwner = useMemo(() => {
-    return profileIsOwner(profile?.profileRole);
-  }, [profile]);
+    return profileIsOwner(profileNode?.profile?.profileRole);
+  }, [profileNode?.profile?.profileRole]);
 
   const webCard = useFragment(
     graphql`
@@ -97,7 +97,7 @@ const WebCardParametersScreen = ({
         ...AccountHeader_webCard
       }
     `,
-    webCardKey as WebCardParametersScreen_webCard$key | null,
+    webCardNode?.webCard as WebCardParametersScreen_webCard$key | null,
   );
 
   const intl = useIntl();

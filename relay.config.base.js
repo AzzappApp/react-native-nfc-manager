@@ -18,6 +18,7 @@ module.exports = {
         DateTime: 'Date',
       },
       featureFlags: {},
+      eagerEsModules: false,
     },
   },
 };

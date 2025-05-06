@@ -59,12 +59,13 @@ const POST_MAX_DURATION = 15;
 
 const postCreationScreenQuery = graphql`
   query PostCreationScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      id
-      ... on WebCard {
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
+        id
+
         userName
+        ...AuthorCartoucheFragment_webCard
       }
-      ...AuthorCartoucheFragment_webCard
     }
   }
 `;
@@ -77,10 +78,8 @@ const PostCreationScreen = ({
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
   const intl = useIntl();
-  const { webCard } = usePreloadedQuery(
-    postCreationScreenQuery,
-    preloadedQuery,
-  );
+  const { node } = usePreloadedQuery(postCreationScreenQuery, preloadedQuery);
+  const webCard = node?.webCard;
 
   const handleProfileActionError = useHandleProfileActionError(
     intl.formatMessage({

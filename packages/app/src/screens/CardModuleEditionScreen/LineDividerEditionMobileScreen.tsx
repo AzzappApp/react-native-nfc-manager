@@ -1,5 +1,4 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_LINE_DIVIDER } from '@azzapp/shared/cardModuleHelpers';
 import LineDividerEditionScreen from '#screens/LineDividerEditionScreen';
 import type { LineDividerEditionMobileScreenQuery } from '#relayArtifacts/LineDividerEditionMobileScreenQuery.graphql';
 import type { LineDividerEditionScreen_module$key } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
@@ -24,7 +23,8 @@ const LineDividerEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: LineDividerEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
@@ -32,10 +32,8 @@ const LineDividerEditionMobileScreen = ({
   let module: LineDividerEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(
-        module =>
-          module?.id === moduleId && module?.kind === MODULE_KIND_LINE_DIVIDER,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.lineDividerModule ?? null;
     if (!module) {
       // TODO
     }
@@ -51,13 +49,13 @@ const LineDividerEditionMobileScreen = ({
 
 const LineDividerQuery = graphql`
   query LineDividerEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         webCard {
           cardModules {
             id
             kind
-            ...LineDividerEditionScreen_module
+            ...LineDividerEditionScreen_module @alias(as: "lineDividerModule")
           }
           ...LineDividerEditionScreen_webCard
         }

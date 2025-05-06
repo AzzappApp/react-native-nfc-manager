@@ -59,18 +59,24 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
     const data = useLazyLoadQuery<PostRendererActionBarTestQuery>(
       graphql`
         query PostRendererActionBarTestQuery @relay_test_operation {
-          post: node(id: "test-post") {
-            id
-            ...PostRendererActionBar_post
-              @arguments(viewerWebCardId: "test-webCard")
+          node(id: "test-post") {
+            ... on Post @alias(as: "post") {
+              id
+              ...PostRendererActionBar_post
+                @arguments(viewerWebCardId: "test-webCard")
+            }
           }
         }
       `,
       {},
     );
-    return (
-      <PostRendererActionBar postKey={data.post!} {...props} actionEnabled />
-    );
+    return data.node?.post ? (
+      <PostRendererActionBar
+        postKey={data.node.post}
+        {...props}
+        actionEnabled
+      />
+    ) : null;
   };
   const component = render(
     <RelayEnvironmentProvider environment={environment}>

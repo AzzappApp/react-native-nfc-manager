@@ -88,8 +88,10 @@ describe('ContactCardExportVcf', () => {
       const data = useLazyLoadQuery<ContactCardExportVcfTestQuery>(
         graphql`
           query ContactCardExportVcfTestQuery @relay_test_operation {
-            profile: node(id: "test-profile") {
-              ...ContactCardExportVcf_card
+            node(id: "test-profile") {
+              ... on Profile @alias(as: "profile") {
+                ...ContactCardExportVcf_card
+              }
             }
           }
         `,
@@ -97,9 +99,9 @@ describe('ContactCardExportVcf', () => {
       );
 
       return (
-        data.profile && (
+        data.node?.profile && (
           <ContactCardExportVcf
-            profile={data.profile}
+            profile={data.node.profile}
             publicKey="publicKey"
             {...props}
           />

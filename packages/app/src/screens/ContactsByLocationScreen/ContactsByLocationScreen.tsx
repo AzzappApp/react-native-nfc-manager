@@ -20,7 +20,7 @@ const ContactsByLocationScreen = ({
   preloadedQuery,
   route,
 }: RelayScreenProps<ContactByLocationRoute, ContactsByLocationScreenQuery>) => {
-  const { profile } = usePreloadedQuery(
+  const { node } = usePreloadedQuery(
     contactsByLocationScreenQuery,
     preloadedQuery,
   );
@@ -44,13 +44,13 @@ const ContactsByLocationScreen = ({
         })}
         onChangeText={setSearch}
       />
-      {profile ? (
+      {node?.profile ? (
         <Suspense fallback={<LoadingView />}>
           <ContactsScreenLists
             search={debounceSearch}
             searchBy="date"
             filterBy={route.params.location}
-            profile={profile}
+            profile={node.profile}
           />
         </Suspense>
       ) : null}
@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
 
 const contactsByLocationScreenQuery = graphql`
   query ContactsByLocationScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         id
         ...ContactsScreenLists_contacts
       }

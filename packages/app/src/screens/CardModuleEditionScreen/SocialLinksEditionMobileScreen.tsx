@@ -1,5 +1,4 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_SOCIAL_LINKS } from '@azzapp/shared/cardModuleHelpers';
 import SocialLinksEditionScreen from '#screens/SocialLinksEditionScreen';
 import type { SocialLinksEditionMobileScreenQuery } from '#relayArtifacts/SocialLinksEditionMobileScreenQuery.graphql';
 import type { SocialLinksEditionScreen_module$key } from '#relayArtifacts/SocialLinksEditionScreen_module.graphql';
@@ -24,7 +23,8 @@ const SocialLinksEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: SocialLinksEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
+  const profile = node?.profile;
   let module: SocialLinksEditionScreen_module$key | null = null;
   if (!profile) {
     return null;
@@ -32,10 +32,8 @@ const SocialLinksEditionMobileScreen = ({
 
   if (moduleId != null) {
     module =
-      profile.webCard?.cardModules.find(
-        module =>
-          module?.id === moduleId && module?.kind === MODULE_KIND_SOCIAL_LINKS,
-      ) ?? null;
+      profile.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.socialLinksModule ?? null;
     if (!module) {
       // TODO
     }
@@ -46,14 +44,14 @@ const SocialLinksEditionMobileScreen = ({
 
 const SocialLinksQuery = graphql`
   query SocialLinksEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...SocialLinksEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
-            ...SocialLinksEditionScreen_module
+            ...SocialLinksEditionScreen_module @alias(as: "socialLinksModule")
           }
         }
       }

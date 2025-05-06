@@ -25,32 +25,30 @@ const queryWithCoverTemplate = graphql`
     $profileId: ID!
     $coverTemplateId: ID!
   ) {
-    profile: node(id: $profileId) {
-      ...CoverEditor_profile
-      ... on Profile {
-        webCard {
-          webCardKind
-          id
-          userName
-          isPremium
+    profileNode: node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...CoverEditor_profile
+        ... on Profile {
+          webCard {
+            webCardKind
+            id
+            userName
+            isPremium
+          }
         }
       }
     }
-    coverTemplate: node(id: $coverTemplateId) {
-      ...CoverEditor_coverTemplate
-      ... on CoverTemplate {
-        id
-        lottie
-      }
+    coverTemplateNode: node(id: $coverTemplateId) {
+      ...CoverEditor_coverTemplate @alias(as: "coverTemplate")
     }
   }
 `;
 
 const queryWithoutCoverTemplate = graphql`
   query CoverCreationScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ...CoverEditor_profile
-      ... on Profile {
+    profileNode: node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...CoverEditor_profile
         webCard {
           webCardKind
           id
@@ -75,7 +73,8 @@ const CoverCreationScreen = ({
     templateId ? queryWithCoverTemplate : queryWithoutCoverTemplate,
     preloadedQuery,
   );
-  const { profile } = data;
+  const { profileNode } = data;
+  const profile = profileNode?.profile;
 
   const [canSave, setCanSave] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
@@ -226,7 +225,11 @@ const CoverCreationScreen = ({
           <CoverEditor
             ref={coverEditorRef}
             profile={profile}
-            coverTemplate={'coverTemplate' in data ? data.coverTemplate : null}
+            coverTemplate={
+              'coverTemplateNode' in data
+                ? (data.coverTemplateNode?.coverTemplate ?? null)
+                : null
+            }
             backgroundColor={color ?? null}
             onCanSaveChange={onCanSaveChange}
             onCancel={onBack}

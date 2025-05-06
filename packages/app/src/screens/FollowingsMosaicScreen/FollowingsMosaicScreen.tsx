@@ -17,8 +17,10 @@ import type { PreloadedQuery } from 'react-relay';
 
 const followingsMosaicScreenQuery = graphql`
   query FollowingsMosaicScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      ...FollowingsMosaicScreenList_webCard
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
+        ...FollowingsMosaicScreenList_webCard
+      }
     }
   }
 `;
@@ -64,10 +66,11 @@ const FollowingsMosaicScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsMosaicScreenQuery>;
 }) => {
-  const { webCard } = usePreloadedQuery(
+  const { node } = usePreloadedQuery(
     followingsMosaicScreenQuery,
     preloadedQuery,
   );
+  const webCard = node?.webCard;
 
   return <FollowingsMosaicScreenList webCard={webCard ?? null} />;
 };

@@ -12,13 +12,15 @@ import type { PostRoute } from '#routes';
 
 const postCommentsMobileScreenQuery = graphql`
   query PostCommentsScreenQuery($profileId: ID!, $postId: ID!) {
-    post: node(id: $postId) {
-      ...PostCommentsList_post
+    postNode: node(id: $postId) {
+      ...PostCommentsList_post @alias(as: "post")
     }
-    profile: node(id: $profileId) {
-      ...PostCommentsList_myProfile
-      ... on WebCard {
-        ...AuthorCartoucheFragment_webCard
+    profileNode: node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...PostCommentsList_myProfile
+        webCard {
+          ...AuthorCartoucheFragment_webCard
+        }
       }
     }
   }
@@ -28,16 +30,20 @@ const PostCommentsMobileScreen = ({
   preloadedQuery,
   route: { params },
 }: RelayScreenProps<PostRoute, PostCommentsScreenQuery>) => {
-  const { profile, post } = usePreloadedQuery(
+  const { profileNode, postNode } = usePreloadedQuery(
     postCommentsMobileScreenQuery,
     preloadedQuery,
   );
 
-  if (!profile || !post) {
+  if (!profileNode?.profile || !postNode?.post) {
     return null;
   }
   return (
-    <PostCommentsList profile={profile} post={post} postId={params.postId} />
+    <PostCommentsList
+      profile={profileNode.profile}
+      post={postNode.post}
+      postId={params.postId}
+    />
   );
 };
 
