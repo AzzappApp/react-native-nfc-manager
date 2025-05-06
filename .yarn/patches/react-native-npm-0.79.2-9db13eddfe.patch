@@ -1,5 +1,5 @@
 diff --git a/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm b/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
-index e1cad8a3f1f37bfa1e107886ea17736a0a1f8ed1..98cf441aa7796bb1abcc039f8aeb4c2874539a95 100644
+index e1cad8a3f1f37bfa1e107886ea17736a0a1f8ed1..d7ee72c75b7e5dae1ca36a5b1e6b41cd51718e1e 100644
 --- a/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
 +++ b/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm
 @@ -547,6 +547,11 @@ - (void)setTextAndSelection:(NSInteger)eventCount

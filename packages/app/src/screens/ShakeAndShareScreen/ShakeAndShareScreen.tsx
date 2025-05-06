@@ -66,7 +66,7 @@ const ShakeAndShareScreen = ({
   );
 
   const profile = node?.profile;
-  const webCard = profile?.webCard;
+  const webCard = node?.profile?.webCard;
 
   const router = useRouter();
 
@@ -75,7 +75,7 @@ const ShakeAndShareScreen = ({
       !profile ||
       profile.invited ||
       !webCard?.cardIsPublished ||
-      !webCard?.userName
+      !webCard.userName
     ) {
       router.back();
     }

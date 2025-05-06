@@ -7,7 +7,7 @@
     "dev": { "persistent": true, "cache": false, "dependsOn": [] },
     "//#relay:build": {
       "dependsOn": ["graphql-codegen"],
-      "inputs": ["packages/app/*.{js,jsx,ts,tsx}", "./schema.graphql"],
+      "inputs": ["packages/app/src/**/*.{js,jsx,ts,tsx}", "./schema.graphql"],
       "outputs": [
         "packages/app/src/relayArtifacts/**",
         "packages/api/src/persisted-query-map.json"
