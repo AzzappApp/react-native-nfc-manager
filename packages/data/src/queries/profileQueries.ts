@@ -495,7 +495,6 @@ export const getSharedWebCardRelation = async (
         eq(ProfileTable.userId, viewerId),
         inArray(TargetProfile.userId, targetUserIds as string[]),
         eq(ProfileTable.deleted, false),
-        eq(TargetProfile.deleted, false),
       ),
     );
 
