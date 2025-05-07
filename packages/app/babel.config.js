@@ -52,7 +52,9 @@ module.exports = {
             !filename.endsWith('.test.tsx') &&
             !filename.endsWith('.test.ts') &&
             // a file in react/relay that breaks the build
-            !filename.includes('useUnsafeRef_DEPRECATED')
+            !filename.includes('useUnsafeRef_DEPRECATED') &&
+            // @gorhom/bottom-sheet seems to be unsupported by react-compiler
+            !filename.includes('@gorhom/bottom-sheet')
           );
         },
         enableReanimatedCheck: true,
