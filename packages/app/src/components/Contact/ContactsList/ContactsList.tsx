@@ -33,8 +33,6 @@ const ContactsList = ({
   listFooterComponent,
   renderSectionHeader,
 }: Props) => {
-  const styles = useStyleSheet(stylesheet);
-
   const renderListItem = useCallback(
     ({
       item,
@@ -64,7 +62,6 @@ const ContactsList = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={styles.content}
       ItemSeparatorComponent={ItemSeparator}
       ListFooterComponent={listFooterComponent}
       onEndReachedThreshold={0.5}
@@ -76,23 +73,13 @@ const ContactsList = ({
 const sectionKeyExtractor = (item: { id?: string }, index: number) => {
   return item.id ?? `${index}`;
 };
+
 const ItemSeparator = () => {
   const styles = useStyleSheet(stylesheet);
   return <View style={styles.separator} />;
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  content: {
-    paddingHorizontal: 10,
-  },
-  flex: { flex: 1 },
-  title: {
-    marginVertical: 20,
-    textTransform: 'uppercase',
-  },
-  section: {
-    margin: 20,
-  },
   separator: {
     height: 1,
     width: '100%',

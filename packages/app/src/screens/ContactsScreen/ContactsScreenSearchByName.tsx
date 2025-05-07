@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import ContactsList from '#components/Contact/ContactsList';
+import Container from '#ui/Container';
 import Text from '#ui/Text';
 import type { ContactType } from '#helpers/contactTypes';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -63,7 +64,11 @@ const ContactsScreenSearchByName = ({
       >;
     }) => {
       if (isNotFalsyString(title)) {
-        return <Text style={styles.title}>{title}</Text>;
+        return (
+          <Container style={styles.titleContainer}>
+            <Text style={styles.title}>{title}</Text>
+          </Container>
+        );
       }
       return null;
     },
@@ -85,8 +90,11 @@ const ContactsScreenSearchByName = ({
 };
 
 const styles = StyleSheet.create({
+  titleContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+  },
   title: {
-    marginVertical: 20,
     textTransform: 'uppercase',
   },
 });

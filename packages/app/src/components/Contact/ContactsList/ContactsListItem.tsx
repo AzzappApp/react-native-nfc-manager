@@ -21,7 +21,7 @@ type Props = {
 
 const COVER_WIDTH = 35;
 
-const ContactSearchByNameItem = ({
+const ContactListItem = ({
   contact,
   onShowContact,
   showContactAction,
@@ -116,6 +116,7 @@ const GAP = 15;
 
 const styles = StyleSheet.create({
   contact: {
+    marginHorizontal: 10,
     marginVertical: 20,
     flexDirection: 'row',
     columnGap: GAP,
@@ -150,4 +151,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactSearchByNameItem;
+export default ContactListItem;
