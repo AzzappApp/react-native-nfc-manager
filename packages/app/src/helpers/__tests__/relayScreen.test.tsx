@@ -56,6 +56,7 @@ jest.mock('../authStore', () => ({
 jest.mock('#hooks/useAppState');
 jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
+  init: jest.fn(),
 }));
 
 type FakeOperation = {

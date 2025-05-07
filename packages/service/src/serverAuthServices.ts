@@ -32,6 +32,7 @@ export const checkServerAuth = async (headers: Headers) => {
       `owner:${TEAM_SLUG}:project:azzapp:environment:${ENVIRONMENT}`,
       `owner:${TEAM_SLUG}:project:azzapp-users-manager-webapp:environment:${ENVIRONMENT}`,
       `owner:${TEAM_SLUG}:project:azzapp-backoffice:environment:${ENVIRONMENT}`,
+      `owner:${TEAM_SLUG}:project:azzapp-api:environment:${ENVIRONMENT}`,
     ].concat(
       ENVIRONMENT === 'development'
         ? [
