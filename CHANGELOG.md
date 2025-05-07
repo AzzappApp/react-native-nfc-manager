@@ -1,3 +1,7 @@
+## 1.10.0-canary.189
+
+* **fix:**  - **ContactList:** contact name overlap
+
 ## 1.10.0-canary.188
 
 * **fix:**  - **CoverEdition:** prevent cover edition during uploading ([#8707](https://github.com/AzzappApp/azzapp/pull/8707))
