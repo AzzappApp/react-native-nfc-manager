@@ -334,10 +334,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: 'azzapp'
           SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
@@ -376,10 +372,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: 'azzapp'
           SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
@@ -513,10 +505,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: 'azzapp'
           SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
           APP_SCHEME: ${{ vars.APP_SCHEME }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
