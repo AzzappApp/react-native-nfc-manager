@@ -8,6 +8,7 @@ import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
+import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
@@ -157,13 +158,17 @@ const WebCardEditScreen = ({
     [router],
   );
 
+  const { coverUploadingData } = useCoverUpload();
   const onEditCover = useCallback(() => {
     //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
     Toast.hide();
+    if (coverUploadingData?.webCardId === webCard.id) {
+      return;
+    }
     router.push({
       route: 'COVER_EDITION',
     });
-  }, [router]);
+  }, [router, coverUploadingData?.webCardId, webCard.id]);
   // #endregion
 
   // #region Selection mode

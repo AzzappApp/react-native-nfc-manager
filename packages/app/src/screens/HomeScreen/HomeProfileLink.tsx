@@ -125,6 +125,9 @@ const HomeProfileLinkText = ({
   text,
   ...props
 }: TextProps & { text: DerivedValue<string> }) => {
+  // Cause a reading of shared value during render
+  // eslint-disable-next-line react-compiler/react-compiler
+  'use no memo';
   const [textInner, setTextInner] = useState(() => text.value);
 
   useAnimatedReaction(

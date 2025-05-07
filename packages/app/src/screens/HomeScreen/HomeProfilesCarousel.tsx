@@ -431,9 +431,8 @@ const ItemRenderComponent = ({
 
   const { coverUploadingData } = useCoverUpload();
 
-  const isPredefined =
-    coverUploadingData?.webCardId !== profile.webCard?.id &&
-    profile.webCard?.coverIsPredefined;
+  const coverIsUploading =
+    coverUploadingData?.webCardId === profile.webCard?.id;
 
   return (
     <>
@@ -472,7 +471,7 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            {isPredefined ? (
+            {!coverIsUploading && profile.webCard?.coverIsPredefined ? (
               <PressableScaleHighlight
                 style={containerStyle}
                 onLongPress={openWebcardModal}
@@ -499,22 +498,23 @@ const ItemRenderComponent = ({
                 prefetch
               />
             )}
-            {(profile.webCard?.coverIsPredefined ||
-              profile.webCard?.coverIsLogoPredefined) && (
-              <PressableNative
-                style={styles.editUserContainer}
-                onPress={onPressEdit}
-                android_ripple={{
-                  borderless: true,
-                  foreground: true,
-                }}
-              >
-                <BlurView style={styles.multiUserIconContainer}>
-                  <View ref={refEdit} style={styles.tooltipTarget} />
-                  <Icon icon="edit" style={styles.multiUserIcon} />
-                </BlurView>
-              </PressableNative>
-            )}
+            {!coverIsUploading &&
+              (profile.webCard?.coverIsPredefined ||
+                profile.webCard?.coverIsLogoPredefined) && (
+                <PressableNative
+                  style={styles.editUserContainer}
+                  onPress={onPressEdit}
+                  android_ripple={{
+                    borderless: true,
+                    foreground: true,
+                  }}
+                >
+                  <BlurView style={styles.multiUserIconContainer}>
+                    <View ref={refEdit} style={styles.tooltipTarget} />
+                    <Icon icon="edit" style={styles.multiUserIcon} />
+                  </BlurView>
+                </PressableNative>
+              )}
             {isMultiUser && ENABLE_MULTI_USER && (
               <PressableNative
                 style={styles.multiUserContainer}
