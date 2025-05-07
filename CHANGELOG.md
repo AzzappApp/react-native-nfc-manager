@@ -1,3 +1,7 @@
+## 1.10.0-canary.182
+
+* **fix:**  - **BottomSheet:** disable compiler on it
+
 ## 1.10.0-canary.181
 
 * **fix:**  - filter out props before creating contact ([#8687](https://github.com/AzzappApp/azzapp/pull/8687))
