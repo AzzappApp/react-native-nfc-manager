@@ -1,3 +1,8 @@
+## 1.10.0-canary.188
+
+* **fix:**  - **CoverEdition:** prevent cover edition during uploading ([#8707](https://github.com/AzzappApp/azzapp/pull/8707))
+* **fix:**  - do not generate valid webcard Url without username ([#8706](https://github.com/AzzappApp/azzapp/pull/8706))
+
 ## 1.10.0-canary.187
 
 * **fix:**  - update x-use-appclip
