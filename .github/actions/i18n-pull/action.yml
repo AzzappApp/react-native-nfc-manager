@@ -2,7 +2,7 @@ name: Pull translations
 description: Pull translations from the database and extract keys
 
 inputs:
-  NEXT_PUBLIC_PLATFORM:
+  DEPLOYMENT_ENVIRONMENT:
     description: dev, staging or production
     required: true
   API_SERVER_TOKEN:
@@ -22,7 +22,7 @@ runs:
     - name: Pull translations
       run: yarn i18n:pull
       env:
-        NEXT_PUBLIC_PLATFORM: ${{ inputs.NEXT_PUBLIC_PLATFORM }}
+        DEPLOYMENT_ENVIRONMENT: ${{ inputs.DEPLOYMENT_ENVIRONMENT }}
         API_SERVER_TOKEN: ${{ inputs.API_SERVER_TOKEN }}
         TRANSLATION_APP_API_ENDPOINT: ${{ inputs.TRANSLATION_APP_API_ENDPOINT }}
       shell: bash

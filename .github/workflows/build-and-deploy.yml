@@ -43,7 +43,7 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
@@ -274,7 +274,7 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
@@ -326,7 +326,7 @@ jobs:
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
@@ -364,7 +364,7 @@ jobs:
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
@@ -434,7 +434,7 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
@@ -498,7 +498,7 @@ jobs:
           DEVELOPMENT_BUILD: ${{ github.ref_name != 'stable' }}
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
           SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
@@ -532,7 +532,7 @@ jobs:
         run: bundle exec fastlane android deploy
         working-directory: packages/app
         env:
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
           ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
