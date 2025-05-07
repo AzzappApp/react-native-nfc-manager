@@ -235,8 +235,8 @@ const addContact: MutationResolvers['addContact'] = async (
       {
         profile,
         contact: {
-          firstname: input.firstname,
-          lastname: input.lastname,
+          firstName: input.firstname,
+          lastName: input.lastname,
         },
       },
     );

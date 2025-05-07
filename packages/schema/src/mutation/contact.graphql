@@ -1,5 +1,5 @@
 extend type Mutation {
-  saveContact(profileId: ID!, contactId: ID!, input: ContactInput!): Contact
+  saveContact(contactId: ID!, input: ContactInput!): Contact
 
   createContact(
     profileId: ID!
@@ -17,8 +17,8 @@ extend type Mutation {
 
 input ContactInput {
   contactProfileId: ID
-  firstname: String
-  lastname: String
+  firstName: String
+  lastName: String
   company: String
   title: String
   birthday: String
@@ -31,7 +31,7 @@ input ContactInput {
   logoId: String
   note: String
   location: LocationInput
-  address: AddressInput
+  meetingPlace: AddressInput
   meetingDate: DateTime
 }
 

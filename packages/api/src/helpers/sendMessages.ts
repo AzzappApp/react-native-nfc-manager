@@ -42,8 +42,8 @@ const buildWebcardUrl = async (profile: Profile, webCard: WebCard) => {
 type Parameters = {
   profile?: Profile;
   contact?: {
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
   };
 };
 
@@ -372,7 +372,7 @@ export const notifyUsers = async (
                       description: 'Email hello for add contact notification',
                     },
                     {
-                      name: contact.firstname,
+                      name: contact.firstName,
                     },
                   ),
                   content: intl.formatMessage(

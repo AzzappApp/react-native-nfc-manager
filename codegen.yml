@@ -59,6 +59,7 @@ generates:
       scalars:
         JSON: Record<string, unknown>
         ID: string
+        DateTime: Date
       contextType: '@azzapp/schema/GraphQLContext#GraphQLContext'
       makeResolverTypeCallable: true
       avoidOptionals: 

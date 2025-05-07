@@ -13,6 +13,7 @@ import {
   removeContacts as deleteContact,
   transaction,
   updateContact,
+  getContactById,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
@@ -30,7 +31,7 @@ import {
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
-import type { Contact, ContactRow } from '@azzapp/data';
+import type { Contact, ContactRow, NewContact } from '@azzapp/data';
 
 export const createContact: MutationResolvers['createContact'] = async (
   _,
@@ -62,28 +63,19 @@ export const createContact: MutationResolvers['createContact'] = async (
     await referencesMedias(data, null);
   }
 
-  const contactToCreate: Omit<Contact, 'deletedAt' | 'id'> = {
-    avatarId: input.avatarId ?? null,
+  const contactToCreate: NewContact = {
+    ...input,
     addresses: input.addresses ?? [],
-    contactProfileId: input.contactProfileId ?? null,
     emails: input.emails ?? [],
     ownerProfileId: profileId,
     phoneNumbers: input.phoneNumbers ?? [],
     type: 'contact',
-    birthday: input.birthday || null,
     company: input.company || '',
-    firstName: input.firstname || '',
-    lastName: input.lastname || '',
     title: input.title || '',
-    deleted: false,
-    urls: input.urls || null,
-    socials: input.socials || null,
-    createdAt: new Date(),
-    logoId: input.logoId ?? null,
-    meetingLocation: input.location ?? null,
-    meetingPlace: input.address ?? null,
-    note: input.note ?? '',
-    meetingDate: input.meetingDate ? new Date(input.meetingDate) : new Date(),
+    birthday: input.birthday || null,
+    firstName: input.firstName || '',
+    lastName: input.lastName || '',
+    meetingDate: input.meetingDate ?? undefined,
   };
 
   let contact: Contact;
@@ -98,11 +90,7 @@ export const createContact: MutationResolvers['createContact'] = async (
   } else {
     const id = await createNewContact(contactToCreate);
 
-    contact = {
-      id,
-      deletedAt: null,
-      ...contactToCreate,
-    };
+    contact = await getContactById(id);
   }
 
   if (scanUsed) {
@@ -188,7 +176,7 @@ export const createContact: MutationResolvers['createContact'] = async (
       urls: commonInformationToMerge.urls.concat(urls),
       socials: commonInformationToMerge.socials.concat(socials),
       meetingLocation: input.location ?? null,
-      meetingPlace: input.address ?? null,
+      meetingPlace: input.meetingPlace ?? null,
     };
 
     const existingShareBack = await getContactByProfiles({
@@ -234,8 +222,8 @@ export const createContact: MutationResolvers['createContact'] = async (
 
   if (
     notify &&
-    input.firstname &&
-    input.lastname &&
+    input.firstName &&
+    input.lastName &&
     input.emails &&
     input.emails.length > 0 &&
     webCard
@@ -250,8 +238,8 @@ export const createContact: MutationResolvers['createContact'] = async (
       {
         profile,
         contact: {
-          firstname: input.firstname,
-          lastname: input.lastname,
+          firstName: input.firstName,
+          lastName: input.lastName,
         },
       },
     );
@@ -264,16 +252,23 @@ export const createContact: MutationResolvers['createContact'] = async (
 
 export const saveContact: MutationResolvers['saveContact'] = async (
   _,
-  { profileId: gqlProfileId, contactId: gqlContactId, input },
+  { contactId: gqlContactId, input },
 ) => {
   const user = await getSessionUser();
   if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-  const profileId = fromGlobalId(gqlProfileId).id;
-  const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== user.id || !gqlContactId) {
+  const contactId = fromGlobalId(gqlContactId).id;
+  const existingContact = await contactLoader.load(contactId);
+
+  if (existingContact === null) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const profile = await profileLoader.load(existingContact.ownerProfileId);
+
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
@@ -283,30 +278,30 @@ export const saveContact: MutationResolvers['saveContact'] = async (
     await referencesMedias(data, null);
   }
 
-  const contactToUpdate: Partial<Contact> = {
-    avatarId: input.avatarId,
-    addresses: input.addresses || [],
-    emails: input.emails || [],
-    phoneNumbers: input.phoneNumbers || [],
-    birthday: input.birthday || null,
-    company: input.company || '',
-    firstName: input.firstname || '',
-    lastName: input.lastname || '',
-    title: input.title || '',
-    urls: input.urls,
-    socials: input.socials,
-    logoId: input.logoId,
-    note: input.note || '',
-    meetingDate: input.meetingDate ? new Date(input.meetingDate) : undefined,
+  const contactToUpdate: Partial<Omit<Contact, 'id' | 'meetingLocation'>> = {
+    ...input,
+    // updatable fields
+    emails: input.emails === null ? [] : input.emails,
+    phoneNumbers: input.phoneNumbers === null ? [] : input.phoneNumbers,
+    addresses: input.addresses === null ? [] : input.addresses,
+    company: input.company === null ? '' : input.company,
+    title: input.title === null ? '' : input.title,
+    firstName: input.firstName === null ? '' : input.firstName,
+    lastName: input.lastName === null ? '' : input.lastName,
+    meetingDate: input.meetingDate === null ? undefined : input.meetingDate,
+    // TODO: meetingLocation cannot be retrieved for now
+    // We should implement fromDriver
+    // meetingLocation:
+    //   'location' in input &&
+    //   input.location?.latitude &&
+    //   input.location?.longitude
+    //     ? input.location
+    //     : existingContact.meetingLocation,
   };
-
-  const contactId = fromGlobalId(gqlContactId).id;
 
   await updateContact(contactId, contactToUpdate);
 
-  const contact = await contactLoader.load(contactId);
-
-  return contact;
+  return { ...existingContact, ...contactToUpdate } as Contact;
 };
 
 export const removeContacts: MutationResolvers['removeContacts'] = async (

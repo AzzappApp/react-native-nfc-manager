@@ -17,7 +17,7 @@ type WebCard implements Node {
   """
   The user name of the profile
   """
-  lastUserNameUpdate: DateTime!
+  lastUserNameUpdate: DateTime
   """
   The kind of the webCard (business, personal)
   """

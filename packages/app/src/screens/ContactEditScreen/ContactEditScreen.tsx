@@ -16,8 +16,6 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
-
-import { getAuthState } from '#helpers/authStore';
 import { contactSchema } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -61,16 +59,11 @@ const ContactEditScreen = ({
 
   const [commit, loading] = useMutation<ContactEditScreenMutation>(graphql`
     mutation ContactEditScreenMutation(
-      $profileId: ID!
       $contactId: ID!
       $contact: ContactInput!
       $pixelRatio: Float!
     ) {
-      saveContact(
-        profileId: $profileId
-        contactId: $contactId
-        input: $contact
-      ) {
+      saveContact(contactId: $contactId, input: $contact) {
         id
         firstName
         lastName
@@ -162,9 +155,7 @@ const ContactEditScreen = ({
   const submit = () => {
     Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
-      const profileId = getAuthState().profileInfos?.profileId;
-
-      if (!profileId || !params.contact.id) {
+      if (!params.contact.id) {
         return;
       }
 
@@ -229,7 +220,6 @@ const ContactEditScreen = ({
 
       commit({
         variables: {
-          profileId,
           contactId: params.contact.id,
           pixelRatio: PixelRatio(),
           contact: {
@@ -253,8 +243,8 @@ const ContactEditScreen = ({
             addresses: data.addresses,
             socials: data.socials,
             company: data.company || '',
-            firstname: data.firstName || '',
-            lastname: data.lastName || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
             title: data.title || '',
             birthday: data.birthday?.birthday,
             meetingDate: data.meetingDate,

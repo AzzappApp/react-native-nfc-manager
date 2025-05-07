@@ -1,5 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { applyMiddleware } from 'graphql-middleware';
+import { DateTimeResolver } from 'graphql-scalars';
 import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
 import {
   asyncLocalStorageContextMiddleware,
@@ -11,6 +12,7 @@ import QueryResolvers from './query';
 import type { Resolvers } from './__generated__/types';
 
 const resolvers: Resolvers = {
+  DateTime: DateTimeResolver,
   Mutation: MutationResolvers,
   ...QueryResolvers,
 };

@@ -370,3 +370,13 @@ export const removeContactsbyIds = async (contactIds: string[]) => {
     })
     .where(inArray(ContactTable.id, contactIds));
 };
+
+export const getContactById = async (contactId: string) => {
+  const res = await db()
+    .select()
+    .from(ContactTable)
+    .where(eq(ContactTable.id, contactId))
+    .then(rows => rows[0] ?? null);
+
+  return res;
+};

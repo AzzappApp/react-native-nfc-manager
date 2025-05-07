@@ -5,12 +5,11 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import useRichTextManager from '#components/cardModules/tool/useRichTextManager';
-import { getAuthState } from '#helpers/authStore';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
-import Button from '#ui/Button';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
 import type { ContactType } from '#helpers/contactTypes';
 import type { NoteModalMutation } from '#relayArtifacts/NoteModalMutation.graphql';
@@ -27,16 +26,8 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
   const [text, setText] = useState(contact.note);
 
   const [commit, loading] = useMutation<NoteModalMutation>(graphql`
-    mutation NoteModalMutation(
-      $profileId: ID!
-      $contactId: ID!
-      $contact: ContactInput!
-    ) {
-      saveContact(
-        profileId: $profileId
-        contactId: $contactId
-        input: $contact
-      ) {
+    mutation NoteModalMutation($contactId: ID!, $contact: ContactInput!) {
+      saveContact(contactId: $contactId, input: $contact) {
         id
         note
       }
@@ -44,11 +35,9 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
   `);
 
   const onSave = useCallback(() => {
-    const profileId = getAuthState().profileInfos?.profileId;
-    if (profileId && contact.id) {
+    if (contact.id) {
       commit({
         variables: {
-          profileId,
           contactId: contact.id,
           contact: {
             note: text || '',
@@ -98,7 +87,7 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
         )}
         style={[styles.header, { marginTop: topInset }]}
         rightElement={
-          <Button
+          <HeaderButton
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
@@ -109,7 +98,7 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
           />
         }
         leftElement={
-          <Button
+          <HeaderButton
             variant="secondary"
             onPress={onDismiss}
             label={intl.formatMessage({

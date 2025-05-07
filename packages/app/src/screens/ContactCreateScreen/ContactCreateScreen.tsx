@@ -230,8 +230,8 @@ const ContactCreateScreen = ({
             addresses: data.addresses,
             socials: data.socials,
             company: data.company || '',
-            firstname: data.firstName || '',
-            lastname: data.lastName || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
             title: data.title || '',
             birthday: data.birthday?.birthday || '',
             note: data.note || '',
@@ -241,7 +241,7 @@ const ContactCreateScreen = ({
                   longitude: location.coords.longitude,
                 }
               : null,
-            address: address
+            meetingPlace: address
               ? {
                   country: address.country,
                   city: address.city,

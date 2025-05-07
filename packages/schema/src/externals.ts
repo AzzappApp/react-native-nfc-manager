@@ -1,12 +1,12 @@
 import { externalFunction } from './GraphQLContext';
-import type { AddContactInput } from '#__generated__/types';
+import type { ContactInput } from '#__generated__/types';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
 import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 type Parameters = {
   profile?: Profile;
-  contact?: Partial<AddContactInput>;
+  contact?: Partial<ContactInput>;
 };
 
 export const notifyUsers =

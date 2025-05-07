@@ -137,6 +137,8 @@ const ContactCardItem = ({
   const qrCodeKey = useQRCodeKey(profile);
 
   const showUpdateContactHint =
+    profile.lastContactCardUpdate &&
+    profile.createdAt &&
     profile.lastContactCardUpdate <= profile.createdAt &&
     profile.webCard?.cardIsPublished;
 

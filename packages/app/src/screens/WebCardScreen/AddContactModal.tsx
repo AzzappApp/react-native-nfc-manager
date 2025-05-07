@@ -136,22 +136,22 @@ const AddContactModal = ({
     const urls = scanned.urls?.filter(isDefined) || [];
 
     return {
-      addresses: addresses ?? [],
-      company: scanned.company ?? '',
+      addresses,
+      company: scanned.company,
       emails:
         emails?.map(email => ({
           label: email.label,
           address: email.address,
         })) ?? [],
-      firstname: scanned.firstName ?? '',
-      lastname: scanned.lastName ?? '',
+      firstName: scanned.firstName,
+      lastName: scanned.lastName,
       phoneNumbers:
         phoneNumbers?.map(number => ({
           label: number.label,
           number: number.number,
         })) ?? [],
-      title: scanned.title ?? '',
-      birthday: scanned?.birthday,
+      title: scanned.title,
+      birthday: scanned.birthday,
       contactProfileId: scanned.profileId,
       urls: urls.map(url => ({ url: url.url })),
       socials: socials?.map(social => ({
@@ -160,8 +160,7 @@ const AddContactModal = ({
       })),
       avatarId: uploadedAvatarId,
       location: geolocation?.location,
-      address: geolocation?.address,
-      meetingDate: new Date(),
+      meetingPlace: geolocation?.address,
     };
   }, [geolocation, scanned, viewer]);
 
