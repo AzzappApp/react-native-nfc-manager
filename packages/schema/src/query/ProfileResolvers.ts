@@ -695,7 +695,7 @@ const getContactCardUrl = async ({
 }) => {
   const webCard = await webCardLoader.load(profile.webCardId);
 
-  if (!profileIsAssociatedToCurrentUser(profile)) {
+  if (!webCard?.userName || !profileIsAssociatedToCurrentUser(profile)) {
     return buildWebUrl(webCard?.userName);
   }
 

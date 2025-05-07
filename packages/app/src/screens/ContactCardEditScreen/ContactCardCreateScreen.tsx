@@ -116,7 +116,6 @@ const ContactCardCreateScreen = ({
         ) {
           profile {
             id
-            contactCardUrl
             profileRole
             invited
             webCard {
