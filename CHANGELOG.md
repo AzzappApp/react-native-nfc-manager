@@ -1,3 +1,7 @@
+## 1.10.0-canary.183
+
+* **build:**  - rework on env variables ([#8655](https://github.com/AzzappApp/azzapp/pull/8655))
+
 ## 1.10.0-canary.182
 
 * **fix:**  - **BottomSheet:** disable compiler on it
