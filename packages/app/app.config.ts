@@ -1,4 +1,4 @@
-import env from '#env';
+import env from './src/env';
 import type { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
