@@ -636,8 +636,7 @@ const ContactCardCreateScreen = ({
     keyboardDismiss();
     openScanner();
   }, [hidePopup, openScanner]);
-
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
 
   return (
     <>
@@ -688,11 +687,13 @@ const ContactCardCreateScreen = ({
           style={styles.scanBusinessCardButton}
         />
 
-        <ContactCardCreateForm
-          control={control}
-          user={currentUser}
-          setValue={setValue}
-        />
+        <View style={{ flex: 1, paddingBottom: bottom }}>
+          <ContactCardCreateForm
+            control={control}
+            user={currentUser}
+            setValue={setValue}
+          />
+        </View>
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}

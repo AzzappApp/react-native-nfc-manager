@@ -37,6 +37,7 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
   onChangeLabel,
   children,
   errorMessage,
+  offsetRef,
 }: PropsWithChildren<{
   labelKey?: FieldPath<TFieldValues>;
   deleteField: () => void;
@@ -44,6 +45,7 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
   labelValues?: Array<{ key: string; value: string }>;
   onChangeLabel?: (label: string) => void;
   errorMessage?: string;
+  offsetRef?: React.RefObject<number>;
 }>) => {
   const deleteMode = useSharedValue(false);
 
@@ -112,9 +114,15 @@ const ContactCardEditFieldWrapper = <TFieldValues extends FieldValues>({
   const onPressDelete = useCallback(() => {
     deleteMode.set(!deleteMode.value);
     if (layout) {
-      openDeleteButton(layout);
+      const newLayout = offsetRef?.current
+        ? {
+            ...layout,
+            y: layout.y + offsetRef.current,
+          }
+        : layout;
+      openDeleteButton(newLayout);
     }
-  }, [deleteMode, layout, openDeleteButton]);
+  }, [deleteMode, layout, openDeleteButton, offsetRef]);
 
   const snapPoints = useMemo(
     () => [useFlatList ? '66%' : expectedHeight],

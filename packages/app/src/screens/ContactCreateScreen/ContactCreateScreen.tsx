@@ -503,68 +503,66 @@ const ContactCreateScreen = ({
   const { top } = useScreenInsets();
 
   return (
-    <>
-      <Container style={[styles.container, { paddingTop: top }]}>
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Create Contact',
-            description: 'Create Contact Card Modal title',
-          })}
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              onPress={router.back}
-              style={styles.leftArrowIcon}
-            />
-          }
-          rightElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'Create contact modal save button label',
-              })}
-              testID="save-contact-card"
-              loading={isSubmitting || loading}
-              onPress={submit}
-              variant="primary"
-              style={styles.headerButton}
-              disabled={!isValid}
-            />
-          }
-        />
-        <ScanMyPaperBusinessCard
-          onPress={openScannerView}
-          style={styles.scanButton}
-        />
-        <ContactCreateForm
-          control={control}
-          scanImage={scanImage}
-          notifyError={notifyError}
-          notify={notify}
-          toggleNotify={toggleNotify}
-        />
-        <ScreenModal
-          visible={!!progressIndicator}
-          gestureEnabled={false}
-          onRequestDismiss={preventModalDismiss}
-        >
-          {progressIndicator && (
-            <UploadProgressModal progressIndicator={progressIndicator} />
-          )}
-        </ScreenModal>
-
-        {showScanner && (
-          <View style={StyleSheet.absoluteFill}>
-            <ContactCardDetector
-              close={closeScanner}
-              extractData={loadFormFromScan}
-              extractVCardData={loadFormFromVCard}
-              closeContainer={closeScannerView}
-            />
-          </View>
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Create Contact',
+          description: 'Create Contact Card Modal title',
+        })}
+        leftElement={
+          <IconButton
+            icon="arrow_left"
+            onPress={router.back}
+            style={styles.leftArrowIcon}
+          />
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Create contact modal save button label',
+            })}
+            testID="save-contact-card"
+            loading={isSubmitting || loading}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+            disabled={!isValid}
+          />
+        }
+      />
+      <ScanMyPaperBusinessCard
+        onPress={openScannerView}
+        style={styles.scanButton}
+      />
+      <ContactCreateForm
+        control={control}
+        scanImage={scanImage}
+        notifyError={notifyError}
+        notify={notify}
+        toggleNotify={toggleNotify}
+      />
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
         )}
-      </Container>
-    </>
+      </ScreenModal>
+
+      {showScanner && (
+        <View style={StyleSheet.absoluteFill}>
+          <ContactCardDetector
+            close={closeScanner}
+            extractData={loadFormFromScan}
+            extractVCardData={loadFormFromVCard}
+            closeContainer={closeScannerView}
+          />
+        </View>
+      )}
+    </Container>
   );
 };
 

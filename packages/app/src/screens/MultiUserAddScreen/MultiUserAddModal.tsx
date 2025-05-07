@@ -39,12 +39,12 @@ import {
   parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import { baseUserDetailsSchema } from '#screens/MultiUserDetailsScreen/MultiUserDetailsSchema';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
@@ -618,48 +618,47 @@ const MultiUserAddModal = (
     },
   );
 
+  const { top } = useScreenInsets();
   return (
     <ScreenModal
       visible={visible}
       animationType="slide"
       onRequestDismiss={onClose}
     >
-      <Container style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <Header
-            middleElement={
-              <Text variant="large" style={styles.name}>
-                {firstName} {lastName}
-              </Text>
-            }
-            leftElement={
-              <Button
-                variant="secondary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'MultiUserAddModal - Cancel button label',
-                })}
-                onPress={onClose}
-              />
-            }
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'MultiUserAddModal - Save button label',
-                })}
-                onPress={submit}
-                loading={isSubmitting || saving}
-              />
-            }
-          />
-          <ContactCardEditForm
-            webCard={webCard}
-            control={control as unknown as Control<ContactCardFormValues>}
-          >
-            <MultiUserAddForm contacts={contacts} control={control} />
-          </ContactCardEditForm>
-        </SafeAreaView>
+      <Container style={{ flex: 1, paddingTop: top }}>
+        <Header
+          middleElement={
+            <Text variant="large" style={styles.name}>
+              {firstName} {lastName}
+            </Text>
+          }
+          leftElement={
+            <Button
+              variant="secondary"
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'MultiUserAddModal - Cancel button label',
+              })}
+              onPress={onClose}
+            />
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'MultiUserAddModal - Save button label',
+              })}
+              onPress={submit}
+              loading={isSubmitting || saving}
+            />
+          }
+        />
+        <ContactCardEditForm
+          webCard={webCard}
+          control={control as unknown as Control<ContactCardFormValues>}
+        >
+          <MultiUserAddForm contacts={contacts} control={control} />
+        </ContactCardEditForm>
         {isSubmitting || saving ? (
           /* Used to prevent user from interacting with the screen while saving */
           <View style={StyleSheet.absoluteFill} />

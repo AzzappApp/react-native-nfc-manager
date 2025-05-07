@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { Keyboard, Platform } from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
@@ -284,8 +284,7 @@ const ContactEditScreen = ({
   useEffect(() => {
     return Toast.hide;
   }, []);
-
-  const { top } = useScreenInsets();
+  const { bottom, top } = useScreenInsets();
 
   return (
     <>
@@ -319,7 +318,9 @@ const ContactEditScreen = ({
         />
 
         <FormDeleteFieldOverlay ref={scrollRef}>
-          <ContactForm control={control} />
+          <View style={{ flex: 1, paddingBottom: bottom }}>
+            <ContactForm control={control} />
+          </View>
         </FormDeleteFieldOverlay>
         <ScreenModal
           visible={!!progressIndicator}

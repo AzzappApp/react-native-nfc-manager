@@ -16,9 +16,11 @@ import type { Control } from 'react-hook-form';
 const ContactCardEditModalUrls = ({
   control,
   isPremium,
+  offsetRef,
 }: {
   control: Control<ContactCardFormValues>;
   isPremium?: boolean | null;
+  offsetRef?: React.RefObject<number>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -53,6 +55,7 @@ const ContactCardEditModalUrls = ({
             isPremium={isPremium}
             requiresPremium
             returnKeyType="done"
+            offsetRef={offsetRef}
           />
           <Separation small />
         </Fragment>

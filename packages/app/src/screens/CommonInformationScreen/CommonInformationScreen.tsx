@@ -298,7 +298,7 @@ export const CommonInformationScreen = ({
 
   const router = useRouter();
 
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
 
   return (
     <Container
@@ -354,7 +354,7 @@ export const CommonInformationScreen = ({
         }
       />
       <FormDeleteFieldOverlay>
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           <View style={styles.container}>
             <Icon icon="lock_line" style={styles.icon} />
             <Text variant="xsmall" style={styles.description}>

@@ -31,11 +31,11 @@ import {
   parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import { contactCardFormFragment } from '../../fragments/ContactCardEditFormFragment';
@@ -300,56 +300,55 @@ const ContactCardEditScreen = ({
     });
   });
 
+  const { top } = useScreenInsets();
   return (
-    <Container style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header
-          middleElement={intl.formatMessage(
-            {
-              defaultMessage: 'Edit Contact Card{azzappA}',
-              description: 'Edit Contact Card Modal title',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          )}
-          leftElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Cancel',
-                description: 'Edit contact card modal cancel button title',
-              })}
-              onPress={router.back}
-              variant="secondary"
-              style={styles.headerButton}
-            />
-          }
-          rightElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'Edit contact card modal save button label',
-              })}
-              testID="save-contact-card"
-              loading={isSubmitting || loading}
-              onPress={submit}
-              variant="primary"
-              style={styles.headerButton}
-            />
-          }
-        />
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={intl.formatMessage(
+          {
+            defaultMessage: 'Edit Contact Card{azzappA}',
+            description: 'Edit Contact Card Modal title',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        )}
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit contact card modal cancel button title',
+            })}
+            onPress={router.back}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit contact card modal save button label',
+            })}
+            testID="save-contact-card"
+            loading={isSubmitting || loading}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+      />
 
-        <ContactCardEditForm webCard={webCard} control={control} />
-        <ScreenModal
-          visible={!!progressIndicator}
-          gestureEnabled={false}
-          onRequestDismiss={preventModalDismiss}
-        >
-          {progressIndicator && (
-            <UploadProgressModal progressIndicator={progressIndicator} />
-          )}
-        </ScreenModal>
-      </SafeAreaView>
+      <ContactCardEditForm webCard={webCard} control={control} />
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

@@ -7,6 +7,7 @@ import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import CheckBox from '#ui/CheckBox';
 import Text from '#ui/Text';
 import type { contactFormValues } from '#helpers/contactHelpers';
@@ -45,10 +46,12 @@ const ContactCreateForm = ({
   }, [notifyError]);
 
   const { width } = useScreenDimensions();
+  const { bottom } = useScreenInsets();
+
   return (
     <>
       <FormDeleteFieldOverlay ref={scrollRef}>
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           {scanImage && (
             <View style={styles.imageContainer}>
               <View

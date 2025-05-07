@@ -22,6 +22,7 @@ import {
 } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -107,11 +108,12 @@ const ContactCardEditForm = ({
   );
 
   const { commonInformation } = webCard ?? {};
+  const { bottom } = useScreenInsets();
 
   return (
     <>
       <FormDeleteFieldOverlay keyboardShouldPersistTaps="handled">
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           {children}
           <ContactCardEditModalAvatar
             control={control}

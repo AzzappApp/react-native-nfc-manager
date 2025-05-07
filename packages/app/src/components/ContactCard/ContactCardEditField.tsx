@@ -25,6 +25,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   requiresPremium,
   returnKeyType,
   multiline,
+  offsetRef,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -42,6 +43,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   requiresPremium?: boolean;
   returnKeyType?: TextInputProps['returnKeyType'];
   multiline?: boolean;
+  offsetRef?: React.RefObject<number>;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -60,6 +62,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           onChangeLabel={onChangeLabel}
           deleteField={deleteField}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
+          offsetRef={offsetRef}
         >
           <TextInput
             value={value as string}
