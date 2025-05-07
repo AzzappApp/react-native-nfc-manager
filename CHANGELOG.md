@@ -1,3 +1,7 @@
+## 1.10.0-canary.193
+
+* **build:**  - simplify env vars
+
 ## 1.10.0-canary.192
 
 * **fix:**  - azzapp-api call web to revalidate pages ([#8712](https://github.com/AzzappApp/azzapp/pull/8712))
