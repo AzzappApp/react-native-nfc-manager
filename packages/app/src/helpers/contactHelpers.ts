@@ -13,7 +13,6 @@ import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 import { prefixWithHttp } from './contactListHelpers';
-import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import type { ContactMeetingPlaceType, ContactType } from './contactTypes';
 import type { ColorSchemeName } from 'react-native';
 
@@ -275,22 +274,15 @@ export const buildVCard = async (contact: ContactType) => {
   const contactImageId = contact.avatar?.id || contact.logo?.id;
   if (contactImageId && contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
-      const existingFile = getLocalCachedMediaFile(contactImageId, 'image');
-      let file: File | undefined;
-      if (existingFile) {
-        file = new File(existingFile);
+      const file = new File(Paths.cache.uri + contactImageId);
+      if (!file.exists) {
+        await File.downloadFileAsync(contactImageUrl, file);
       }
-      if (!file || !file.exists) {
-        file = new File(existingFile ?? Paths.cache.uri + contactImageId);
-        if (!file.exists) {
-          await File.downloadFileAsync(contactImageUrl, file);
-        }
-      }
+
       const image = file.base64();
       if (image) {
         vCard.addPhoto(image, 'png'); // requested avatars format
       }
-      console.log(vCard.toString());
     } catch (e) {
       Sentry.captureException(e);
       console.error('download avatar failure', e);
