@@ -26,6 +26,12 @@ const RootLayout = async (props: {
 
   const { children } = props;
 
+  const headersList = await headers();
+  const useAppClip = headersList.get('x-use-appclip') || '0';
+  const appleItunesAppMeta = useAppClip
+    ? `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}, ${env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID}`
+    : env.NEXT_PUBLIC_APPLE_ITUNES_APP_META;
+
   const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
 
   let locale = webCard?.locale;
@@ -82,10 +88,7 @@ const RootLayout = async (props: {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        <meta
-          name="apple-itunes-app"
-          content={env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}
-        />
+        <meta name="apple-itunes-app" content={appleItunesAppMeta} />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
