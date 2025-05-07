@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { z } from 'zod';
 
 export const schema = z.object({
@@ -53,7 +54,7 @@ export const schema = z.object({
     .describe('Deployment environment'),
 });
 
-const env = schema.safeParse({
+const usedEnvVars = {
   NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
   AZZAPP_API_VERCEL_PROTECTION_BYPASS:
     process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS,
@@ -68,9 +69,32 @@ const env = schema.safeParse({
   PURCHASE_ANDROID_KEY: process.env.PURCHASE_ANDROID_KEY,
   SENTRY_DSN: process.env.SENTRY_DSN,
   DEPLOYMENT_ENVIRONMENT: process.env.DEPLOYMENT_ENVIRONMENT,
+};
+
+Sentry.init({
+  dsn: usedEnvVars.SENTRY_DSN,
+  enabled: !__DEV__,
+  environment: usedEnvVars.DEPLOYMENT_ENVIRONMENT,
+  // TODO better configuration based on environment
+  // WARNING: This option interferes with reanimated and creates flickering in some animations
+  // do not enable it unless it has been fixed
+  enableStallTracking: false,
+  tracesSampleRate:
+    usedEnvVars.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
+  // DO NOT REENABLE THIS UNTIL IT DOES NOT CRASH THE APP ANYMORE
+  // see https://github.com/getsentry/sentry-java/issues/2604#issuecomment-1524566544
+  profilesSampleRate: 0,
 });
 
+const env = schema.safeParse(usedEnvVars);
+
 if (!env.success) {
+  Sentry.captureMessage('❌ app - invalid environment variables: ', {
+    level: 'fatal',
+    extra: {
+      error: env.error.format(),
+    },
+  });
   console.error('❌ app - invalid environment variables:', env.error.format());
 }
 

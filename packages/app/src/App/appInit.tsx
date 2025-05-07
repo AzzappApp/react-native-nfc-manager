@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native';
 import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 import env from '#env';
@@ -11,21 +10,7 @@ import { loadSkiaTypeFonts } from '#hooks/useApplicationFonts';
  * called at first launch before rendering the App component
  */
 const appInit = async () => {
-  Sentry.init({
-    dsn: env.SENTRY_DSN,
-    enabled: !__DEV__,
-    environment: env.DEPLOYMENT_ENVIRONMENT,
-    // TODO better configuration based on environment
-    // WARNING: This option interferes with reanimated and creates flickering in some animations
-    // do not enable it unless it has been fixed
-    enableStallTracking: false,
-    tracesSampleRate: env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
-    // DO NOT REENABLE THIS UNTIL IT DOES NOT CRASH THE APP ANYMORE
-    // see https://github.com/getsentry/sentry-java/issues/2604#issuecomment-1524566544
-    profilesSampleRate: 0,
-  });
-
-  //initializing RC sneed to be done early
+  //initializing RC needs to be done early
   if (Platform.OS === 'ios') {
     Purchases.configure({
       apiKey: env.PURCHASE_IOS_KEY,
