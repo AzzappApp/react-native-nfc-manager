@@ -28,9 +28,10 @@ const RootLayout = async (props: {
 
   const headersList = await headers();
   const useAppClip = headersList.get('x-use-appclip') || '0';
-  const appleItunesAppMeta = useAppClip
-    ? `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}, ${env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID}`
-    : env.NEXT_PUBLIC_APPLE_ITUNES_APP_META;
+  const appleItunesAppMeta =
+    useAppClip === '1'
+      ? `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}, ${env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID}`
+      : env.NEXT_PUBLIC_APPLE_ITUNES_APP_META;
 
   const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
 

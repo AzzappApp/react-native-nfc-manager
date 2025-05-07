@@ -38,7 +38,7 @@ export const schema = z.object({
   NEXT_PUBLIC_APP_CLIP_BUNDLE_ID: z
     .string()
     .default(
-      '"app-clip-bundle-id=com.azzapp.app-dev.Clip, app-clip-display=card"',
+      'app-clip-bundle-id=com.azzapp.app-dev.Clip, app-clip-display=card',
     )
     .describe('Apple App Clip meta'),
 });
