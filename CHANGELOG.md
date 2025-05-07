@@ -1,3 +1,7 @@
+## 1.10.0-canary.185
+
+* **feat:**  - shared path for appclip experiences ([#8679](https://github.com/AzzappApp/azzapp/pull/8679))
+
 ## 1.10.0-canary.184
 
 
