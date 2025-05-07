@@ -1,3 +1,7 @@
+## 1.10.0-canary.187
+
+* **fix:**  - update x-use-appclip
+
 ## 1.10.0-canary.186
 
 * **fix:**  - **contact:** [#8561](https://github.com/AzzappApp/azzapp/pull/8561) don’t use avatar in cache that may be too big for… ([#8701](https://github.com/AzzappApp/azzapp/pull/8701))
