@@ -28,7 +28,8 @@
     "clean": "turbo run clean && rm -Rf node_modules && rm -f tsconfig.tsbuildinfo",
     "release": "node ./scripts/release.js",
     "bump-version": "node ./scripts/bumpVersion.js",
-    "write-dev-changelog": "node ./scripts/writeDevChangeLog.js"
+    "write-dev-changelog": "node ./scripts/writeDevChangeLog.js",
+    "list-env-vars": "tsx scripts/collectEnvVars.ts"
   },
   "devScripts": [
     "relay:watch",
@@ -86,6 +87,7 @@
     "semver": "^7.6.3",
     "tagged-versions": "^1.3.0",
     "ts-jest": "^29.3.1",
+    "tsx": "^4.19.4",
     "turbo": "^2.5.0",
     "typescript": "^5.8.3"
   },

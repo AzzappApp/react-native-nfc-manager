@@ -2,9 +2,12 @@ import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
 import { getProfileById, getWebCardById } from '@azzapp/data';
+import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
-import { shareBackVCardFilename } from '@azzapp/service/shareBackHelper';
-import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import {
+  buildVCardFileName,
+  parseContactCard,
+} from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 
@@ -50,7 +53,7 @@ const downloadVCard = async (req: NextRequest) => {
   }
 
   const isValid = await verifyHmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+    CONTACT_CARD_SIGNATURE_SECRET,
     signature,
     decodeURIComponent(contactData),
     { salt: username },
@@ -105,7 +108,7 @@ const downloadVCard = async (req: NextRequest) => {
 
   const vCardContactString = vCard.toString();
 
-  const vCardFileName = shareBackVCardFilename(buildVCardContact);
+  const vCardFileName = buildVCardFileName('', buildVCardContact);
 
   return new Response(vCardContactString, {
     headers: {

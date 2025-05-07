@@ -18,6 +18,7 @@ const MAX_INVITATIONS_BY_SMS = 20;
 const sendInvitations: MutationResolvers['sendInvitations'] = async (
   _,
   { webCardId: gqlWebCardId, profileIds, allProfiles },
+  context,
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
@@ -51,11 +52,15 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
   }
 
   if (countDeletedProfiles > 0) {
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: countDeletedProfiles,
-    });
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: countDeletedProfiles,
+      },
+      context.apiEndpoint,
+    );
   }
 
   const user = await getSessionUser();

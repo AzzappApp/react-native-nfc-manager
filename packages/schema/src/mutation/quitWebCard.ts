@@ -10,7 +10,7 @@ import type { MutationResolvers } from '#/__generated__/types';
 
 type Mutation = MutationResolvers['quitWebCard'];
 
-const quitWebCard: Mutation = async (_, params) => {
+const quitWebCard: Mutation = async (_, params, context) => {
   const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
   const user = await getSessionUser();
   if (!user) {
@@ -29,7 +29,7 @@ const quitWebCard: Mutation = async (_, params) => {
   if (profile?.profileRole === 'owner') {
     await transaction(async () => {
       await markWebCardAsDeleted(profile.webCardId, user.id);
-      await updateMonthlySubscription(user.id);
+      await updateMonthlySubscription(user.id, context.apiEndpoint);
     });
     if (webCard?.userName) {
       invalidateWebCard(webCard.userName);
@@ -37,7 +37,7 @@ const quitWebCard: Mutation = async (_, params) => {
   } else {
     await transaction(async () => {
       await removeProfile(profile.id, user.id);
-      await updateMonthlySubscription(user.id);
+      await updateMonthlySubscription(user.id, context.apiEndpoint);
     });
   }
 

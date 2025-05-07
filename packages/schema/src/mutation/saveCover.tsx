@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   getWebCardPosts,
   referencesMedias,
   transaction,
   updateWebCard,
   createId,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import {
   invalidatePost,

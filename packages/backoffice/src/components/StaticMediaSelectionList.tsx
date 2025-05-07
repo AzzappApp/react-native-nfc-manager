@@ -5,7 +5,7 @@ import {
   FormLabel,
   Card,
 } from '@mui/material';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { getImageURL } from '@azzapp/service/mediaServices/imageHelpers';
 import type { ModuleBackground } from '@azzapp/data';
 
 type ModuleBackgroundSelectionListProps = {

@@ -11,7 +11,10 @@ import {
   Typography,
 } from '@mui/material';
 import { yellow } from '@mui/material/colors';
-import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURLForSize,
+  getVideoURL,
+} from '@azzapp/service/mediaServices/imageHelpers';
 import type { WebCard } from '@azzapp/data';
 
 type Props = {

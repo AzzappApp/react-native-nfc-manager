@@ -2,10 +2,11 @@ import { toGlobalId } from 'graphql-relay';
 import { getUsersToNotifyOnWebCard } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
+import env from '#env';
 import { inngest } from '../client';
 import type { WebCard } from '@azzapp/data';
 
-const NOTIF_DELAY = process.env.WEBCARD_NOTIFICATION_DELAY || '5m';
+const NOTIF_DELAY = env.WEBCARD_NOTIFICATION_DELAY;
 
 export const notifyWebCardUsersBatch = inngest.createFunction(
   {

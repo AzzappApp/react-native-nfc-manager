@@ -2,8 +2,7 @@ import {
   getImageURLForSize,
   getVideoThumbnailURL,
   getVideoUrlForSize,
-} from '@azzapp/shared/imagesHelpers';
-
+} from '@azzapp/service/mediaServices/imageHelpers';
 import { mediaLoader } from '#loaders';
 import { getDeferredMedia, uriResolver } from '#helpers/mediaHelpers';
 import type {

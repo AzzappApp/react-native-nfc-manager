@@ -13,22 +13,24 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
+import { sendTemplateEmail } from '@azzapp/service/emailServices';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
-  shareBackVCardFilename,
 } from '@azzapp/service/shareBackHelper';
 import { sendTwilioSMS } from '@azzapp/service/twilioHelpers';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
+import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
+import env from '#env';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
-import type { NewContact } from '@azzapp/data/src/schema';
+import type { NewContact } from '@azzapp/data';
 import type { VerifySignToken } from '@azzapp/service/signatureServices';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
@@ -183,7 +185,7 @@ export const processShareBackSubmission = async (
       const shareBackContactDetails = getValuesFromSubmitData(contactFormValue);
 
       const signature = await shareBackSignature(
-        process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+        CONTACT_CARD_SIGNATURE_SECRET,
         shareBackContactDetails,
       );
 
@@ -191,7 +193,7 @@ export const processShareBackSubmission = async (
         JSON.stringify([shareBackContactDetails, signature]),
       );
 
-      const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
+      const shareBackContactVCardUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
 
       await sendTwilioSMS({
         body: intl.formatMessage({
@@ -206,7 +208,7 @@ export const processShareBackSubmission = async (
       const buildVCardContact =
         buildVCardFromShareBackContact(contactFormValue);
 
-      const vCardFileName = shareBackVCardFilename(submission.value);
+      const vCardFileName = buildVCardFileName('', submission.value);
 
       await sendTemplateEmail({
         templateId: 'd-edcdee049b6d468cadf3ce7098bf0fe2',

@@ -12,6 +12,7 @@ import {
   isValidEmail,
   isValidUserName,
 } from '@azzapp/shared/stringHelpers';
+import env from '#env';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
@@ -81,7 +82,7 @@ const SignInScreen = () => {
       });
 
       await setSharedWebCredentials(
-        process.env.APP_WEBSHARED_CREDENTIALS!,
+        env.APP_WEBSHARED_CREDENTIALS,
         intlPhoneNumber ?? credential.value,
         password,
       ).catch(() => {});

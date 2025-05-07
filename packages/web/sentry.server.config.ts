@@ -3,9 +3,10 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import env from '#env';
 
-const DNS = process.env.NEXT_PUBLIC_SENTRY_DSN;
-const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM || 'development';
+const DNS = env.NEXT_PUBLIC_SENTRY_DSN;
+const ENVIRONMENT = env.NEXT_PUBLIC_PLATFORM;
 
 Sentry.init({
   dsn: DNS,

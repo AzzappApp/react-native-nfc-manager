@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
   buildDefaultContactCard,
-  checkMedias,
   getContactCardAccessForProfile,
   getPushTokens,
   referencesMedias,
@@ -9,6 +8,7 @@ import {
   updateProfile,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
@@ -21,6 +21,7 @@ import type { Profile } from '@azzapp/data';
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
   { profileId: gqlProfileId, contactCard },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -64,13 +65,17 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(owner, {
-    action: 'UPDATE_CONTACT_CARD',
-    contactCardHasCompanyName: !!updates.contactCard?.company,
-    webCardIsPublished: webCard.cardIsPublished,
-    contactCardHasUrl: !!updates.contactCard?.urls?.length,
-    contactCardHasLogo: !!updates.logoId,
-  });
+  await validateCurrentSubscription(
+    owner,
+    {
+      action: 'UPDATE_CONTACT_CARD',
+      contactCardHasCompanyName: !!updates.contactCard?.company,
+      webCardIsPublished: webCard.cardIsPublished,
+      contactCardHasUrl: !!updates.contactCard?.urls?.length,
+      contactCardHasLogo: !!updates.logoId,
+    },
+    context.apiEndpoint,
+  );
 
   try {
     const addedMedia = [

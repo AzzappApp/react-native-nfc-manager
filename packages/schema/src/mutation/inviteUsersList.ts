@@ -33,6 +33,7 @@ import type { NewProfile, Profile } from '@azzapp/data';
 const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -222,12 +223,16 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
-      alreadyAdded: true,
-    }); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
+        alreadyAdded: true,
+      },
+      context.apiEndpoint,
+    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });

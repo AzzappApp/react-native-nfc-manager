@@ -133,10 +133,14 @@ describe('generateEmailSignatureMutation', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith(userId, {
-      action: 'GENERATE_EMAIL_SIGNATURE',
-      webCardIsMultiUser: false,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      userId,
+      {
+        action: 'GENERATE_EMAIL_SIGNATURE',
+        webCardIsMultiUser: false,
+      },
+      mockContext.apiEndpoint,
+    );
 
     expect(generateEmailSignature).toHaveBeenCalledWith({
       profile: expect.any(Object),

@@ -1,6 +1,5 @@
 import * as z from 'zod';
-import { getUserProfilesWithWebCard } from '@azzapp/data';
-import { runWithPrimary } from '@azzapp/data/src/database/database';
+import { getUserProfilesWithWebCard, runWithPrimary } from '@azzapp/data';
 import {
   acknowledgeRecurringPayment,
   checkSignature,

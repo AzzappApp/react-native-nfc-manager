@@ -27,6 +27,7 @@ export const acknowledgeFirstPayment = async ({
   webCardId,
   pspAccountId,
   transactionAlias,
+  apiEndpoint,
 }: {
   paymentMeanId: string;
   transactionId: string;
@@ -34,6 +35,7 @@ export const acknowledgeFirstPayment = async ({
   webCardId?: string | null;
   pspAccountId: string;
   transactionAlias: string;
+  apiEndpoint: string;
 }) => {
   let paymentId: string | undefined;
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
@@ -109,7 +111,7 @@ export const acknowledgeFirstPayment = async ({
               clientPaymentRequestUlid: paymentMeanId,
               rebill_manager_fail_rule: generateRebillFailRule(),
               rebill_manager_external_reference: subscription.id,
-              rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
+              rebill_manager_callback_url: `${apiEndpoint}/webhook/subscription`,
             },
           },
         );

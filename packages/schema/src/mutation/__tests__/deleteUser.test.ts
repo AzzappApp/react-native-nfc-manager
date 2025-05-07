@@ -65,7 +65,10 @@ describe('deleteUser', () => {
 
     expect(markUserAsDeleted).toHaveBeenCalledWith('user-1', 'user-1');
     expect(invalidateWebCard).toHaveBeenCalledWith('testUser');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('owner-1');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'owner-1',
+      mockContext.apiEndpoint,
+    );
     expect(result).toEqual({ id: 'user-1' });
   });
 

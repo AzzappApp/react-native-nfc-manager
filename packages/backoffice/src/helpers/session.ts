@@ -1,9 +1,10 @@
 import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { seal, unseal } from '@azzapp/shared/crypto';
+import env from '#env';
 import type { NextResponse, NextRequest } from 'next/server';
 
 const TTL = 15 * 24 * 3600;
-const PASSWORD = process.env.SECRET_COOKIE_PASSWORD as string;
+const PASSWORD = env.SECRET_COOKIE_PASSWORD;
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: true,

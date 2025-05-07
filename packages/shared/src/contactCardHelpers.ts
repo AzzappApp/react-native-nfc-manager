@@ -165,3 +165,27 @@ export const displayName = (
   }
   return webCard?.userName ?? '';
 };
+
+export const buildVCardFileName = (
+  webCardUserName: string,
+  contact?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    company?: string | null;
+  },
+): string => {
+  let vCardFileName = [
+    webCardUserName,
+    contact?.firstName?.trim() || '',
+    contact?.lastName?.trim() || '',
+    contact?.company?.trim() || '',
+  ]
+    .filter(Boolean)
+    .join('-');
+
+  if (!vCardFileName) {
+    vCardFileName = 'azzapp-contact';
+  }
+
+  return `${vCardFileName}.vcf`;
+};

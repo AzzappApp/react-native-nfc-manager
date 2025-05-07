@@ -1,14 +1,19 @@
 import { getActiveContactCardAccess, getUserById } from '@azzapp/data';
 import { getEmailSignatureTitleColor } from '@azzapp/shared/colorsHelpers';
 import { hmacWithPassword } from '@azzapp/shared/crypto';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
-import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
+import { serializeEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import {
   buildEmailSignatureGenerationUrl,
   buildEmailSignatureGenerationUrlWithKey,
 } from '@azzapp/shared/urlHelpers';
+import { sendTemplateEmail } from './emailServices';
+import env from './env';
 import { buildAvatarUrl, buildBannerUrl, buildLogoUrl } from './mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
+import type {
+  CommonInformation,
+  ContactCard,
+} from '@azzapp/shared/contactCardHelpers';
 import type { IntlShape } from '@formatjs/intl';
 const IMAGE_AVATAR_LOGO_WIDTH = 180;
 
@@ -53,7 +58,7 @@ export const generateEmailSignature = async ({
     if (contactCardAccess) {
       const serialized = JSON.stringify([contactCardAccess.id, key]);
       const signature = await hmacWithPassword(
-        process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+        env.CONTACT_CARD_SIGNATURE_SECRET,
         serialized,
         {
           salt: `${webCard.userName}`,
@@ -226,4 +231,34 @@ The azzapp Team`,
   }
 
   return linkUrl;
+};
+
+const serializeAndSignEmailSignature = async (
+  userName: string,
+  profileId: string,
+  webCardId: string,
+  card: ContactCard,
+  commonInformation: CommonInformation | null | undefined,
+  avatarUrl: string | null,
+) => {
+  const serialized = serializeEmailSignature(
+    profileId,
+    webCardId,
+    card,
+    commonInformation,
+    avatarUrl,
+  );
+
+  const signature = await hmacWithPassword(
+    env.CONTACT_CARD_SIGNATURE_SECRET,
+    serialized,
+    {
+      salt: `${userName}`,
+    },
+  );
+
+  return {
+    signature: signature.digest,
+    data: serialized,
+  };
 };

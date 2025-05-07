@@ -23,6 +23,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
       removedProfileIds: gqlRemovedProfileIds,
       allProfiles,
     },
+    context,
   ) => {
     const user = await getSessionUser();
     if (!user) {
@@ -58,7 +59,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
         user.id,
       );
       if (owner) {
-        await updateMonthlySubscription(owner.id);
+        await updateMonthlySubscription(owner.id, context.apiEndpoint);
       }
     });
 

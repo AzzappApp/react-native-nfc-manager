@@ -1,7 +1,6 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import {
-  checkMedias,
   createCardTemplate,
   getCardModulesByWebCard,
   getCardTemplateById,
@@ -12,6 +11,7 @@ import {
   updateCardTemplate,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,

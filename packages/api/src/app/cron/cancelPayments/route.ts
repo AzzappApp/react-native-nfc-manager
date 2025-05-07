@@ -1,11 +1,12 @@
 import { waitUntil } from '@vercel/functions';
 import { cancelExpiredSubscription } from '@azzapp/data';
+import env from '#env';
 import { withPluginsRoute } from '#helpers/queries';
 import type { NextRequest } from 'next/server';
 
 export const GET = withPluginsRoute((request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
     return new Response('Unauthorized', {
       status: 401,
     });

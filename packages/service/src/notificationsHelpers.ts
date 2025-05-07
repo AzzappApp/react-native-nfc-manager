@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/nextjs';
 import { SignJWT, importPKCS8 } from 'jose'; // because of  edge (jsonwebToken, google-auth-library, etc are not supported on "you can do nothing" edge)import { getFcmTokensForUserId } from '@azzapp/data';
 import { getFcmTokensForUserId } from '@azzapp/data';
+import env from './env';
+import { createServerIntl } from './i18nServices';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
-} from '@azzapp/shared/imagesHelpers';
-import { createServerIntl } from './i18nServices';
+} from './mediaServices/imageHelpers';
 import type { Locale } from '@azzapp/i18n';
 import type {
   NotificationType,
@@ -91,7 +92,7 @@ export const sendPushNotification = async (
 
       try {
         await fetch(
-          `https://fcm.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID!}/messages:send`,
+          `https://fcm.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/messages:send`,
           {
             method: 'POST',
             headers: {
@@ -125,14 +126,11 @@ async function getAccessToken() {
     return accessToken;
   }
 
-  const privateKey = await importPKCS8(
-    process.env.FIREBASE_PRIVATE_KEY!,
-    'RS256',
-  );
+  const privateKey = await importPKCS8(env.FIREBASE_PRIVATE_KEY, 'RS256');
 
   const payload = {
-    iss: process.env.FIREBASE_CLIENT_EMAIL,
-    sub: process.env.FIREBASE_CLIENT_EMAIL,
+    iss: env.FIREBASE_CLIENT_EMAIL,
+    sub: env.FIREBASE_CLIENT_EMAIL,
     aud: 'https://oauth2.googleapis.com/token',
     iat: now,
     exp: now + 3600,

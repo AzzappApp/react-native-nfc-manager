@@ -8,36 +8,31 @@ import {
   buildDefaultContactCard,
   getWebCardById,
 } from '@azzapp/data';
+import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import {
+  buildWebUrl,
   buildUserUrlWithContactCard,
   buildUserUrlWithKey,
 } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import type { Profile, WebCard } from '@azzapp/data';
 
-const getCoverUrl = (webCard: WebCard, size: number) =>
-  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&height=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
+const getCoverUrl = (apiEndpoint: string, webCard: WebCard, size: number) =>
+  `${apiEndpoint}/cover/${webCard.userName}?width=${size}&height=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
 
-export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
+export const APPLE_TEAM_IDENTIFIER = env.APPLE_TEAM_IDENTIFIER; // Team ID
 
 const APPLE_HEADER_PREFIX = 'ApplePass ';
 
-export const SIGNER_CERT = Buffer.from(
-  process.env.APPLE_PASS_SIGNER_CERT ?? '',
-  'base64',
-);
+export const SIGNER_CERT = Buffer.from(env.APPLE_PASS_SIGNER_CERT, 'base64');
 
-export const SIGNER_KEY = Buffer.from(
-  process.env.APPLE_PASS_SIGNER_KEY ?? '',
-  'base64',
-);
+export const SIGNER_KEY = Buffer.from(env.APPLE_PASS_SIGNER_KEY, 'base64');
 
-export const SIGNER_KEY_PASSPHRASE =
-  process.env.APPLE_PASS_SIGNER_KEY_PASSPHRASE;
+export const SIGNER_KEY_PASSPHRASE = env.APPLE_PASS_SIGNER_KEY_PASSPHRASE;
 
-export const APPLE_PASS_IDENTIFIER = process.env.APPLE_PASS_IDENTIFIER ?? '';
+export const APPLE_PASS_IDENTIFIER = env.APPLE_PASS_IDENTIFIER;
 
 export const checkAuthorization = async (req: Request, serial: string) => {
   const authorization = req.headers
@@ -48,10 +43,7 @@ export const checkAuthorization = async (req: Request, serial: string) => {
     throw new Error('Unauthorized');
   }
 
-  const data = await unseal(
-    authorization,
-    process.env.APPLE_TOKEN_PASSWORD ?? '',
-  );
+  const data = await unseal(authorization, env.APPLE_TOKEN_PASSWORD);
   if (typeof data === 'object' && data) {
     const { contactCardAccessId, key } = data as {
       contactCardAccessId: string;
@@ -74,11 +66,13 @@ export const buildApplePass = async ({
   locale,
   contactCardAccessId,
   key,
+  apiEndpoint,
 }: {
   profile: Profile;
   locale: string;
   contactCardAccessId?: string | null;
   key?: string | null;
+  apiEndpoint: string;
 }) => {
   const webCard = await getWebCardById(profile.webCardId);
   if (webCard) {
@@ -89,9 +83,9 @@ export const buildApplePass = async ({
     const thumbnails: Record<string, Buffer> = {};
 
     if (media) {
-      const thumbnail = getCoverUrl(webCard, 90);
-      const thumbnail2x = getCoverUrl(webCard, 90 * 2);
-      const thumbnail3x = getCoverUrl(webCard, 90 * 3);
+      const thumbnail = getCoverUrl(apiEndpoint, webCard, 90);
+      const thumbnail2x = getCoverUrl(apiEndpoint, webCard, 90 * 2);
+      const thumbnail3x = getCoverUrl(apiEndpoint, webCard, 90 * 3);
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] = thumbnail
         ? await Promise.allSettled([
             fetch(thumbnail).then(res => res.arrayBuffer()),
@@ -119,18 +113,10 @@ export const buildApplePass = async ({
 
     const [iconContent, icon2xContent, logoContent, logo2xContent] =
       await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_URL}${icon.src}`).then(res =>
-          res.arrayBuffer(),
-        ),
-        fetch(`${process.env.NEXT_PUBLIC_URL}${icon2x.src}`).then(res =>
-          res.arrayBuffer(),
-        ),
-        fetch(`${process.env.NEXT_PUBLIC_URL}${logo.src}`).then(res =>
-          res.arrayBuffer(),
-        ),
-        fetch(`${process.env.NEXT_PUBLIC_URL}${logo2x.src}`).then(res =>
-          res.arrayBuffer(),
-        ),
+        fetch(buildWebUrl(icon.src)).then(res => res.arrayBuffer()),
+        fetch(buildWebUrl(icon2x.src)).then(res => res.arrayBuffer()),
+        fetch(buildWebUrl(logo.src)).then(res => res.arrayBuffer()),
+        fetch(buildWebUrl(logo2x.src)).then(res => res.arrayBuffer()),
       ]);
 
     const primary = webCard.cardColors?.primary;
@@ -151,19 +137,19 @@ export const buildApplePass = async ({
         signerCert: SIGNER_CERT,
         signerKey: SIGNER_KEY,
         signerKeyPassphrase: SIGNER_KEY_PASSPHRASE,
-        wwdr: Buffer.from(process.env.APPLE_PASS_WWDR ?? '', 'base64'),
+        wwdr: Buffer.from(env.APPLE_PASS_WWDR, 'base64'),
       },
       {
-        passTypeIdentifier: process.env.APPLE_PASS_IDENTIFIER ?? '',
+        passTypeIdentifier: env.APPLE_PASS_IDENTIFIER,
         teamIdentifier: APPLE_TEAM_IDENTIFIER,
-        organizationName: process.env.APPLE_ORGANIZATION_NAME ?? '',
+        organizationName: env.APPLE_ORGANIZATION_NAME,
         description: 'Contact Card',
         foregroundColor: convertHexToRGBA(getTextColor(backgroundColor)),
         backgroundColor,
         labelColor: convertHexToRGBA(getTextColor(backgroundColor)),
         suppressStripShine: false,
         serialNumber: contactCardAccessId ?? profile.id,
-        webServiceURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${locale}/wallet/apple/`,
+        webServiceURL: `${apiEndpoint}/${locale}/wallet/apple/`,
         authenticationToken: await seal(
           key
             ? {
@@ -171,7 +157,7 @@ export const buildApplePass = async ({
                 key,
               }
             : profile.id,
-          process.env.APPLE_TOKEN_PASSWORD ?? '',
+          env.APPLE_TOKEN_PASSWORD,
         ),
       },
     );

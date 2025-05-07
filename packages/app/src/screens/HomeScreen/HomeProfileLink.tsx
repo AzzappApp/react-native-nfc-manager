@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import useLatestCallback from '#hooks/useLatestCallback';
@@ -68,7 +68,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(
+      buildWebUrl(
         userNames.value[currentIndexProfileSharedValue.value - 1] ?? '',
       ),
     )

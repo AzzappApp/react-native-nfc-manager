@@ -76,7 +76,10 @@ describe('quitWebCard', () => {
     );
 
     expect(markWebCardAsDeleted).toHaveBeenCalledWith('webcard-456', 'user-1');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('user-1');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'user-1',
+      mockContext.apiEndpoint,
+    );
     expect(invalidateWebCard).toHaveBeenCalledWith('testWebCard');
 
     expect(result).toEqual({ webCardId: 'global-webcard-456' });
@@ -98,7 +101,10 @@ describe('quitWebCard', () => {
     );
 
     expect(removeProfile).toHaveBeenCalledWith('profile-789', 'user-2');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('user-2');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'user-2',
+      mockContext.apiEndpoint,
+    );
     expect(invalidateWebCard).not.toHaveBeenCalled(); // Non-owner case doesn't invalidate the web card
 
     expect(result).toEqual({ webCardId: 'global-webcard-456' });

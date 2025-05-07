@@ -106,16 +106,23 @@ describe('acceptOwnership', () => {
     expect(profileLoader.load).toHaveBeenCalledWith('profile-123');
     expect(webCardLoader.load).toHaveBeenCalledWith('webcard-456');
     expect(webCardOwnerLoader.load).toHaveBeenCalledWith('webcard-456');
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-1', {
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: 3,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'user-1',
+      {
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: 3,
+      },
+      mockContext.apiEndpoint,
+    );
     expect(updateProfileForUserAndWebCard).toHaveBeenCalledWith(
       'owner-1',
       'webcard-456',
       { profileRole: 'admin' },
     );
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('owner-1');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'owner-1',
+      mockContext.apiEndpoint,
+    );
     expect(updateProfile).toHaveBeenCalledWith('profile-123', {
       profileRole: 'owner',
       promotedAsOwner: false,

@@ -3,6 +3,7 @@ import { SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getProfileById, getWebCardById, createId } from '@azzapp/data';
+import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import {
   parseContactCard,
@@ -10,10 +11,11 @@ import {
 } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
+import env from '#env';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = env.JWT_SECRET as string;
 
 const verifySignBody = z.object({
   signature: z.string().nonempty(),
@@ -68,7 +70,7 @@ const verifySignApi = async (req: Request) => {
 
   const [isValid, storedProfile, webCard] = await Promise.all([
     verifyHmacWithPassword(
-      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      CONTACT_CARD_SIGNATURE_SECRET,
       signature,
       decodedData,
       { salt },

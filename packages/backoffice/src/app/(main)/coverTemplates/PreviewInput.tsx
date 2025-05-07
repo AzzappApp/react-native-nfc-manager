@@ -16,7 +16,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import {
   getVideoThumbnailURL,
   getVideoURL,
-} from '@azzapp/shared/imagesHelpers';
+} from '@azzapp/service/mediaServices/imageHelpers';
 
 type Props = {
   previewField: FieldMetadata<File | undefined>;

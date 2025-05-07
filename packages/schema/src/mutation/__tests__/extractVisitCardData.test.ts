@@ -14,6 +14,10 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
 
+jest.mock('@azzapp/data', () => ({
+  getProfileById: jest.fn(),
+}));
+
 global.fetch = jest.fn();
 
 // Mock context and info
@@ -45,9 +49,13 @@ describe('extractVisitCardData', () => {
   test('should validate subscription if `createContactCard` is false', async () => {
     await extractVisitCardData({}, mockArgs, mockContext, mockInfo);
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-123', {
-      action: 'USE_SCAN',
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'user-123',
+      {
+        action: 'USE_SCAN',
+      },
+      mockContext.apiEndpoint,
+    );
   });
 
   test('should return extracted business card data on valid API response', async () => {

@@ -20,6 +20,7 @@ import type { WebCard } from '@azzapp/data';
 const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   _,
   { webCardId: gqlWebCardId, input: { isMultiUser } },
+  context,
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   await checkWebCardOwnerProfile(webCardId);
@@ -40,11 +41,15 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   }
 
   if (isMultiUser) {
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: await getWebCardCountProfile(webCardId),
-    });
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: await getWebCardCountProfile(webCardId),
+      },
+      context.apiEndpoint,
+    );
   }
 
   try {
@@ -53,7 +58,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
       if (!isMultiUser) {
         await transaction(async () => {
           await removeWebCardNonOwnerProfiles(webCardId);
-          await updateMonthlySubscription(owner.id);
+          await updateMonthlySubscription(owner.id, context.apiEndpoint);
         });
       }
     });

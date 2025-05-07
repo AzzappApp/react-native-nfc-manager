@@ -13,6 +13,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
+import env from '#env';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
@@ -174,9 +175,9 @@ const appleSignin = async (req: Request) => {
 
 const appleWebSignin = oauthSignin({
   authorizeURL: 'https://appleid.apple.com/auth/authorize',
-  redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/apple/callback`,
-  clientId: process.env.APPLE_CLIENT_ID!,
-  csrfSecret: new TextEncoder().encode(process.env.APPLE_TOKEN_SECRET),
+  redirectURI: '/signin/apple/callback',
+  clientId: env.APPLE_CLIENT_ID,
+  csrfSecret: new TextEncoder().encode(env.APPLE_TOKEN_SECRET),
   scope: 'name email',
 });
 

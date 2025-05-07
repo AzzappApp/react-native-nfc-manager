@@ -1,7 +1,5 @@
 import { getUserById } from '@azzapp/data';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
-import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
-import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
+import { sendTemplateEmail } from '../emailServices';
 import { generateEmailSignature } from '../emailSignatureServices';
 import { buildAvatarUrl, buildBannerUrl, buildLogoUrl } from '../mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
@@ -16,13 +14,16 @@ jest.mock('@azzapp/data', () => ({
   getUserById: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/emailHelpers', () => ({
+jest.mock('../emailServices', () => ({
   sendTemplateEmail: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/serializeAndSignEmailSignature', () => jest.fn());
-jest.mock('@azzapp/shared/urlHelpers', () => ({
-  buildEmailSignatureGenerationUrl: jest.fn(),
+jest.mock('@azzapp/shared/crypto', () => ({
+  hmacWithPassword: jest.fn(() => ({
+    signature: {
+      digest: 'mocked-digest',
+    },
+  })),
 }));
 
 const mockIntl = {
@@ -137,13 +138,6 @@ describe('generateEmailSignature', () => {
     (buildAvatarUrl as jest.Mock).mockResolvedValue('https://avatar.url');
     (buildLogoUrl as jest.Mock).mockResolvedValue('https://logo.url');
     (buildBannerUrl as jest.Mock).mockResolvedValue('https://banner.url');
-    (serializeAndSignEmailSignature as jest.Mock).mockResolvedValue({
-      data: 'sig-data',
-      signature: 'sig-signature',
-    });
-    (buildEmailSignatureGenerationUrl as jest.Mock).mockReturnValue(
-      'https://signature.url',
-    );
     (getUserById as jest.Mock).mockResolvedValue({ email: 'test@example.com' });
 
     const result = await generateEmailSignature({
@@ -155,12 +149,6 @@ describe('generateEmailSignature', () => {
     expect(buildAvatarUrl).toHaveBeenCalled();
     expect(buildLogoUrl).toHaveBeenCalled();
     expect(buildBannerUrl).toHaveBeenCalled();
-    expect(serializeAndSignEmailSignature).toHaveBeenCalled();
-    expect(buildEmailSignatureGenerationUrl).toHaveBeenCalledWith(
-      'johndoe',
-      'sig-data',
-      'sig-signature',
-    );
     expect(sendTemplateEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         recipients: [
@@ -170,18 +158,13 @@ describe('generateEmailSignature', () => {
         ],
       }),
     );
-    expect(result).toBe('https://signature.url');
+    expect(result).toContain(
+      'https://dev.azzapp.com/johndoe/emailsignature?e=',
+    );
   });
 
   it('skips sending email if user has no email', async () => {
     (buildAvatarUrl as jest.Mock).mockResolvedValue('https://avatar.url');
-    (serializeAndSignEmailSignature as jest.Mock).mockResolvedValue({
-      data: 'sig-data',
-      signature: 'sig-signature',
-    });
-    (buildEmailSignatureGenerationUrl as jest.Mock).mockReturnValue(
-      'https://signature.url',
-    );
     (getUserById as jest.Mock).mockResolvedValue({});
 
     const result = await generateEmailSignature({
@@ -191,6 +174,8 @@ describe('generateEmailSignature', () => {
     });
 
     expect(sendTemplateEmail).not.toHaveBeenCalled();
-    expect(result).toBe('https://signature.url');
+    expect(result).toContain(
+      'https://dev.azzapp.com/johndoe/emailsignature?e=',
+    );
   });
 });

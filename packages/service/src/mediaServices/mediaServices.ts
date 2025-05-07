@@ -1,10 +1,157 @@
-import { getCrypto } from './crypto';
-import { getVideoUrlForSize, resizeTransforms } from './imagesHelpers';
-import { fetchJSON } from './networkHelpers';
+import { getMediasByIds, updateMediaSize } from '@azzapp/data';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/coverHelpers';
+import { getCrypto } from '@azzapp/shared/crypto';
+import { fetchJSON } from '@azzapp/shared/networkHelpers';
+import env from '../env';
+import {
+  CLOUDINARY_BASE_URL,
+  getVideoUrlForSize,
+  resizeTransforms,
+} from './imageHelpers';
+import type { Profile, WebCard } from '@azzapp/data';
 
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
-const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET!;
+const AVATAR_WIDTH = 720;
+const LOGO_WIDTH = 720;
+const BANNER_WIDTH = 1200;
+
+export const CROP = ['fit', 'lpad', 'fill'] as const;
+
+export type Crop = (typeof CROP)[number];
+
+export const buildAvatarUrl = async (
+  profile: Profile,
+  webCard: WebCard | null,
+  fallbackOnCover: boolean = true,
+  fallbackOnCompanyLogo: boolean = true,
+  width = AVATAR_WIDTH,
+) => {
+  const avatarId =
+    profile.avatarId ?? (fallbackOnCompanyLogo ? profile.logoId : undefined);
+  let avatarUrl: string | null = null;
+  if (avatarId) {
+    avatarUrl = `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${width}/v1/${avatarId}.jpg`;
+  } else if (fallbackOnCover) {
+    avatarUrl = await buildCoverAvatarUrl(webCard);
+  }
+
+  return avatarUrl;
+};
+
+export const buildLogoUrl = async (
+  profile: Profile,
+  webCard: WebCard | null,
+  width = LOGO_WIDTH,
+) => {
+  const logoId = webCard?.isMultiUser
+    ? (webCard.logoId ?? profile.logoId)
+    : profile.logoId;
+
+  if (logoId) {
+    return `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${width}/v1/${logoId}.jpg`;
+  }
+
+  return null;
+};
+
+export const buildBannerUrl = async (
+  profile: Profile,
+  webCard: WebCard | null,
+  width = BANNER_WIDTH,
+) => {
+  const bannerId = webCard?.isMultiUser
+    ? (webCard.bannerId ?? profile.bannerId)
+    : profile.bannerId;
+
+  if (bannerId) {
+    return `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${width}/v1/${bannerId}.jpg`;
+  }
+
+  return null;
+};
+
+export const buildCoverAvatarUrl = async (webCard: WebCard | null) => {
+  let avatarUrl: string | null = null;
+  if (webCard?.cardIsPublished) {
+    avatarUrl =
+      (await buildCoverImageUrl(webCard, {
+        width: AVATAR_WIDTH,
+        height: AVATAR_WIDTH,
+        crop: 'fill',
+      })) ?? null;
+  }
+
+  return avatarUrl;
+};
+
+export const buildCoverImageUrl = async (
+  webCard: WebCard,
+  options: {
+    width: number;
+    height: number;
+    crop?: Crop | null;
+    radius?: number | null;
+  },
+) => {
+  const { coverMediaId, coverPreviewPositionPercentage } = webCard;
+
+  const { width, height, crop, radius } = options;
+
+  if (coverMediaId) {
+    const [media] = await getMediasByIds([coverMediaId]);
+
+    return `${CLOUDINARY_BASE_URL}/${
+      media?.kind === 'video' ? 'video' : 'image'
+    }/upload${media?.kind === 'video' ? `/so_${coverPreviewPositionPercentage ?? DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p` : ''}${
+      crop ? `/c_${crop}` : '/c_fit'
+    },g_east,w_${width},h_${height}${radius ? `,r_${radius}` : ''},ar_1:1/${coverMediaId}.png`;
+  }
+  return undefined;
+};
+
+// TODO : move this to a service
+/**
+ * Check if medias have been registered in the database.
+ * For medias that have never been registered, check their existance in cloudinary,
+ * and update their information (width, height).
+ *
+ * > This function is should be used OUTSIDE of a transaction. since it will interact with cloudinary.
+ * And might take some time to complete.
+ *
+ * @param ids
+ */
+export const checkMedias = async (mediaIds: string[]) => {
+  const medias = await getMediasByIds(mediaIds);
+  const notFoundMediaIds = mediaIds.filter((_, index) => !medias[index]);
+  if (notFoundMediaIds.length > 0) {
+    throw new Error(`Medias not found: ${notFoundMediaIds.join(', ')}`);
+  }
+  const newMedias = medias.filter(media => media!.refCount === 0);
+  if (newMedias.length > 0) {
+    const cloudinaryMedias = await getMediaInfoByPublicIds(
+      newMedias.map(media => ({
+        publicId: media!.id,
+        kind: media!.kind,
+      })),
+    );
+
+    await Promise.all(
+      // TODO batch update
+      cloudinaryMedias.map(
+        cloudinaryMedia =>
+          cloudinaryMedia &&
+          updateMediaSize(
+            cloudinaryMedia.public_id,
+            cloudinaryMedia.width,
+            cloudinaryMedia.height,
+          ),
+      ),
+    );
+  }
+};
+
+const CLOUDINARY_CLOUDNAME = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_API_KEY = env.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_SECRET = env.CLOUDINARY_API_SECRET;
 
 const CLOUDINARY_VIDEO_PATH = 'video/upload';
 const CLOUDINARY_IMAGE_PATH = 'image/upload';
@@ -147,7 +294,7 @@ export const getPreviewVideoForModule = async ({
  * @param medias The medias to get the info from.
  * @returns The media info.
  */
-export const getMediaInfoByPublicIds = async (
+const getMediaInfoByPublicIds = async (
   medias: Array<{ publicId: string; kind: 'image' | 'video' }>,
 ) => {
   const videosIds = medias
@@ -306,11 +453,12 @@ export const createPresignedUpload = async (
 
   // TODO transformations based on preset
 
+  if (!CLOUDINARY_API_SECRET) {
+    throw new Error('CLOUDINARY_API_SECRET is not set');
+  }
+
   Object.assign(uploadParameters, {
-    signature: await apiSinRequest(
-      uploadParameters,
-      process.env.CLOUDINARY_API_SECRET!,
-    ),
+    signature: await apiSinRequest(uploadParameters, CLOUDINARY_API_SECRET),
     api_key: CLOUDINARY_API_KEY,
   });
 

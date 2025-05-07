@@ -2,11 +2,12 @@ import { headers } from 'next/headers';
 import { getSessionUser } from '@azzapp/schema/GraphQLContext';
 import { seal, unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
+import env from '#env';
 
 const TOKEN_EXP_TIME = 3600 * 1000;
 const REFRESH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
-const TOKEN_SECRET = process.env.TOKEN_SECRET!;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+const TOKEN_SECRET = env.TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = env.REFRESH_TOKEN_SECRET;
 
 export type SessionData = {
   userId: string;

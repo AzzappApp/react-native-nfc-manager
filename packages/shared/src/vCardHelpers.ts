@@ -1,6 +1,6 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
-import { buildUserUrl } from './urlHelpers';
+import { buildWebUrl } from './urlHelpers';
 import type { CommonInformation, ContactCard } from './contactCardHelpers';
 
 /**
@@ -68,7 +68,7 @@ export const buildVCardFromSerializedContact = async (
   });
 
   if (userName) {
-    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+    vcard.addURL(buildWebUrl(userName), 'type=azzapp WebCard');
   }
   additionalData?.urls?.forEach(url => {
     vcard.addURL(url.address, '');
@@ -141,7 +141,7 @@ export const buildVCardFromContactCard = async (
   });
 
   if (userName) {
-    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+    vcard.addURL(buildWebUrl(userName), 'type=azzapp WebCard');
   }
   contactCard?.urls?.forEach(url => {
     vcard.addURL(url.address, '');

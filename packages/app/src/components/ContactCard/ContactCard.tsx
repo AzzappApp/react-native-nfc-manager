@@ -21,7 +21,7 @@ import Animated, {
 import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
@@ -351,7 +351,7 @@ export const ContactCardComponent = ({
                 { opacity: 0.5, color: readableColor },
               ]}
             >
-              {buildUserUrl(userName)}
+              {buildWebUrl(userName)}
             </Text>
           )}
         </Animated.View>

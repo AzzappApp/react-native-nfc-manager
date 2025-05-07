@@ -8,7 +8,7 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data';
-import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/coverHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';

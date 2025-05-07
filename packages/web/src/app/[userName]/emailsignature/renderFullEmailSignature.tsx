@@ -1,9 +1,9 @@
 import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
+import { getImageURLForSize } from '@azzapp/service/mediaServices/imageHelpers';
 import {
   getEmailSignatureTitleColor,
   colors,
 } from '@azzapp/shared/colorsHelpers';
-import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
 import type { Profile, WebCard } from '@azzapp/data';

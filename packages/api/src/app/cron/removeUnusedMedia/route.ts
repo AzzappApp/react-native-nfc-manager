@@ -1,12 +1,13 @@
 import { waitUntil } from '@vercel/functions';
 import { getUnusedMedias, removeMedias } from '@azzapp/data';
-import { deleteMediaByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
+import { deleteMediaByPublicIds } from '@azzapp/service/mediaServices/mediaServices';
+import env from '#env';
 import { withPluginsRoute } from '#helpers/queries';
 import type { NextRequest } from 'next/server';
 
 export const GET = withPluginsRoute((request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
     return new Response('Unauthorized', {
       status: 401,
     });
@@ -17,10 +18,7 @@ export const GET = withPluginsRoute((request: NextRequest) => {
   return Response.json({ success: true });
 });
 
-const MEDIA_DELETION_SLOT_SIZE = parseInt(
-  process.env.MEDIA_DELETION_SLOT_SIZE || '',
-  10,
-);
+const MEDIA_DELETION_SLOT_SIZE = parseInt(env.MEDIA_DELETION_SLOT_SIZE, 10);
 
 const removeUnusedMedia = async () => {
   const media = await getUnusedMedias(

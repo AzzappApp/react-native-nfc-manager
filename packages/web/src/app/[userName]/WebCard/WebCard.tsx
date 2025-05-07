@@ -7,8 +7,10 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import arrows from '@azzapp/web/public/arrows@3x.png';
 import { FlipIcon } from '#assets';
+import env from '#env';
 import { ButtonIcon } from '#ui';
 import ContactSteps from '#components/ContactSteps';
 import FullScreenOverlay from '#components/FullscreenOverlay/FullscreenOverlayContext';
@@ -24,7 +26,7 @@ import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
 import type { PropsWithChildren } from 'react';
 
-const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL || 'https://www.azzapp.com';
+const webSiteUrl = buildWebUrl();
 
 type Step1Props = PropsWithChildren<{
   webCard: WebCard;
@@ -265,7 +267,7 @@ const Footer = ({
           />
         </div>
         <Link
-          href={NEXT_PUBLIC_URL}
+          href={webSiteUrl}
           target="_blank"
           style={{
             display: 'flex',
@@ -287,9 +289,7 @@ const Footer = ({
             {(deviceType === DeviceType.IOS ||
               deviceType === DeviceType.DESKTOP) && (
               <Link
-                href={
-                  new URL(process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP as string)
-                }
+                href={new URL(env.NEXT_PUBLIC_DOWNLOAD_IOS_APP)}
                 target="_blank"
               >
                 <Image
@@ -303,11 +303,7 @@ const Footer = ({
             {(deviceType === DeviceType.ANDROID ||
               deviceType === DeviceType.DESKTOP) && (
               <Link
-                href={
-                  new URL(
-                    process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP as string,
-                  )
-                }
+                href={new URL(env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP)}
                 target="_blank"
               >
                 <Image
@@ -320,7 +316,7 @@ const Footer = ({
             )}
           </div>
           <Link
-            href={NEXT_PUBLIC_URL}
+            href={webSiteUrl}
             target="_blank"
             className={styles.azzapLink}
             style={{

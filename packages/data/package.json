@@ -2,7 +2,10 @@
   "name": "@azzapp/data",
   "version": "1.10.0",
   "private": true,
-  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
+  },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",

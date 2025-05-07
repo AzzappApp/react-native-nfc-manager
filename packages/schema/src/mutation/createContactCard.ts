@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   createProfile,
   createWebCard,
   getWebCardByUserNameWithRedirection,
@@ -9,6 +8,7 @@ import {
   referencesMedias,
   transaction,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -16,9 +16,7 @@ import { getSessionUser } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
-import type { WebCardTable } from '@azzapp/data/src/schema';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
-import type { InferInsertModel } from 'drizzle-orm';
 
 const createContactCard: MutationResolvers['createContactCard'] = async (
   _,
@@ -30,6 +28,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     coverMediaId,
     publishWebCard,
   },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -53,16 +52,20 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
     }
   }
-  await validateCurrentSubscription(user.id, {
-    webCardKind,
-    action: 'CREATE_CONTACT_CARD',
-    alreadyPublished: await getPublishedWebCardCount(user.id),
-    webCardIsPublished: publishWebCard ?? true,
-    contactCardHasCompanyName: !!contactCard.company,
-    contactCardHasUrl: !!contactCard.urls?.length,
-  });
+  await validateCurrentSubscription(
+    user.id,
+    {
+      webCardKind,
+      action: 'CREATE_CONTACT_CARD',
+      alreadyPublished: await getPublishedWebCardCount(user.id),
+      webCardIsPublished: publishWebCard ?? true,
+      contactCardHasCompanyName: !!contactCard.company,
+      contactCardHasUrl: !!contactCard.urls?.length,
+    },
+    context.apiEndpoint,
+  );
 
-  const inputWebCard: InferInsertModel<typeof WebCardTable> = {
+  const inputWebCard = {
     firstName: contactCard.firstName,
     lastName: contactCard.lastName ?? null,
     webCardKind: webCardKind as WebCardKind,

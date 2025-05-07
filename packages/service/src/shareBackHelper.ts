@@ -19,23 +19,6 @@ export const generateSaltFromValues = (values: ShareBackContact): string => {
   return encodeURIComponent(Object.values(values).join(''));
 };
 
-export const shareBackVCardFilename = (data: {
-  firstName?: string;
-  lastName?: string;
-}): string => {
-  let vCardFileName = [
-    `${data.firstName?.trim() ? `${data.firstName.trim()}` : ''}`,
-    `${data?.lastName?.trim() ? `${data.lastName.trim()}` : ''}`,
-  ]
-    .filter(Boolean)
-    .join('-');
-  if (!vCardFileName) {
-    vCardFileName = 'azzapp-contact';
-  }
-
-  return `${vCardFileName}.vcf`;
-};
-
 export const shareBackSignature = async (
   secret: string,
   data: ShareBackContact,

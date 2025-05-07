@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   createId,
   createProfile,
   createUser,
@@ -13,6 +12,7 @@ import {
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import {
@@ -31,6 +31,7 @@ import type { Profile } from '@azzapp/data';
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
+  context,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const user = await getSessionUser();
@@ -79,11 +80,15 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(owner.id, {
-    webCardIsPublished: webCard.cardIsPublished,
-    action: 'UPDATE_MULTI_USER',
-    addedSeats: webCard.isMultiUser ? 1 : 2,
-  }); //add owner
+  await validateCurrentSubscription(
+    owner.id,
+    {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: webCard.isMultiUser ? 1 : 2,
+    },
+    context.apiEndpoint,
+  ); //add owner
 
   try {
     const { avatarId, logoId, bannerId } = invited.contactCard ?? {};

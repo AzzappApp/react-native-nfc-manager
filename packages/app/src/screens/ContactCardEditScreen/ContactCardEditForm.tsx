@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, {
@@ -220,7 +220,7 @@ const ContactCardEditForm = ({
                 </Text>
               </View>
               <Text variant="medium" style={{ flex: 1 }}>
-                {buildUserUrl(webCard?.userName || '')}
+                {buildWebUrl(webCard?.userName)}
               </Text>
             </View>
           )}

@@ -8,7 +8,7 @@ import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 const generateEmailSignatureMutation: MutationResolvers['generateEmailSignature'] =
-  async (_parent, { profileId: gqlProfileId }, { intl }) => {
+  async (_parent, { profileId: gqlProfileId }, { intl, apiEndpoint }) => {
     const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -28,10 +28,14 @@ const generateEmailSignatureMutation: MutationResolvers['generateEmailSignature'
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
-    await validateCurrentSubscription(user.id, {
-      action: 'GENERATE_EMAIL_SIGNATURE',
-      webCardIsMultiUser: webCard.isMultiUser,
-    });
+    await validateCurrentSubscription(
+      user.id,
+      {
+        action: 'GENERATE_EMAIL_SIGNATURE',
+        webCardIsMultiUser: webCard.isMultiUser,
+      },
+      apiEndpoint,
+    );
 
     const linkUrl = await generateEmailSignature({
       profile,
@@ -48,7 +52,7 @@ const generateEmailSignatureWithKey: MutationResolvers['generateEmailSignatureWi
   async (
     _parent,
     { input: { profileId: gqlProfileId, deviceId, key } },
-    { intl },
+    { intl, apiEndpoint },
   ) => {
     const user = await getSessionUser();
     if (!user) {
@@ -69,10 +73,14 @@ const generateEmailSignatureWithKey: MutationResolvers['generateEmailSignatureWi
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
-    await validateCurrentSubscription(user.id, {
-      action: 'GENERATE_EMAIL_SIGNATURE',
-      webCardIsMultiUser: webCard.isMultiUser,
-    });
+    await validateCurrentSubscription(
+      user.id,
+      {
+        action: 'GENERATE_EMAIL_SIGNATURE',
+        webCardIsMultiUser: webCard.isMultiUser,
+      },
+      apiEndpoint,
+    );
 
     const linkUrl = await generateEmailSignature({
       profile,

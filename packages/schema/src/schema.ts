@@ -5,7 +5,7 @@ import {
   asyncLocalStorageContextMiddleware,
   resetSessionResourceAfterMutationMiddleware,
 } from '#GraphQLContext';
-import { typeDefs } from './__generated__/types';
+import { typeDefs } from '#/__generated__/types';
 import MutationResolvers from './mutation';
 import QueryResolvers from './query';
 import type { Resolvers } from './__generated__/types';

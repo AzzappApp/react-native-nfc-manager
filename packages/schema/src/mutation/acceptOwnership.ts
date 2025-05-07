@@ -19,6 +19,7 @@ import type { MutationResolvers } from '#/__generated__/types';
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
   { profileId: gqlProfileId },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -45,11 +46,15 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
 
   const webCardNbSeats = await getWebCardCountProfile(profile.webCardId);
 
-  await validateCurrentSubscription(user.id, {
-    webCardIsPublished: webCard.cardIsPublished,
-    action: 'UPDATE_MULTI_USER',
-    addedSeats: webCardNbSeats,
-  });
+  await validateCurrentSubscription(
+    user.id,
+    {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: webCardNbSeats,
+    },
+    context.apiEndpoint,
+  );
 
   try {
     const updatedProfile = await transaction(async () => {
@@ -57,7 +62,7 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
         await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
           profileRole: 'admin',
         });
-        await updateMonthlySubscription(owner.id);
+        await updateMonthlySubscription(owner.id, context.apiEndpoint);
       }
       await updateProfile(profileId, {
         profileRole: 'owner',

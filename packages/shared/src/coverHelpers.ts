@@ -82,6 +82,8 @@ export const DEFAULT_COVER_WIDTH = 375;
  */
 export const DEFAULT_COVER_HEIGHT = DEFAULT_COVER_WIDTH / COVER_RATIO;
 
+export const DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL = 17;
+
 /**
  * A color that can be replaced in a lottie animation
  */

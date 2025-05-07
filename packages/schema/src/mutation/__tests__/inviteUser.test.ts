@@ -31,6 +31,7 @@ jest.mock('@azzapp/data', () => ({
   updateWebCard: jest.fn(),
   updateUser: jest.fn(),
   createId: jest.fn(() => 'new-id'),
+  getMediasByIds: jest.fn(() => []),
 }));
 
 jest.mock('@azzapp/i18n', () => ({

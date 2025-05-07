@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { AxiomWebVitals } from 'next-axiom';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { getTranslationMessages } from '@azzapp/service/i18nServices';
+import env from '#env';
 import ClientWrapper from '#components/ClientWrapper';
 import { cachedGetWebCardByUserName } from './dataAccess';
 import { themeClass } from './theme.css';
@@ -45,7 +46,7 @@ const RootLayout = async (props: {
       lang={currentLocale}
       className={cn(plusJakarta.className, themeClass)}
     >
-      <GoogleTagManager gtmId={`${process.env.NEXT_PUBLIC_GTM_ID}`} />
+      <GoogleTagManager gtmId={env.NEXT_PUBLIC_GTM_ID} />
       <head>
         <meta
           name="viewport"
@@ -83,7 +84,7 @@ const RootLayout = async (props: {
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
         <meta
           name="apple-itunes-app"
-          content={`${process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
+          content={env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}
         />
       </head>
       <body>

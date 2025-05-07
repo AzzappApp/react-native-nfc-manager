@@ -23,7 +23,7 @@ const businessCardSchema = z.object({
 });
 
 export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
-  async (_parent, args) => {
+  async (_parent, args, context) => {
     const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -47,13 +47,21 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
         if (!ownerId) {
           throw new GraphQLError(ERRORS.INVALID_REQUEST);
         }
-        await validateCurrentSubscription(ownerId, {
-          action: 'USE_SCAN',
-        });
+        await validateCurrentSubscription(
+          ownerId,
+          {
+            action: 'USE_SCAN',
+          },
+          context.apiEndpoint,
+        );
       } else {
-        await validateCurrentSubscription(user.id, {
-          action: 'USE_SCAN',
-        });
+        await validateCurrentSubscription(
+          user.id,
+          {
+            action: 'USE_SCAN',
+          },
+          context.apiEndpoint,
+        );
       }
     }
 

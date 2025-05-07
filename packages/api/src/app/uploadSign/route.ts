@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { createMedia, createId } from '@azzapp/data';
+import { encodeMediaId } from '@azzapp/service/mediaServices/imageHelpers';
+import { createPresignedUpload } from '@azzapp/service/mediaServices/mediaServices';
 import {
   MODULE_IMAGES_SIZES,
   MODULE_VIDEO_SIZES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import {
   POST_IMAGES_SIZES,
   POST_VIDEO_SIZES,

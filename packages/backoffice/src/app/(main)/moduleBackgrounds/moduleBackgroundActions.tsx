@@ -1,41 +1,14 @@
 'use server';
-import { createId } from '@paralleldrive/cuid2';
 import { revalidatePath } from 'next/cache';
 import {
-  checkMedias,
-  createMedia,
   createModuleBackgrounds,
   getModuleBackgrounds,
   referencesMedias,
   transaction,
 } from '@azzapp/data';
-import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import { ADMIN } from '#roles';
-import getCurrentUser from '#helpers/getCurrentUser';
 import { currentUserHasRole } from '#helpers/roleHelpers';
-
-export const getModuleBackgroundSignedUpload = async () => {
-  if (!(await currentUserHasRole(ADMIN))) {
-    throw new Error('Unauthorized');
-  }
-  const userId = (await getCurrentUser())?.id;
-  const mediaId = createId();
-
-  await createMedia({
-    id: mediaId,
-    kind: 'image',
-    height: 0,
-    width: 0,
-  });
-
-  return createPresignedUpload(
-    mediaId,
-    'image',
-    null,
-    null,
-    `userId=${userId}|backoffice=true`,
-  );
-};
 
 export const addModuleBackgrounds = async ({
   medias,

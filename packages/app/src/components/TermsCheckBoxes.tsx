@@ -1,5 +1,6 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import env from '#env';
 import CheckBox from '#ui/CheckBox';
 import HyperLink from '#ui/HyperLink';
 import Text from '#ui/Text';
@@ -13,8 +14,8 @@ type TermsCheckBoxesProps = {
   showError: boolean;
 };
 
-const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+const TERMS_OF_SERVICE = env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = env.PRIVACY_POLICY;
 
 const TermsCheckBoxes = ({
   communicationChecked,
@@ -55,7 +56,7 @@ const TermsCheckBoxes = ({
                   tosLink: value => (
                     <HyperLink
                       label={value[0] as string}
-                      url={`${TERMS_OF_SERVICE}`}
+                      url={TERMS_OF_SERVICE}
                     />
                   ),
                   ppLink: value => (

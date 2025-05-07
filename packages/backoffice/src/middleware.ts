@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserById } from '@azzapp/data';
 import backOfficeSections from '#backOfficeSections';
+import env from '#env';
 import { destroySession, getRequestSession } from '#helpers/session';
 import type { SubSection } from '#backOfficeSections';
 import type { NextURL } from 'next/dist/server/web/next-url';
@@ -15,7 +16,7 @@ export async function middleware(request: NextRequest) {
   const session = await getRequestSession(request).catch(e => {
     if (
       process.env.NODE_ENV === 'development' ||
-      process.env.DEPLOYMENT_ENVIRONMENT === 'development'
+      env.NEXT_PUBLIC_PLATFORM === 'development'
     ) {
       console.error(e);
     }

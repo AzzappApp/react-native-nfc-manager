@@ -19,10 +19,13 @@ import {
   getContactCountWithWebcardId,
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
-import { buildCoverAvatarUrl } from '@azzapp/service/mediaServices';
-import { getPreviewVideoForModule } from '@azzapp/shared/cloudinaryHelpers';
+import {
+  buildCoverAvatarUrl,
+  getPreviewVideoForModule,
+} from '@azzapp/service/mediaServices/mediaServices';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   subscriptionsForUserLoader,
@@ -555,6 +558,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );

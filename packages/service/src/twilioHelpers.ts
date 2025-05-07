@@ -1,10 +1,10 @@
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
+import env from './env';
 
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID!;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
-const TWILIO_ACCOUNT_VERIFY_SERVICE_SID =
-  process.env.TWILIO_ACCOUNT_VERIFY_SERVICE_SID!;
-export const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER!;
+const TWILIO_ACCOUNT_SID = env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = env.TWILIO_AUTH_TOKEN;
+const TWILIO_ACCOUNT_VERIFY_SERVICE_SID = env.TWILIO_ACCOUNT_VERIFY_SERVICE_SID;
+export const TWILIO_PHONE_NUMBER = env.TWILIO_PHONE_NUMBER;
 
 const TWILIO_API_URL = 'https://api.twilio.com/2010-04-01/Accounts/';
 const TWILIO_VERIFICATION_SERVICE_URL =

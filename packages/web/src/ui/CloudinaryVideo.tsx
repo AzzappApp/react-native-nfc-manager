@@ -1,8 +1,10 @@
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import { forwardRef, type ForwardedRef } from 'react';
 import { MODULE_VIDEO_SIZES } from '@azzapp/shared/cardModuleHelpers';
-import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
-import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
+import {
+  COVER_ASSET_SIZES,
+  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
+} from '@azzapp/shared/coverHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data';
 

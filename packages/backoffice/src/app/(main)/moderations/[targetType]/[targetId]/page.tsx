@@ -27,7 +27,11 @@ import {
   type ReportTargetType,
   type WebCard,
 } from '@azzapp/data';
-import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURLForSize,
+  getVideoURL,
+} from '@azzapp/service/mediaServices/imageHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { deleteRelatedItem, ignoreReport } from './reportsAction';
 import ReportsList from './ReportsList';
 import type { ReportStatus } from '../../page';
@@ -173,16 +177,21 @@ const ReportPage = async (props: ReportPageProps) => {
               <Typography variant="body2" color="text.secondary">
                 Post:
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}
+                  href={buildWebUrl(
+                    `/${item.webCard.userName}/post/${item.post.id}`,
+                  )}
                   target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}</Link>
+                >
+                  {buildWebUrl(
+                    `/${item.webCard.userName}/post/${item.post.id}`,
+                  )}
+                </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Webcard:
-                <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
-                  target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
+                <Link href={buildWebUrl(item.webCard.userName)} target="_blank">
+                  {buildWebUrl(item.webCard.userName)}
+                </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:
@@ -230,17 +239,25 @@ const ReportPage = async (props: ReportPageProps) => {
                   Post:
                   <Typography variant="body2" color="text.secondary">
                     <Link
-                      href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}
+                      href={buildWebUrl(
+                        `/${item.webCard.userName}/post/${item.post.id}`,
+                      )}
                       target="_blank"
-                    >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}</Link>
+                    >
+                      {buildWebUrl(
+                        `${item.webCard.userName}/post/${item.post.id}`,
+                      )}
+                    </Link>
                   </Typography>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Webcard:
                   <Link
-                    href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
+                    href={buildWebUrl(item.webCard.userName)}
                     target="_blank"
-                  >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
+                  >
+                    {buildWebUrl(item.webCard.userName)}
+                  </Link>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Owner:
@@ -262,10 +279,9 @@ const ReportPage = async (props: ReportPageProps) => {
               />
               <Typography variant="body2" color="text.secondary">
                 Webcard:
-                <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
-                  target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
+                <Link href={buildWebUrl(item.webCard.userName)} target="_blank">
+                  {buildWebUrl(item.webCard.userName)}
+                </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:

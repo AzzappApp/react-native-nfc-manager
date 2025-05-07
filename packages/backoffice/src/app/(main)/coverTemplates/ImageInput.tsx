@@ -3,7 +3,7 @@
 import { getInputProps, useInputControl } from '@conform-to/react';
 import { Box, Button, Typography } from '@mui/material';
 import { useState } from 'react';
-import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
+import { getCloudinaryAssetURL } from '@azzapp/service/mediaServices/imageHelpers';
 import type { FieldMetadata } from '@conform-to/react';
 
 type Props = {

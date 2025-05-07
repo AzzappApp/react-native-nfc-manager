@@ -2,7 +2,6 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 
 import {
-  checkMedias,
   createContact as createNewContact,
   getContactByProfiles,
   getWebcardsMediaFromContactIds,
@@ -16,9 +15,10 @@ import {
   updateContact,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import {
@@ -35,6 +35,7 @@ import type { Contact, ContactRow } from '@azzapp/data';
 export const createContact: MutationResolvers['createContact'] = async (
   _,
   { profileId: gqlProfileId, input, notify, scanUsed, withShareBack },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -105,9 +106,13 @@ export const createContact: MutationResolvers['createContact'] = async (
   }
 
   if (scanUsed) {
-    await validateCurrentSubscription(user.id, {
-      action: 'ADD_CONTACT_WITH_SCAN',
-    });
+    await validateCurrentSubscription(
+      user.id,
+      {
+        action: 'ADD_CONTACT_WITH_SCAN',
+      },
+      context.apiEndpoint,
+    );
     await incrementContactsImportFromScan(profileId);
     await incrementImportFromScan(profileId, true);
   }
@@ -138,7 +143,7 @@ export const createContact: MutationResolvers['createContact'] = async (
       profile.contactCard?.birthday?.birthday?.split('T')[0] ?? null;
 
     const urls = (
-      webCard?.userName ? [{ url: buildUserUrl(webCard.userName) }] : []
+      webCard?.userName ? [{ url: buildWebUrl(webCard.userName) }] : []
     ).concat(
       profile.contactCard?.urls?.map(url => ({
         url: url.address,

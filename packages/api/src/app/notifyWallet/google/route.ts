@@ -9,9 +9,9 @@ import {
   getWebCardById,
   updateHasGooglePass,
 } from '@azzapp/data';
+import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { checkServerAuth } from '@azzapp/service/serverAuthServices';
 import ERRORS from '@azzapp/shared/errors';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';

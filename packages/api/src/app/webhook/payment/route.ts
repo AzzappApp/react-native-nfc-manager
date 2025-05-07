@@ -1,6 +1,5 @@
 import * as z from 'zod';
-import { getUserProfilesWithWebCard } from '@azzapp/data';
-import { runWithPrimary } from '@azzapp/data/src/database/database';
+import { runWithPrimary, getUserProfilesWithWebCard } from '@azzapp/data';
 import {
   acknowledgeFirstPayment,
   checkSignature,
@@ -9,6 +8,7 @@ import {
 import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { sendInvoice } from '#helpers/paymentHelpers';
 import { withPluginsRoute } from '#helpers/queries';
+import { getApiEndpoint } from '#helpers/request';
 
 const paymentCallbackBody = z.object({
   MULTIPSP_UNIFIED_STATUS: z.string(),
@@ -35,6 +35,8 @@ export const POST = withPluginsRoute(async (req: Request) => {
   if (data.MULTIPSP_UNIFIED_STATUS === 'OK') {
     const extraData = JSON.parse(data.EXTRADATA || '{}');
 
+    const apiEndpoint = getApiEndpoint(req);
+
     const result = await acknowledgeFirstPayment({
       paymentMeanId: data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
       transactionId: data.TRANSACTIONID,
@@ -42,6 +44,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
       webCardId: extraData.webCardId,
       pspAccountId: data.MULTIPSP_PSP_ACCOUNT_ULID,
       transactionAlias: data.ALIAS,
+      apiEndpoint,
     });
 
     if (result) {

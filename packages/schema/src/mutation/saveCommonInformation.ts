@@ -1,11 +1,11 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   referencesMedias,
   transaction,
   updateWebCard,
   updateWebCardProfiles,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';

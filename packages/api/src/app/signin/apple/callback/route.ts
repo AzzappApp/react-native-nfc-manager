@@ -1,10 +1,11 @@
 import { importPKCS8, SignJWT } from 'jose';
+import env from '#env';
 import { oauthSigninCallback } from '../../oauthSigninUtils';
 
-const APPLE_PRIVATE_KEY = process.env.APPLE_PRIVATE_KEY!;
-const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER!;
-const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID!;
-const APPLE_KEY_ID = process.env.APPLE_KEY_ID!;
+const APPLE_PRIVATE_KEY = env.APPLE_PRIVATE_KEY;
+const APPLE_TEAM_IDENTIFIER = env.APPLE_TEAM_IDENTIFIER;
+const APPLE_CLIENT_ID = env.APPLE_CLIENT_ID;
+const APPLE_KEY_ID = env.APPLE_KEY_ID;
 
 async function generateAppleClientSecret() {
   const now = Math.floor(Date.now() / 1000);
@@ -27,8 +28,8 @@ const appleSigninCallback = oauthSigninCallback({
   tokenURL: 'https://appleid.apple.com/auth/token',
   clientId: APPLE_CLIENT_ID,
   clientSecret: generateAppleClientSecret,
-  redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/apple/callback`,
-  csrfSecret: new TextEncoder().encode(process.env.APPLE_TOKEN_SECRET),
+  redirectURI: '/signin/apple/callback',
+  csrfSecret: new TextEncoder().encode(env.APPLE_TOKEN_SECRET),
 });
 
 export { appleSigninCallback as POST };

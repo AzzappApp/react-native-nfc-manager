@@ -8,12 +8,13 @@ import {
   transaction,
   updateActiveInAppUserSubscription,
 } from '@azzapp/data';
+import env from '#env';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
 import { unpublishWebCardForUser } from '#helpers/subscription';
 
-const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
+const BEARER_HEADER = env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
   const authorization = req.headers.get('Authorization');
 

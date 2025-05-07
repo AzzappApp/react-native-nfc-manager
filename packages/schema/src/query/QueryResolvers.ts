@@ -9,6 +9,7 @@ import {
   getWebCardByUserNamePrefixWithRedirection,
   pickRandomPredefinedCover,
 } from '@azzapp/data';
+import env from '#env';
 import { getSessionUser } from '#GraphQLContext';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -119,6 +120,6 @@ export const Query: QueryResolvers = {
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );

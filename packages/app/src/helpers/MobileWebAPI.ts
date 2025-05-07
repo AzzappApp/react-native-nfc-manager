@@ -1,7 +1,7 @@
 import { fetchBlob, fetchJSON } from '@azzapp/shared/networkHelpers';
-import * as WebAPI from '@azzapp/shared/WebAPI';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
+import * as WebAPI from './WebAPI';
 import type { FetchFunction } from '@azzapp/shared/networkHelpers';
 
 const authenticatedFetchJSON = fetchWithGlobalEvents(

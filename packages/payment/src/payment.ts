@@ -11,6 +11,7 @@ import {
   getUserById,
 } from '@azzapp/data';
 import { login } from '#authent';
+import env from '#env';
 import client from './client';
 import {
   calculateAmount,
@@ -82,6 +83,7 @@ export const createPaymentRequest = async ({
   customer,
   redirectUrlSuccess,
   redirectUrlCancel,
+  paymentCallBackUrl,
 }: {
   totalSeats: number;
   userId: string;
@@ -91,6 +93,7 @@ export const createPaymentRequest = async ({
   redirectUrlSuccess: string;
   redirectUrlCancel: string;
   customer: Customer;
+  paymentCallBackUrl: string;
 }) => {
   const ORDERID = createId();
 
@@ -130,7 +133,7 @@ export const createPaymentRequest = async ({
       userId,
       webCardId,
     }),
-    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    CALLBACKURL: paymentCallBackUrl,
     REDIRECTURLSUCCESS: redirectUrlSuccess,
     REDIRECTURLCANCEL: redirectUrlCancel,
     BILLINGADDRESS: customer.address,
@@ -232,12 +235,14 @@ export const createSubscriptionRequest = async ({
   userId,
   plan,
   customer,
+  subscriptionCallBackUrl,
 }: {
   paymentMean: PaymentMean;
   totalSeats: number;
   userId: string;
   plan: 'monthly' | 'yearly';
   customer: Customer;
+  subscriptionCallBackUrl: string;
 }) => {
   const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
@@ -276,7 +281,7 @@ export const createSubscriptionRequest = async ({
         clientPaymentRequestUlid: paymentMean.id,
         rebill_manager_fail_rule: generateRebillFailRule(),
         rebill_manager_external_reference: subscriptionId,
-        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
+        rebill_manager_callback_url: subscriptionCallBackUrl,
       },
     },
   );
@@ -332,12 +337,14 @@ export const createNewPaymentMean = async ({
   locale,
   redirectUrlSuccess,
   redirectUrlCancel,
+  paymentCallBackUrl,
 }: {
   userId: string;
   locale: string;
   customer: Customer;
   redirectUrlSuccess: string;
   redirectUrlCancel: string;
+  paymentCallBackUrl: string;
 }) => {
   const token = await login();
   const ORDERID = createId();
@@ -366,7 +373,7 @@ export const createNewPaymentMean = async ({
     }),
     REDIRECTURLSUCCESS: redirectUrlSuccess,
     REDIRECTURLCANCEL: redirectUrlCancel,
-    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    CALLBACKURL: paymentCallBackUrl,
     BILLINGADDRESS: customer.address,
     BILLINGCITY: customer.city,
     BILLINGPOSTALCODE: customer.zip,
@@ -432,15 +439,14 @@ export const generateInvoice = async (
 
   const invoiceBody = {
     clientPaymentRequestUlid: payment.paymentMeanId,
-    invoicingCompany: process.env.INVOICING_COMPANY ?? 'APPCORP',
-    invoicingEmail: process.env.INVOICING_EMAIL ?? 'contact@azzapp.com',
-    invoicingAddress1:
-      process.env.INVOICING_ADDRESS ?? '3-5 avenue des Citronniers',
+    invoicingCompany: env.INVOICING_COMPANY,
+    invoicingEmail: env.INVOICING_EMAIL,
+    invoicingAddress1: env.INVOICING_ADDRESS,
     invoicingAddress2: '',
-    invoicingCity: process.env.INVOICING_CITY ?? 'Monaco',
-    invoicingZip: process.env.INVOICING_ZIP ?? '98000',
-    invoicingCountry: process.env.INVOICING_COUNTRY ?? 'France',
-    invoicingVat: process.env.INVOICING_VAT ?? 'FR68923096283',
+    invoicingCity: env.INVOICING_CITY,
+    invoicingZip: env.INVOICING_ZIP,
+    invoicingCountry: env.INVOICING_COUNTRY,
+    invoicingVat: env.INVOICING_VAT,
     invoicedCompany: subscription.subscriberName ?? '',
     invoicedFirstname: '',
     invoicedLastname: '',

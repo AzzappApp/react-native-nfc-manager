@@ -15,12 +15,14 @@ import {
   updateContactCardAccessHasGooglePass,
   updateHasGooglePass,
 } from '@azzapp/data';
+import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import ERRORS from '@azzapp/shared/errors';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import {
   buildUserUrlWithContactCard,
   buildUserUrlWithKey,
+  buildWebUrl,
 } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
@@ -81,10 +83,7 @@ const getGoogleWalletPass = async (
     }
 
     const credentials = JSON.parse(
-      Buffer.from(
-        process.env.GOOGLE_PASS_CREDENTIALS ?? '',
-        'base64',
-      ).toString(),
+      Buffer.from(env.GOOGLE_PASS_CREDENTIALS, 'base64').toString(),
     );
 
     const { passId, issuerId, objectId, genericClient } =
@@ -94,13 +93,13 @@ const getGoogleWalletPass = async (
 
     const classData: GenericClass = {
       // Define the class data
-      id: `${process.env.GOOGLE_PASS_ISSUER_ID}.${classPrefix}`,
+      id: `${env.GOOGLE_PASS_ISSUER_ID}.${classPrefix}`,
       multipleDevicesAndHoldersAllowedStatus:
         MultipleDevicesAndHoldersAllowedStatusEnum.ONE_USER_ALL_DEVICES,
     };
 
     let genericClass = await genericClient.getClass(
-      process.env.GOOGLE_PASS_ISSUER_ID ?? '',
+      env.GOOGLE_PASS_ISSUER_ID,
       `${classPrefix}`,
     );
 
@@ -224,7 +223,7 @@ const getGoogleWalletPass = async (
       {
         iss: credentials.client_email,
         aud: 'google',
-        origins: [new URL(process.env.NEXT_PUBLIC_URL ?? '').hostname],
+        origins: [new URL(buildWebUrl()).hostname],
         typ: 'savetowallet',
         payload: {
           // The listed classes and objects will be created

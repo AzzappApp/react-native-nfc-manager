@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
@@ -54,7 +55,7 @@ const ContactActionModal = ({
     ) {
       return;
     }
-    const targetRoute = `${process.env.NEXT_PUBLIC_URL}/${contactActionData.contact?.webCardUserName}`;
+    const targetRoute = buildWebUrl(contactActionData.contact?.webCardUserName);
     const route = await matchUrlWithRoute(targetRoute);
     if (route) {
       router?.push(route);

@@ -3,6 +3,7 @@ import { getContactCardAccessById, getProfileById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass, checkAuthorization } from '#helpers/pass/apple';
 import { withPluginsRoute } from '#helpers/queries';
+import { getApiEndpoint } from '#helpers/request';
 
 const updatePass = async (
   req: Request,
@@ -54,6 +55,7 @@ const updatePass = async (
     locale: params.lang,
     contactCardAccessId,
     key,
+    apiEndpoint: getApiEndpoint(req),
   });
 
   if (pass) {

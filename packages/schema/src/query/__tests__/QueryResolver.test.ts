@@ -2,7 +2,7 @@ import latinize from 'latinize';
 import {
   getWebCardById,
   getWebCardByUserNamePrefixWithRedirection,
-} from '@azzapp/data/src/queries/webCardQueries';
+} from '@azzapp/data';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
@@ -21,7 +21,7 @@ jest.mock('#helpers/permissionsHelpers', () => ({
   checkWebCardProfileAdminRight: jest.fn(),
 }));
 
-jest.mock('@azzapp/data/src/queries/webCardQueries', () => ({
+jest.mock('@azzapp/data', () => ({
   getWebCardById: jest.fn(),
   getWebCardByUserNamePrefixWithRedirection: jest.fn(),
 }));

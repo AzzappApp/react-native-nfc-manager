@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { AZZAPP_URL_WEBSITE } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { getDeviceInfo } from '#helpers/devices';
 
-const iosApp = process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP;
-const androidApp = process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP;
-const azzappWebsite = process.env.NEXT_PUBLIC_AZZAPP_WEBSITE;
+const iosApp = env.NEXT_PUBLIC_DOWNLOAD_IOS_APP;
+const androidApp = env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP;
+const azzappWebsite = AZZAPP_URL_WEBSITE;
 
 const invite = async (req: Request) => {
   const { isAndroid, isIos } = getDeviceInfo(req);

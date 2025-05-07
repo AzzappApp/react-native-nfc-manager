@@ -17,6 +17,10 @@ jest.mock('#loaders', () => ({
   },
 }));
 
+jest.mock('@azzapp/service/mediaServices', () => ({
+  buildCoverImageUrl: jest.fn(),
+}));
+
 jest.mock('#helpers/permissionsHelpers', () => ({
   hasWebCardProfileRight: jest.fn(),
 }));

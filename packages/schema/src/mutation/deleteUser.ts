@@ -12,7 +12,11 @@ import { subscriptionsForUserLoader } from '#loaders';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
-const deleteUser: MutationResolvers['deleteUser'] = async () => {
+const deleteUser: MutationResolvers['deleteUser'] = async (
+  _,
+  _args,
+  context,
+) => {
   const user = await getSessionUser();
   if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -45,7 +49,7 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     );
     if (owners.length > 0) {
       for (const owner of owners) {
-        await updateMonthlySubscription(owner.id);
+        await updateMonthlySubscription(owner.id, context.apiEndpoint);
       }
     }
   } catch (error) {

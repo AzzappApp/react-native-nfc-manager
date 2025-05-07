@@ -3,6 +3,7 @@
 import { saveAs } from 'file-saver';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import env from '#env';
 import IosAddContactInfoModal from '#components/IosAddContactInfoModal';
 import LinkButton from './LinkButton';
 import type { ModalActions } from '#ui/Modal';
@@ -66,7 +67,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
       const blob = new Blob(
         [
           btoa(
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
+            `${env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
           ),
         ],
         {

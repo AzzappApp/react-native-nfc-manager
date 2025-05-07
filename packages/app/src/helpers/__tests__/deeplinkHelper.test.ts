@@ -1,4 +1,5 @@
 import { compressToEncodedURIComponent } from 'lz-string';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { verifySign } from '#helpers/MobileWebAPI';
 
@@ -12,7 +13,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile', async () => {
-    const res = await matchUrlWithRoute(`${process.env.NEXT_PUBLIC_URL}123`);
+    const res = await matchUrlWithRoute(buildWebUrl('123'));
 
     expect(res).toEqual({
       route: 'WEBCARD',
@@ -46,7 +47,7 @@ describe('deeplinkHelpers', () => {
     );
 
     const res = await matchUrlWithRoute(
-      `${process.env.NEXT_PUBLIC_URL}/123?c=${compressedCard}`,
+      buildWebUrl(`/123?c=${compressedCard}`),
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -88,7 +89,7 @@ describe('deeplinkHelpers', () => {
     );
 
     const res = await matchUrlWithRoute(
-      `${process.env.NEXT_PUBLIC_URL}124?c=${compressedCard}`,
+      buildWebUrl(`/124?c=${compressedCard}`),
     );
 
     expect(verifySignMock).toBeCalledTimes(1);

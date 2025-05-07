@@ -7,9 +7,9 @@ import {
   getProfileByUserAndWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { sendTemplateEmail } from '@azzapp/service/emailServices';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
-import { shareBackVCardFilename } from '@azzapp/service/shareBackHelper';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
+import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import type { VerifySignToken } from '../verifySign/route';
 import type { JwtPayload } from 'jwt-decode';
@@ -141,7 +141,7 @@ export async function POST(request: Request) {
     // Send email with vCard
     if (user.email) {
       const vCardContact = buildVCardFromShareBackContact(contactData);
-      const vCardFileName = shareBackVCardFilename(contactData);
+      const vCardFileName = buildVCardFileName('', contactData);
 
       await sendTemplateEmail({
         templateId: 'd-edcdee049b6d468cadf3ce7098bf0fe2',

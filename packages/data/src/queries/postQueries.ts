@@ -10,7 +10,6 @@ import {
   like,
   or,
 } from 'drizzle-orm';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { db, transaction } from '../database';
 import {
   FollowTable,
@@ -55,7 +54,9 @@ export const getPostByIdWithMedia = async (
   const res = await db().select().from(PostTable).where(eq(PostTable.id, id));
 
   const post = res[0];
-  const medias = convertToNonNullArray(await getMediasByIds(post.medias));
+  const medias = (await getMediasByIds(post.medias)).filter(
+    media => media !== null,
+  );
 
   return { ...post, medias };
 };
@@ -100,7 +101,7 @@ export const getWebCardsPostsWithMedias = async (
 
   const medias =
     mediasIds.length > 0
-      ? convertToNonNullArray(await getMediasByIds(mediasIds))
+      ? (await getMediasByIds(mediasIds)).filter(media => media !== null)
       : [];
 
   return posts.map(post => ({
@@ -211,7 +212,9 @@ export const getProfilesPostsWithTopComment = async (
     return [...mediasIds, ...post.medias];
   }, []);
 
-  const medias = convertToNonNullArray(await getMediasByIds(mediasIds));
+  const medias = (await getMediasByIds(mediasIds)).filter(
+    media => media !== null,
+  );
 
   return posts.map(post => ({
     ...post,

@@ -1,11 +1,11 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   getWebCardById,
   referencesMedias,
   transaction,
   updateProfile,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import {
   profileHasAdminRight,
@@ -26,6 +26,7 @@ import type { MutationResolvers } from '#/__generated__/types';
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
   { profileId: gqlProfileId, input: { profileRole, contactCard } },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -90,13 +91,17 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(ownerId, {
-    action: 'UPDATE_CONTACT_CARD',
-    webCardIsPublished: !!webCard?.cardIsPublished,
-    contactCardHasCompanyName: !!contactCard?.company,
-    contactCardHasUrl: !!contactCard?.urls?.length,
-    contactCardHasLogo: !!contactCard?.logoId,
-  });
+  await validateCurrentSubscription(
+    ownerId,
+    {
+      action: 'UPDATE_CONTACT_CARD',
+      webCardIsPublished: !!webCard?.cardIsPublished,
+      contactCardHasCompanyName: !!contactCard?.company,
+      contactCardHasUrl: !!contactCard?.urls?.length,
+      contactCardHasLogo: !!contactCard?.logoId,
+    },
+    context.apiEndpoint,
+  );
 
   const { avatarId, logoId, bannerId, ...restContactCard } = contactCard || {};
   try {
@@ -120,7 +125,8 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
         targetProfile.bannerId,
       ]);
     });
-  } catch {
+  } catch (e) {
+    console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 

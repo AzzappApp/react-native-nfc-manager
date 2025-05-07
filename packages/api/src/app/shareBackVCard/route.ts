@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
+import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
 import { generateSaltFromValues } from '@azzapp/service/shareBackHelper';
+import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { withPluginsRoute } from '#helpers/queries';
@@ -48,7 +50,7 @@ const shareBackVCard = async (req: NextRequest) => {
   );
 
   const isValid = await verifyHmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+    CONTACT_CARD_SIGNATURE_SECRET,
     signature,
     JSON.stringify(contactData, null, 2),
     { salt: shareBackContactValues },
@@ -67,14 +69,9 @@ const shareBackVCard = async (req: NextRequest) => {
   );
   const vCardContactString = buildVCardContact.toString();
 
-  let vCardFileName = `${contactData?.firstName?.trim() ? `-${contactData.firstName.trim()}` : ''}${contactData?.lastName?.trim() ? `-${contactData.lastName.trim()}` : ''}`;
-  if (!vCardFileName) {
-    vCardFileName = 'azzapp-contact';
-  }
-
   return new Response(vCardContactString, {
     headers: {
-      'Content-Disposition': `attachment; filename="${vCardFileName}.vcf"`,
+      'Content-Disposition': `attachment; filename="${buildVCardFileName('', contactData)}"`,
       'Content-Type': 'text/vcard',
     },
   });

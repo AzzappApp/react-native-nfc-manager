@@ -12,7 +12,7 @@ import {
 } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -475,7 +475,7 @@ const buildContactFromContactCard = async (
       ? [
           {
             label: 'azzapp',
-            url: buildUserUrl(userName),
+            url: buildWebUrl(userName),
           },
         ]
       : []
@@ -555,7 +555,7 @@ const buildContact = async (
     urls: (userName
       ? [
           {
-            url: buildUserUrl(userName),
+            url: buildWebUrl(userName),
           },
         ]
       : []

@@ -2,6 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
+      "@azzapp/service/*": ["../service/src/*"],
       "@azzapp/shared/*": ["../shared/src/*"],
       "#*": ["./src/*"]
     }

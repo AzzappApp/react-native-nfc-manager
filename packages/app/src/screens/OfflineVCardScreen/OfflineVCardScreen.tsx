@@ -16,7 +16,7 @@ import { graphql } from 'react-relay';
 import VCard from 'vcard-creator';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import {
   addressLabelToVCardLabel,
   emailLabelToVCardLabel,
@@ -246,8 +246,7 @@ export const OfflineVCardScreenRenderer = ({
                 );
               });
             }
-            if (webCard?.userName)
-              vCard.addURL(buildUserUrl(webCard?.userName));
+            if (webCard?.userName) vCard.addURL(buildWebUrl(webCard?.userName));
 
             const company =
               webCard?.isMultiUser && webCard?.commonInformation?.company

@@ -1,5 +1,5 @@
 import { getCoverTemplateTagsByIds } from '@azzapp/data';
-import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
+import { getCloudinaryAssetURL } from '@azzapp/service/mediaServices/imageHelpers';
 import { colorPaletteLoader, coverTemplateTypeLoader } from '#loaders';
 import { idResolver } from '#helpers/relayIdHelpers';
 import type { CoverTemplateResolvers } from '#/__generated__/types';

@@ -1,10 +1,10 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   transaction,
   updateWebCard,
   updateWebCardProfiles,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
@@ -14,11 +14,14 @@ import saveCommonInformation from '../saveCommonInformation';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
-  checkMedias: jest.fn(),
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateWebCard: jest.fn(),
   updateWebCardProfiles: jest.fn(),
+}));
+
+jest.mock('@azzapp/service/mediaServices/mediaServices', () => ({
+  checkMedias: jest.fn(),
 }));
 
 jest.mock('#helpers/webCardHelpers', () => ({

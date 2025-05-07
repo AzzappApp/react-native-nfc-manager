@@ -143,17 +143,21 @@ describe('toggleWebCardPublished Mutation', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-1', {
-      webCardIsPublished: true,
-      action: 'UPDATE_WEBCARD_PUBLICATION',
-      webCardIsMultiUser: true,
-      webCardKind: 'business',
-      alreadyPublished: 1,
-      addedSeats: 2,
-      ownerContactCardHasCompanyName: true,
-      ownerContactCardHasUrl: true,
-      ownerContactCardHasLogo: true,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'owner-1',
+      {
+        webCardIsPublished: true,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: true,
+        webCardKind: 'business',
+        alreadyPublished: 1,
+        addedSeats: 2,
+        ownerContactCardHasCompanyName: true,
+        ownerContactCardHasUrl: true,
+        ownerContactCardHasLogo: true,
+      },
+      mockContext.apiEndpoint,
+    );
   });
 
   test('should update webCard and invalidate cache on publish', async () => {

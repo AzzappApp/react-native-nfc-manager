@@ -1,6 +1,7 @@
 import { addEventListener, configure } from '@react-native-community/netinfo';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
+import env from '#env';
 import type { NetInfoSubscription } from '@react-native-community/netinfo';
 import type { AppStateStatus } from 'react-native';
 
@@ -26,7 +27,7 @@ export const NetworkAvailableContextProvider = ({
 const networkCheckTimeoutMs = __DEV__ ? 600000 : 5000;
 
 // The url to request
-const reachabilityUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/availabilityCheck`;
+const reachabilityUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/availabilityCheck`;
 
 // configure NetInfo, should be done only once
 configure({
@@ -66,7 +67,7 @@ export const useNetworkAvailableFetcher = () => {
         method: 'HEAD',
         headers: {
           'x-vercel-protection-bypass':
-            process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
+            env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
         },
       })
         .then(() => {

@@ -1,6 +1,7 @@
 import * as jose from 'jose';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
+import env from './env';
 
 const TEAM_SLUG = 'azzapp';
 
@@ -11,7 +12,7 @@ const JWKS = jose.createRemoteJWKSet(new URL('/.well-known/jwks', ISSUER_URL));
 const ENVIRONMENT =
   process.env.NODE_ENV === 'development'
     ? 'development'
-    : process.env.NEXT_PUBLIC_PLATFORM === 'production'
+    : env.NEXT_PUBLIC_PLATFORM === 'production'
       ? 'production'
       : 'preview';
 

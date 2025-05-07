@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
 import { commitLocalUpdate, graphql, usePreloadedQuery } from 'react-relay';
+import env from '#env';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -41,8 +42,8 @@ import type { PurchasesPackage } from 'react-native-purchases';
 const TERMS_OF_SERVICE =
   Platform.OS === 'ios'
     ? 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
-    : process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+    : env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
 
 const userPayWallScreenQuery = graphql`
@@ -523,9 +524,7 @@ const UserPayWallScreen = ({
             <Text variant="medium" style={styles.descriptionText}>
               |
             </Text>
-            <PressableOpacity
-              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
-            >
+            <PressableOpacity onPress={() => Linking.openURL(TERMS_OF_SERVICE)}>
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
                   defaultMessage="Terms of use"

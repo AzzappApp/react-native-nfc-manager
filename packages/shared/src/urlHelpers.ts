@@ -1,15 +1,18 @@
 import { compressToEncodedURIComponent } from 'lz-string';
+import env from './env';
 import { isDefined } from './isDefined';
 import type { Geolocation } from './geolocationHelpers';
-/**
- * Builds a user URL from a user name.
- */
-export function buildUserUrl(
-  userName?: string | null,
-  base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
-) {
-  if (userName) {
-    return `${base}${userName}`;
+
+export const AZZAPP_URL_WEBSITE = env.NEXT_PUBLIC_AZZAPP_WEBSITE;
+
+export function buildWebUrl(path?: string | null) {
+  let base = env.NEXT_PUBLIC_URL;
+  if (base.endsWith('/')) {
+    base = base.slice(0, -1);
+  }
+
+  if (path) {
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
   }
   return `${base}`; //maybe we should return empty string here
 }
@@ -17,21 +20,18 @@ export function buildUserUrl(
 /**
  * Builds a user URL from a user name.
  */
-export function buildReadableUserUrl(
-  userName?: string | null,
-  base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
-) {
+export function buildReadableUserUrl(userName?: string | null) {
   if (!userName) {
-    return 'azzapp.com/';
+    return 'azzapp.com';
   }
-  return buildUserUrl(userName, base).replace(base, 'azzapp.com/');
+  return `azzapp.com/${userName}`;
 }
 
 /**
  * Builds a post URL from a user name and post.
  */
 export function buildPostUrl(userName: string, postId: string) {
-  return `${buildUserUrl(userName)}/post/${postId}`;
+  return `${buildWebUrl(userName)}/post/${postId}`;
 }
 
 /**
@@ -40,7 +40,7 @@ export function buildPostUrl(userName: string, postId: string) {
  * @returns the url for invitation (redirect to store when relevant)
  */
 export function buildInviteUrl(userName: string) {
-  return `${buildUserUrl(userName)}/invite`;
+  return `${buildWebUrl(userName)}/invite`;
 }
 
 /**
@@ -70,7 +70,7 @@ export function buildUserUrlWithContactCard(
     ),
   );
 
-  return `${buildUserUrl(userName)}?c=${compressedData}`;
+  return `${buildWebUrl(userName)}?c=${compressedData}`;
 }
 
 export const deserializeGeolocation = (
@@ -134,7 +134,7 @@ export function buildUserUrlWithKey({
     JSON.stringify([contactCardAccessId, key, geolocationTrimmed]),
   );
 
-  return `${buildUserUrl(userName)}?k=${dataWithKey}`;
+  return `${buildWebUrl(userName)}?k=${dataWithKey}`;
 }
 
 export function buildEmailSignatureGenerationUrlWithKey(
@@ -146,7 +146,7 @@ export function buildEmailSignatureGenerationUrlWithKey(
     JSON.stringify([serializedKey, signature]),
   );
 
-  return `${buildUserUrl(userName)}/emailsignature?k=${compressedData}`;
+  return `${buildWebUrl(userName)}/emailsignature?k=${compressedData}`;
 }
 
 export function buildEmailSignatureGenerationUrl(
@@ -158,7 +158,7 @@ export function buildEmailSignatureGenerationUrl(
     JSON.stringify([serializedEmail, signature]),
   );
 
-  return `${buildUserUrl(userName)}/emailsignature?e=${compressedData}`;
+  return `${buildWebUrl(userName)}/emailsignature?e=${compressedData}`;
 }
 
 export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';

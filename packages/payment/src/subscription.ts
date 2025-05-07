@@ -26,10 +26,12 @@ export const updateActiveSubscription = async ({
   subscription,
   totalSeats,
   paymentMeanId,
+  subscriptionCallBackUrl,
 }: {
   subscription: UserSubscription;
   totalSeats?: number | null;
   paymentMeanId?: string | null;
+  subscriptionCallBackUrl: string;
 }) => {
   if (subscription.status === 'canceled') {
     throw new Error('Subscription is canceled');
@@ -39,6 +41,7 @@ export const updateActiveSubscription = async ({
     userSubscription: subscription,
     totalSeats,
     paymentMeanId,
+    subscriptionCallBackUrl,
   });
 };
 
@@ -148,10 +151,12 @@ export const updateExistingSubscription = async ({
   userSubscription: existingSubscription,
   totalSeats,
   paymentMeanId,
+  subscriptionCallBackUrl,
 }: {
   userSubscription: UserSubscription;
   totalSeats?: number | null;
   paymentMeanId?: string | null;
+  subscriptionCallBackUrl: string;
 }) => {
   if (
     existingSubscription.subscriptionPlan !== 'web.monthly' &&
@@ -258,7 +263,7 @@ export const updateExistingSubscription = async ({
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
             rebill_manager_external_reference: newSubscriptionId,
-            rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
+            rebill_manager_callback_url: subscriptionCallBackUrl,
           },
         },
       );
@@ -372,7 +377,7 @@ export const updateExistingSubscription = async ({
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
           rebill_manager_external_reference: newSubscriptionId,
-          rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
+          rebill_manager_callback_url: subscriptionCallBackUrl,
         },
       },
     );
@@ -417,7 +422,10 @@ export const updateExistingSubscription = async ({
   return (await getSubscriptionById(newSubscriptionId))!;
 };
 
-export const upgradePlan = async (existingSubscription: UserSubscription) => {
+export const upgradePlan = async (
+  existingSubscription: UserSubscription,
+  subscriptionCallBackUrl: string,
+) => {
   if (existingSubscription.status === 'canceled') {
     throw new Error('Subscription is canceled');
   }
@@ -516,7 +524,7 @@ export const upgradePlan = async (existingSubscription: UserSubscription) => {
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
           rebill_manager_external_reference: newSubscriptionId,
-          rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
+          rebill_manager_callback_url: subscriptionCallBackUrl,
         },
       },
     );

@@ -11,7 +11,9 @@ import {
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import env from '#env';
 import { retrieveSigninInfos, type SigninInfos } from '#helpers/auth';
+import { getApiEndpoint } from '#helpers/request';
 import type { Profile, User } from '@azzapp/data';
 import type { NextRequest } from 'next/server';
 
@@ -60,7 +62,7 @@ export const oauthSignin =
     url.searchParams.append('state', csrfToken);
     url.searchParams.append('scope', scope ?? 'profile email openid');
     url.searchParams.append('access_type', 'online');
-    if (clientId === process.env.APPLE_CLIENT_ID) {
+    if (clientId === env.APPLE_CLIENT_ID) {
       url.searchParams.append('response_mode', 'form_post');
     }
 
@@ -81,16 +83,16 @@ const redirectToApp = (
 ) => {
   if (platform === 'web') {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_USER_MGMT_URL}/api/oAuthSignin?data=${JSON.stringify(data)}`,
+      `${env.NEXT_PUBLIC_USER_MGMT_URL}/api/oAuthSignin?data=${JSON.stringify(data)}`,
       {
         status: 302,
       },
     );
   }
   const appScheme =
-    process.env.NEXT_PUBLIC_PLATFORM === 'development'
+    env.NEXT_PUBLIC_PLATFORM === 'development'
       ? 'azzapp-dev'
-      : process.env.NEXT_PUBLIC_PLATFORM === 'staging'
+      : env.NEXT_PUBLIC_PLATFORM === 'staging'
         ? 'azzapp-staging'
         : 'azzapp';
   return NextResponse.redirect(
@@ -157,7 +159,7 @@ export const oauthSigninCallback =
       const params = new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: redirectURI,
+        redirect_uri: `${getApiEndpoint(request)}${redirectURI}`,
         client_id: clientId,
         client_secret:
           typeof clientSecret === 'string'

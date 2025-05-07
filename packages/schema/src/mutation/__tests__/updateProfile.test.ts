@@ -1,10 +1,11 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
+  getMediasByIds,
   getWebCardById,
   referencesMedias,
   updateProfile,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/index';
 import ERRORS from '@azzapp/shared/errors';
 import { profileByWebCardIdAndUserIdLoader, profileLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -13,12 +14,18 @@ import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import updateProfileMutation from '../updateProfile';
 
 jest.mock('@azzapp/data', () => ({
-  checkMedias: jest.fn(),
   getWebCardById: jest.fn(),
   referencesMedias: jest.fn(),
   transaction: jest.fn(fn => fn()),
   updateProfile: jest.fn(),
+  getMediasByIds: jest.fn(),
 }));
+
+jest.mock('@azzapp/service/mediaServices/index', () => ({
+  checkMedias: jest.fn(),
+}));
+
+jest.mock('#env', () => ({}));
 
 jest.mock('#loaders', () => ({
   profileByWebCardIdAndUserIdLoader: { load: jest.fn() },
@@ -161,6 +168,10 @@ describe('updateProfileMutation', () => {
     (checkMedias as jest.Mock).mockResolvedValue(undefined);
     (updateProfile as jest.Mock).mockResolvedValue(undefined);
     (referencesMedias as jest.Mock).mockResolvedValue(undefined);
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'oldAvatar', type: 'avatar' },
+      { id: 'oldLogo', type: 'logo' },
+    ]);
 
     const result = await updateProfileMutation(
       {},

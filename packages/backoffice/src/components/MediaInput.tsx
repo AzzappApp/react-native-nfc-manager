@@ -1,7 +1,10 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { IconButton, Box, Button, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getImageURL, getVideoURL } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURL,
+  getVideoURL,
+} from '@azzapp/service/mediaServices/imageHelpers';
 import type { BoxProps } from '@mui/material';
 import type { Variant } from '@mui/material/styles/createTypography';
 import type { ChangeEvent, CSSProperties } from 'react';

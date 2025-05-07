@@ -7,6 +7,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
+import env from '#env';
 import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
@@ -17,18 +18,19 @@ import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );
 
 const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
-  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '2',
+  env.USERNAME_REDIRECTION_AVAILABILITY_DAY,
   10,
 );
 
 const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   _,
   { webCardId: gqlWebCardId, input: updates },
+  context,
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
@@ -91,11 +93,15 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     if (!owner) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_WEBCARD_KIND',
-      webCardKind: profileUpdates.webCardKind,
-    });
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_WEBCARD_KIND',
+        webCardKind: profileUpdates.webCardKind,
+      },
+      context.apiEndpoint,
+    );
   }
 
   try {

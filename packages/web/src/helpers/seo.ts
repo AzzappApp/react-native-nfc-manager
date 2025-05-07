@@ -1,3 +1,4 @@
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import type { Metadata } from 'next';
 import type { OpenGraphType } from 'next/dist/lib/metadata/types/opengraph-types';
 
@@ -20,7 +21,7 @@ export function getMetaData({
   type,
   other,
 }: SocialMetas): Metadata {
-  const basePath = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000';
+  const basePath = buildWebUrl();
   const url = path.startsWith('http')
     ? path
     : `${basePath}${stripPreSlash(path)}`;

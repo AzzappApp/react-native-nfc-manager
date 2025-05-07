@@ -18,8 +18,6 @@
     "@aws-sdk/credential-provider-web-identity": "^3.787.0",
     "@azzapp/data": "workspace:^",
     "@azzapp/i18n": "workspace:^",
-    "@azzapp/payment": "workspace:^",
-    "@azzapp/schema": "workspace:^",
     "@azzapp/service": "workspace:^",
     "@azzapp/shared": "workspace:^",
     "@conform-to/react": "^1.4.0",

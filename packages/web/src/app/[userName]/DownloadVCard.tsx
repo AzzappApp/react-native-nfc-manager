@@ -8,12 +8,16 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import {
+  buildVCardFileName,
+  parseContactCard,
+} from '@azzapp/shared/contactCardHelpers';
 import {
   buildVCardFromContactCard,
   buildVCardFromSerializedContact,
 } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon, InviteIcon } from '#assets';
+import env from '#env';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import ContactSteps from '#components/ContactSteps';
@@ -91,18 +95,15 @@ const DownloadVCard = ({
       }
 
       if (contactData && signature) {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/verifySign`,
-          {
-            body: JSON.stringify({
-              signature,
-              data: contactData,
-              salt: webCard.userName,
-              geolocation,
-            }),
-            method: 'POST',
-          },
-        );
+        const res = await fetch(`${env.NEXT_PUBLIC_API_ENDPOINT}/verifySign`, {
+          body: JSON.stringify({
+            signature,
+            data: contactData,
+            salt: webCard.userName,
+            geolocation,
+          }),
+          method: 'POST',
+        });
         if (res.ok) {
           const additionalData = await res.json();
 
@@ -162,7 +163,7 @@ const DownloadVCard = ({
           decompressFromEncodedURIComponent(keyData),
         );
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/verifyQrCodeKey`,
+          `${env.NEXT_PUBLIC_API_ENDPOINT}/verifyQrCodeKey`,
           {
             body: JSON.stringify({
               contactCardAccessId,
@@ -282,7 +283,7 @@ const DownloadVCard = ({
       if (!compressedContactCard) {
         return;
       }
-      const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${webCard.userName}&c=${compressedContactCard}`;
+      const appClipUrl = `${env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${webCard.userName}&c=${compressedContactCard}`;
       // Open the App Clip URL
       window.location.href = appClipUrl;
     },
@@ -347,7 +348,7 @@ const DownloadVCard = ({
             size="medium"
             href={fileUrl}
             className={styles.buttonLink}
-            download={`${webCard.userName}${contact?.firstName?.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName?.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+            download={buildVCardFileName(webCard.userName, contact)}
             userName={webCard.userName}
             onClick={handleClose}
           >
@@ -379,9 +380,7 @@ const DownloadVCard = ({
               {(deviceType === DeviceType.IOS ||
                 deviceType === DeviceType.DESKTOP) && (
                 <Link
-                  href={
-                    new URL(process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP as string)
-                  }
+                  href={new URL(env.NEXT_PUBLIC_DOWNLOAD_IOS_APP)}
                   target="_blank"
                 >
                   <Image
@@ -395,11 +394,7 @@ const DownloadVCard = ({
               {(deviceType === DeviceType.ANDROID ||
                 deviceType === DeviceType.DESKTOP) && (
                 <Link
-                  href={
-                    new URL(
-                      process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP as string,
-                    )
-                  }
+                  href={new URL(env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP)}
                   target="_blank"
                 >
                   <Image

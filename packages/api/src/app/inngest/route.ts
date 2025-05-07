@@ -1,4 +1,5 @@
 import { serve } from 'inngest/next';
+import env from '#env';
 import { inngest } from '#inngest/client';
 import {
   notifyWebCardUsersBatch,
@@ -11,7 +12,7 @@ import {
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  signingKey: process.env.INNGEST_SIGNING_KEY,
+  signingKey: env.INNGEST_SIGNING_KEY,
   functions: [
     sendEmailSignature,
     sendEmailSignatureBatch,

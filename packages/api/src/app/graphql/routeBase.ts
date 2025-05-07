@@ -21,8 +21,9 @@ import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
+  runWithPrimary,
+  isDatabaseMonitoringEnabled,
 } from '@azzapp/data';
-import { runWithPrimary } from '@azzapp/data/src/database/database';
 import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
 import { schema, type GraphQLContext } from '@azzapp/schema';
 import { createServerIntl } from '@azzapp/service/i18nServices';
@@ -30,18 +31,20 @@ import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import { checkServerAuth } from '@azzapp/service/serverAuthServices';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import queryMap from '#persisted-query-map.json';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { withPluginsRoute } from '#helpers/queries';
+import { getApiEndpoint } from '#helpers/request';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import { inngest } from '#inngest/client';
 import packageJSON from '../../../package.json';
 import type { WebCard } from '@azzapp/data';
-import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
+import type { Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
-  process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
+  env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
 function useAppVersion(): YogaPlugin {
   return {
     onRequest({ request, fetchAPI, endResponse }) {
@@ -103,18 +106,15 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
   };
 }
 
-const SUPPORTED_LOG_LEVELS = ['debug', 'info', 'warn', 'error', 'silent'];
 const getLoggingLevel = () => {
-  const logLevel = process.env.API_LOG_LEVEL;
+  const logLevel = env.API_LOG_LEVEL;
 
   if (logLevel === 'silent') {
     return false;
   }
 
   if (logLevel) {
-    if (SUPPORTED_LOG_LEVELS.includes(logLevel)) {
-      return logLevel as LogLevel;
-    }
+    return logLevel;
   }
 
   return process.env.NODE_ENV !== 'production' ? 'debug' : 'error';
@@ -158,13 +158,17 @@ const { handleRequest } = createYoga({
     'currentUser' | 'invalidatePost' | 'invalidateWebCard'
   > => {
     const locale = request.headers.get('azzapp-locale') as Locale;
+
+    const apiEndpoint = getApiEndpoint(request);
+
     return {
       locale: locale ?? DEFAULT_LOCALE,
       notifyUsers,
-      validateMailOrPhone,
+      validateMailOrPhone: validateMailOrPhone(apiEndpoint),
       sendPushNotification,
-      notifyApplePassWallet,
-      notifyGooglePassWallet,
+      notifyApplePassWallet: notifyApplePassWallet(apiEndpoint),
+      notifyGooglePassWallet: notifyGooglePassWallet(apiEndpoint),
+      apiEndpoint,
       intl: createServerIntl(locale ?? DEFAULT_LOCALE),
       sendEmailSignatures: async (profileIds: string[], webCard: WebCard) => {
         waitUntil(
@@ -204,7 +208,7 @@ const { handleRequest } = createYoga({
     useAppVersion(),
     useLogger({
       logFn: (eventName, { args }) => {
-        if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+        if (isDatabaseMonitoringEnabled()) {
           if (eventName === 'execute-start') {
             startDatabaseConnectionMonitoring();
           }
@@ -259,29 +263,6 @@ const { handleRequest } = createYoga({
         }
       },
     }),
-    usePersistedOperations({
-      extractPersistedOperationId: params => {
-        return 'id' in params && params.id ? (params.id as string) : null;
-      },
-      getPersistedOperation(id: string) {
-        return (queryMap as any)[id];
-      },
-      allowArbitraryOperations: async () => {
-        if (
-          process.env.NODE_ENV !== 'production' ||
-          process.env.NEXT_PUBLIC_PLATFORM === 'development'
-        ) {
-          return true;
-        }
-
-        try {
-          await checkServerAuth(await headers());
-          return true;
-        } catch {
-          return false;
-        }
-      },
-    }),
     useGenericAuth({
       resolveUserFn: async () => {
         try {
@@ -302,8 +283,31 @@ const { handleRequest } = createYoga({
       },
       contextFieldName: 'currentUser',
       mode: 'protect-all',
-    }) as YogaPlugin,
-    useRevalidatePages() as YogaPlugin,
+    }),
+    usePersistedOperations({
+      extractPersistedOperationId: params => {
+        return 'id' in params && params.id ? (params.id as string) : null;
+      },
+      getPersistedOperation(id: string) {
+        return (queryMap as any)[id];
+      },
+      allowArbitraryOperations: async () => {
+        if (
+          process.env.NODE_ENV !== 'production' ||
+          env.NEXT_PUBLIC_PLATFORM === 'development'
+        ) {
+          return true;
+        }
+
+        try {
+          await checkServerAuth(await headers());
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    }),
+    useRevalidatePages(),
     runOnPrimaryPlugin,
     useSentry({
       includeRawResult: false,
@@ -319,56 +323,49 @@ const removePreRelease = (version: string) => {
   return versionParts[0];
 };
 
-const validateMailOrPhone = async (
-  type: 'email' | 'phone',
-  issuer: string,
-  token: string,
-) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/validateMailOrPhone`,
-    {
+const validateMailOrPhone =
+  (apiEndpoint: string) =>
+  async (type: 'email' | 'phone', issuer: string, token: string) => {
+    const res = await fetch(`${apiEndpoint}/validateMailOrPhone`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
       },
       body: JSON.stringify({ type, issuer, token }),
-    },
-  );
-  if (!res.ok) {
-    throw new Error('Error validating mail or phone');
-  }
-};
+    });
+    if (!res.ok) {
+      throw new Error('Error validating mail or phone');
+    }
+  };
 
-const notifyApplePassWallet = (pushToken: string) => {
+const notifyApplePassWallet = (apiEndpoint: string) => (pushToken: string) => {
   waitUntil(
     (async () => {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/apple`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
-          },
-          body: JSON.stringify({ pushToken }),
-        },
-      );
-    })(),
-  );
-};
-
-const notifyGooglePassWallet = (serial: string, locale: string) => {
-  waitUntil(
-    (async () => {
-      fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/google`, {
+      await fetch(`${apiEndpoint}/notifyWallet/apple`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
         },
-        body: JSON.stringify({ serial, locale }),
+        body: JSON.stringify({ pushToken }),
       });
     })(),
   );
 };
+
+const notifyGooglePassWallet =
+  (apiEndpoint: string) => (serial: string, locale: string) => {
+    waitUntil(
+      (async () => {
+        fetch(`${apiEndpoint}/notifyWallet/google`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
+          },
+          body: JSON.stringify({ serial, locale }),
+        });
+      })(),
+    );
+  };

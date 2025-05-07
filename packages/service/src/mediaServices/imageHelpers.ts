@@ -1,10 +1,6 @@
-import getRuntimeEnvironment from './getRuntimeEnvironment';
+import env from '../env';
 
-export const CLOUDINARY_CLOUDNAME =
-  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${CLOUDINARY_CLOUDNAME}`;
-
-export const DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL = 17;
+export const CLOUDINARY_BASE_URL = `https://${env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}`;
 
 /**
  * Helpers used to create an asset url from a cloudinary id without any transformation
@@ -16,7 +12,6 @@ export const getCloudinaryAssetURL = (
   id: string,
   kind: 'image' | 'raw' | 'video',
 ) => {
-  assetNotRN('getCloudinaryAssetURL');
   return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}`;
 };
 
@@ -27,7 +22,6 @@ export const getCloudinaryAssetURL = (
  * @returns
  */
 export const getImageURL = (id: string) => {
-  assetNotRN('getImageURL');
   return assembleCloudinaryUrl(id, 'image', resizeTransforms());
 };
 
@@ -63,7 +57,6 @@ export const getImageURLForSize = ({
   pregeneratedSizes,
   format,
 }: UrLForSizeParam) => {
-  assetNotRN('getImageURLForSize');
   const transforms = resizeTransforms(
     width,
     height,
@@ -81,7 +74,6 @@ export const getImageURLForSize = ({
  * @returns
  */
 export const getVideoURL = (id: string, path?: string) => {
-  assetNotRN('getVideoURL');
   return assembleCloudinaryUrl(
     id,
     'video',
@@ -111,7 +103,6 @@ export const getVideoUrlForSize = ({
   format,
   path,
 }: UrLForSizeParam) => {
-  assetNotRN('getVideoUrlForSize');
   const transforms = resizeTransforms(
     width,
     height,
@@ -147,7 +138,6 @@ export const getVideoThumbnailURL = ({
   pregeneratedSizes,
   previewPositionPercentage,
 }: UrLForSizeParam) => {
-  assetNotRN('getVideoThumbnailURL');
   const transforms = resizeTransforms(
     width,
     height,
@@ -222,15 +212,6 @@ export const resizeTransforms = (
  */
 export const encodeMediaId = (mediaId: string, kind: string) => {
   return `${kind.charAt(0)}_${mediaId}`;
-};
-
-const assetNotRN = (funcName: string) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error(`${funcName} is not supported on react-native`);
-  }
 };
 
 const assembleCloudinaryUrl = (

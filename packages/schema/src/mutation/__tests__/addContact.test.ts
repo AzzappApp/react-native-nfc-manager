@@ -32,7 +32,7 @@ jest.mock('@azzapp/i18n', () => ({
 }));
 
 jest.mock('@azzapp/shared/urlHelpers', () => ({
-  buildUserUrl: jest.fn(userName => `https://azzapp.com/${userName}`),
+  buildWebUrl: jest.fn(userName => `https://azzapp.com/${userName}`),
 }));
 
 jest.mock('#externals', () => ({
@@ -208,9 +208,13 @@ describe('addContact Mutation', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
-      action: 'ADD_CONTACT_WITH_SCAN',
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'user-456',
+      {
+        action: 'ADD_CONTACT_WITH_SCAN',
+      },
+      mockContext.apiEndpoint,
+    );
     expect(incrementContactsImportFromScan).toHaveBeenCalled();
     expect(incrementImportFromScan).toHaveBeenCalled();
   });

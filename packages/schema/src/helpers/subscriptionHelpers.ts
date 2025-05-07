@@ -16,7 +16,11 @@ export const calculateAvailableSeats = async (
   return userSubscription.totalSeats + userSubscription.freeSeats - totalUsed;
 };
 
-const checkSubscription = async (userId: string, params: FeatureParams) => {
+const checkSubscription = async (
+  userId: string,
+  params: FeatureParams,
+  subscriptionCallBackUrl: string,
+) => {
   const result = { hasActiveSubscription: false, hasEnoughSeats: false };
   const userSubscription = await getUserSubscriptions({
     userIds: [userId],
@@ -60,6 +64,7 @@ const checkSubscription = async (userId: string, params: FeatureParams) => {
           totalSeats:
             monthly.totalSeats +
             ((params.alreadyAdded ? 0 : params.addedSeats) - availableSeats),
+          subscriptionCallBackUrl,
         });
       }
       return {
@@ -171,17 +176,26 @@ const MAX_FREE_SCANS = 5;
 export const validateCurrentSubscription = async (
   userId: string,
   params: FeatureParams,
+  apiEndpoint: string,
 ) => {
   switch (params.action) {
     case 'ADD_CONTACT_WITH_SCAN': {
-      const { hasActiveSubscription } = await checkSubscription(userId, params);
+      const { hasActiveSubscription } = await checkSubscription(
+        userId,
+        params,
+        `${apiEndpoint}/webhook/subscription`,
+      );
       if (!hasActiveSubscription) {
         await updateNbFreeScans(userId);
       }
       break;
     }
     case 'USE_SCAN': {
-      const { hasActiveSubscription } = await checkSubscription(userId, params);
+      const { hasActiveSubscription } = await checkSubscription(
+        userId,
+        params,
+        `${apiEndpoint}/webhook/subscription`,
+      );
       if (!hasActiveSubscription) {
         const user = await getUserById(userId);
         if (user && user.nbFreeScans >= MAX_FREE_SCANS) {
@@ -195,6 +209,7 @@ export const validateCurrentSubscription = async (
         const { hasActiveSubscription } = await checkSubscription(
           userId,
           params,
+          `${apiEndpoint}/webhook/subscription`,
         );
         if (!hasActiveSubscription) {
           throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
@@ -248,6 +263,7 @@ export const validateCurrentSubscription = async (
       const { hasActiveSubscription, hasEnoughSeats } = await checkSubscription(
         userId,
         params,
+        `${apiEndpoint}/webhook/subscription`,
       );
 
       if (!hasActiveSubscription) {
@@ -261,7 +277,10 @@ export const validateCurrentSubscription = async (
   }
 };
 
-export const updateMonthlySubscription = async (userId: string) => {
+export const updateMonthlySubscription = async (
+  userId: string,
+  subscriptionCallBackUrl: string,
+) => {
   const subs = await getUserSubscriptions({
     userIds: [userId],
     onlyActive: true,
@@ -277,6 +296,7 @@ export const updateMonthlySubscription = async (userId: string) => {
     await updateExistingSubscription({
       userSubscription: monthly,
       totalSeats: seats,
+      subscriptionCallBackUrl,
     });
   }
 };

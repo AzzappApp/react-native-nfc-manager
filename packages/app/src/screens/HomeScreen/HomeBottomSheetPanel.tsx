@@ -13,8 +13,9 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
+import env from '#env';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { logEvent } from '#helpers/analytics';
@@ -188,7 +189,7 @@ const HomeBottomSheetPanel = ({
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
-      const url = buildUserUrl(profile?.webCard.userName);
+      const url = buildWebUrl(profile?.webCard.userName);
       let message = intl.formatMessage({
         defaultMessage: 'Check out this azzapp WebCard: ',
         description:
@@ -394,7 +395,7 @@ const HomeBottomSheetPanel = ({
             description: 'Help center us message in Home bottom sheet panel',
           }),
           onPress: () => {
-            Linking.openURL(process.env.FAQ || '');
+            Linking.openURL(env.FAQ);
           },
         },
         {

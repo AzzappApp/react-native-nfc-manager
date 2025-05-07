@@ -1,5 +1,4 @@
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { db, transaction } from '../database';
 import { PostCommentTable, PostTable, WebCardTable } from '../schema';
 import { getMediasByIds } from './mediaQueries';
@@ -73,7 +72,7 @@ export const getPostCommentsWithWebCard = async (
 
   const mediasMap = (
     await getMediasByIds(
-      convertToNonNullArray(res.map(({ WebCard }) => WebCard.coverMediaId)),
+      res.map(r => r?.WebCard.coverMediaId).filter(r => r !== null),
     )
   ).reduce((acc, media) => {
     if (!media) return acc;

@@ -8,10 +8,13 @@ import {
   getUserById,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
+import {
+  serializeAndSignContactCard,
+  CONTACT_CARD_SIGNATURE_SECRET,
+} from '@azzapp/service/contactCardSerializationServices';
+import { getImageURLForSize } from '@azzapp/service/mediaServices/imageHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
-import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import {
   buildUserUrlWithContactCard,
   buildUserUrlWithKey,
@@ -66,7 +69,7 @@ const EmailSignaturePage = async (props: EmailSignatureProps) => {
     );
 
     const isValid = await verifyHmacWithPassword(
-      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      CONTACT_CARD_SIGNATURE_SECRET,
       signature,
       serialized,
       { salt: webCard.userName },
@@ -113,7 +116,7 @@ const EmailSignaturePage = async (props: EmailSignatureProps) => {
       return notFound();
     }
     const isValid = await verifyHmacWithPassword(
-      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      CONTACT_CARD_SIGNATURE_SECRET,
       signature,
       contactData,
       { salt: webCard.userName },

@@ -1,12 +1,17 @@
 /**
  * This modules contains helper functions to make API calls to the backend.
  */
-import { fetchJSON, postFormData } from './networkHelpers';
-import type { CommonInformation, ContactCard } from './contactCardHelpers';
-import type { Geolocation } from './geolocationHelpers';
-import type { FetchFunction, fetchBlob } from './networkHelpers';
 
-const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
+import { fetchJSON, postFormData } from '@azzapp/shared/networkHelpers';
+import env from '#env';
+import type {
+  CommonInformation,
+  ContactCard,
+} from '@azzapp/shared/contactCardHelpers';
+import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
+import type { FetchFunction, fetchBlob } from '@azzapp/shared/networkHelpers';
+
+const API_ENDPOINT = env.NEXT_PUBLIC_API_ENDPOINT;
 
 export type APIMethod<Params, ReturnType> = (
   params: Params,
@@ -25,8 +30,7 @@ const apiFetch = <ReturnType>(
     ...init,
     headers: {
       ...init?.headers,
-      'x-vercel-protection-bypass':
-        process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
+      'x-vercel-protection-bypass': env.AZZAPP_API_VERCEL_PROTECTION_BYPASS,
     },
   });
 };

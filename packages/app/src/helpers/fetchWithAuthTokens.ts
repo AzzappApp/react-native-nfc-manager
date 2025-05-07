@@ -1,9 +1,9 @@
 import ERRORS from '@azzapp/shared/errors';
 import { type FetchFunction } from '@azzapp/shared/networkHelpers';
-import { refreshTokens } from '@azzapp/shared/WebAPI';
 import * as authStore from './authStore';
 import { dispatchGlobalEvent } from './globalEvents';
-import type { TokensResponse } from '@azzapp/shared/WebAPI';
+import { refreshTokens } from './WebAPI';
+import type { TokensResponse } from './WebAPI';
 
 /**
  * Fetches JSON data from the server, injecting the token in the header

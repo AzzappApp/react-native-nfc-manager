@@ -1,6 +1,7 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Linking } from 'react-native';
 
+import env from '#env';
 import AccountHeader from '#components/AccountHeader';
 
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -9,10 +10,10 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
-const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
-const ABOUT = process.env.ABOUT;
-const FAQ = process.env.FAQ;
+const TERMS_OF_SERVICE = env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = env.PRIVACY_POLICY;
+const ABOUT = env.ABOUT;
+const FAQ = env.FAQ;
 
 const AboutScreen = () => {
   const intl = useIntl();
@@ -56,7 +57,7 @@ const AboutScreen = () => {
       </PressableNative>
       <PressableNative
         style={styles.rowStyle}
-        onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
+        onPress={() => Linking.openURL(TERMS_OF_SERVICE)}
       >
         <Text variant="medium">
           <FormattedMessage

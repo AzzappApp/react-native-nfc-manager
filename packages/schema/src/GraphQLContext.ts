@@ -13,6 +13,7 @@ export type GraphQLContext = {
   };
   locale: Locale;
   intl: IntlShape;
+  apiEndpoint: string;
 };
 
 const storage = new AsyncLocalStorage<GraphQLContext>();

@@ -6,8 +6,10 @@ import {
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { generateInvoice } from '@azzapp/payment';
+import { sendTemplateEmail } from '@azzapp/service/emailServices';
 import { createServerIntl } from '@azzapp/service/i18nServices';
-import { sendTemplateEmail, SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
+import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
+import env from '#env';
 
 export const sendInvoice = async ({
   paymentId,
@@ -146,7 +148,7 @@ export const sendInvoice = async ({
                     description: 'Email body for invoice - download',
                     id: 'JBgTaz',
                   }),
-                  userMgmtUrl: process.env.NEXT_PUBLIC_USER_MGMT_URL,
+                  userMgmtUrl: env.NEXT_PUBLIC_USER_MGMT_URL,
                   manage: intl.formatMessage({
                     defaultMessage: 'Manage your team',
                     description:

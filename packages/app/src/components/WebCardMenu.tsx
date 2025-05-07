@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -102,7 +102,7 @@ const WebCardMenu = ({
       return;
     }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
-    const url = buildUserUrl(webCard.userName);
+    const url = buildWebUrl(webCard.userName);
     let message = intl.formatMessage({
       defaultMessage: 'Check out this azzapp WebCard: ',
       description:

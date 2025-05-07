@@ -1,8 +1,12 @@
-import { serializeContactCard } from './contactCardHelpers';
-import { hmacWithPassword } from './crypto';
-import type { CommonInformation, ContactCard } from './contactCardHelpers';
+import {
+  type ContactCard,
+  type CommonInformation,
+  serializeContactCard,
+} from '@azzapp/shared/contactCardHelpers';
+import { hmacWithPassword } from '@azzapp/shared/crypto';
+import env from './env';
 
-const serializeAndSignContactCard = async (
+export const serializeAndSignContactCard = async (
   userName: string,
   profileId: string,
   webCardId: string,
@@ -17,7 +21,7 @@ const serializeAndSignContactCard = async (
   );
 
   const signature = await hmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+    env.CONTACT_CARD_SIGNATURE_SECRET,
     serializedContactCard,
     {
       salt: userName ?? '',
@@ -30,4 +34,4 @@ const serializeAndSignContactCard = async (
   };
 };
 
-export default serializeAndSignContactCard;
+export const CONTACT_CARD_SIGNATURE_SECRET = env.CONTACT_CARD_SIGNATURE_SECRET;

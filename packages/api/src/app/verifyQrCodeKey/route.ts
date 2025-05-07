@@ -14,11 +14,12 @@ import { displayName } from '@azzapp/shared/contactCardHelpers';
 import { importPublicKey, verifyMessage } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { deserializeGeolocation } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
 import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = env.JWT_SECRET;
 
 const verifyQrCodeKeyBody = z.object({
   contactCardAccessId: z.string().nonempty(),

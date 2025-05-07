@@ -73,7 +73,7 @@ export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSu
   };
 
 export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
-  async (_, { intent }) => {
+  async (_, { intent }, context) => {
     const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -90,6 +90,7 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
         ...intent,
         webCardId,
         userId: user.id,
+        paymentCallBackUrl: `${context.apiEndpoint}/webhook/payment`,
       });
 
       if (!result?.clientRedirectUrl) {
@@ -102,7 +103,7 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
   };
 
 export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscriptionFromPaymentMean'] =
-  async (_, { intent, paymentMeanId }) => {
+  async (_, { intent, paymentMeanId }, context) => {
     const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -119,6 +120,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
       ...intent,
       paymentMean,
       userId: user.id,
+      subscriptionCallBackUrl: `${context.apiEndpoint}/webhook/subscription`,
     });
 
     return result;
@@ -127,6 +129,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
 export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
   _,
   { locale, redirectUrlSuccess, redirectUrlCancel, customer },
+  context,
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -138,6 +141,7 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
     locale,
     redirectUrlSuccess,
     redirectUrlCancel,
+    paymentCallBackUrl: `${context.apiEndpoint}/webhook/payment`,
   });
 
   if (!result) {
@@ -225,6 +229,7 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
       subscriptionId: gqlSubscriptionId,
       totalSeats,
     },
+    context,
   ) => {
     const subscriptionId = fromGlobalIdWithType(
       gqlSubscriptionId,
@@ -239,11 +244,12 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
       paymentMeanId: gqlPaymentMeanId
         ? fromGlobalIdWithType(gqlPaymentMeanId, 'PaymentMean')
         : null,
+      subscriptionCallBackUrl: `${context.apiEndpoint}/webhook/subscription`,
     });
   };
 
 export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan'] =
-  async (_, { subscriptionId: gqlSubscriptionId }) => {
+  async (_, { subscriptionId: gqlSubscriptionId }, context) => {
     const subscriptionId = fromGlobalIdWithType(
       gqlSubscriptionId,
       'UserSubscription',
@@ -251,7 +257,10 @@ export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan
 
     const { subscription } = await checkSubscription(subscriptionId);
 
-    return upgradePlan(subscription);
+    return upgradePlan(
+      subscription,
+      `${context.apiEndpoint}/webhook/subscription`,
+    );
   };
 
 export const endSubscription: MutationResolvers['endSubscription'] = async (

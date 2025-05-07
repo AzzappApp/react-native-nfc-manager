@@ -12,11 +12,6 @@ jest.mock('@azzapp/data', () => ({
   getMediasByIds: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/imagesHelpers', () => ({
-  CLOUDINARY_BASE_URL: 'https://res.cloudinary.com/demo',
-  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL: 10,
-}));
-
 const mockProfile: Profile = {
   id: 'profile-123',
   userId: 'user-456',
@@ -112,14 +107,14 @@ describe('buildAvatarUrl', () => {
   test('should build avatar URL from profile avatarId', async () => {
     const url = await buildAvatarUrl(mockProfile, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/avatar-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/avatar-image-id.jpg',
     );
   });
 
   test('should fallback to logoId if avatarId is missing', async () => {
     const url = await buildAvatarUrl({ ...mockProfile, avatarId: null }, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
     );
   });
 });
@@ -139,7 +134,7 @@ describe('buildCoverImageUrl', () => {
     });
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -153,7 +148,7 @@ describe('buildCoverImageUrl', () => {
     });
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/video/upload/so_20p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/video/upload/so_20p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -166,7 +161,7 @@ describe('buildCoverImageUrl', () => {
     );
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/video/upload/so_10p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/video/upload/so_17p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -188,7 +183,7 @@ describe('buildLogoUrl', () => {
   test('should build logo URL from profile logoId', async () => {
     const url = await buildLogoUrl(mockProfile, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
     );
   });
 
@@ -202,7 +197,7 @@ describe('buildLogoUrl', () => {
       },
     );
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/webcard-logo-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/webcard-logo-image-id.jpg',
     );
   });
 
@@ -223,7 +218,7 @@ describe('buildBannerUrl', () => {
   test('should build banner URL from profile bannerId', async () => {
     const url = await buildBannerUrl(mockProfile, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_1200/v1/banner-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_1200/v1/banner-image-id.jpg',
     );
   });
 
@@ -237,7 +232,7 @@ describe('buildBannerUrl', () => {
       },
     );
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_1200/v1/webcard-banner-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_1200/v1/webcard-banner-image-id.jpg',
     );
   });
 

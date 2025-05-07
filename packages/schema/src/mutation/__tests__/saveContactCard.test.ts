@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import {
   getContactCardAccessForProfile,
   getContactCardAccessWithHasGooglePass,
+  getMediasByIds,
   getPushTokens,
   referencesMedias,
   transaction,
@@ -26,6 +27,7 @@ jest.mock('@azzapp/data', () => ({
   updateProfile: jest.fn(),
   getContactCardAccessWithHasGooglePass: jest.fn(),
   getContactCardAccessForProfile: jest.fn(),
+  getMediasByIds: jest.fn(),
 }));
 
 jest.mock('#externals', () => ({
@@ -164,6 +166,16 @@ describe('saveContactCard', () => {
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      {
+        id: 'new-avatar',
+        type: 'avatar',
+      },
+      {
+        id: 'new-logo',
+        type: 'logo',
+      },
+    ]);
 
     await saveContactCard(
       {},
@@ -179,13 +191,17 @@ describe('saveContactCard', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-123', {
-      action: 'UPDATE_CONTACT_CARD',
-      contactCardHasCompanyName: true,
-      webCardIsPublished: true,
-      contactCardHasUrl: false,
-      contactCardHasLogo: true,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'owner-123',
+      {
+        action: 'UPDATE_CONTACT_CARD',
+        contactCardHasCompanyName: true,
+        webCardIsPublished: true,
+        contactCardHasUrl: false,
+        contactCardHasLogo: true,
+      },
+      mockContext.apiEndpoint,
+    );
   });
 
   test('should update contact card and notify Apple & Google Wallet', async () => {
@@ -235,6 +251,9 @@ describe('saveContactCard', () => {
     });
     (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
     (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'new-avatar', type: 'avatar' },
+    ]);
 
     await saveContactCard(
       {},
@@ -258,6 +277,9 @@ describe('saveContactCard', () => {
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'new-avatar', type: 'avatar' },
+    ]);
 
     await expect(
       saveContactCard(

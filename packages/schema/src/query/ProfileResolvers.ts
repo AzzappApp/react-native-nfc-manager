@@ -19,12 +19,12 @@ import {
   getActiveContactCardAccess,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
-  buildUserUrl,
+  buildWebUrl,
   buildUserUrlWithContactCard,
   buildUserUrlWithKey,
 } from '@azzapp/shared/urlHelpers';
@@ -694,11 +694,9 @@ const getContactCardUrl = async ({
   key?: string | null;
 }) => {
   const webCard = await webCardLoader.load(profile.webCardId);
-  if (!webCard || !webCard?.userName) {
-    return process.env.NEXT_PUBLIC_URL!;
-  }
+
   if (!profileIsAssociatedToCurrentUser(profile)) {
-    return buildUserUrl(webCard.userName);
+    return buildWebUrl(webCard?.userName);
   }
 
   const geolocation = location && address ? { location, address } : null;
@@ -709,7 +707,7 @@ const getContactCardUrl = async ({
       profile.id,
     );
     const url = buildUserUrlWithKey({
-      userName: webCard.userName,
+      userName: webCard?.userName ?? '',
       key,
       contactCardAccessId: activeContactCardAccess?.id,
       geolocation,
@@ -722,7 +720,7 @@ const getContactCardUrl = async ({
     profile.id,
     profile.webCardId,
     profile.contactCard ?? {},
-    webCard.isMultiUser ? webCard?.commonInformation : null,
+    webCard?.isMultiUser ? webCard?.commonInformation : null,
   );
 
   const url = buildUserUrlWithContactCard(

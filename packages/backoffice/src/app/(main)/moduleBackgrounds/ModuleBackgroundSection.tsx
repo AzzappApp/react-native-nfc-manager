@@ -16,7 +16,7 @@ import { CSS } from '@dnd-kit/utilities';
 import DisableIcon from '@mui/icons-material/HideImage';
 import { IconButton, Box } from '@mui/material';
 import { useState } from 'react';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { getImageURL } from '@azzapp/service/mediaServices/imageHelpers';
 import type { ModuleBackground } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';

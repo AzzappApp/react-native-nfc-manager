@@ -1,17 +1,18 @@
 import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
 import { getMediasByIds, type Profile, type WebCard } from '@azzapp/data';
+import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
+import { sendEmail, sendTemplateEmail } from '@azzapp/service/emailServices';
 import { createServerIntl } from '@azzapp/service/i18nServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
-import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import { sendEmail, sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
-} from '@azzapp/shared/imagesHelpers';
-import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
+} from '@azzapp/service/mediaServices/imageHelpers';
+import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import {
+  AZZAPP_URL_WEBSITE,
   buildInviteUrl,
   buildUserUrlWithContactCard,
 } from '@azzapp/shared/urlHelpers';
@@ -481,7 +482,7 @@ export const notifyUsers = async (
                     id: 'HO2BMC',
                     description: 'discover for add contact notification',
                   }),
-                  azzappUrl: process.env.NEXT_PUBLIC_URL,
+                  azzappUrl: AZZAPP_URL_WEBSITE,
                   year: intl.formatMessage({
                     defaultMessage: '2025',
                     id: '7mxm1W',

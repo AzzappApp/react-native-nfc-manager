@@ -2,10 +2,9 @@
 import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
 import * as Sentry from '@sentry/nextjs';
 import { useOptimistic, useState } from 'react';
-import { uploadMedia } from '@azzapp/shared/WebAPI';
+import { uploadMedia } from '#helpers/mediaHelper';
 import {
   addModuleBackgrounds,
-  getModuleBackgroundSignedUpload,
   reorderModuleBackgrounds,
   setModuleBackgroundEnabled,
 } from './moduleBackgroundActions';
@@ -69,21 +68,9 @@ const ModuleBackgroundsList = ({
   ) => {
     setUploading(true);
     try {
-      const mediaToUploads = await Promise.all(
-        medias.map(async media => {
-          return {
-            media,
-            ...(await getModuleBackgroundSignedUpload()),
-          } as const;
-        }),
-      );
       const mediaIds = await Promise.all(
-        mediaToUploads.map(async ({ media, uploadParameters, uploadURL }) => {
-          const { public_id } = await uploadMedia(
-            media,
-            uploadURL,
-            uploadParameters,
-          ).promise;
+        medias.map(async media => {
+          const { public_id } = await uploadMedia(media, 'image');
           return public_id;
         }),
       );

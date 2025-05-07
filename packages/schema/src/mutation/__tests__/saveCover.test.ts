@@ -1,10 +1,6 @@
 import { GraphQLError } from 'graphql';
-import {
-  checkMedias,
-  getWebCardPosts,
-  referencesMedias,
-  updateWebCard,
-} from '@azzapp/data';
+import { getWebCardPosts, referencesMedias, updateWebCard } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import {
   invalidatePost,
@@ -31,6 +27,10 @@ jest.mock('#externals', () => ({
   invalidatePost: jest.fn(),
   invalidateWebCard: jest.fn(),
   notifyWebCardUsers: jest.fn(),
+}));
+
+jest.mock('@azzapp/service/mediaServices/mediaServices', () => ({
+  checkMedias: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
