@@ -59,9 +59,6 @@ module.exports = withAxiom(
       // For all available options, see:
       // https://github.com/getsentry/sentry-webpack-plugin#options
 
-      // An auth token is required for uploading source maps.
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-
       // Suppresses source map uploading logs during build
       silent: !process.env.CI,
       org: 'azzapp',
