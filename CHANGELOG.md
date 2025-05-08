@@ -1,3 +1,7 @@
+## 1.10.0-canary.196
+
+
+
 ## 1.10.0-canary.195
 
 * **fix:**  - wrong uri in oauth call ([#8715](https://github.com/AzzappApp/azzapp/pull/8715))
