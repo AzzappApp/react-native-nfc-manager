@@ -4,12 +4,5 @@ export const getApiEndpoint = (request: Request) => {
 
   const apiEndpoint = `${protocol}://${host}`;
 
-  console.log(
-    'getApiEndpoint',
-    request.headers.get('x-forwarded-proto'),
-    request.headers.get('host'),
-    apiEndpoint,
-  );
-
   return apiEndpoint;
 };

@@ -53,7 +53,10 @@ export const oauthSignin =
     const url = new URL(authorizeURL);
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
-    url.searchParams.append('redirect_uri', redirectURI);
+    url.searchParams.append(
+      'redirect_uri',
+      `${getApiEndpoint(req)}${redirectURI}`,
+    );
     const csrfToken = await new SignJWT({ csrf: cuid2.createId(), platform })
       .setProtectedHeader({ alg: 'HS256' })
       .setExpirationTime('10m')
