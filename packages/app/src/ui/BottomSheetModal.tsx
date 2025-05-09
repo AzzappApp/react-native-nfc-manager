@@ -111,11 +111,11 @@ const BottomSheetModal = ({
   automaticBottomPadding = true,
   automaticTopPadding = true,
   enableContentPanningGesture,
-  closeOnBackdropTouch = true,
   variant,
   dismissKeyboardOnOpening = false,
   backgroundStyle,
   showShadow = true,
+  closeOnBackdropTouch = true,
   nestedScroll = false,
   ...props
 }: Props) => {
@@ -176,9 +176,6 @@ const BottomSheetModal = ({
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => {
-      if (!closeOnBackdropTouch) {
-        return null;
-      }
       if (variant !== 'modal') {
         return (
           <BottomSheetBackdrop
@@ -187,13 +184,18 @@ const BottomSheetModal = ({
             disappearsOnIndex={-1}
             appearsOnIndex={0}
             opacity={1}
-            pressBehavior="close"
+            pressBehavior={closeOnBackdropTouch ? 'close' : 'none'}
           />
         );
       }
-      return <CustomBackdrop closeOnBackdropTouch {...props} />;
+      return (
+        <CustomBackdrop
+          closeOnBackdropTouch={closeOnBackdropTouch}
+          {...props}
+        />
+      );
     },
-    [closeOnBackdropTouch, variant],
+    [variant, closeOnBackdropTouch],
   );
 
   const backgroundStyleInner = backgroundStyle
@@ -287,17 +289,13 @@ const CustomBackdrop = ({
     };
   });
 
-  if (!closeOnBackdropTouch) {
-    return null;
-  }
-
   return (
     <BottomSheetBackdrop
       {...props}
       style={[style, containerAnimatedStyle]}
       disappearsOnIndex={-1}
       appearsOnIndex={0}
-      pressBehavior="close"
+      pressBehavior={closeOnBackdropTouch ? 'close' : 'none'}
       animatedIndex={animatedIndex}
     />
   );
