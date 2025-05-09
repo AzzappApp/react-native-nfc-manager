@@ -1,19 +1,14 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
-import { getTextColor } from '@azzapp/shared/colorsHelpers';
-import { colors, shadow } from '#theme';
+import { shadow } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useQRCodeKey from '#hooks/useQRCodeKey';
-import FingerHint, {
-  FINGER_HINT_HEIGHT,
-  FINGER_HINT_WIDTH,
-} from '#ui/FingerHint';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
@@ -136,17 +131,6 @@ const ContactCardItem = ({
 
   const qrCodeKey = useQRCodeKey(profile);
 
-  const showUpdateContactHint =
-    profile.lastContactCardUpdate &&
-    profile.createdAt &&
-    profile.lastContactCardUpdate <= profile.createdAt &&
-    profile.webCard?.cardIsPublished;
-
-  const readableColor = useMemo(
-    () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
-    [profile.webCard?.cardColors?.primary],
-  );
-
   const router = useRouter();
 
   const openContactCard = useCallback(() => {
@@ -179,15 +163,6 @@ const ContactCardItem = ({
             </TouchableOpacity>
           </View>
         )}
-      {showUpdateContactHint && (
-        <FingerHint
-          color={readableColor === colors.black ? 'dark' : 'light'}
-          style={{
-            top: (95 * height) / 100 - FINGER_HINT_HEIGHT / 2,
-            left: (78 * width) / 100 - FINGER_HINT_WIDTH / 2,
-          }}
-        />
-      )}
     </View>
   );
 };
