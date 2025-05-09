@@ -27,36 +27,42 @@ const ContactsScreenSearchByDate = ({
 
   const sections = useMemo(() => {
     const today = new Date().toDateString();
-    return contacts?.reduce(
-      (accumulator, contact) => {
-        const date = new Date(contact.meetingDate);
-        const isToday = date.toDateString() === today;
+    return contacts
+      ?.sort(
+        (contactA, contactB) =>
+          new Date(contactB.meetingDate).getTime() -
+          new Date(contactA.meetingDate).getTime(),
+      )
+      .reduce(
+        (accumulator, contact) => {
+          const date = new Date(contact.meetingDate);
+          const isToday = date.toDateString() === today;
 
-        const title = isToday
-          ? intl.formatMessage({
-              defaultMessage: 'Today',
-              description: 'Contacts by date - Title for current day',
-            })
-          : date.toLocaleDateString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            });
+          const title = isToday
+            ? intl.formatMessage({
+                defaultMessage: 'Today',
+                description: 'Contacts by date - Title for current day',
+              })
+            : date.toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
 
-        const existingSection = accumulator.find(
-          section => section.title === title,
-        );
+          const existingSection = accumulator.find(
+            section => section.title === title,
+          );
 
-        if (!existingSection) {
-          accumulator.push({ title, data: [contact] });
-        } else {
-          existingSection.data.push(contact);
-        }
+          if (!existingSection) {
+            accumulator.push({ title, data: [contact] });
+          } else {
+            existingSection.data.push(contact);
+          }
 
-        return accumulator;
-      },
-      [] as Array<{ title: string; data: ContactType[] }>,
-    );
+          return accumulator;
+        },
+        [] as Array<{ title: string; data: ContactType[] }>,
+      );
   }, [contacts, intl]);
 
   return (
