@@ -62,8 +62,6 @@ export const HomeBackgroundComponent = ({
   gradientColors,
   currentIndexSharedValue,
 }: HomeBackgroundComponentProps) => {
-  // eslint-disable-next-line react-compiler/react-compiler
-  'use no memo'; // compiler interfere with reanimated
   const skiaGradient = useIndexInterpolation(
     currentIndexSharedValue,
     gradientColors,
@@ -74,12 +72,18 @@ export const HomeBackgroundComponent = ({
         interpolateColor(
           value,
           inputRange,
-          outputRange.map(c => c[0] ?? '#45444b'),
+          outputRange.map(c => {
+            'worklet';
+            return c[0] ?? '#45444b';
+          }),
         ),
         interpolateColor(
           value,
           inputRange,
-          outputRange.map(c => c[1] ?? colors.black),
+          outputRange.map(c => {
+            'worklet';
+            return c[1] ?? colors.black;
+          }),
         ),
       ];
     },
