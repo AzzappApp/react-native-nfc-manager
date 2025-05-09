@@ -32,7 +32,9 @@ export type HeaderProps = Omit<ViewProps, 'children'> & {
 
 /**
  * A mobile header with a title and two buttons.
- * we got issue with alignment of the title with right or left element, using flex 1.7 but we need to do better TODO: fix this.
+ *
+ * :warning: Don't change the layout of this component and put a fake view on left or right side.
+ * if you need a single button, you'll be fired if you add flex: 1 to the button.
  */
 const Header = ({
   middleElement,
@@ -49,9 +51,7 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
-        {(rightElement || leftElement) && (
-          <View style={styles.element}>{leftElement}</View>
-        )}
+        {leftElement && <View style={styles.element}>{leftElement}</View>}
         <View
           style={[styles.headerMiddle, middleElementStyle]}
           pointerEvents="box-none"
@@ -69,9 +69,7 @@ const Header = ({
             <View>{middleElement}</View>
           ) : undefined}
         </View>
-        {(rightElement || leftElement) && (
-          <View style={styles.element}>{rightElement}</View>
-        )}
+        {rightElement && <View style={styles.element}>{rightElement}</View>}
       </View>
     </Container>
   );
@@ -98,13 +96,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   element: {
-    flex: 1,
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerMiddle: {
-    flex: 4,
+    flex: 1,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
