@@ -628,6 +628,7 @@ __metadata:
     expo-auth-session: "npm:~6.1.5"
     expo-av: "npm:~15.1.4"
     expo-blur: "npm:~14.1.4"
+    expo-brightness: "npm:^13.1.4"
     expo-clipboard: "npm:~7.1.4"
     expo-contacts: "npm:~14.2.3"
     expo-file-system: "npm:~18.1.9"
@@ -19763,6 +19764,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/62a405ca66a1e42bc76b19eea57d79ec6e6669b359ae3dbebb8219230b2e0afd08d732a8efe9ec05b22f909a8f0c89ed13d0e694d8802f39ee63226d42ab77d9
+  languageName: node
+  linkType: hard
+
+"expo-brightness@npm:^13.1.4":
+  version: 13.1.4
+  resolution: "expo-brightness@npm:13.1.4"
+  peerDependencies:
+    expo: "*"
+    react-native: "*"
+  checksum: 10/a28bdb8a41331b7d685cfcf1a8471f7001b6e35acc733e31b416a903530f7e38ae5d7a8cb59cafac05b4759fa928d1ae6c23471e81c54683a48bdde7788edf55
   languageName: node
   linkType: hard
 

@@ -9,6 +9,7 @@ import {
   rect,
   Skia,
 } from '@shopify/react-native-skia';
+import * as Brightness from 'expo-brightness';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { toString } from 'qrcode';
@@ -69,6 +70,41 @@ const ShakeAndShareScreen = ({
   const webCard = node?.profile?.webCard;
 
   const router = useRouter();
+
+  useEffect(() => {
+    let canceled = false;
+    let brightness: number | null = null;
+    (async () => {
+      try {
+        const { status } = await Brightness.requestPermissionsAsync();
+        if (canceled) {
+          return;
+        }
+        if (status === 'granted') {
+          brightness = await Brightness.getBrightnessAsync();
+          if (canceled) {
+            return;
+          }
+          Brightness.setBrightnessAsync(1);
+        }
+      } catch {
+        // Ignore errors
+      }
+    })();
+    return () => {
+      canceled = true;
+      (async () => {
+        try {
+          if (brightness !== null) {
+            Brightness.setBrightnessAsync(brightness);
+          }
+          Brightness.restoreSystemBrightnessAsync();
+        } catch {
+          // Ignore errors
+        }
+      })();
+    };
+  }, []);
 
   useEffect(() => {
     if (
