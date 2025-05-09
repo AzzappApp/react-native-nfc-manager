@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { getSessionUser } from '@azzapp/schema/GraphQLContext';
+import { getUserById } from '@azzapp/data';
 import { seal, unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import env from '#env';
@@ -29,14 +29,15 @@ export const verifyToken = (token: string): Promise<SessionData> =>
   unseal(token, TOKEN_SECRET) as Promise<any>;
 
 export const refreshTokens = async (refreshToken: string) => {
-  const user = await getSessionUser();
-  if (!user) {
-    throw new Error(ERRORS.UNAUTHORIZED);
-  }
   const data: any = await unseal(refreshToken, REFRESH_TOKEN_SECRET);
 
   if (typeof data !== 'object' || typeof data?.userId !== 'string') {
     throw new Error('Invalid token');
+  }
+
+  const user = await getUserById(data?.userId);
+  if (!user || user.deleted) {
+    throw new Error(ERRORS.UNAUTHORIZED);
   }
   const { userId } = data;
   return generateTokens({ userId });

@@ -35,11 +35,7 @@ const fetchWithAuthTokens =
           res as {
             errors?: Array<{ message: string }>;
           }
-        ).errors?.some(
-          e =>
-            e.message === ERRORS.INVALID_TOKEN ||
-            e.message === ERRORS.UNAUTHORIZED,
-        )
+        ).errors?.some(e => e.message === ERRORS.INVALID_TOKEN)
       ) {
         throw new Error(ERRORS.INVALID_TOKEN);
       }
