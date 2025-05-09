@@ -1,3 +1,10 @@
+## 1.10.0-canary.202
+
+* **fix:**  - **ShakeAndShare:** increase brightness while sharing ([#8733](https://github.com/AzzappApp/azzapp/pull/8733))
+* **fix:**  - **OfflineScreen:** use black QRCode ([#8735](https://github.com/AzzappApp/azzapp/pull/8735))
+* **fix:**  - **bottomSheet:** [#8718](https://github.com/AzzappApp/azzapp/pull/8718) enhance closeOnBackdropTouch ([#8720](https://github.com/AzzappApp/azzapp/pull/8720))
+* **fix:**  - **ContactList:** sort by date after edit ([#8732](https://github.com/AzzappApp/azzapp/pull/8732))
+
 ## 1.10.0-canary.201
 
 * **fix:**  - **ContactScreen:** refresh logo on edit ([#8731](https://github.com/AzzappApp/azzapp/pull/8731))
