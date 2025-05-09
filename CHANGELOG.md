@@ -1,3 +1,7 @@
+## 1.10.0-canary.198
+
+* **fix:**  - rework phonebook permission access in multi user page ([#8710](https://github.com/AzzappApp/azzapp/pull/8710))
+
 ## 1.10.0-canary.197
 
 
