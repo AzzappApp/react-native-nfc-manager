@@ -43,7 +43,7 @@ const TitleTextModuleWebCardEditionScreenQuery = graphql`
             # module: cardModule(moduleId: $moduleId) {
             id
             ...TitleTextModuleWebCardEditionScreen_module
-              @alias(as: "titleTextModule")
+              @alias(as: "innerModule")
           }
         }
       }

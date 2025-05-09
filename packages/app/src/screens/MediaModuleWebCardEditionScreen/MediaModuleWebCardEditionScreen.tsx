@@ -47,7 +47,7 @@ const mediaModuleWebCardEditionScreenQuery = graphql`
             # and relay is not able to find it properly
             # module: cardModule(moduleId: $moduleId) {
             id
-            ...MediaModuleWebCardEditionScreen_module @alias(as: "mediaModule")
+            ...MediaModuleWebCardEditionScreen_module @alias(as: "innerModule")
           }
         }
       }

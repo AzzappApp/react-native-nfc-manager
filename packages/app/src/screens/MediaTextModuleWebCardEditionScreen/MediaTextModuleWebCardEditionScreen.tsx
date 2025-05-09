@@ -45,7 +45,7 @@ const mediaTextModuleWebCardEditionScreenQuery = graphql`
             # module: cardModule(moduleId: $moduleId) {
             id
             ...MediaTextModuleWebCardEditionScreen_module
-              @alias(as: "mediaTextModule")
+              @alias(as: "innerModule")
           }
         }
       }
