@@ -1,3 +1,7 @@
+## 1.10.0-canary.201
+
+* **fix:**  - **ContactScreen:** refresh logo on edit ([#8731](https://github.com/AzzappApp/azzapp/pull/8731))
+
 ## 1.10.0-canary.200
 
 * **fix:**  - **Home:** increase contact card edit button hitslop ([#8726](https://github.com/AzzappApp/azzapp/pull/8726))
