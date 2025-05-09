@@ -1,5 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import * as Contacts from 'expo-contacts';
+import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -7,6 +8,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
+import { usePermissionContext } from '#helpers/PermissionContext';
+import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import IconButton from '#ui/IconButton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -47,13 +50,22 @@ const MultiUserAddList = ({
   const loadNextPage = useRef(false);
   const hasNextPage = useRef(true);
 
+  const { contactPermission } = usePermissionContext();
+
+  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
+    usePhonebookPermission();
+
   const loadContacts = useCallback(async () => {
     if (loadNextPage.current || !hasNextPage.current) return;
-    loadNextPage.current = true;
-    setIsLoading(true);
 
-    const { status } = await Contacts.requestPermissionsAsync();
-    if (status === 'granted') {
+    const { status } =
+      contactPermission !== 'granted'
+        ? await requestPhonebookPermissionAndRedirectToSettingsAsync()
+        : { status: ContactPermissionStatus.GRANTED };
+
+    if (status === ContactPermissionStatus.GRANTED) {
+      loadNextPage.current = true;
+      setIsLoading(true);
       const { data, hasNextPage: hasNextPageValue } = await getContactsAsync({
         pageSize: PAGE_SIZE,
         pageOffset: pageOffset.current,
@@ -81,11 +93,10 @@ const MultiUserAddList = ({
         pageOffset.current += PAGE_SIZE;
       }
       hasNextPage.current = hasNextPageValue;
+      setIsLoading(false);
+      loadNextPage.current = false;
     }
-
-    setIsLoading(false);
-    loadNextPage.current = false;
-  }, []);
+  }, [contactPermission, requestPhonebookPermissionAndRedirectToSettingsAsync]);
 
   useEffect(() => {
     loadContacts();
