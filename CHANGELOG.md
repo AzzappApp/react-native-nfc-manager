@@ -1,3 +1,8 @@
+## 1.10.0-canary.200
+
+* **fix:**  - **Home:** increase contact card edit button hitslop ([#8726](https://github.com/AzzappApp/azzapp/pull/8726))
+* **fix:**  - **Home:** remove finger hint ([#8725](https://github.com/AzzappApp/azzapp/pull/8725))
+
 ## 1.10.0-canary.199
 
 * **fix:**  - don’t send invalid token on unauthorized fields ([#8713](https://github.com/AzzappApp/azzapp/pull/8713))
