@@ -25,7 +25,7 @@ export const getWhatsAppUrl = (number: string) => {
  * This context is use the query is whatsapp is supported on the device
  * The goal of this context is to ensure not all whatsapp links check if the app is install before being displayed
  */
-export const IsAzzappSupportedProvider = ({
+export const IsWhatsappSupportedProvider = ({
   children,
 }: {
   children: JSX.Element;

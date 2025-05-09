@@ -14,7 +14,7 @@ import ContactsFilteredByLocation from './ContactsFilteredByLocation';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
-import { IsAzzappSupportedProvider } from './isWhatsappSupportedContext';
+import { IsWhatsappSupportedProvider } from './isWhatsappSupportedContext';
 import type { ContactType } from '#helpers/contactTypes';
 import type { ContactsScreenLists_contacts$key } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
@@ -247,7 +247,7 @@ const ContactsScreenLists = ({
   });
 
   return (
-    <IsAzzappSupportedProvider>
+    <IsWhatsappSupportedProvider>
       <View style={styles.flex}>
         {profile && searchBy === 'name' && (
           <ContactsScreenSearchByName
@@ -300,7 +300,7 @@ const ContactsScreenLists = ({
           onShow={onShowContact}
         />
       </View>
-    </IsAzzappSupportedProvider>
+    </IsWhatsappSupportedProvider>
   );
 };
 
