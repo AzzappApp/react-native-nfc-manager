@@ -543,8 +543,8 @@ const QRCode = ({ value, width }: { width: number; value: string }) => {
         width,
         margin: 0,
         color: {
-          dark: colors.white,
-          light: colors.black,
+          dark: colors.black,
+          light: colors.white,
         },
       });
       setQrCode(qrCode);
@@ -591,7 +591,7 @@ const stylesheet = createStyleSheet(() => ({
     justifyContent: 'center',
     alignItems: 'center',
     alignContent: 'center',
-    backgroundColor: colors.black,
+    backgroundColor: colors.white,
     borderRadius: 34,
   },
   progress: {
