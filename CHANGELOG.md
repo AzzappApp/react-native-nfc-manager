@@ -1,3 +1,8 @@
+## 1.10.0-canary.203
+
+* **fix:**  - header layout ([#8736](https://github.com/AzzappApp/azzapp/pull/8736))
+* **fix:**  - **ModuleEdition:** fix after relay19 migration ([#8737](https://github.com/AzzappApp/azzapp/pull/8737))
+
 ## 1.10.0-canary.202
 
 * **fix:**  - **ShakeAndShare:** increase brightness while sharing ([#8733](https://github.com/AzzappApp/azzapp/pull/8733))
