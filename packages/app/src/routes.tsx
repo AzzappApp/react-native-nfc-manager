@@ -305,7 +305,7 @@ export type ContactDetailsRoute = {
   params: {
     webCardId?: string | null;
     contactId?: string | null;
-    contact?: ContactType;
+    scannedContact?: ContactType;
   };
 };
 

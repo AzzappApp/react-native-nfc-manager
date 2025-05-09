@@ -37,7 +37,7 @@ const ContactsScreenSection = ({
     });
   }, [data, showContactAction]);
 
-  const RenderProfile = useCallback(
+  const renderProfile = useCallback(
     ({ item }: ListRenderItemInfo<ContactType>) => {
       return (
         <ContactHorizontalItem
@@ -91,7 +91,7 @@ const ContactsScreenSection = ({
       <FlatList
         data={data}
         keyExtractor={keyExtractor}
-        renderItem={RenderProfile}
+        renderItem={renderProfile}
         horizontal
         contentContainerStyle={styles.profiles}
         showsHorizontalScrollIndicator={false}

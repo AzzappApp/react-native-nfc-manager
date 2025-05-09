@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
@@ -8,7 +8,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
 import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
 import ContactDetailsBody from './ContactDetailsBody';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -18,7 +17,7 @@ import type { ContactDetailsRoute } from '#routes';
 const query = graphql`
   query ContactsDetailScreenQuery(
     $contactId: ID!
-    $pixelRatio: Float!
+    $cappedPixelRatio: Float!
     $screenWidth: Float!
   ) {
     contact: node(id: $contactId) {
@@ -51,11 +50,11 @@ const query = graphql`
         }
         avatar {
           id
-          uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
+          uri: uri(width: 112, pixelRatio: $cappedPixelRatio, format: png)
         }
         logo {
           id
-          uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
+          uri: uri(width: 180, pixelRatio: $cappedPixelRatio, format: png)
         }
         birthday
         meetingPlace {
@@ -77,7 +76,7 @@ const query = graphql`
               ... on MediaVideo {
                 webcardThumbnail: thumbnail(
                   width: $screenWidth
-                  pixelRatio: $pixelRatio
+                  pixelRatio: $cappedPixelRatio
                 )
               }
             }
@@ -101,20 +100,10 @@ const ContactDetailsScreen = ({
     preloadedQuery,
   );
 
-  // We need to use an intermediate state to avoid buildLocalContact which is an async function
-  const [displayedContact, setDisplayedContact] = useState(params.contact);
-
-  const updateContact = useCallback(async () => {
-    if (!params.contact) {
-      setDisplayedContact(
-        (await buildContactTypeFromContactNode(contact)) || undefined,
-      );
-    }
-  }, [contact, params.contact]);
-
-  useEffect(() => {
-    updateContact();
-  }, [updateContact]);
+  const displayedContact = useMemo(
+    () => params.scannedContact ?? buildContactTypeFromContactNode(contact),
+    [contact, params.scannedContact],
+  );
 
   const onInviteContact = useOnInviteContact();
 
@@ -131,7 +120,7 @@ const ContactDetailsScreen = ({
     <View collapsable={false} style={styles.container}>
       {displayedContact ? (
         <ContactDetailsBody
-          details={displayedContact}
+          contact={displayedContact}
           onClose={router.back}
           onSave={onInviteContactInner}
         />
@@ -157,7 +146,6 @@ export default relayScreen(ContactDetailsScreen, {
     return {
       webCardId: webCardId ?? '',
       contactId: contactId ?? '',
-      pixelRatio: PixelRatio(),
       screenWidth: ScreenWidth(),
       cappedPixelRatio: CappedPixelRatio(),
     };

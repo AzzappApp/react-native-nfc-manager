@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -12,6 +12,7 @@ import { getAuthState } from '#helpers/authStore';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import ShareContact from '#helpers/ShareContact';
 import useBoolean from '#hooks/useBoolean';
 import useRemoveContact from '#hooks/useRemoveContact';
@@ -29,7 +30,7 @@ import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type ContactDetailsBodyProps = {
-  details: ContactType;
+  contact: ContactType;
   onClose: () => void;
   onSave: () => void;
 };
@@ -69,7 +70,7 @@ const ContactDetailItem = ({
 };
 
 const ContactDetailsBody = ({
-  details,
+  contact,
   onSave,
   onClose,
 }: ContactDetailsBodyProps) => {
@@ -103,27 +104,63 @@ const ContactDetailsBody = ({
         }
       }
     `,
-    details?.webCard,
+    contact?.webCard,
   );
 
-  const avatar = details?.avatar?.uri || details.logo?.uri;
+  const avatarUrl = useMemo(() => {
+    if (contact?.avatar) {
+      if (contact?.avatar?.id) {
+        const localFile = getLocalCachedMediaFile(contact.avatar.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      if (contact?.avatar?.uri) {
+        return contact.avatar.uri;
+      }
+    }
+    if (contact?.logo) {
+      if (contact?.logo?.id) {
+        const localFile = getLocalCachedMediaFile(contact.logo.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      return contact.logo.uri;
+    }
+    return undefined;
+  }, [contact.avatar, contact.logo]);
 
-  const birthday = details?.birthday;
+  const birthday = contact?.birthday;
 
-  const onShare = async () => details && ShareContact(details);
+  const onShare = async () => contact && ShareContact(contact);
   const appearance = useColorScheme();
 
   const { width: screenWidth } = useScreenDimensions();
   const { top, bottom } = useScreenInsets();
 
   const backgroundWidth = screenWidth + 40;
-  const backgroundImageUrl = avatar || details?.webCardPreview?.uri;
+  const backgroundImageUrl = useMemo(() => {
+    if (avatarUrl) {
+      return avatarUrl;
+    }
+    if (contact?.webCardPreview?.id) {
+      const localFile = getLocalCachedMediaFile(
+        contact.webCardPreview.id,
+        'image',
+      );
+      if (localFile) {
+        return localFile;
+      }
+    }
+    return contact?.webCardPreview?.uri ?? undefined;
+  }, [contact?.webCardPreview, avatarUrl]);
 
-  const meetingPlace = details?.meetingPlace
-    ? getFriendlyNameFromLocation(details.meetingPlace)
+  const meetingPlace = contact?.meetingPlace
+    ? getFriendlyNameFromLocation(contact.meetingPlace)
     : undefined;
-  const meetingDate = details.meetingDate
-    ? new Date(details.meetingDate).toLocaleDateString(undefined, {
+  const meetingDate = contact.meetingDate
+    ? new Date(contact.meetingDate).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
@@ -142,32 +179,27 @@ const ContactDetailsBody = ({
 
   const onRemoveContacts = useCallback(() => {
     const profileId = getAuthState().profileInfos?.profileId;
-    if (!profileId || !details.id) {
+    if (!profileId || !contact.id) {
       return;
     }
-    removeContact([details.id], profileId);
-  }, [details.id, removeContact]);
+    removeContact([contact.id], profileId);
+  }, [contact.id, removeContact]);
 
   const onEditContact = useCallback(() => {
     hideMore();
     router.push({
       route: 'CONTACT_EDIT',
       params: {
-        contact: details,
+        contact,
       },
     });
-  }, [details, hideMore, router]);
+  }, [contact, hideMore, router]);
 
   return (
     <Container style={styles.container}>
       {backgroundImageUrl ? (
         <View
-          style={[
-            styles.avatarBackgroundContainer,
-            {
-              width: backgroundWidth,
-            },
-          ]}
+          style={[styles.avatarBackgroundContainer, { width: backgroundWidth }]}
         >
           <Image
             source={backgroundImageUrl}
@@ -208,28 +240,28 @@ const ContactDetailsBody = ({
           </PressableNative>
           <View style={styles.avatarContainer}>
             <View style={[styles.avatar, styles.avatarWrapper]}>
-              {avatar ? (
-                <Image source={avatar} style={styles.avatar} />
+              {avatarUrl ? (
+                <Image source={avatarUrl} style={styles.avatar} />
               ) : webCard ? (
-                <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
+                <CoverRenderer width={AVATAR_WIDTH} webCard={contact.webCard} />
               ) : (
                 <Text style={styles.initials}>
-                  {details.firstName?.substring(0, 1)}
-                  {details.lastName?.substring(0, 1)}
-                  {!details.firstName &&
-                    !details.lastName &&
-                    details.company?.substring(0, 1)}
+                  {contact.firstName?.substring(0, 1)}
+                  {contact.lastName?.substring(0, 1)}
+                  {!contact.firstName &&
+                    !contact.lastName &&
+                    contact.company?.substring(0, 1)}
                 </Text>
               )}
             </View>
           </View>
           <Text variant="large" style={styles.name}>
-            {`${details?.firstName ?? ''} ${details?.lastName ?? ''}`.trim()}
+            {`${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim()}
           </Text>
-          {details.company && (
-            <Text style={styles.company}>{details.company}</Text>
+          {contact.company && (
+            <Text style={styles.company}>{contact.company}</Text>
           )}
-          {details.title && <Text style={styles.job}>{details.title}</Text>}
+          {contact.title && <Text style={styles.job}>{contact.title}</Text>}
           <View style={styles.saveContainer}>
             <Button
               label={intl.formatMessage({
@@ -281,8 +313,8 @@ const ContactDetailsBody = ({
                   )}
             </Text>
           )}
-          <NoteItem contact={details} />
-          {details.phoneNumbers?.map((phoneNumber, index) => (
+          <NoteItem contact={contact} />
+          {contact.phoneNumbers?.map((phoneNumber, index) => (
             <ContactDetailItem
               key={'phone' + index + '' + phoneNumber.number}
               onPress={() => {
@@ -293,7 +325,7 @@ const ContactDetailsBody = ({
               content={phoneNumber.number}
             />
           ))}
-          {details.emails?.map((email, index) => (
+          {contact.emails?.map((email, index) => (
             <ContactDetailItem
               key={'email' + index + '' + email.address}
               onPress={() => {
@@ -322,7 +354,7 @@ const ContactDetailsBody = ({
               })}
             />
           )}
-          {details.urls?.map((urlAddress, index) => (
+          {contact.urls?.map((urlAddress, index) => (
             <ContactDetailItem
               key={'url' + index + '' + urlAddress.url}
               onPress={async () => {
@@ -349,7 +381,7 @@ const ContactDetailsBody = ({
               content={urlAddress.url}
             />
           ))}
-          {details.addresses?.map((address, index) => (
+          {contact.addresses?.map((address, index) => (
             <ContactDetailItem
               key={'street' + index + '' + address.address}
               onPress={async () => {
@@ -369,7 +401,7 @@ const ContactDetailsBody = ({
               content={address.address}
             />
           ))}
-          {details.socials?.map((social, index) => (
+          {contact.socials?.map((social, index) => (
             <ContactDetailItem
               key={'social' + index + '' + social.url}
               onPress={() => {
@@ -389,14 +421,14 @@ const ContactDetailsBody = ({
           ))}
         </View>
       </ScrollView>
-      {details ? (
+      {contact ? (
         <ContactDetailActionModal
           visible={isMoreVisible}
           close={hideMore}
           onRemoveContacts={onRemoveContacts}
           onSaveContact={onSave}
           onShare={onShare}
-          details={details}
+          details={contact}
           onEdit={onEditContact}
         />
       ) : undefined}

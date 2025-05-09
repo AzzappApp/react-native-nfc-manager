@@ -29,7 +29,7 @@ import {
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
 import useScreenInsets from '#hooks/useScreenInsets';
-import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -61,7 +61,7 @@ const ContactEditScreen = ({
     mutation ContactEditScreenMutation(
       $contactId: ID!
       $contact: ContactInput!
-      $pixelRatio: Float!
+      $cappedPixelRatio: Float!
     ) {
       saveContact(contactId: $contactId, input: $contact) {
         id
@@ -70,12 +70,12 @@ const ContactEditScreen = ({
         title
         avatar {
           id
-          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          uri: uri(width: 112, pixelRatio: $cappedPixelRatio, format: png)
         }
         company
         logo {
           id
-          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          uri: uri(width: 180, pixelRatio: $cappedPixelRatio, format: png)
         }
         phoneNumbers {
           label
@@ -221,7 +221,7 @@ const ContactEditScreen = ({
       commit({
         variables: {
           contactId: params.contact.id,
-          pixelRatio: PixelRatio(),
+          cappedPixelRatio: CappedPixelRatio(),
           contact: {
             avatarId,
             logoId,
