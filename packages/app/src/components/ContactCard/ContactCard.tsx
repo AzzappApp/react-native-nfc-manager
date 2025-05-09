@@ -382,6 +382,7 @@ export const ContactCardComponent = ({
               },
             ]}
             onPress={onEdit}
+            hitSlop={20}
           >
             <Icon
               icon="edit"
