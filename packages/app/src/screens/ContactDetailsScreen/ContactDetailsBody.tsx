@@ -29,6 +29,8 @@ import type { ContactType } from '#helpers/contactTypes';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
+const BLUR_GAP = 20;
+
 type ContactDetailsBodyProps = {
   contact: ContactType;
   onClose: () => void;
@@ -139,7 +141,7 @@ const ContactDetailsBody = ({
   const { width: screenWidth } = useScreenDimensions();
   const { top, bottom } = useScreenInsets();
 
-  const backgroundWidth = screenWidth + 40;
+  const backgroundWidth = screenWidth + BLUR_GAP * 2;
   const backgroundImageUrl = useMemo(() => {
     if (avatarUrl) {
       return avatarUrl;
@@ -530,7 +532,8 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingTop: 30,
   },
   avatarBackgroundContainer: {
-    top: -20,
+    top: -BLUR_GAP,
+    left: -BLUR_GAP,
     position: 'absolute',
     height: 387,
   },
