@@ -143,8 +143,25 @@ const ContactDetailsBody = ({
 
   const backgroundWidth = screenWidth + BLUR_GAP * 2;
   const backgroundImageUrl = useMemo(() => {
-    if (avatarUrl) {
-      return avatarUrl;
+    if (contact?.logo) {
+      if (contact?.logo?.id) {
+        const localFile = getLocalCachedMediaFile(contact.logo.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      return contact.logo.uri;
+    }
+    if (contact?.avatar) {
+      if (contact?.avatar?.id) {
+        const localFile = getLocalCachedMediaFile(contact.avatar.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      if (contact?.avatar?.uri) {
+        return contact.avatar.uri;
+      }
     }
     if (contact?.webCardPreview?.id) {
       const localFile = getLocalCachedMediaFile(
@@ -156,7 +173,12 @@ const ContactDetailsBody = ({
       }
     }
     return contact?.webCardPreview?.uri ?? undefined;
-  }, [contact?.webCardPreview, avatarUrl]);
+  }, [
+    contact?.logo,
+    contact?.avatar,
+    contact?.webCardPreview?.id,
+    contact?.webCardPreview?.uri,
+  ]);
 
   const meetingPlace = contact?.meetingPlace
     ? getFriendlyNameFromLocation(contact.meetingPlace)
@@ -206,17 +228,15 @@ const ContactDetailsBody = ({
           <Image
             source={backgroundImageUrl}
             style={styles.avatarBackground}
-            blurRadius={9.2}
+            blurRadius={8.2}
             contentFit="cover"
           />
           <LinearGradient
             colors={[
-              appearance === 'dark'
-                ? 'rgba(0, 0, 0, 0)'
-                : 'rgba(255, 255, 255, 0.5)',
+              appearance === 'dark' ? 'transparent' : 'rgba(255, 255, 255, 0)',
               appearance === 'dark' ? colors.grey1000 : colors.white,
             ]}
-            start={{ x: 0, y: 0 }}
+            start={{ x: 0, y: 0.1 }}
             end={{ x: 0, y: 1 }}
             style={[
               styles.avatarBackgroundGradient,
