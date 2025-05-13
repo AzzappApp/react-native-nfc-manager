@@ -1,3 +1,7 @@
+## 1.9.26-rc.4
+
+* **fix:**  - missing env vars
+
 ## 1.9.26-rc.3
 
 * **fix:**  - remove unused import
