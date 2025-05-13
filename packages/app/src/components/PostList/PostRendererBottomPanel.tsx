@@ -492,113 +492,121 @@ const PostRendererBottomPanel = ({
           />
         </Text>
       </View>
-      <BottomSheetModal
-        visible={showModal}
-        variant="modal"
-        onDismiss={closeModal}
-      >
-        <View style={{ justifyContent: 'space-evenly' }}>
-          {isViewer && (
-            <PostConfiguration
-              allowLikes={post.allowLikes}
-              allowComments={post.allowComments}
-              updatePost={updatePost}
-            />
-          )}
-          {isViewer && (
-            <PressableNative onPress={openEditcontent} style={styles.modalLine}>
-              <Text variant="medium">
-                <FormattedMessage
-                  defaultMessage="Edit"
-                  description="PostItem Modal - Edit Label"
-                />
-              </Text>
-            </PressableNative>
-          )}
-
-          <PressableNative onPress={copyLink} style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Copy link"
-                description="PostItem Modal - Copy Link Label"
+      {showModal && (
+        <BottomSheetModal
+          visible={showModal}
+          variant="modal"
+          onDismiss={closeModal}
+        >
+          <View style={{ justifyContent: 'space-evenly' }}>
+            {isViewer && (
+              <PostConfiguration
+                allowLikes={post.allowLikes}
+                allowComments={post.allowComments}
+                updatePost={updatePost}
               />
-            </Text>
-          </PressableNative>
-          <PressableNative onPress={onShare} style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Share"
-                description="PostItem Modal - Share Label"
-              />
-            </Text>
-          </PressableNative>
-          {post.allowComments && (
-            <PressableNative onPress={addComment} style={styles.modalLine}>
-              <Text variant="medium">
-                <FormattedMessage
-                  defaultMessage="Add a comment"
-                  description="PostItem Modal - Add a comment Label"
-                />
-              </Text>
-            </PressableNative>
-          )}
-          {!isViewer && (
-            <PressableNative onPress={onToggleFollow} style={styles.modalLine}>
-              {post.webCard?.isFollowing ? (
-                <Text variant="medium" style={{ color: colors.grey400 }}>
-                  <FormattedMessage
-                    defaultMessage="Unfollow"
-                    description="PostItem Modal - unfollow Label"
-                  />
-                </Text>
-              ) : (
+            )}
+            {isViewer && (
+              <PressableNative
+                onPress={openEditcontent}
+                style={styles.modalLine}
+              >
                 <Text variant="medium">
                   <FormattedMessage
-                    defaultMessage="Follow"
-                    description="PostItem Modal - Follows Label"
+                    defaultMessage="Edit"
+                    description="PostItem Modal - Edit Label"
                   />
                 </Text>
-              )}
+              </PressableNative>
+            )}
+
+            <PressableNative onPress={copyLink} style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Copy link"
+                  description="PostItem Modal - Copy Link Label"
+                />
+              </Text>
             </PressableNative>
-          )}
-          {!isViewer && (
-            <PressableNative
-              onPress={sendReport}
-              style={[styles.modalLine, styles.errorModalLine]}
-              disabled={commitSendReportLoading}
-            >
-              {commitSendReportLoading ? (
-                <ActivityIndicator />
-              ) : (
-                <Text variant="error">
+            <PressableNative onPress={onShare} style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Share"
+                  description="PostItem Modal - Share Label"
+                />
+              </Text>
+            </PressableNative>
+            {post.allowComments && (
+              <PressableNative onPress={addComment} style={styles.modalLine}>
+                <Text variant="medium">
                   <FormattedMessage
-                    defaultMessage="Report this post"
-                    description="PostItem Modal - Report this post"
+                    defaultMessage="Add a comment"
+                    description="PostItem Modal - Add a comment Label"
                   />
                 </Text>
-              )}
-            </PressableNative>
-          )}
-          {isViewer && (
-            <PressableNative
-              onPress={deletePost}
-              disabled={deleteLoading}
-              style={[styles.modalLine, styles.errorModalLine]}
-            >
-              {deleteLoading ? (
-                <ActivityIndicator />
-              ) : (
-                <Text variant="error">
-                  <FormattedMessage
-                    defaultMessage="Delete this post"
-                    description="PostItem Modal - Delete this post"
-                  />
-                </Text>
-              )}
-            </PressableNative>
-          )}
-        </View>
-      </BottomSheetModal>
+              </PressableNative>
+            )}
+            {!isViewer && (
+              <PressableNative
+                onPress={onToggleFollow}
+                style={styles.modalLine}
+              >
+                {post.webCard?.isFollowing ? (
+                  <Text variant="medium" style={{ color: colors.grey400 }}>
+                    <FormattedMessage
+                      defaultMessage="Unfollow"
+                      description="PostItem Modal - unfollow Label"
+                    />
+                  </Text>
+                ) : (
+                  <Text variant="medium">
+                    <FormattedMessage
+                      defaultMessage="Follow"
+                      description="PostItem Modal - Follows Label"
+                    />
+                  </Text>
+                )}
+              </PressableNative>
+            )}
+            {!isViewer && (
+              <PressableNative
+                onPress={sendReport}
+                style={[styles.modalLine, styles.errorModalLine]}
+                disabled={commitSendReportLoading}
+              >
+                {commitSendReportLoading ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Text variant="error">
+                    <FormattedMessage
+                      defaultMessage="Report this post"
+                      description="PostItem Modal - Report this post"
+                    />
+                  </Text>
+                )}
+              </PressableNative>
+            )}
+            {isViewer && (
+              <PressableNative
+                onPress={deletePost}
+                disabled={deleteLoading}
+                style={[styles.modalLine, styles.errorModalLine]}
+              >
+                {deleteLoading ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Text variant="error">
+                    <FormattedMessage
+                      defaultMessage="Delete this post"
+                      description="PostItem Modal - Delete this post"
+                    />
+                  </Text>
+                )}
+              </PressableNative>
+            )}
+          </View>
+        </BottomSheetModal>
+      )}
       <TextAreaModal
         visible={showEdit}
         value={post.content ?? ''}
