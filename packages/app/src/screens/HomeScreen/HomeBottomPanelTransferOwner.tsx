@@ -79,6 +79,7 @@ const HomeBottomPanelTransferOwner = ({
                   'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
               }),
             });
+            return;
           }
           router.push({
             route: 'USER_PAY_WALL',

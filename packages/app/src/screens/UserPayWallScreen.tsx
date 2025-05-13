@@ -68,6 +68,7 @@ const userPayWallScreenQuery = graphql`
         totalSeats
         subscriptionPlan
       }
+      isPremium
     }
   }
 `;
@@ -110,6 +111,14 @@ const UserPayWallScreen = ({
     string | null
   >(null);
 
+  const paywallVisible =
+    !data.currentUser?.isPremium ||
+    (data.currentUser?.isPremium &&
+      ((data.currentUser?.userSubscription?.issuer === 'google' &&
+        Platform.OS === 'android') ||
+        (data.currentUser?.userSubscription?.issuer === 'apple' &&
+          Platform.OS === 'ios')));
+
   useEffect(() => {
     if (
       shouldWaitDatabase &&
@@ -128,6 +137,7 @@ const UserPayWallScreen = ({
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
       //set the period
+
       if (currentSubscription) {
         const found = subscriptions.find(
           sub => sub.product.identifier === currentSubscription?.subscriptionId,
@@ -231,14 +241,18 @@ const UserPayWallScreen = ({
             },
           );
         } catch (error) {
-          console.log({ error });
+          Sentry.captureException(error);
         }
       }
-
       // Update Relay cache temporary
       if (res && res.customerInfo.entitlements.active?.multiuser?.isActive) {
-        const subscriptionId =
-          res.customerInfo.entitlements.active?.multiuser.productIdentifier;
+        const { productIdentifier, productPlanIdentifier } =
+          res.customerInfo.entitlements.active.multiuser;
+        let subscriptionId = productIdentifier;
+        if (productPlanIdentifier) {
+          //specific to android, we  want to use the official identifier with :{basePlan} instead of fixing the identifier manually
+          subscriptionId = `${productIdentifier}:${productPlanIdentifier}`;
+        }
         setWaitedSubscriptionId(subscriptionId);
         const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
         const currentTotalSeat = currentSubscription?.totalSeats ?? 0;
@@ -248,7 +262,6 @@ const UserPayWallScreen = ({
             currentTotalSeat +
             (currentSubscription?.availableSeats ?? 0),
         );
-
         if (updateAvailableSeats >= 0 && activateMultiUser) {
           startWaitDatabase();
           return;
@@ -332,24 +345,14 @@ const UserPayWallScreen = ({
       <View style={[{ width, height: width }, styles.featureContainer]}>
         <View
           key="subscription_page_1"
-          style={[
-            {
-              width,
-              height: lottieHeight,
-            },
-            styles.promoContainer,
-          ]}
+          style={[{ width, height: lottieHeight }, styles.promoContainer]}
         >
           <LottieView
             source={require('../assets/paywall/paywall_azzapp_step1.json')}
             autoPlay
             loop
             hardwareAccelerationAndroid
-            style={{
-              position: 'absolute',
-              width,
-              height: lottieHeight,
-            }}
+            style={{ position: 'absolute', width, height: lottieHeight }}
             resizeMode="cover"
           />
           <LinearGradient
@@ -454,144 +457,191 @@ const UserPayWallScreen = ({
         size={50}
       />
       <View style={styles.content}>
-        <View style={styles.containerLogo}>
-          <Image
-            source={require('#assets/logo-full.png')}
-            resizeMode="contain"
-            style={styles.plusImage}
-          />
-          <PremiumIndicator size={17} isRequired />
-        </View>
-        <SwitchLabel
-          variant="small"
-          appearance="light"
-          value={period === 'year'}
-          labelPosition="left"
-          onValueChange={() => setPeriod(period === 'year' ? 'month' : 'year')}
-          label={intl.formatMessage({
-            defaultMessage: 'Yearly billing (30% off)',
-            description:
-              'MultiUser Paywall screen - switch between monthly and yearly billing',
-          })}
-        />
-        <View style={{ flex: 1, width, overflow: 'visible' }}>
-          <ScrollView
-            style={styles.scrollViewStyle}
-            contentContainerStyle={styles.contentContainerStyle}
-          >
-            {subscriptions.map(offer => {
-              return (
-                <Offer
-                  key={offer.identifier}
-                  offer={offer}
-                  period={period}
-                  selectedPurchasePackage={selectedPurchasePackage}
-                  setSelectedPurchasePackage={setSelectedPurchasePackage}
-                />
-              );
-            })}
-          </ScrollView>
-          <LinearGradient
-            colors={[
-              colors.white,
-              'rgba(255, 255, 255, 0.00) ',
-              'rgba(255, 255, 255, 0.00)',
-              colors.white,
-            ]}
-            locations={[0, 0.1149, 0.8716, 1]}
-            style={{
-              height: '100%',
-              width,
-              position: 'absolute',
-              paddingBottom: 5,
-            }}
-            pointerEvents="none"
-          />
-        </View>
-        <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
-          <Button
-            label={labelPurchase}
-            style={styles.buttonSubscribe}
-            appearance="light"
-            onPress={processOrder}
-          />
-          <Text variant="small" style={styles.subTitleText}>
-            {currentSubscription?.status !== 'active' &&
-            selectedPurchasePackage?.product.introPrice?.period ? (
-              <FormattedMessage
-                defaultMessage="{days}-day free trial, with auto renew. Cancel anytime"
-                description="MultiUser subscription subtitle for inactive subscription"
-                values={{
-                  days: iso8601DurationToDays(
-                    selectedPurchasePackage.product.introPrice.period,
-                  ),
-                }}
+        {paywallVisible ? (
+          <>
+            <View style={styles.containerLogo}>
+              <Image
+                source={require('#assets/logo-full.png')}
+                resizeMode="contain"
+                style={styles.plusImage}
               />
-            ) : currentSubscription?.status === 'active' ? (
-              <FormattedMessage
-                defaultMessage="Your actual subscription : {qty, plural,
+              <PremiumIndicator size={17} isRequired />
+            </View>
+            <SwitchLabel
+              variant="small"
+              appearance="light"
+              value={period === 'year'}
+              labelPosition="left"
+              onValueChange={() =>
+                setPeriod(period === 'year' ? 'month' : 'year')
+              }
+              label={intl.formatMessage({
+                defaultMessage: 'Yearly billing (30% off)',
+                description:
+                  'MultiUser Paywall screen - switch between monthly and yearly billing',
+              })}
+            />
+            <View style={{ flex: 1, width, overflow: 'visible' }}>
+              <ScrollView
+                style={styles.scrollViewStyle}
+                contentContainerStyle={styles.contentContainerStyle}
+              >
+                {subscriptions.map(offer => {
+                  return (
+                    <Offer
+                      key={offer.identifier}
+                      offer={offer}
+                      period={period}
+                      selectedPurchasePackage={selectedPurchasePackage}
+                      setSelectedPurchasePackage={setSelectedPurchasePackage}
+                    />
+                  );
+                })}
+              </ScrollView>
+              <LinearGradient
+                colors={[
+                  colors.white,
+                  'rgba(255, 255, 255, 0.00) ',
+                  'rgba(255, 255, 255, 0.00)',
+                  colors.white,
+                ]}
+                locations={[0, 0.1149, 0.8716, 1]}
+                style={{
+                  height: '100%',
+                  width,
+                  position: 'absolute',
+                  paddingBottom: 5,
+                }}
+                pointerEvents="none"
+              />
+            </View>
+            <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
+              <Button
+                label={labelPurchase}
+                style={styles.buttonSubscribe}
+                appearance="light"
+                onPress={processOrder}
+              />
+              <Text variant="small" style={styles.subTitleText}>
+                {currentSubscription?.status !== 'active' &&
+                selectedPurchasePackage?.product.introPrice?.period ? (
+                  <FormattedMessage
+                    defaultMessage="{days}-day free trial, with auto renew. Cancel anytime"
+                    description="MultiUser subscription subtitle for inactive subscription"
+                    values={{
+                      days: iso8601DurationToDays(
+                        selectedPurchasePackage.product.introPrice.period,
+                      ),
+                    }}
+                  />
+                ) : currentSubscription?.status === 'active' ? (
+                  <FormattedMessage
+                    defaultMessage="Your actual subscription : {qty, plural,
         =1 {{qty} user}
         other {{qty} Users}
       } billed {period}"
-                description="Paywall subscription subtitle for active subscription"
-                values={{
-                  qty: currentSubscription?.totalSeats,
-                  period:
-                    currentSubscription?.subscriptionPlan === 'yearly'
-                      ? intl.formatMessage({
-                          defaultMessage: 'yearly',
-                          description:
-                            'UserPaywall Screen - yearly billing - period',
-                        })
-                      : currentSubscription?.subscriptionPlan === 'monthly'
-                        ? intl.formatMessage({
-                            defaultMessage: 'monthly',
-                            description:
-                              'UserPaywall Screen - monthly billing - period',
-                          })
-                        : '',
-                }}
+                    description="Paywall subscription subtitle for active subscription"
+                    values={{
+                      qty: currentSubscription?.totalSeats,
+                      period:
+                        currentSubscription?.subscriptionPlan === 'yearly'
+                          ? intl.formatMessage({
+                              defaultMessage: 'yearly',
+                              description:
+                                'UserPaywall Screen - yearly billing - period',
+                            })
+                          : currentSubscription?.subscriptionPlan === 'monthly'
+                            ? intl.formatMessage({
+                                defaultMessage: 'monthly',
+                                description:
+                                  'UserPaywall Screen - monthly billing - period',
+                              })
+                            : '',
+                    }}
+                  />
+                ) : null}
+              </Text>
+              <View style={styles.footer}>
+                <PressableOpacity onPress={restorePurchase}>
+                  <Text variant="medium" style={styles.descriptionText}>
+                    <FormattedMessage
+                      defaultMessage="Restore Purchases"
+                      description="MultiUser subscription restore purchases link"
+                    />
+                  </Text>
+                </PressableOpacity>
+                <Text variant="medium" style={styles.descriptionText}>
+                  |
+                </Text>
+                <PressableOpacity
+                  onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
+                >
+                  <Text variant="medium" style={styles.descriptionText}>
+                    <FormattedMessage
+                      defaultMessage="Terms of use"
+                      description="MultiUser subscription Terms of use link"
+                    />
+                  </Text>
+                </PressableOpacity>
+                <Text variant="medium" style={styles.descriptionText}>
+                  |
+                </Text>
+                <PressableOpacity
+                  onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
+                >
+                  <Text variant="medium" style={styles.descriptionText}>
+                    <FormattedMessage
+                      defaultMessage="Privacy"
+                      description="MultiUser subscription Privacy link"
+                    />
+                  </Text>
+                </PressableOpacity>
+              </View>
+            </View>
+          </>
+        ) : (
+          <View style={styles.viewCantSubscribe}>
+            <View style={{ ...shadow({ appearance: 'light' }) }}>
+              <Icon
+                icon={
+                  data.currentUser?.userSubscription?.issuer === 'google'
+                    ? 'play_store_square'
+                    : data.currentUser?.userSubscription?.issuer === 'apple'
+                      ? 'app_store_square'
+                      : 'webazzapp_square'
+                }
+                size={53}
+                style={{ marginBottom: 30 }}
               />
-            ) : null}
-          </Text>
-          <View style={styles.footer}>
-            <PressableOpacity onPress={restorePurchase}>
-              <Text variant="medium" style={styles.descriptionText}>
+            </View>
+            {data.currentUser?.userSubscription?.issuer === 'web' && (
+              <Text variant="medium" style={styles.textOtherDevice}>
                 <FormattedMessage
-                  defaultMessage="Restore Purchases"
-                  description="MultiUser subscription restore purchases link"
+                  defaultMessage="You already have an active subscription through azzapp user management platform. To manage or cancel it, visit users.azzapp.com and sign in to your account"
+                  description="UserPayWall - message when a web subscription already exist web"
                 />
               </Text>
-            </PressableOpacity>
-            <Text variant="medium" style={styles.descriptionText}>
-              |
-            </Text>
-            <PressableOpacity
-              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
-            >
-              <Text variant="medium" style={styles.descriptionText}>
+            )}
+            {data.currentUser?.userSubscription?.issuer === 'google' && (
+              <Text variant="medium" style={styles.textOtherDevice}>
                 <FormattedMessage
-                  defaultMessage="Terms of use"
-                  description="MultiUser subscription Terms of use link"
+                  defaultMessage="You already have an active subscription through Google Play. To manage or cancel it, visit play.google.com and sign in to your Google account"
+                  description="UserPayWall - message when a web subscription already exist google"
                 />
               </Text>
-            </PressableOpacity>
-            <Text variant="medium" style={styles.descriptionText}>
-              |
-            </Text>
-            <PressableOpacity
-              onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
-            >
-              <Text variant="medium" style={styles.descriptionText}>
+            )}
+            {data.currentUser?.userSubscription?.issuer === 'apple' && (
+              <Text variant="medium" style={styles.textOtherDevice}>
                 <FormattedMessage
-                  defaultMessage="Privacy"
-                  description="MultiUser subscription Privacy link"
+                  defaultMessage="You already have an active subscription via Apple. To manage or cancel it, log in to your Apple account at appleid.apple.com"
+                  description="UserPayWall - message when a web subscription already exist apple"
                 />
               </Text>
-            </PressableOpacity>
+            )}
           </View>
-        </View>
+        )}
       </View>
+
       {processing && (
         <View style={styles.loadingContainer}>
           <LottieView
@@ -599,11 +649,7 @@ const UserPayWallScreen = ({
             autoPlay
             loop
             hardwareAccelerationAndroid
-            style={{
-              width: width / 2,
-              height: width / 2,
-              marginTop: -100,
-            }}
+            style={{ width: width / 2, height: width / 2, marginTop: -100 }}
           />
           <Text variant="button" style={styles.text}>
             <FormattedMessage
@@ -710,6 +756,14 @@ const OfferItem = ({
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = 450;
 const styles = StyleSheet.create({
+  textOtherDevice: { textAlign: 'center', color: colors.black },
+  viewCantSubscribe: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 40,
+    marginBottom: 50,
+  },
   containerPromo: {
     position: 'absolute',
     top: 0,
@@ -732,20 +786,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 36,
   },
-  titlePromo: {
-    color: colors.white,
-    textAlign: 'center',
-    lineHeight: 40,
-  },
-  textPromo: {
-    color: colors.white,
-    textAlign: 'center',
-  },
-  containerLogo: {
-    flexDirection: 'row',
-    height: 34,
-    marginBottom: 15,
-  },
+  titlePromo: { color: colors.white, textAlign: 'center', lineHeight: 40 },
+  textPromo: { color: colors.white, textAlign: 'center' },
+  containerLogo: { flexDirection: 'row', height: 34, marginBottom: 15 },
   plusImage: { height: 34 },
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
   container: { flex: 1, backgroundColor: 'transparent' },
@@ -784,26 +827,16 @@ const styles = StyleSheet.create({
     width,
     height: BOTTOM_HEIGHT,
   },
-  descriptionText: {
-    color: colors.grey400,
-  },
-  subTitleText: {
-    textAlign: 'center',
-    color: colors.black,
-  },
+  descriptionText: { color: colors.grey400 },
+  subTitleText: { textAlign: 'center', color: colors.black },
   icon: {
     backgroundColor: colors.black,
     position: 'absolute',
     top: 50,
     right: 15,
   },
-  iconStyle: {
-    tintColor: colors.white,
-  },
-  buttonSubscribe: {
-    width: '100%',
-    marginTop: 5,
-  },
+  iconStyle: { tintColor: colors.white },
+  buttonSubscribe: { width: '100%', marginTop: 5 },
   footer: {
     width: '100%',
     flexDirection: 'row',
