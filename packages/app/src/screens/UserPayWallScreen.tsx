@@ -254,7 +254,8 @@ const UserPayWallScreen = ({
           subscriptionId = `${productIdentifier}:${productPlanIdentifier}`;
         }
         setWaitedSubscriptionId(subscriptionId);
-        const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
+        const newTotalSeat = extractSeatsFromSubscriptionId(productIdentifier);
+
         const currentTotalSeat = currentSubscription?.totalSeats ?? 0;
         const updateAvailableSeats = Math.max(
           0,

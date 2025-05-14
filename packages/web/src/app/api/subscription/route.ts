@@ -119,8 +119,10 @@ const subscriptionWebHook = async (req: Request) => {
               invalidatedAt: new Date(),
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
             });
-
-            await unpublishWebCardForUser({ userId });
+            await unpublishWebCardForUser({
+              userId,
+              forceUnpublishUser: true,
+            });
           }
         });
 
