@@ -163,7 +163,7 @@ const { handleRequest } = createYoga({
 
     return {
       locale: locale ?? DEFAULT_LOCALE,
-      notifyUsers,
+      notifyUsers: notifyUsers(apiEndpoint),
       validateMailOrPhone: validateMailOrPhone(apiEndpoint),
       sendPushNotification,
       notifyApplePassWallet: notifyApplePassWallet(apiEndpoint),

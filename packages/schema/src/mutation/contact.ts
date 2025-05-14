@@ -220,14 +220,7 @@ export const createContact: MutationResolvers['createContact'] = async (
     }
   }
 
-  if (
-    notify &&
-    input.firstName &&
-    input.lastName &&
-    input.emails &&
-    input.emails.length > 0 &&
-    webCard
-  ) {
+  if (notify && input.emails && input.emails.length > 0 && webCard) {
     const user = await userLoader.load(profile?.userId);
     await notifyUsers(
       'email',
