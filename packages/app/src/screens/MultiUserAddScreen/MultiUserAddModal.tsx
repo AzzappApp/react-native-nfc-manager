@@ -351,11 +351,11 @@ const MultiUserAddModal = (
 
       const { avatar, logo, ...data } = value;
 
-      if (avatar?.local && avatar.uri) {
-        let uri = avatar.uri;
-        if (avatar.uri.startsWith('content://')) {
+      let avatarUri = avatar?.uri;
+      if (avatar?.local && avatarUri) {
+        if (avatarUri.startsWith('content://')) {
           try {
-            uri = `file://${await downloadContactImage(avatar.uri)}`;
+            avatarUri = `file://${await downloadContactImage(avatarUri)}`;
           } catch (e: any) {
             Sentry.captureException(e);
             console.warn(
@@ -366,7 +366,7 @@ const MultiUserAddModal = (
         }
 
         const { file, uploadURL, uploadParameters } =
-          await prepareAvatarForUpload(uri);
+          await prepareAvatarForUpload(avatarUri);
 
         uploads.push(uploadMedia(file, uploadURL, uploadParameters));
       } else {
@@ -459,8 +459,8 @@ const MultiUserAddModal = (
           },
         };
 
-        if (avatar?.local) {
-          addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+        if (avatar?.local && avatarUri) {
+          addLocalCachedMediaFile(avatarId, 'image', avatarUri);
         }
 
         if (logoUri) {
