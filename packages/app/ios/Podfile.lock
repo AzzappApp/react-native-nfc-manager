@@ -295,8 +295,8 @@ PODS:
   - nanopb/encode (3.30910.0)
   - OpenSSL-Universal (3.3.3001)
   - PromisesObjC (2.4.0)
-  - PurchasesHybridCommon (13.29.1):
-    - RevenueCat (= 5.22.2)
+  - PurchasesHybridCommon (13.31.0):
+    - RevenueCat (= 5.23.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2107,7 +2107,7 @@ PODS:
     - React-logger (= 0.77.2)
     - React-perflogger (= 0.77.2)
     - React-utils (= 0.77.2)
-  - RevenueCat (5.22.2)
+  - RevenueCat (5.23.0)
   - RNBootSplash (6.3.4):
     - DoubleConversion
     - glog
@@ -2290,8 +2290,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPurchases (8.9.6):
-    - PurchasesHybridCommon (= 13.29.1)
+  - RNPurchases (8.9.7):
+    - PurchasesHybridCommon (= 13.31.0)
     - React-Core
   - RNReactNativeHapticFeedback (2.3.3):
     - DoubleConversion
@@ -3083,7 +3083,7 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   OpenSSL-Universal: 6082b0bf950e5636fe0d78def171184e2b3899c2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  PurchasesHybridCommon: 1728ff834821ecfc85e987a565d51eda36213958
+  PurchasesHybridCommon: f694edb3e77b863b6dd92b1097d2558182d11f77
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 85b72250b63cfb54f29ca96ceb108cb9ef3c2079
   RCTRequired: 567cb8f5d42b990331bfd93faad1d8999b1c1736
@@ -3127,7 +3127,7 @@ SPEC CHECKSUMS:
   react-native-quick-crypto: 4dafcc99067e4b36b17cb33f1766e110ad164f18
   react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
-  react-native-skottie-template-player: d6cbe5a53aff471f9d3bb7b7653dcf3e645db4c4
+  react-native-skottie-template-player: b384ee58b1130782cc8519e7206bfd886a8d5a0d
   react-native-webview: 5095dd03fc98a529e44a6bb81aed21062b5f879e
   React-nativeconfig: ecf4dc92c40b97e2b3f0c619938f78bfd6507b08
   React-NativeModulesApple: f457bbfb30fb3bc41979b1a87b99d292d7340d39
@@ -3158,7 +3158,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: f334cebc0beed0a72490492e978007082c03d533
   ReactCodegen: 00a2b2a721bbd0805100f1f63fcae650fc03630b
   ReactCommon: 7763e59534d58e15f8f22121cdfe319040e08888
-  RevenueCat: 234d2361e453ce1282cee7e18449d01aba45ebbf
+  RevenueCat: a4db48f41c10fcdd6fd1ef455875e091b32bf70d
   RNBootSplash: 540e4bfcfe3a9c0a2fe5b3d28d5efe0458f8e7cb
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
@@ -3171,7 +3171,7 @@ SPEC CHECKSUMS:
   RNKeychain: 455cc7002480eac3d24f67b4329ec80c7d901edc
   RNLocalize: 7ed277415799ab5a8931b77fd2124c4749822e8a
   RNPermissions: 0f2ea503cb886cd6c7191bcefeb733467dae824c
-  RNPurchases: 44561894fbf72dbf21c3c82533951bd075e8fa96
+  RNPurchases: e20d58889e85fa6d248de647176d2cc9968e2628
   RNReactNativeHapticFeedback: 66c6b0cf19f5d9dae8be36b2336e1fe2a2e42566
   RNReactNativeSharedGroupPreferences: d4869af3c7757405b6b5ac633d0ef5f9886a9be7
   RNReanimated: 6cd556bc7a436ced2b3d47d1ab23536b9b27212d
@@ -3187,8 +3187,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 7aaae584148bbc250e81b5662e45a7f25c18be2e
-  Yoga: 6f65362b9e599b5a80e079df91843ea27b4d1afa
+  Yoga: 31a098f74c16780569aebd614a0f37a907de0189
 
 PODFILE CHECKSUM: 523d5e289b0d05bc39a1fb765a75df2a09fa62fd
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.2
