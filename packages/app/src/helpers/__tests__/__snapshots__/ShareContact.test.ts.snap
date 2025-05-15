@@ -154,8 +154,8 @@ exports[`ShareContact buildVCard with avatar 1`] = `
       "value": "",
     },
     {
-      "key": "PHOTO;ENCODING=b;TYPE=PNG",
-      "value": "<BASE64DATA>",
+      "key": "PHOTO;ENCODING=b;TYPE=JPEG",
+      "value": "mocked_compressed_image",
     },
   ],
   "useVCalendar": false,
@@ -190,8 +190,8 @@ exports[`ShareContact buildVCard with logo 1`] = `
       "value": "",
     },
     {
-      "key": "PHOTO;ENCODING=b;TYPE=PNG",
-      "value": "<BASE64DATA>",
+      "key": "PHOTO;ENCODING=b;TYPE=JPEG",
+      "value": "mocked_compressed_image",
     },
   ],
   "useVCalendar": false,
@@ -226,8 +226,8 @@ exports[`ShareContact buildVCard with logo and avatar 1`] = `
       "value": "",
     },
     {
-      "key": "PHOTO;ENCODING=b;TYPE=PNG",
-      "value": "<BASE64DATA>",
+      "key": "PHOTO;ENCODING=b;TYPE=JPEG",
+      "value": "mocked_compressed_image",
     },
   ],
   "useVCalendar": false,

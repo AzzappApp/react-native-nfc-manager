@@ -157,6 +157,13 @@ jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'mock://redirect'),
 }));
 
+jest.mock('react-native-compressor', () => ({
+  Image: {
+    compress: jest.fn(() => Promise.resolve('mocked_compressed_image')),
+    resize: jest.fn(() => Promise.resolve('mocked_resized_image')),
+  },
+}));
+
 jest.mock('react-native-quick-crypto', () => ({
   createHash: jest.fn(() => ({
     update: jest.fn(() => ({

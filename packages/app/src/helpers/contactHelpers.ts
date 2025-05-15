@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import VCard from 'vcard-creator';
 import * as z from 'zod';
 import {
@@ -279,9 +280,13 @@ export const buildVCard = async (contact: ContactType) => {
         await File.downloadFileAsync(contactImageUrl, file);
       }
 
-      const image = file.base64();
+      const image = await ImageCompressor.compress(file.uri, {
+        output: 'jpg',
+        returnableOutputType: 'base64',
+      });
+
       if (image) {
-        vCard.addPhoto(image, 'png'); // requested avatars format
+        vCard.addPhoto(image, 'jpeg');
       }
     } catch (e) {
       Sentry.captureException(e);
