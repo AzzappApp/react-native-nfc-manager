@@ -1,3 +1,7 @@
+## 1.10.0-canary.209
+
+* **feat:**  - add mutation to enrich contact ([#8764](https://github.com/AzzappApp/azzapp/pull/8764))
+
 ## 1.10.0-canary.208
 
 
