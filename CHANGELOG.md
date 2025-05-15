@@ -1,3 +1,7 @@
+## 1.10.0-canary.212
+
+* **feat:**  - **enrichment:** manage max enrichment per user ([#8783](https://github.com/AzzappApp/azzapp/pull/8783))
+
 ## 1.10.0-canary.211
 
 
