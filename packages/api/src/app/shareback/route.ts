@@ -10,6 +10,7 @@ import { guessLocale } from '@azzapp/i18n';
 import { sendTemplateEmail } from '@azzapp/service/emailServices';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import type { VerifySignToken } from '../verifySign/route';
 import type { JwtPayload } from 'jwt-decode';
@@ -123,6 +124,7 @@ export async function POST(request: Request) {
     // Save the shareback contact
     await saveShareBack(profile.id, {
       ...contactData,
+      socials: filterSocialLink(contactData.socials),
       type: 'shareback',
       ownerProfileId: profile.id,
     });

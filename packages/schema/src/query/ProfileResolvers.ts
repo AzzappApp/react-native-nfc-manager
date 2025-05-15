@@ -210,7 +210,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return profile.avatarId
         ? {
             media: profile.avatarId,
-            assetKind: 'contactCard',
+            assetKind: 'avatar',
           }
         : null;
     }

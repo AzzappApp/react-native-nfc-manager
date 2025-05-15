@@ -54,6 +54,9 @@ generates:
         PaymentMean: '@azzapp/data#PaymentMean as PaymentMeanModel'
         Payment: '@azzapp/data#Payment as PaymentModel'
         Contact: '@azzapp/data#Contact as ContactModel'
+        EnrichedContactFields: '@azzapp/data#EnrichedContactFields as EnrichedContactFieldsModel'
+        Position: '@azzapp/data#Position as PositionModel'
+        Education: '@azzapp/data#Education as EducationModel'
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

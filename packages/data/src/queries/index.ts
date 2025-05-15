@@ -30,3 +30,4 @@ export * from './predefinedCoverQueries';
 export * from './termsOfUseQueries';
 export * from './passRegistrationQueries';
 export * from './contactCardAccessQueries';
+export * from './contactEnrichmentQueries';

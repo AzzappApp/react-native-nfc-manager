@@ -15,6 +15,7 @@ import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
@@ -171,7 +172,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         bannerId: bannerId ?? null,
         invited: true,
         invitedBy: profileId,
-        contactCard: data,
+        contactCard: { ...data, socials: filterSocialLink(data.socials) },
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole,

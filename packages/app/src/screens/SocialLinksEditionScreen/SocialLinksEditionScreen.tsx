@@ -16,6 +16,10 @@ import {
   getSocialLinksDefaultColors,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import {
+  isSocialLinkId,
+  type SocialLinkItem,
+} from '@azzapp/shared/socialLinkHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useOnFocus, useRouter } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
@@ -43,7 +47,6 @@ import type {
   SocialLinksEditionScreenUpdateModuleMutation,
   SaveSocialLinksModuleInput,
 } from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
-import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
 import type { ViewProps } from 'react-native';
 
 export type SocialLinksEditionScreenProps = ViewProps & {
@@ -181,11 +184,16 @@ const SocialLinksEditionScreen = ({
     () =>
       readOnlyLinks
         .sort((a, b) => a.position - b.position)
-        .map((item, index) => ({
-          link: item.link,
-          position: index,
-          socialId: item.socialId,
-        })),
+        .map((item, index) =>
+          isSocialLinkId(item.socialId)
+            ? {
+                link: item.link,
+                position: index,
+                socialId: item.socialId,
+              }
+            : null,
+        )
+        .filter(item => item !== null),
     [readOnlyLinks],
   );
 

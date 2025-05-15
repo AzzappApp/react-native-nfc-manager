@@ -23,6 +23,57 @@ type Contact implements Node {
   meetingPlace: Address
   meetingDate: DateTime
   note: String
+  enrichment: Enrichment
+}
+
+type EnrichedContactFields {
+  avatar: Media
+  firstName: String
+  lastName: String
+  company: String
+  title: String
+  type: String
+  birthday: String
+  phoneNumbers: [ContactPhoneNumber!]
+  emails: [ContactEmail!]
+  addresses: [ContactAddress!]
+  webCard: WebCard
+  socials: [ContactSocial!]
+  urls: [ContactUrl!]
+  deleted: Boolean
+  logo: Media
+}
+
+type Enrichment {
+  fields: EnrichedContactFields
+  publicProfile: PublicProfile
+}
+
+type Position {
+  company: String
+  summary: String
+  title: String
+  startDate: String
+  endDate: String
+  logo: Media
+}
+
+type Education {
+  startDate: String
+  endDate: String
+  school: String
+  logo: Media
+}
+
+type PublicProfile {
+  headline: String
+  summary: String
+  interests: [String!]
+  skills: [String!]
+  positions: [Position!]
+  education: [Education!]
+  country: String
+  countryCode: String
 }
 
 type Address {

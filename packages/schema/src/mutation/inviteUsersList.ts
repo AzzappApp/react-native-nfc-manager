@@ -17,6 +17,7 @@ import {
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
@@ -177,6 +178,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         inviteSent: sendInvite ?? false,
         contactCard: {
           ...data,
+          socials: filterSocialLink(data.socials) ?? [],
           birthday: undefined,
         },
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,

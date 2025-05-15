@@ -71,7 +71,7 @@ export const uriResolver =
       case 'module':
         pregeneratedSizes = MODULE_IMAGES_SIZES;
         break;
-      case 'contactCard':
+      case 'avatar':
         pregeneratedSizes = CONTACT_CARD_AVATAR_SIZES;
         break;
       case 'post':

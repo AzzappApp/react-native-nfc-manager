@@ -57,4 +57,8 @@ export type {
   Contact,
   NewContact,
   TermsOfUse,
+  PublicProfile,
+  EnrichedContactFields,
+  Position,
+  Education,
 } from './schema';

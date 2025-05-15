@@ -32,6 +32,7 @@ export default [
       'packages/schema/lib',
       'packages/payment/lib',
       'packages/service/lib',
+      'packages/enrichment/lib',
       'packages/app/fonts',
       'packages/api/persistedQueries',
       'packages/api/.next',

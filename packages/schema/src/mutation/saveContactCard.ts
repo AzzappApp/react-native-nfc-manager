@@ -10,12 +10,13 @@ import {
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
-import type { ContactCard, MutationResolvers } from '#/__generated__/types';
+import type { MutationResolvers } from '#/__generated__/types';
 import type { Profile } from '@azzapp/data';
 
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
@@ -42,10 +43,11 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const contactCardUpdates: Partial<ContactCard> = {
+  const contactCardUpdates = {
     ...(profile.contactCard ??
       (await buildDefaultContactCard(webCard, user.id))),
     ...contactCard,
+    socials: filterSocialLink(contactCard?.socials),
   };
 
   const updates: Partial<Profile> = {

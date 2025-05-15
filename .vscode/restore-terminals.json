@@ -56,6 +56,10 @@
         {
           "name": "service",
           "commands": ["cd packages/service", "yarn dev"]
+        },
+        {
+          "name": "enrichment",
+          "commands": ["cd packages/enrichment", "yarn dev"]
         }
       ]
     },

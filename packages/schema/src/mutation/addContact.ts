@@ -16,6 +16,7 @@ import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/index';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
@@ -69,7 +70,7 @@ const addContact: MutationResolvers['addContact'] = async (
     title: input.title,
     deleted: false,
     urls: input.urls || null,
-    socials: input.socials || null,
+    socials: filterSocialLink(input.socials) || [],
     createdAt: new Date(),
     logoId: input.logoId ?? null,
     meetingLocation: location ?? null,

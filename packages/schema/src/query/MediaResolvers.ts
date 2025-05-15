@@ -17,7 +17,7 @@ export type DeferredMedia = MediaModel | string;
 export type MediaWithAssetKind =
   | {
       media: DeferredMedia;
-      assetKind: 'banner' | 'contactCard' | 'logo' | 'module' | 'post';
+      assetKind: 'avatar' | 'banner' | 'logo' | 'module' | 'post';
     }
   | {
       media: DeferredMedia;

@@ -11,6 +11,7 @@ import {
   profileHasAdminRight,
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { getSessionUser } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
@@ -103,7 +104,8 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     context.apiEndpoint,
   );
 
-  const { avatarId, logoId, bannerId, ...restContactCard } = contactCard || {};
+  const { avatarId, logoId, bannerId, socials, ...restContactCard } =
+    contactCard || {};
   try {
     const addedMedia = [avatarId, logoId, bannerId].filter(
       mediaId => mediaId,
@@ -113,8 +115,10 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
       await updateProfile(targetProfileId, {
         profileRole: profileRole ?? undefined,
         contactCard: {
+          socials: filterSocialLink(socials),
           ...restContactCard,
         },
+
         logoId,
         avatarId,
         bannerId,
@@ -146,6 +150,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   if (contactCard) {
     updatedProfile.contactCard = {
       ...contactCard,
+      socials: filterSocialLink(contactCard.socials),
     };
   }
 

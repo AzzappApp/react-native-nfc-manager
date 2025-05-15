@@ -810,6 +810,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@azzapp/enrichment@workspace:^, @azzapp/enrichment@workspace:packages/enrichment":
+  version: 0.0.0-use.local
+  resolution: "@azzapp/enrichment@workspace:packages/enrichment"
+  dependencies:
+    "@azzapp/data": "workspace:^"
+    "@azzapp/service": "workspace:^"
+    "@azzapp/shared": "workspace:^"
+    "@sentry/nextjs": "npm:^7.113.0"
+    eslint: "npm:^9.24.0"
+    i18n-iso-countries: "npm:^7.14.0"
+    lodash: "npm:^4.17.21"
+    peopledatalabs: "npm:^12.0.0"
+    typescript: "npm:^5.8.3"
+    zod: "npm:^3.24.3"
+  languageName: unknown
+  linkType: soft
+
 "@azzapp/i18n@workspace:^, @azzapp/i18n@workspace:packages/i18n":
   version: 0.0.0-use.local
   resolution: "@azzapp/i18n@workspace:packages/i18n"
@@ -935,6 +952,7 @@ __metadata:
   resolution: "@azzapp/schema@workspace:packages/schema"
   dependencies:
     "@azzapp/data": "workspace:^"
+    "@azzapp/enrichment": "workspace:^"
     "@azzapp/i18n": "workspace:^"
     "@azzapp/payment": "workspace:^"
     "@azzapp/service": "workspace:^"
@@ -15509,6 +15527,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "axios@npm:1.9.0"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/a2f90bba56820883879f32a237e2b9ff25c250365dcafd41cec41b3406a3df334a148f90010182dfdadb4b41dc59f6f0b3e8898ff41b666d1157b5f3f4523497
+  languageName: node
+  linkType: hard
+
 "b4a@npm:^1.6.4":
   version: 1.6.4
   resolution: "b4a@npm:1.6.4"
@@ -17015,6 +17044,15 @@ __metadata:
   version: 0.7.2
   resolution: "cookie@npm:0.7.2"
   checksum: 10/24b286c556420d4ba4e9bc09120c9d3db7d28ace2bd0f8ccee82422ce42322f73c8312441271e5eefafbead725980e5996cc02766dbb89a90ac7f5636ede608f
+  languageName: node
+  linkType: hard
+
+"copy-anything@npm:3.0.5":
+  version: 3.0.5
+  resolution: "copy-anything@npm:3.0.5"
+  dependencies:
+    is-what: "npm:^4.1.8"
+  checksum: 10/4c41385a94a1cff6352a954f9b1c05b6bb1b70713a2d31f4c7b188ae7187ce00ddcc9c09bd58d24cd35b67fc6dd84df5954c0be86ea10700ff74e677db3cb09c
   languageName: node
   linkType: hard
 
@@ -22889,6 +22927,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-what@npm:^4.1.8":
+  version: 4.1.16
+  resolution: "is-what@npm:4.1.16"
+  checksum: 10/f6400634bae77be6903365dc53817292e1c4d8db1b467515d0c842505b8388ee8e558326d5e6952cb2a9d74116eca2af0c6adb8aa7e9d5c845a130ce9328bf13
+  languageName: node
+  linkType: hard
+
 "is-windows@npm:^1.0.1":
   version: 1.0.2
   resolution: "is-windows@npm:1.0.2"
@@ -26724,6 +26769,16 @@ __metadata:
   version: 4.1.0
   resolution: "peek-readable@npm:4.1.0"
   checksum: 10/97373215dcf382748645c3d22ac5e8dbd31759f7bd0c539d9fdbaaa7d22021838be3e55110ad0ed8f241c489342304b14a50dfee7ef3bcee2987d003b24ecc41
+  languageName: node
+  linkType: hard
+
+"peopledatalabs@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "peopledatalabs@npm:12.0.0"
+  dependencies:
+    axios: "npm:^1.9.0"
+    copy-anything: "npm:3.0.5"
+  checksum: 10/476477f38803541e9cf0805aba8ca5c039c4b39625fc0396b76c5e04d8f80e85d19897efa50feb61065d4ced43c7cf3f7492a4d2a67e19daccc55c75c74f2d14
   languageName: node
   linkType: hard
 

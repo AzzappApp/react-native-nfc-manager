@@ -35,7 +35,7 @@ describe('deeplinkHelpers', () => {
         socials: [
           {
             selected: true,
-            label: 'LinkedIn',
+            label: 'linkedin',
             url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
           },
         ],
@@ -72,7 +72,7 @@ describe('deeplinkHelpers', () => {
           socials: [
             {
               selected: true,
-              label: 'LinkedIn',
+              label: 'linkedin',
               url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
             },
           ],

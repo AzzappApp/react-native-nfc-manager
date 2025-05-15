@@ -1,3 +1,4 @@
+import { isSocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type {
@@ -11,6 +12,7 @@ import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { SkPoint, SkRect } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
@@ -124,7 +126,15 @@ export type CoverEditorOverlayItem = SourceMediaImage & {
 export type CoverEditorSocialLink = {
   link: string;
   position: number;
+  socialId: SocialLinkId;
+};
+
+export const isSocialLink = (item: {
   socialId: string;
+  link: string;
+  position: number;
+}): item is CoverEditorSocialLink => {
+  return isSocialLinkId(item.socialId);
 };
 
 export type CoverEditorLinksLayerItem = {

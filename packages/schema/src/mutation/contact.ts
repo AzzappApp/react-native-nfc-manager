@@ -14,11 +14,14 @@ import {
   transaction,
   updateContact,
   getContactById,
+  saveContactEnrichment,
 } from '@azzapp/data';
+import { enrichContact as enrich } from '@azzapp/enrichment';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
@@ -76,6 +79,7 @@ export const createContact: MutationResolvers['createContact'] = async (
     firstName: input.firstName || '',
     lastName: input.lastName || '',
     meetingDate: input.meetingDate ?? undefined,
+    socials: input.socials === null ? [] : filterSocialLink(input.socials),
   };
 
   let contact: Contact;
@@ -273,6 +277,7 @@ export const saveContact: MutationResolvers['saveContact'] = async (
 
   const contactToUpdate: Partial<Omit<Contact, 'id' | 'meetingLocation'>> = {
     ...input,
+    socials: input.socials === null ? [] : filterSocialLink(input.socials),
     // updatable fields
     emails: input.emails === null ? [] : input.emails,
     phoneNumbers: input.phoneNumbers === null ? [] : input.phoneNumbers,
@@ -325,5 +330,60 @@ export const removeContacts: MutationResolvers['removeContacts'] = async (
 
   return {
     removedContactIds: input.contactIds,
+  };
+};
+
+export const enrichContact: MutationResolvers['enrichContact'] = async (
+  _,
+  { contactId: gqlContactId },
+) => {
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const contactId = fromGlobalId(gqlContactId).id;
+  const existingContact = await contactLoader.load(contactId);
+
+  if (existingContact === null) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const profile = await profileLoader.load(existingContact.ownerProfileId);
+
+  if (!profile || profile.userId !== user.id) {
+    throw new GraphQLError(ERRORS.FORBIDDEN);
+  }
+
+  const {
+    enriched: { contact, profile: publicProfile },
+    trace,
+  } = await enrich({
+    contact: existingContact,
+  });
+
+  const medias = [
+    contact.avatarId,
+    contact.logoId,
+    ...(publicProfile?.positions?.map(p => p.logoId) ?? []),
+    ...(publicProfile?.education?.map(e => e.logoId) ?? []),
+  ].filter(isDefined);
+
+  await checkMedias(medias);
+
+  if (Object.keys(trace).length > 0) {
+    await transaction(async () => {
+      await referencesMedias(medias, null);
+      await saveContactEnrichment({
+        contactId,
+        fields: contact,
+        publicProfile,
+        trace,
+      });
+    });
+  }
+
+  return {
+    contact: existingContact,
   };
 };

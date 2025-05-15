@@ -1,4 +1,5 @@
 import { json2csv, csv2json } from 'csv42';
+import type { SocialLinkId } from './socialLinkHelpers';
 
 /**
  * A contact card
@@ -22,7 +23,7 @@ export type CommonInformation = {
   }> | null;
   socials?: Array<{
     url: string;
-    label: string;
+    label: SocialLinkId;
   }> | null;
 };
 
@@ -54,7 +55,7 @@ export type ContactCard = {
   } | null;
   socials?: Array<{
     url: string;
-    label: string;
+    label: SocialLinkId;
   }> | null;
 };
 

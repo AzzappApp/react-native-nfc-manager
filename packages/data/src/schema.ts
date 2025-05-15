@@ -19,6 +19,8 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 // #region CardModule
@@ -974,7 +976,7 @@ export const ContactTable = cols.table(
     urls: cols.json('urls').$type<Array<{ url: string }>>(),
     socials: cols
       .json('socials')
-      .$type<Array<{ url: string; label: string }>>(),
+      .$type<Array<{ url: string; label: SocialLinkId }>>(),
     logoId: cols.mediaId('logoId'),
     meetingLocation: cols.point('meetingLocation'),
     meetingPlace: cols.json('meetingPlace').$type<{
@@ -1084,5 +1086,56 @@ export const ContactCardAccessTable = cols.table(
     pk: cols
       .uniqueIndex('deviceId_profileId_idx')
       .on(table.deviceId, table.profileId),
+  }),
+);
+
+export type Position = {
+  company?: string | null;
+  summary?: string | null;
+  title?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  logoId?: string | null;
+};
+
+export type Education = {
+  startDate?: string | null;
+  endDate?: string | null;
+  school?: string | null;
+  logoId?: string | null;
+};
+
+export type PublicProfile = {
+  headline?: string | null;
+  summary?: string | null;
+  interests?: string[] | null;
+  skills?: string[] | null;
+  positions?: Position[] | null;
+  education?: Education[] | null;
+  country?: string | null;
+  countryCode?: string | null;
+  icons?: Record<string, string> | null;
+};
+
+export type EnrichedContactFields = Partial<
+  NullableFields<Omit<Contact, 'contactProfileId' | 'id' | 'ownerProfileId'>>
+>;
+
+export const ContactEnrichmentTable = cols.table(
+  'ContactEnrichment',
+  {
+    id: cols.cuid('id').primaryKey().$defaultFn(createId),
+    contactId: cols.cuid('contactId').notNull(),
+    enrichedAt: cols
+      .dateTime('enrichedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    fields: cols.json('fields').$type<EnrichedContactFields>(),
+    publicProfile: cols.json('publicProfile').$type<PublicProfile>(),
+    approved: cols.boolean('approved'),
+    trace: cols.json('trace').$type<Record<string, string>>(),
+  },
+  table => ({
+    pk: cols.index('contactId_idx').on(table.contactId, table.enrichedAt),
   }),
 );

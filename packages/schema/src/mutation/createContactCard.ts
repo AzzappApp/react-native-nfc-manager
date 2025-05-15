@@ -11,6 +11,7 @@ import {
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionUser } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
@@ -108,7 +109,10 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       const id = await createProfile({
         webCardId,
         userId: user.id,
-        contactCard,
+        contactCard: {
+          ...contactCard,
+          socials: filterSocialLink(contactCard.socials) ?? [],
+        },
         lastContactCardUpdate: new Date(
           currentDate.setMinutes(currentDate.getMinutes() + 1),
         ), // Will hide finger hint after creation

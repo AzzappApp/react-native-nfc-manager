@@ -18,3 +18,14 @@ export function typedEntries<T extends object>(object: T) {
 export type NullableFields<T> = {
   [K in keyof T]: T[K] | null;
 };
+
+export const cleanObject = <T extends object>(obj: T): Partial<T> => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, value]) =>
+        value !== null &&
+        value !== undefined &&
+        !(Array.isArray(value) && value.length === 0),
+    ),
+  ) as Partial<T>;
+};

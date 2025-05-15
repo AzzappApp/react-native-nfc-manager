@@ -29,6 +29,7 @@ import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
+import { isSocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import {
@@ -233,11 +234,17 @@ const CoverEditorCore = (
           },
           size: dataLinks.size ?? 24,
           links:
-            dataLinks.links?.map((link, index) => ({
-              socialId: link,
-              position: index,
-              link: '?',
-            })) ?? [],
+            dataLinks.links
+              ?.map((link, index) =>
+                isSocialLinkId(link)
+                  ? {
+                      socialId: link,
+                      position: index,
+                      link: '?',
+                    }
+                  : null,
+              )
+              .filter(link => link !== null) ?? [],
           rotation: 0,
           shadow: false,
         }

@@ -13,6 +13,10 @@ extend type Mutation {
     profileId: ID!
     input: RemoveContactsInput!
   ): RemoveContactPayload
+
+  enrichContact(
+    contactId: ID!
+  ): ContactPayload
 }
 
 input ContactInput {

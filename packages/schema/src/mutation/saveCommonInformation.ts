@@ -7,6 +7,7 @@ import {
 } from '@azzapp/data';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -17,7 +18,7 @@ import type { WebCard } from '@azzapp/data';
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
   async (
     _,
-    { webCardId: gqlWebCardId, input: { logoId, bannerId, ...data } },
+    { webCardId: gqlWebCardId, input: { logoId, bannerId, socials, ...data } },
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileAdminRight(webCardId);
@@ -29,7 +30,7 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
     }
 
     const updates: Partial<WebCard> = {
-      commonInformation: data,
+      commonInformation: { ...data, socials: filterSocialLink(socials) },
       logoId,
       bannerId,
     };
