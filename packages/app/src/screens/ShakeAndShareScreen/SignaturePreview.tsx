@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet, Text } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { isColorTooLight } from '@azzapp/shared/colorsHelpers';
@@ -150,7 +151,10 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             ]}
             numberOfLines={1}
           >
-            Save my contact
+            <FormattedMessage
+              defaultMessage="Save my contact"
+              description="Save my contact label in Signature preview of Share screen"
+            />
           </Text>
         </View>
         <View style={{ width: '50%', paddingLeft: 15 }}>
