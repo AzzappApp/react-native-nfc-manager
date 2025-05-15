@@ -27,7 +27,6 @@ export const schema = z.object({
     .describe('Apple app clip URL'),
   NEXT_PUBLIC_API_ENDPOINT: z
     .string()
-    .url()
     .default('http://localhost:3000')
     .describe('API endpoint'),
   NEXT_PUBLIC_GTM_ID: z.string().default('').describe('Google Tag Manager ID'),
