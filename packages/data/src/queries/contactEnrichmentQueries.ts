@@ -1,7 +1,10 @@
 import { eq, ne, and, desc } from 'drizzle-orm';
 import { db } from '../database';
-import { ContactEnrichmentTable, type PublicProfile } from '../schema';
-import type { EnrichedContactFields } from '../schema';
+import {
+  ContactEnrichmentTable,
+  type PublicProfile,
+  type EnrichedContactFields,
+} from '../schema';
 
 export const saveContactEnrichment = async (data: {
   contactId: string;
