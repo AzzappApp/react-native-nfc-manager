@@ -72,6 +72,10 @@ const ShakeAndShareScreen = ({
   const router = useRouter();
 
   useEffect(() => {
+    if (Platform.OS === 'android') {
+      return;
+    }
+
     let canceled = false;
     let brightness: number | null = null;
     (async () => {
