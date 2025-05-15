@@ -30,6 +30,7 @@ import Avatar from '#ui/Avatar/Avatar';
 import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
+import WhatsappButton from './WhatsappButton';
 import type { WebCard } from '@azzapp/data';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -68,7 +69,12 @@ const DownloadVCard = ({
   const loading = useRef(false);
   const [token, setToken] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumbers, setPhoneNumbers] = useState<
+    Array<{
+      label: string;
+      number: string;
+    }>
+  >([]);
 
   const processContact = useCallback(
     async (compressedContactCard: string) => {
@@ -81,14 +87,19 @@ const DownloadVCard = ({
         );
 
         const contactCard = parseContactCard(contactData);
-        let phoneNumber;
-        if (contactCard?.phoneNumbers?.[0]?.[1]) {
-          phoneNumber = parsePhoneNumberFromString(
-            contactCard?.phoneNumbers?.[0]?.[1],
+        if (contactCard?.phoneNumbers?.[0]) {
+          setPhoneNumbers(
+            contactCard?.phoneNumbers[0]
+              .map(number => {
+                const phoneNumber = parsePhoneNumberFromString(number[1]);
+
+                return {
+                  label: number[0],
+                  number: phoneNumber?.number || '',
+                };
+              })
+              .filter(p => p.number),
           );
-        }
-        if (phoneNumber) {
-          setPhoneNumber(phoneNumber.number);
         }
       } catch {
         return;
@@ -190,10 +201,21 @@ const DownloadVCard = ({
               base64,
             };
           }
-          const firstPhoneNumber = (contactCard as ContactCard)
-            ?.phoneNumbers?.[0]?.number;
-          if (firstPhoneNumber) {
-            setPhoneNumber(firstPhoneNumber);
+
+          const contactNumbers = (contactCard as ContactCard)?.phoneNumbers;
+          if (contactNumbers) {
+            setPhoneNumbers(
+              contactNumbers
+                .map(({ number, label }) => {
+                  const phoneNumber = parsePhoneNumberFromString(number);
+
+                  return {
+                    label,
+                    number: phoneNumber?.number || '',
+                  };
+                })
+                .filter(p => p.number),
+            );
           }
 
           const { vCard } = await buildVCardFromContactCard(
@@ -433,7 +455,7 @@ const DownloadVCard = ({
         <div
           className={styles.addContact}
           style={{
-            bottom: phoneNumber ? 75 : 15,
+            bottom: phoneNumbers.length > 0 ? 75 : 15,
             right: 15,
           }}
         >
@@ -448,38 +470,12 @@ const DownloadVCard = ({
           />
         </div>
       )}
-      {phoneNumber && !opened && contact?.avatarUrl && (
-        <Link
-          href={`https://wa.me/${phoneNumber}?text=${intl.formatMessage({
-            defaultMessage: 'Hello',
-            id: 'xuXlIz',
-            description: 'Hello message for whatsapp contact discussion button',
-          })}`}
-          target="_blank"
-          className={styles.whatsappContainer}
-        >
-          {contact?.avatarUrl ? (
-            <Avatar
-              className={styles.whatsappAvatar}
-              variant="image"
-              url={contact?.avatarUrl}
-              alt="avatar"
-            />
-          ) : (
-            <Avatar
-              className={styles.whatsappAvatar}
-              variant="initials"
-              initials={contactInitials}
-            />
-          )}
-          <Image
-            className={styles.whatsappIcon}
-            alt="play store"
-            src="/whatsapp.svg"
-            width={19}
-            height={19}
-          />
-        </Link>
+      {phoneNumbers.length > 0 && !opened && (
+        <WhatsappButton
+          phoneNumbers={phoneNumbers}
+          contactInitials={contactInitials}
+          avatarUrl={contact?.avatarUrl}
+        />
       )}
     </>
   );
