@@ -1,3 +1,7 @@
+## 1.10.0-canary.214
+
+* **feat:**  - **enrichment:** get logos with brandfetch ([#8792](https://github.com/AzzappApp/azzapp/pull/8792))
+
 ## 1.10.0-canary.213
 
 * **feat:**  - **enrichment:** add traces and check null values ([#8787](https://github.com/AzzappApp/azzapp/pull/8787))
