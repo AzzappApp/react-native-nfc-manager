@@ -12,6 +12,10 @@ export const schema = z.object({
     .string()
     .default('2')
     .describe('Nb of days before username redirection is active'),
+  MAX_ENRICHMENTS_PER_USER: z
+    .string()
+    .default('10')
+    .describe('Max enrichments per user'),
 });
 
 const env = schema.safeParse(process.env);

@@ -308,6 +308,7 @@ export const oauthSigninCallback =
                 invited: false,
                 nbFreeScans: 0,
                 cookiePreferences: null,
+                nbEnrichments: 0,
               },
               null,
             ];

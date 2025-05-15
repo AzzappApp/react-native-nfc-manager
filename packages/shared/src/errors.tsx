@@ -148,6 +148,10 @@ const ERRORS = {
    * The user has been moderated
    */
   USER_IS_BLOCKED: 'USER_IS_BLOCKED',
+  /*
+   * The user has used all his credits to enrich
+   */
+  MAX_ENRICHMENTS_REACHED: 'MAX_ENRICHMENTS_REACHED',
 } as const;
 
 export default ERRORS;

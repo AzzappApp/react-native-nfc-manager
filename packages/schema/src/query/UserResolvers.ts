@@ -8,6 +8,7 @@ import {
   getLastTermsOfUse,
   getSharedWebCardRelation,
 } from '@azzapp/data';
+import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   subscriptionsForUserLoader,
@@ -159,5 +160,18 @@ export const User: ProtectedResolver<UserResolvers> = {
     }
 
     return true; // we don't have a way to check if the user has a password
+  },
+  nbEnrichments: async user => {
+    if (!isSameUser(user)) {
+      return {
+        total: 0,
+        max: parseInt(env.MAX_ENRICHMENTS_PER_USER, 10),
+      };
+    }
+
+    return {
+      total: user.nbEnrichments,
+      max: parseInt(env.MAX_ENRICHMENTS_PER_USER, 10),
+    };
   },
 };

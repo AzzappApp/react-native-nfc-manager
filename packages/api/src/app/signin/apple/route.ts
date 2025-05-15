@@ -146,6 +146,7 @@ const appleSignin = async (req: Request) => {
                 invited: false,
                 nbFreeScans: 0,
                 cookiePreferences: null,
+                nbEnrichments: 0,
               },
               null,
             ];

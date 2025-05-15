@@ -733,6 +733,7 @@ export const UserTable = cols.table(
       marketing: boolean;
       functional: boolean;
     }>(),
+    nbEnrichments: cols.int('nbEnrichments').default(0).notNull(),
   },
   table => {
     return {

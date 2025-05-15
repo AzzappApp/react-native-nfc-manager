@@ -530,3 +530,9 @@ export const updateNbFreeScans = (userId: string) =>
     .update(UserTable)
     .set({ nbFreeScans: sql`${UserTable.nbFreeScans} + 1` })
     .where(eq(UserTable.id, userId));
+
+export const incrementNbEnrichments = (userId: string) =>
+  db()
+    .update(UserTable)
+    .set({ nbEnrichments: sql`${UserTable.nbEnrichments} + 1` })
+    .where(eq(UserTable.id, userId));

@@ -67,6 +67,22 @@ type User {
   Returns true when user has filled a password
   """
   hasPassword: Boolean!
+
+  """
+  Returns the number of enrichments made by the user
+  """
+  nbEnrichments: EnrichmentData!
+}
+
+type EnrichmentData {
+  """
+  The number of enrichments made by the user
+  """
+  total: Int!
+  """
+  The number of allowed enrichments
+  """
+  max: Int!
 }
 
 

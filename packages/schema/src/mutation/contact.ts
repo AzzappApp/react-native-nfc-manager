@@ -15,6 +15,7 @@ import {
   updateContact,
   getContactById,
   saveContactEnrichment,
+  incrementNbEnrichments,
 } from '@azzapp/data';
 import { enrichContact as enrich } from '@azzapp/enrichment';
 import { guessLocale } from '@azzapp/i18n';
@@ -23,6 +24,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import {
@@ -342,6 +344,10 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
+  if (user.nbEnrichments >= parseInt(env.MAX_ENRICHMENTS_PER_USER, 10)) {
+    throw new GraphQLError(ERRORS.MAX_ENRICHMENTS_REACHED);
+  }
+
   const contactId = fromGlobalId(gqlContactId).id;
   const existingContact = await contactLoader.load(contactId);
 
@@ -380,6 +386,7 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
         publicProfile,
         trace,
       });
+      await incrementNbEnrichments(user.id);
     });
   }
 
