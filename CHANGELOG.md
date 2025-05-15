@@ -1,3 +1,7 @@
+## 1.10.0-canary.215
+
+
+
 ## 1.10.0-canary.214
 
 * **feat:**  - **enrichment:** get logos with brandfetch ([#8792](https://github.com/AzzappApp/azzapp/pull/8792))
