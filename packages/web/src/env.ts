@@ -27,6 +27,7 @@ export const schema = z.object({
     .describe('Apple app clip URL'),
   NEXT_PUBLIC_API_ENDPOINT: z
     .string()
+    .url()
     .default('http://localhost:3000')
     .describe('API endpoint'),
   NEXT_PUBLIC_GTM_ID: z.string().default('').describe('Google Tag Manager ID'),
@@ -42,7 +43,21 @@ export const schema = z.object({
     .describe('Apple App Clip meta'),
 });
 
-const env = schema.safeParse(process.env);
+const env = schema.safeParse({
+  ...process.env,
+  NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
+  NEXT_PUBLIC_APPLE_APP_ENABLED: process.env.NEXT_PUBLIC_APPLE_APP_ENABLED,
+  NEXT_PUBLIC_APPLE_APP_CLIP_URL: process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL,
+  NEXT_PUBLIC_APP_CLIP_BUNDLE_ID: process.env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID,
+  NEXT_PUBLIC_APPLE_ITUNES_APP_META:
+    process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META,
+  NEXT_PUBLIC_DOWNLOAD_IOS_APP: process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP,
+  NEXT_PUBLIC_DOWNLOAD_ANDROID_APP:
+    process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP,
+  NEXT_PUBLIC_PLATFORM: process.env.NEXT_PUBLIC_PLATFORM,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
+});
 
 if (!env.success) {
   console.error('❌ web - invalid environment variables:', env.error.format());
