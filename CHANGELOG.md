@@ -1,3 +1,7 @@
+## 1.10.0-canary.211
+
+
+
 ## 1.10.0-canary.210
 
 * **fix:**  - **contact:** [#8561](https://github.com/AzzappApp/azzapp/pull/8561) some avatars need more compression for whatsapp ([#8766](https://github.com/AzzappApp/azzapp/pull/8766))
