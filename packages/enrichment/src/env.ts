@@ -15,6 +15,7 @@ export const schema = z.object({
     .enum(['true', 'false'])
     .default('false')
     .describe('Enable enrichment monitoring'),
+  BRANDFETCH_CLIENT_ID: z.string().default('').describe('Brandfetch API key'),
 });
 
 const env = schema.safeParse(process.env);

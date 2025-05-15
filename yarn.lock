@@ -523,6 +523,7 @@ __metadata:
   dependencies:
     "@aws-sdk/credential-provider-web-identity": "npm:^3.787.0"
     "@azzapp/data": "workspace:^"
+    "@azzapp/enrichment": "workspace:^"
     "@azzapp/i18n": "workspace:^"
     "@azzapp/payment": "workspace:^"
     "@azzapp/schema": "workspace:^"

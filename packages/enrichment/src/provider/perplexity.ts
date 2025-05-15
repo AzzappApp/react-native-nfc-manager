@@ -49,7 +49,7 @@ export const perplexity: ApiResolver = {
       !data.contact?.title ? 'title?: string|null; ' : ''
     }${!data.contact?.birthday ? 'birthday?: string|null; ' : ''}${
       !data.contact?.addresses ? 'addresses?: string[]|null; ' : ''
-    }socials: {label, url}[]; urls: string[]; }`;
+    }socials: {label, url}[]; urls: {url: string}[]; }`;
 
     const prompt = `You will receive a JSON object representing a contact. Use reliable public sources to enrich this contact with public data **only if the identity is clear and unambiguous**.
 

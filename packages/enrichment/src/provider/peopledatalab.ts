@@ -2,6 +2,7 @@ import PDLJS from 'peopledatalabs';
 import { isSocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import env from '../env';
 import { firstDefined } from '../helpers';
+import { downloadMediaFromBrand } from './brandfetch';
 import type { ApiResolver } from '../types';
 import type { PersonResponse } from 'peopledatalabs';
 
@@ -46,7 +47,7 @@ export const peopleDataLabsEnrichment: ApiResolver = {
         const { data } = response;
 
         return {
-          data: buildContact(data),
+          data: await buildContact(data),
         };
       }
       return null;
@@ -54,7 +55,41 @@ export const peopleDataLabsEnrichment: ApiResolver = {
   },
 };
 
-const buildContact = (data: PersonResponse) => {
+const buildContact = async (data: PersonResponse) => {
+  const uniqueBrands = (
+    data.experience?.map(position => ({
+      brand: position.company?.name,
+      website: position.company?.website,
+    })) ?? []
+  )
+    .concat(
+      data.education?.map(education => ({
+        brand: education.school?.name,
+        website: education.school?.website,
+      })) ?? [],
+    )
+    .reduce(
+      (acc, { brand, website }) => {
+        if (brand && !acc.some(b => b.brand === brand)) {
+          acc.push({ brand, website });
+        }
+        return acc;
+      },
+      [] as Array<{ brand: string; website?: string | null }>,
+    );
+
+  const logos = await Promise.all(
+    uniqueBrands.map(async ({ brand, website }) => {
+      if (brand) {
+        const logo = await downloadMediaFromBrand(brand, website);
+        return {
+          brand,
+          logoId: logo,
+        };
+      }
+    }),
+  );
+
   return {
     contact: {
       emails: (Array.isArray(data.emails)
@@ -134,18 +169,35 @@ const buildContact = (data: PersonResponse) => {
       summary: data.summary,
       interests: data.interests,
       skills: data.skills,
-      positions: data.experience?.map(position => ({
-        company: position.company?.name,
-        title: position.title?.name,
-        summary: position.summary,
-        startDate: position.start_date,
-        endDate: position.end_date,
-      })),
-      education: data.education?.map(education => ({
-        school: education.school?.name,
-        startDate: education.start_date,
-        endDate: education.end_date,
-      })),
+      positions: data.experience
+        ? await Promise.all(
+            data.experience?.map(async position => ({
+              company: position.company?.name,
+              title: position.title?.name,
+              summary: position.summary,
+              startDate: position.start_date,
+              endDate: position.end_date,
+              logoId: position.company?.name
+                ? logos.find(logo => logo?.brand === position.company?.name)
+                    ?.logoId
+                : null,
+            })),
+          )
+        : undefined,
+
+      education: data.education
+        ? await Promise.all(
+            data.education?.map(async education => ({
+              school: education.school?.name,
+              startDate: education.start_date,
+              endDate: education.end_date,
+              logoId: education.school?.name
+                ? logos.find(logo => logo?.brand === education.school?.name)
+                    ?.logoId
+                : null,
+            })),
+          )
+        : undefined,
       country: data.countries?.length ? data.countries[0] : undefined,
     },
   };
@@ -196,7 +248,7 @@ export const peopleDataLabsIdentify: ApiResolver = {
     if (response.status === 200) {
       const data = response.matches[0].data;
       return {
-        data: buildContact(data),
+        data: await buildContact(data),
       };
     } else {
       return {
