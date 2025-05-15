@@ -7,8 +7,13 @@ export const githubAvatar: ApiResolver = {
   provides: {
     contact: ['avatarId'],
   },
-  dependsOn: ({ contact }) => {
-    return contact.socials?.some(social => social.label === 'github') ?? false;
+  dependsOn: {
+    all: [
+      'contact.socials',
+      data =>
+        data.contact?.socials?.some(social => social.label === 'github') ??
+        false,
+    ],
   },
   run: async data => {
     const githubUrl = data.contact.socials?.find(

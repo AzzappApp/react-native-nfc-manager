@@ -79,3 +79,43 @@ export const extractSingleJsonObject = <T>(text: string): T | null => {
 
   return null;
 };
+
+export const describeDependsOn = (expr: EnrichedDataFieldExpr): string => {
+  if (typeof expr === 'string') {
+    return expr;
+  }
+  if (typeof expr === 'function') {
+    return '[function]';
+  }
+  if ('all' in expr) {
+    return `all(${expr.all.map(describeDependsOn).join(', ')})`;
+  }
+  if ('any' in expr) {
+    return `any(${expr.any.map(describeDependsOn).join(', ')})`;
+  }
+  if ('not' in expr) {
+    return `not(${describeDependsOn(expr.not)})`;
+  }
+  return '[unknown]';
+};
+
+export const extractFieldPaths = (
+  expr: EnrichedDataFieldExpr,
+): EnrichedDataFieldPath[] => {
+  if (typeof expr === 'string') {
+    return [expr];
+  }
+  if (typeof expr === 'function') {
+    return [];
+  }
+  if ('all' in expr) {
+    return expr.all.flatMap(extractFieldPaths);
+  }
+  if ('any' in expr) {
+    return expr.any.flatMap(extractFieldPaths);
+  }
+  if ('not' in expr) {
+    return extractFieldPaths(expr.not);
+  }
+  return [];
+};

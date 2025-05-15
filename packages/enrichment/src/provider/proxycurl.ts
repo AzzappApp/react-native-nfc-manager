@@ -207,8 +207,14 @@ export const proxyCurlProfile: ApiResolver = {
       'country',
     ],
   },
-  dependsOn: (data: EnrichedData) =>
-    data.contact?.socials?.some(social => social.label === 'linkedin') ?? false,
+  dependsOn: {
+    all: [
+      'contact.socials',
+      (data: EnrichedData) =>
+        data.contact?.socials?.some(social => social.label === 'linkedin') ??
+        false,
+    ],
+  },
   run: async data => {
     const url = new URL('https://nubela.co/proxycurl/api/linkedin/profile');
 

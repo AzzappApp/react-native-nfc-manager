@@ -2,7 +2,8 @@ import * as Sentry from '@sentry/nextjs';
 import isEqual from 'lodash/isEqual';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { cleanObject } from '@azzapp/shared/objectHelpers';
-import { evaluateExpr } from './helpers';
+import env from './env';
+import { evaluateExpr, describeDependsOn, extractFieldPaths } from './helpers';
 import { countryCode } from './provider/countryCode';
 import { githubAvatar } from './provider/github';
 import { ipqualityscore } from './provider/ipqualityscore';
@@ -90,6 +91,7 @@ export const enrichContact = async (
           providesContact.some(
             field =>
               current.contact[field] === undefined ||
+              current.contact[field] === null ||
               (typeof current.contact[field] === 'string' &&
                 !current.contact[field].trim()) ||
               (Array.isArray(current.contact[field]) &&
@@ -98,6 +100,7 @@ export const enrichContact = async (
           providesProfile.some(
             field =>
               current.profile[field] === undefined ||
+              current.profile[field] === null ||
               (Array.isArray(current.profile[field]) &&
                 current.profile[field].filter(isDefined).length === 0),
           )
@@ -109,6 +112,28 @@ export const enrichContact = async (
 
     for (const resolver of candidates) {
       try {
+        if (env.ENABLE_ENRICHMENT_MONITORING === 'true') {
+          const dependsDescription = describeDependsOn(resolver.dependsOn);
+          const paths = extractFieldPaths(resolver.dependsOn);
+          const inputSummary = paths
+            .map(path => {
+              const [section, key] = path.split('.') as [
+                'contact' | 'profile',
+                string,
+              ];
+              const value = (current[section] as any)?.[key];
+              return `${path}=${JSON.stringify(value)}`;
+            })
+            .join(', ');
+
+          console.log(
+            `[ENRICHMENT] Resolver: ${resolver.name} | DependsOn: ${dependsDescription} | Priority: ${resolver.priority}`,
+          );
+          if (inputSummary) {
+            console.log(`            → With inputs: ${inputSummary}`);
+          }
+        }
+
         const {
           data,
           error,
@@ -134,13 +159,13 @@ export const enrichContact = async (
 
         if (Object.keys(newContact).length > 0) {
           enriched.contact = { ...enriched.contact, ...newContact };
-          current.contact = { ...current.contact, ...contact };
+          current.contact = { ...current.contact, ...newContact };
           for (const k of Object.keys(newContact))
             trace[`contact.${k}`] = resolver.name;
         }
         if (Object.keys(newProfile).length > 0) {
           enriched.profile = { ...enriched.profile, ...newProfile };
-          current.profile = { ...current.profile, ...profile };
+          current.profile = { ...current.profile, ...newProfile };
           for (const k of Object.keys(newProfile))
             trace[`profile.${k}`] = resolver.name;
         }
@@ -148,7 +173,10 @@ export const enrichContact = async (
         if (!shouldRetry) usedResolvers.add(resolver.name);
       } catch (error) {
         usedResolvers.add(resolver.name);
-        console.error(`Error in resolver ${resolver.name}: ${error}`, error);
+        console.error(
+          `Error in resolver ${resolver.name}: ${JSON.stringify(error)}`,
+          error,
+        );
         Sentry.captureException(error);
       }
     }

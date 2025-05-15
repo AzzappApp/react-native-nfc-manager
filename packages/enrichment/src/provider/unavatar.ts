@@ -22,11 +22,14 @@ export const unAvatar: ApiResolver = {
   provides: {
     contact: ['avatarId'],
   },
-  dependsOn: ({ contact }) => {
-    return (
-      contact.socials?.some(social => unAvatarSocials.includes(social.label)) ??
-      false
-    );
+  dependsOn: {
+    all: [
+      'contact.socials',
+      ({ contact }) =>
+        contact.socials?.some(social =>
+          unAvatarSocials.includes(social.label),
+        ) ?? false,
+    ],
   },
   run: async data => {
     return firstDefined(

@@ -11,6 +11,10 @@ export const schema = z.object({
     .string()
     .default('')
     .describe('API Key for IPQualityScore'),
+  ENABLE_ENRICHMENT_MONITORING: z
+    .enum(['true', 'false'])
+    .default('false')
+    .describe('Enable enrichment monitoring'),
 });
 
 const env = schema.safeParse(process.env);
