@@ -105,8 +105,16 @@ const Toast = ({
             <Icon icon="warning" style={styles.errorToastIcon} />
           )}
           renderTrailingIcon={() => renderTrailingIcon(errorProps.props)}
-          text1Style={[textStyles.smallbold, styles.toastText]}
+          text1Style={[textStyles.medium, styles.toastText]}
           text1Props={{
+            numberOfLines: 3,
+          }}
+          text2Style={[
+            textStyles.small,
+            styles.toastText,
+            styles.toastDescription,
+          ]}
+          text2Props={{
             numberOfLines: 3,
           }}
         />
@@ -173,6 +181,7 @@ const Toast = ({
     styles.errorToastIcon,
     styles.info,
     styles.successToastIcon,
+    styles.toastDescription,
     styles.toastText,
   ]);
   return (
@@ -290,6 +299,9 @@ const styleSheet = createStyleSheet(appearance => ({
     // TODO UI
     color: colors.black, //appearance === 'light' ? colors.black : colors.white,
     width: undefined,
+  },
+  toastDescription: {
+    textAlign: 'center',
   },
   info: {
     height: 300,
