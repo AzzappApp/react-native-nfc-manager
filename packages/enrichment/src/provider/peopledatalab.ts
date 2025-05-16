@@ -191,6 +191,7 @@ const buildContact = async (data: PersonResponse) => {
               school: education.school?.name,
               startDate: education.start_date,
               endDate: education.end_date,
+              summary: education.summary,
               logoId: education.school?.name
                 ? logos.find(logo => logo?.brand === education.school?.name)
                     ?.logoId

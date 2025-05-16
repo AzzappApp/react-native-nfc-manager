@@ -1104,6 +1104,7 @@ export type Education = {
   endDate?: string | null;
   school?: string | null;
   logoId?: string | null;
+  summary?: string | null;
 };
 
 export type PublicProfile = {

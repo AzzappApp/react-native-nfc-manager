@@ -63,6 +63,7 @@ type Education {
   endDate: String
   school: String
   logo: Media
+  summary: String
 }
 
 type PublicProfile {

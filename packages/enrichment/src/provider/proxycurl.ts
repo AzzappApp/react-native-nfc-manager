@@ -176,6 +176,7 @@ const buildDataFromResponse = async (
                       edu.starts_at?.day,
                     ).toISOString()
                   : undefined,
+              summary: edu.description,
               endDate:
                 edu.ends_at?.year && edu.ends_at?.month
                   ? new Date(
