@@ -69,12 +69,22 @@ type Education {
 type PublicProfile {
   headline: String
   summary: String
-  interests: [String!]
-  skills: [String!]
+  interests: [Interest!]
+  skills: [Skill!]
   positions: [Position!]
   education: [Education!]
   country: String
   countryCode: String
+}
+
+type Interest {
+  name: String!
+  icon: String
+}
+
+type Skill {
+  name: String!
+  icon: String
 }
 
 type Address {

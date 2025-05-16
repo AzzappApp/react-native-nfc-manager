@@ -1141,3 +1141,5 @@ export const ContactEnrichmentTable = cols.table(
     pk: cols.index('contactId_idx').on(table.contactId, table.enrichedAt),
   }),
 );
+
+export type ContactEnrichment = InferSelectModel<typeof ContactEnrichmentTable>;

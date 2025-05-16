@@ -55,6 +55,8 @@ generates:
         Payment: '@azzapp/data#Payment as PaymentModel'
         Contact: '@azzapp/data#Contact as ContactModel'
         EnrichedContactFields: '@azzapp/data#EnrichedContactFields as EnrichedContactFieldsModel'
+        Enrichment: '@azzapp/data#ContactEnrichment as ContactEnrichmentModel'
+        PublicProfile: '@azzapp/data#PublicProfile as PublicProfileModel'
         Position: '@azzapp/data#Position as PositionModel'
         Education: '@azzapp/data#Education as EducationModel'
       defaultMapper: 'Partial<{T}>'

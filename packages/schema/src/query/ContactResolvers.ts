@@ -6,6 +6,7 @@ import type {
   EducationResolvers,
   EnrichedContactFieldsResolvers,
   PositionResolvers,
+  PublicProfileResolvers,
 } from '#/__generated__/types';
 
 export const Position: PositionResolvers = {
@@ -46,6 +47,25 @@ export const EnrichedContactFields: EnrichedContactFieldsResolvers = {
           assetKind: 'logo',
         }
       : null;
+  },
+};
+
+export const PublicProfile: PublicProfileResolvers = {
+  skills: profile => {
+    return profile.skills
+      ? profile.skills.map(skill => ({
+          name: skill,
+          icon: profile.icons?.[skill] || null,
+        }))
+      : [];
+  },
+  interests: profile => {
+    return profile.interests
+      ? profile.interests.map(interest => ({
+          name: interest,
+          icon: profile.icons?.[interest] || null,
+        }))
+      : [];
   },
 };
 
