@@ -1,3 +1,8 @@
+## 1.10.0-canary.217
+
+* **feat:**  - **enrichment:** add icons for skills and interests ([#8794](https://github.com/AzzappApp/azzapp/pull/8794))
+* **feat:**  - **enrichment:** add summary field in school ([#8801](https://github.com/AzzappApp/azzapp/pull/8801))
+
 ## 1.10.0-canary.216
 
 
