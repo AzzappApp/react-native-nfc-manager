@@ -3,7 +3,7 @@ import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
 import { memo, useCallback, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
-import { View, StyleSheet, Share, Platform } from 'react-native';
+import { View, StyleSheet, Share, Platform, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
@@ -433,6 +433,37 @@ const PostRendererBottomPanel = ({
       }),
   );
 
+  const confirmDelete = () => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Delete this post',
+        description: 'Title of delete post Alert',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete this post? This action is irreversible.',
+        description: 'description of delete post Alert',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete this post',
+            description: 'button of delete post Alert',
+          }),
+          onPress: deletePost,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete post Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
+
   return (
     <>
       <View style={styles.bottomContainerPost}>
@@ -588,7 +619,7 @@ const PostRendererBottomPanel = ({
             )}
             {isViewer && (
               <PressableNative
-                onPress={deletePost}
+                onPress={confirmDelete}
                 disabled={deleteLoading}
                 style={[styles.modalLine, styles.errorModalLine]}
               >

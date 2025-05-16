@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  Alert,
   StyleSheet,
   View,
   useColorScheme,
@@ -348,6 +349,37 @@ const WebCardEditBlockContainer = ({
     };
   }, [id, registerTooltip, unregisterTooltip]);
 
+  const confirmDelete = () => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Delete this section',
+        description: 'Title of delete section Alert',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete this section? This action is irreversible',
+        description: 'description of delete section Alert',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete this section',
+            description: 'button of delete section Alert',
+          }),
+          onPress: onRemove,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete section Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
+
   return (
     <Animated.View
       entering={
@@ -601,7 +633,7 @@ const WebCardEditBlockContainer = ({
               pointerEvents={activeSection !== 'right' ? 'none' : 'auto'}
             >
               <IconButton
-                onPress={onRemove}
+                onPress={confirmDelete}
                 disabled={activeSection !== 'right' || !canDelete}
                 icon="delete"
                 size={buttonSize}

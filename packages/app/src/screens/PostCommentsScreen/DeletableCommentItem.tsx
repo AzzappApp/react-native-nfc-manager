@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
@@ -82,6 +82,38 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
       }
     };
 
+    const confirmDelete = () => {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Delete this comment',
+          description: 'Title of delete comment Alert',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this comment? This action is irreversible',
+          description: 'description of delete comment Alert',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Delete this comment',
+              description: 'button of delete comment Alert',
+            }),
+            onPress: onDelete,
+            style: 'destructive',
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Cancel button of delete comment Alert',
+            }),
+            onPress: onClose,
+            isPreferred: true,
+          },
+        ],
+      );
+    };
+
     return (
       <View
         style={{
@@ -90,7 +122,7 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
         }}
       >
         <SwipeableRowRightAction x={72} progress={progress}>
-          <PressableNative style={styles.rightAction} onPress={onDelete}>
+          <PressableNative style={styles.rightAction} onPress={confirmDelete}>
             <Icon
               icon="trash"
               style={{ tintColor: colors.white, width: 24, height: 24 }}

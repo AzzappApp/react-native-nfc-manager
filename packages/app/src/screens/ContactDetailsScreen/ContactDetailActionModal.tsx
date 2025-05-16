@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import ContactActionModalOption from '#screens/ContactsScreen/ContactActionModalOption';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -60,6 +60,37 @@ const ContactDetailActionModal = ({
     ];
   }, [intl, onSaveContact, onShare, onEdit]);
 
+  const confirmDelete = () => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Delete this contact',
+        description: 'Title of delete contact Alert',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete this contact? This action is irreversible.',
+        description: 'description of delete contact Alert',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete this contact',
+            description: 'button of delete contact Alert',
+          }),
+          onPress: onRemoveContacts,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete contact Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
+
   return (
     <BottomSheetModal
       index={0}
@@ -75,7 +106,7 @@ const ContactDetailActionModal = ({
       {elements.map((element, index) => {
         return <ContactActionModalOption key={index} {...element} />;
       })}
-      <PressableNative style={styles.removeButton} onPress={onRemoveContacts}>
+      <PressableNative style={styles.removeButton} onPress={confirmDelete}>
         <Text variant="button" style={styles.removeText}>
           <FormattedMessage
             defaultMessage="Remove contact"
