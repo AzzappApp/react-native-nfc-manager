@@ -282,11 +282,11 @@ export const buildVCard = async (contact: ContactType) => {
 
       const image = await ImageCompressor.compress(file.uri, {
         output: 'jpg',
-        returnableOutputType: 'base64',
+        quality: 0.7,
       });
-
-      if (image) {
-        vCard.addPhoto(image, 'jpeg');
+      const imageFile = new File(image);
+      if (imageFile.exists) {
+        vCard.addPhoto(imageFile.base64(), 'jpeg');
       }
     } catch (e) {
       Sentry.captureException(e);
