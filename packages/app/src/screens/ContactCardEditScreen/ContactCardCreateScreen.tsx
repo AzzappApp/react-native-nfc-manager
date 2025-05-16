@@ -684,6 +684,11 @@ const ContactCardCreateScreen = ({
         <ScanMyPaperBusinessCard
           onPress={openScannerFromPopup}
           style={styles.scanBusinessCardButton}
+          label={intl.formatMessage({
+            defaultMessage: 'Scan a Card, Badge, email signature...',
+            description:
+              'ContactCardCreateScreen - Scan a Card, Badge, email signature buttonlabel',
+          })}
         />
 
         <View style={{ flex: 1, paddingBottom: bottom }}>
@@ -745,7 +750,14 @@ const ContactCardCreateScreen = ({
               description="ContactCardCreateScreen - Message in popup between 2 buttons"
             />
           </Text>
-          <ScanMyPaperBusinessCard onPress={openScannerFromPopup} />
+          <ScanMyPaperBusinessCard
+            onPress={openScannerFromPopup}
+            label={intl.formatMessage({
+              defaultMessage: 'Scan a Card, Badge, email signature...',
+              description:
+                'ContactCardCreateScreen - BottomSheetPopup - Scan a Card, Badge, email signature buttonlabel',
+            })}
+          />
         </View>
       </BottomSheetPopup>
       {showScanner && (
@@ -815,20 +827,17 @@ export default relayScreen(ContactCardCreateScreen, {
 
 export const ScanMyPaperBusinessCard = ({
   onPress,
+  label,
   style,
 }: {
   onPress: () => void;
+  label: string;
   style?: ViewStyle;
 }) => {
-  const intl = useIntl();
   return (
     <Button
       variant="secondary"
-      label={intl.formatMessage({
-        defaultMessage: 'Scan a Card, Badge, email signature...',
-        description:
-          'MultiUserAddModal - Scan a Card, Badge, email signature buttonlabel',
-      })}
+      label={label}
       onPress={onPress}
       leftElement={<Icon icon="scan" size={24} />}
       style={style}

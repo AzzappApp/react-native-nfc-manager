@@ -534,6 +534,11 @@ const ContactCreateScreen = ({
       <ScanMyPaperBusinessCard
         onPress={openScannerView}
         style={styles.scanButton}
+        label={intl.formatMessage({
+          defaultMessage: 'Scan a Card, Badge, email signature...',
+          description:
+            'ContactCreateScreen - Scan a Card, Badge, email signature buttonlabel',
+        })}
       />
       <ContactCreateForm
         control={control}
