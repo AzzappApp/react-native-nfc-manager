@@ -1,3 +1,7 @@
+## 1.10.0-canary.218
+
+* **fix:**  - **contact:** [#8561](https://github.com/AzzappApp/azzapp/pull/8561) base64 is broken with image compressor ([#8812](https://github.com/AzzappApp/azzapp/pull/8812))
+
 ## 1.10.0-canary.217
 
 * **feat:**  - **enrichment:** add icons for skills and interests ([#8794](https://github.com/AzzappApp/azzapp/pull/8794))
