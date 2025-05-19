@@ -97,6 +97,8 @@ const UserPayWallScreen = ({
     router.back();
   }, [router]);
   const setAllowMultiUser = useMultiUserUpdate(onCompleted);
+  const activateMultiUser = route.params?.activateFeature === 'MULTI_USER';
+  const waitDatabase = route.params?.waitDatabase;
 
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
@@ -124,9 +126,12 @@ const UserPayWallScreen = ({
       shouldWaitDatabase &&
       currentSubscription?.subscriptionId === waitedSubscriptionId
     ) {
-      setAllowMultiUser(true);
+      if (activateMultiUser) {
+        setAllowMultiUser(true);
+      }
     }
   }, [
+    activateMultiUser,
     currentSubscription,
     router,
     setAllowMultiUser,
@@ -201,8 +206,6 @@ const UserPayWallScreen = ({
     }
   }, [freeTrialEligible, intl, selectedPurchasePackage]);
 
-  const activateMultiUser = route.params?.activateFeature === 'MULTI_USER';
-
   const processOrder = useCallback(async () => {
     if (!selectedPurchasePackage) {
       return;
@@ -263,7 +266,7 @@ const UserPayWallScreen = ({
             currentTotalSeat +
             (currentSubscription?.availableSeats ?? 0),
         );
-        if (updateAvailableSeats >= 0 && activateMultiUser) {
+        if (waitDatabase || (updateAvailableSeats >= 0 && activateMultiUser)) {
           startWaitDatabase();
           return;
         }
@@ -318,6 +321,7 @@ const UserPayWallScreen = ({
     router,
     selectedPurchasePackage,
     startWaitDatabase,
+    waitDatabase,
   ]);
 
   const restorePurchase = useCallback(async () => {
