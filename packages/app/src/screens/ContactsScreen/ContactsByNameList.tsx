@@ -35,6 +35,11 @@ type ContactsByNameListProps = {
   showContactAction: (arg: ContactType) => void;
   contentContainerStyle?: ViewStyle;
   fetchPolicy?: FetchPolicy;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
 };
 
 const ContactsByNameList = ({
@@ -44,6 +49,7 @@ const ContactsByNameList = ({
   onShowContact,
   showContactAction,
   contentContainerStyle,
+  ListHeaderComponent,
   fetchPolicy = 'store-or-network',
 }: ContactsByNameListProps) => {
   const queryResult = useLazyLoadQuery<ContactsByNameListQuery>(
@@ -181,6 +187,7 @@ const ContactsByNameList = ({
       onShowContact={onShowContact}
       showContactAction={showContactAction}
       contentContainerStyle={contentContainerStyle}
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
     />
   );

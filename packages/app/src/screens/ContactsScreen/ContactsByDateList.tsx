@@ -18,6 +18,11 @@ type ContactsByDateListProps = {
   onShowContact: (contact: ContactType) => void;
   showContactAction: (arg: ContactType | ContactType[]) => void;
   contentContainerStyle?: ViewStyle;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
 };
 
 const ContactsByDateList = ({
@@ -26,6 +31,7 @@ const ContactsByDateList = ({
   onShowContact,
   showContactAction,
   contentContainerStyle,
+  ListHeaderComponent,
 }: ContactsByDateListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment<ContactsByDateListQuery, ContactsByDateList_root$key>(
@@ -128,6 +134,8 @@ const ContactsByDateList = ({
             new Date(date).getMonth() === today.getMonth() &&
             new Date(date).getFullYear() === today.getFullYear();
 
+          const hasSeeAll = node.nbContacts > contacts.length;
+
           return {
             title: isToday
               ? intl.formatMessage({
@@ -140,11 +148,8 @@ const ContactsByDateList = ({
                   year: 'numeric',
                 }),
             count: node.nbContacts,
-            contacts,
-            onSeeAll:
-              node.nbContacts > contacts.length
-                ? () => onSeeAll(date)
-                : undefined,
+            contacts: hasSeeAll ? contacts.slice(0, 5) : contacts,
+            onSeeAll: hasSeeAll ? () => onSeeAll(date) : undefined,
           };
         })
         .filter(data => !!data) ?? []
@@ -161,6 +166,7 @@ const ContactsByDateList = ({
       showContactAction={showContactAction}
       showLocationInSubtitle
       contentContainerStyle={contentContainerStyle}
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
     />
   );

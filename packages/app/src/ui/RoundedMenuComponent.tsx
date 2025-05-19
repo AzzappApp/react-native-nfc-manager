@@ -4,6 +4,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { TextVariant } from './Text';
+import type { ViewStyle } from 'react-native';
 
 type Props = {
   selected?: boolean;
@@ -11,6 +12,7 @@ type Props = {
   label: string;
   onSelect?: (id: string | null) => void;
   textVariant?: TextVariant;
+  style?: ViewStyle;
 };
 
 const RoundedMenuComponent = ({
@@ -19,6 +21,7 @@ const RoundedMenuComponent = ({
   onSelect,
   id,
   textVariant = 'button',
+  style,
 }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -30,7 +33,7 @@ const RoundedMenuComponent = ({
 
   return (
     <PressableNative
-      style={[styles.menu, selected && styles.menuSelected]}
+      style={[styles.menu, selected && styles.menuSelected, style]}
       onPress={onPress}
     >
       <Text variant={textVariant}>{label}</Text>
@@ -47,11 +50,11 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingHorizontal: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    borderColor: appearance === 'light' ? colors.grey100 : colors.grey900,
     borderWidth: 1,
     borderStyle: 'solid',
   },
   menuSelected: {
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey900,
   },
 }));

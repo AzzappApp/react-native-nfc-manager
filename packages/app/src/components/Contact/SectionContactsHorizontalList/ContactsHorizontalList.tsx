@@ -1,11 +1,14 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Button from '#ui/Button';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
 import type { ContactType } from '#helpers/contactTypes';
@@ -94,6 +97,22 @@ const ContactsScreenSection = ({
         decelerationRate="fast"
         scrollEventThrottle={16}
         nestedScrollEnabled
+        ListFooterComponent={
+          onSeeAll ? (
+            <PressableNative style={styles.morePlaceHolder} onPress={onSeeAll}>
+              <LinearGradient
+                colors={[`${colors.grey1000}FF`, `${colors.grey1000}00`]}
+                style={styles.morePlaceHolderBackground}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text variant="medium" style={styles.morePlaceHolderText}>
+                  + {(count ?? contacts.length) - contacts.length}
+                </Text>
+              </LinearGradient>
+            </PressableNative>
+          ) : null
+        }
       />
       {onSeeAll ? (
         <View style={styles.seeAll}>
@@ -126,7 +145,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   profiles: {
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     marginTop: 15,
     gap: 5,
   },
@@ -134,6 +153,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     top: '40%',
+  },
+  morePlaceHolder: {
+    width: 80,
+    height: 80 / COVER_RATIO,
+    marginRight: 80,
+    borderRadius: COVER_CARD_RADIUS * 80,
+    overflow: 'hidden',
+  },
+  morePlaceHolderBackground: {
+    width: 80,
+    height: 80 / COVER_RATIO,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  morePlaceHolderText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 

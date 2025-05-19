@@ -16,6 +16,11 @@ type ContactsByLocationListProps = {
   onShowContact: (contact: ContactType) => void;
   showContactAction: (arg: ContactType | ContactType[]) => void;
   contentContainerStyle?: ViewStyle;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
 };
 
 const ContactsByLocationList = ({
@@ -23,6 +28,7 @@ const ContactsByLocationList = ({
   onShowContact,
   showContactAction,
   contentContainerStyle,
+  ListHeaderComponent,
 }: ContactsByLocationListProps) => {
   const queryResult = useLazyLoadQuery<ContactsByLocationListQuery>(
     ContactsByLocationListQueryNode,
@@ -122,6 +128,7 @@ const ContactsByLocationList = ({
           }
 
           const { location, nbContacts } = node;
+          const hasSeeAll = nbContacts > contacts.length;
           return {
             title:
               location ??
@@ -130,11 +137,8 @@ const ContactsByLocationList = ({
                 description:
                   'ContactsScreenSearchByLocation - Title for unknown location',
               }),
-            onSeeAll:
-              nbContacts > contacts.length
-                ? () => onSeeAll(location)
-                : undefined,
-            contacts,
+            onSeeAll: hasSeeAll ? () => onSeeAll(location) : undefined,
+            contacts: hasSeeAll ? contacts.slice(0, 5) : contacts,
             count: nbContacts,
           };
         })
@@ -152,6 +156,7 @@ const ContactsByLocationList = ({
       showContactAction={showContactAction}
       showLocationInSubtitle
       contentContainerStyle={contentContainerStyle}
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
     />
   );

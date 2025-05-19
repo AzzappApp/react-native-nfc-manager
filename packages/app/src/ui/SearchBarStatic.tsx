@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { View, TextInput, useColorScheme } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from './Icon';
 import IconButton from './IconButton';
 import type {
@@ -70,6 +71,10 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
     textInputRef.current?.blur();
   };
 
+  const styles = useStyleSheet(styleSheet);
+
+  const appearance = useColorScheme();
+
   return (
     <View
       style={[style, styles.innerSearchBarView]}
@@ -89,7 +94,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
         style={styles.input}
         value={searchValue}
         onChangeText={onSetValueText}
-        selectionColor={colors.primary400}
+        selectionColor={appearance === 'dark' ? colors.white : colors.black}
         returnKeyType="search"
         onSubmitEditing={onSubmitEditingLocal}
         autoFocus={autoFocus}
@@ -108,31 +113,29 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   innerSearchBarView: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.grey50,
+    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
     borderRadius: 12,
     fontSize: 16,
-    color: colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     position: 'relative',
   },
-
   lensIcon: {
     marginLeft: 16,
     marginRight: 11,
-    tintColor: colors.grey200,
+    tintColor: appearance === 'dark' ? colors.grey800 : colors.grey200,
   },
   lensIconFocuses: {
-    tintColor: colors.black,
+    tintColor: appearance === 'dark' ? colors.white : colors.black,
   },
   input: {
     flex: 1,
     height: 46,
-    color: colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
   },
-  // eslint-disable-next-line react-native/no-unused-styles
   placeHolder: {
     color: colors.grey400,
   },
@@ -141,8 +144,8 @@ const styles = StyleSheet.create({
     right: 15,
   },
   closeIcon: {
-    tintColor: colors.grey200,
+    tintColor: appearance === 'dark' ? colors.grey800 : colors.grey200,
   },
-});
+}));
 
 export default SearchBarStatic;

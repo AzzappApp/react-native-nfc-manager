@@ -24,6 +24,11 @@ type Props = {
     | React.ReactElement
     | null
     | undefined;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
   contentContainerStyle?: ViewStyle;
 };
 
@@ -36,10 +41,9 @@ const SectionContactsHorizontalList = ({
   showContactAction,
   showLocationInSubtitle,
   ListFooterComponent,
+  ListHeaderComponent,
   contentContainerStyle,
 }: Props) => {
-  const styles = useStyleSheet(stylesheet);
-
   const renderItem = useCallback(
     ({
       item,
@@ -78,8 +82,9 @@ const SectionContactsHorizontalList = ({
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      contentContainerStyle={[styles.content, contentContainerStyle]}
+      contentContainerStyle={[contentContainerStyle]}
     />
   );
 };
@@ -94,10 +99,6 @@ const RenderSectionSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  flex: { flex: 1 },
-  content: {
-    marginHorizontal: 10,
-  },
   separator: {
     height: 1,
     width: '100%',

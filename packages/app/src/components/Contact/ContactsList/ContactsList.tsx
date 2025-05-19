@@ -23,6 +23,11 @@ type Props = {
       { title: string; data: ContactType[] }
     >;
   }) => JSX.Element | null;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
   ListFooterComponent?:
     | React.ComponentType<any>
     | React.ReactElement
@@ -39,6 +44,7 @@ const ContactsList = ({
   onShowContact,
   showContactAction,
   renderSectionHeader,
+  ListHeaderComponent,
   ListFooterComponent,
   contentContainerStyle,
 }: Props) => {
@@ -74,6 +80,7 @@ const ContactsList = ({
       ItemSeparatorComponent={ItemSeparator}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
       contentContainerStyle={contentContainerStyle}
     />
