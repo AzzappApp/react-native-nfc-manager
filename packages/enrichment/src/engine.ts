@@ -179,7 +179,9 @@ export const enrichContact = async (
           );
         }
 
-        const newContact = cleanObject(diffValues(initialContact, contact));
+        const newContact = deduplicateContactFields(
+          cleanObject(diffValues(initialContact, contact)),
+        );
         const newProfile = cleanObject(diffValues(initialProfile, profile));
 
         if (Object.keys(newContact).length > 0) {
@@ -291,3 +293,29 @@ function finalizeLogos<T extends { tempLogoId?: string | null }>(
     };
   });
 }
+
+export const deduplicateContactFields = (
+  contact: EnrichedContactFields,
+): EnrichedContactFields => {
+  const deduplicate = <U>(
+    items: U[] | null | undefined,
+    keyFn: (item: U) => string,
+  ): U[] | null | undefined => {
+    if (!items) return items;
+    const seen = new Set<string>();
+    return items.filter(item => {
+      const key = keyFn(item);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+  return {
+    ...contact,
+    emails: deduplicate(contact.emails, e => e.address.toLowerCase()),
+    phoneNumbers: deduplicate(contact.phoneNumbers, p => p.number),
+    socials: deduplicate(contact.socials, s => s.label),
+    urls: deduplicate(contact.urls, u => u.url),
+  };
+};
