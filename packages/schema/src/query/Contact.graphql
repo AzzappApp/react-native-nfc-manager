@@ -25,6 +25,14 @@ type Contact implements Node {
   meetingDate: DateTime
   note: String
   enrichment: ContactEnrichment
+  enrichmentStatus: EnrichmentStatus
+}
+
+enum EnrichmentStatus {
+  pending
+  running
+  completed
+  failed
 }
 
 type EnrichedContactFields {

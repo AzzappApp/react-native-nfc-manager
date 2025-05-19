@@ -1,6 +1,7 @@
 import { serve } from 'inngest/next';
 import env from '#env';
 import { inngest } from '#inngest/client';
+import { enrichContact } from '#inngest/functions/enrichContact';
 import {
   notifyWebCardUsersBatch,
   notifyWebCardUser,
@@ -18,6 +19,7 @@ export const { GET, POST, PUT } = serve({
     sendEmailSignatureBatch,
     notifyWebCardUsersBatch,
     notifyWebCardUser,
+    enrichContact,
   ],
 });
 

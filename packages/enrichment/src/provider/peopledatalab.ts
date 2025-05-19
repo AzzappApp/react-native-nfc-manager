@@ -45,9 +45,10 @@ export const peopleDataLabsEnrichment: ApiResolver = {
 
       if (response.status === 200) {
         const { data } = response;
-
+        const mediaPromises = new Map<string, Promise<void>>();
         return {
-          data: await buildContact(data),
+          data: await buildContact(data, mediaPromises),
+          mediaPromises,
         };
       }
       return null;
@@ -55,7 +56,10 @@ export const peopleDataLabsEnrichment: ApiResolver = {
   },
 };
 
-const buildContact = async (data: PersonResponse) => {
+const buildContact = async (
+  data: PersonResponse,
+  mediaPromises: Map<string, Promise<void>>,
+) => {
   const uniqueBrands = (
     data.experience?.map(position => ({
       brand: position.company?.name,
@@ -77,18 +81,20 @@ const buildContact = async (data: PersonResponse) => {
       },
       [] as Array<{ brand: string; website?: string | null }>,
     );
-
-  const logos = await Promise.all(
-    uniqueBrands.map(async ({ brand, website }) => {
-      if (brand) {
-        const logo = await downloadMediaFromBrand(brand, website);
-        return {
-          brand,
-          logoId: logo,
-        };
+  const logoIdPerBrand = new Map<string, string>();
+  uniqueBrands.forEach(({ brand, website }) => {
+    if (brand && website) {
+      const logo = downloadMediaFromBrand(website);
+      if (logo) {
+        logoIdPerBrand.set(brand, logo.mediaId);
+        mediaPromises.set(logo.mediaId, logo.promise);
       }
-    }),
-  );
+      return {
+        brand,
+        logoId: logo,
+      };
+    }
+  });
 
   return {
     contact: {
@@ -177,9 +183,8 @@ const buildContact = async (data: PersonResponse) => {
               summary: position.summary,
               startDate: position.start_date,
               endDate: position.end_date,
-              logoId: position.company?.name
-                ? logos.find(logo => logo?.brand === position.company?.name)
-                    ?.logoId
+              tempLogoId: position.company?.name
+                ? logoIdPerBrand.get(position.company.name)
                 : null,
             })),
           )
@@ -192,9 +197,8 @@ const buildContact = async (data: PersonResponse) => {
               startDate: education.start_date,
               endDate: education.end_date,
               summary: education.summary,
-              logoId: education.school?.name
-                ? logos.find(logo => logo?.brand === education.school?.name)
-                    ?.logoId
+              tempLogoId: education.school?.name
+                ? logoIdPerBrand.get(education.school?.name)
                 : null,
             })),
           )
@@ -248,8 +252,10 @@ export const peopleDataLabsIdentify: ApiResolver = {
 
     if (response.status === 200) {
       const data = response.matches[0].data;
+      const mediaPromises = new Map<string, Promise<void>>();
       return {
-        data: await buildContact(data),
+        data: await buildContact(data, mediaPromises),
+        mediaPromises,
       };
     } else {
       return {

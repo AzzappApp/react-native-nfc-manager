@@ -1,6 +1,6 @@
 import { externalFunction } from './GraphQLContext';
 import type { ContactInput } from '#__generated__/types';
-import type { Profile, WebCard } from '@azzapp/data';
+import type { Contact, Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
 import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
@@ -64,3 +64,6 @@ export const notifyWebCardUsers =
   externalFunction<(webCard: WebCard, editorUserId: string) => void>(
     'notifyWebCardUsers',
   );
+
+export const enrichContact =
+  externalFunction<(userId: string, contact: Contact) => void>('enrichContact');

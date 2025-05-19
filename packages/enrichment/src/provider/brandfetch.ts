@@ -1,3 +1,5 @@
+import { createId } from '@azzapp/data';
+import { encodeMediaId } from '@azzapp/service/mediaServices/imageHelpers';
 import env from '../env';
 import { uploadMedia } from '../media';
 
@@ -48,52 +50,48 @@ const updateUrl = (url: string, format: 'png' | 'webp'): string => {
   return updatedUrl;
 };
 
-export const downloadMediaFromBrand = async (
-  brand: string,
-  website?: string | null,
-) => {
+export const downloadMediaFromBrand = (website: string) => {
   try {
-    if (website) {
-      let hostname;
+    let hostname;
+    try {
+      const url = new URL(website);
+      hostname = url.hostname;
+    } catch {
       try {
-        const url = new URL(website);
+        const url = new URL(`http://${website}`);
         hostname = url.hostname;
       } catch {
-        try {
-          const url = new URL(`http://${website}`);
-          hostname = url.hostname;
-        } catch {
-          hostname = null;
-        }
-      }
-
-      if (hostname) {
-        // check if we can directly use the domain
-        const logo = await fetch(
-          `https://cdn.brandfetch.io/${hostname}/icon?c=${env.BRANDFETCH_CLIENT_ID}`,
-        );
-        if (logo.ok) {
-          const type = logo.headers.get('content-type') || '';
-          if (type.includes('image')) {
-            const buffer = await logo.blob();
-            const result = await uploadMedia(buffer);
-            return result;
-          }
-        }
+        hostname = null;
       }
     }
 
-    const logos = await getLogos(brand, 'webp');
+    if (hostname) {
+      const mediaId = encodeMediaId(createId(), 'image');
 
-    if (logos.length > 0) {
-      const logo = logos[0];
-      const response = await fetch(logo.uri);
-      const buffer = await response.blob();
-
-      return uploadMedia(buffer);
+      return {
+        mediaId,
+        promise: uploadLogo(mediaId, hostname),
+      };
     }
   } catch (error) {
     console.error('Error downloading media from Brandfetch:', error);
   }
   return null;
+};
+
+export const uploadLogo = async (mediaId: string, hostname: string) => {
+  const logo = await fetch(
+    `https://cdn.brandfetch.io/${hostname}/icon?c=${env.BRANDFETCH_CLIENT_ID}`,
+  );
+  if (logo.ok) {
+    const type = logo.headers.get('content-type') || '';
+    if (type.includes('image')) {
+      const buffer = await logo.blob();
+      await uploadMedia(buffer, mediaId);
+    } else {
+      throw new Error(
+        `Error fetching logo of ${hostname}: invalid content type ${type}, response ${logo.status}:  ${logo.statusText}`,
+      );
+    }
+  }
 };

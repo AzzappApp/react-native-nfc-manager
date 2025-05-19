@@ -77,6 +77,7 @@ const addContact: MutationResolvers['addContact'] = async (
     meetingPlace: address ?? null,
     note: '',
     meetingDate: new Date(),
+    enrichmentStatus: null,
   };
 
   let contact: Contact;

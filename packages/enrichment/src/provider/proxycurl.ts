@@ -1,3 +1,4 @@
+import { isDefined } from '@azzapp/shared/isDefined';
 import env from '../env';
 import { uploadMediaFromUrl } from '../media';
 import type { ApiResolver, EnrichedData } from '../types';
@@ -55,9 +56,14 @@ export const proxyCurlLookup: ApiResolver = {
 
     if (response.ok) {
       const json: ProfileLookupEnrichedResponse = await response.json();
-
+      const mediaPromises = new Map<string, Promise<void>>();
       return {
-        data: await buildDataFromResponse(json.profile, json.url),
+        data: await buildDataFromResponse(
+          json.profile,
+          mediaPromises,
+          json.url,
+        ),
+        mediaPromises,
       };
     } else {
       return {
@@ -71,128 +77,145 @@ export const proxyCurlLookup: ApiResolver = {
 };
 
 const buildDataFromResponse = async (
-  profile?: PersonProfileResponse,
+  profile: PersonProfileResponse,
+  mediaPromises: Map<string, Promise<void>>,
   linkedinProfileUrl?: string | null,
-) =>
-  profile
-    ? {
-        contact: {
-          avatarId: profile.profile_pic_url
-            ? await uploadMediaFromUrl(profile.profile_pic_url).catch(
-                () => undefined,
-              )
-            : undefined,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          company: profile.occupation,
-          title: profile.headline,
-          emails: profile.personal_emails?.map(email => ({
-            address: email,
-            label: 'Home',
-          })),
-          phoneNumbers: profile.personal_numbers?.map(phone => ({
-            number: phone,
-            label: 'Home',
-          })),
-          socials: [
-            ...(linkedinProfileUrl
-              ? [
-                  {
-                    label: 'linkedin',
-                    url: linkedinProfileUrl,
-                  } as const,
-                ]
-              : []),
-            ...(profile.extra?.twitter_profile_id
-              ? [
-                  {
-                    label: 'twitter',
-                    url: `https://x.com/${profile.extra.twitter_profile_id}`,
-                  } as const,
-                ]
-              : []),
-            ...(profile.extra?.facebook_profile_id
-              ? [
-                  {
-                    label: 'facebook',
-                    url: `https://facebook.com/${profile.extra.facebook_profile_id}`,
-                  } as const,
-                ]
-              : []),
-            ...(profile.extra?.github_profile_id
-              ? [
-                  {
-                    label: 'github',
-                    url: `https://github.com/${profile.extra.github_profile_id}`,
-                  } as const,
-                ]
-              : []),
-          ],
-        },
-        profile: {
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          title: profile.headline,
-          company: profile.occupation,
-          country: profile.country_full_name,
-          skills: profile.skills,
-          positions: await Promise.all(
-            (profile.experiences ?? [])?.map(async exp => ({
-              company: exp.company,
-              title: exp.title,
-              summary: exp.description,
-              startDate:
-                exp.starts_at?.year && exp.starts_at?.month
-                  ? new Date(
-                      exp.starts_at?.year,
-                      exp.starts_at?.month,
-                      exp.starts_at?.day,
-                    ).toISOString()
-                  : undefined,
-              endDate:
-                exp.ends_at?.year && exp.ends_at?.month
-                  ? new Date(
-                      exp.ends_at?.year,
-                      exp.ends_at?.month,
-                      exp.ends_at?.day,
-                    ).toISOString()
-                  : undefined,
-              logoId: exp.logo_url
-                ? await uploadMediaFromUrl(exp.logo_url).catch(() => undefined)
-                : undefined,
-            })),
-          ),
-          education: await Promise.all(
-            (profile.education ?? [])?.map(async edu => ({
-              school: edu.school,
-              logoId: edu.logo_url
-                ? await uploadMediaFromUrl(edu.logo_url).catch(() => undefined)
-                : undefined,
-              startDate:
-                edu.starts_at?.year && edu.starts_at?.month
-                  ? new Date(
-                      edu.starts_at?.year,
-                      edu.starts_at?.month,
-                      edu.starts_at?.day,
-                    ).toISOString()
-                  : undefined,
-              summary: edu.description,
-              endDate:
-                edu.ends_at?.year && edu.ends_at?.month
-                  ? new Date(
-                      edu.ends_at?.year,
-                      edu.ends_at?.month,
-                      edu.ends_at?.day,
-                    ).toISOString()
-                  : undefined,
-            })),
-          ),
-        },
-      }
-    : {
-        contact: {},
-        profile: {},
-      };
+) => {
+  const logos = new Set(
+    (profile.experiences?.map(exp => exp.logo_url) ?? [])
+      .concat(profile?.education?.map(edu => edu.logo_url) ?? [])
+      .filter(isDefined),
+  );
+
+  const logoIdPerUrl = new Map<string, string>();
+  logos.forEach(url => {
+    const res = uploadMediaFromUrl(url);
+
+    logoIdPerUrl.set(url, res.id);
+    mediaPromises.set(url, res.promise);
+  });
+
+  const avatar = profile?.profile_pic_url
+    ? uploadMediaFromUrl(profile.profile_pic_url)
+    : null;
+  let avatarId;
+  if (avatar) {
+    avatar.promise
+      .then(() => {
+        avatarId = avatar.id;
+      })
+      .catch(() => {
+        avatarId = undefined;
+      });
+  }
+
+  return {
+    contact: {
+      avatarId,
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      company: profile.occupation,
+      title: profile.headline,
+      emails: profile.personal_emails?.map(email => ({
+        address: email,
+        label: 'Home',
+      })),
+      phoneNumbers: profile.personal_numbers?.map(phone => ({
+        number: phone,
+        label: 'Home',
+      })),
+      socials: [
+        ...(linkedinProfileUrl
+          ? [
+              {
+                label: 'linkedin',
+                url: linkedinProfileUrl,
+              } as const,
+            ]
+          : []),
+        ...(profile.extra?.twitter_profile_id
+          ? [
+              {
+                label: 'twitter',
+                url: `https://x.com/${profile.extra.twitter_profile_id}`,
+              } as const,
+            ]
+          : []),
+        ...(profile.extra?.facebook_profile_id
+          ? [
+              {
+                label: 'facebook',
+                url: `https://facebook.com/${profile.extra.facebook_profile_id}`,
+              } as const,
+            ]
+          : []),
+        ...(profile.extra?.github_profile_id
+          ? [
+              {
+                label: 'github',
+                url: `https://github.com/${profile.extra.github_profile_id}`,
+              } as const,
+            ]
+          : []),
+      ],
+    },
+    profile: {
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      title: profile.headline,
+      company: profile.occupation,
+      country: profile.country_full_name,
+      skills: profile.skills,
+      positions: await Promise.all(
+        (profile.experiences ?? [])?.map(async exp => ({
+          company: exp.company,
+          title: exp.title,
+          summary: exp.description,
+          startDate:
+            exp.starts_at?.year && exp.starts_at?.month
+              ? new Date(
+                  exp.starts_at?.year,
+                  exp.starts_at?.month,
+                  exp.starts_at?.day,
+                ).toISOString()
+              : undefined,
+          endDate:
+            exp.ends_at?.year && exp.ends_at?.month
+              ? new Date(
+                  exp.ends_at?.year,
+                  exp.ends_at?.month,
+                  exp.ends_at?.day,
+                ).toISOString()
+              : undefined,
+          tempLogoId: exp.logo_url ? logoIdPerUrl.get(exp.logo_url) : undefined,
+        })),
+      ),
+      education: await Promise.all(
+        (profile.education ?? [])?.map(async edu => ({
+          school: edu.school,
+          tempLogoId: edu.logo_url ? logoIdPerUrl.get(edu.logo_url) : undefined,
+          startDate:
+            edu.starts_at?.year && edu.starts_at?.month
+              ? new Date(
+                  edu.starts_at?.year,
+                  edu.starts_at?.month,
+                  edu.starts_at?.day,
+                ).toISOString()
+              : undefined,
+          summary: edu.description,
+          endDate:
+            edu.ends_at?.year && edu.ends_at?.month
+              ? new Date(
+                  edu.ends_at?.year,
+                  edu.ends_at?.month,
+                  edu.ends_at?.day,
+                ).toISOString()
+              : undefined,
+        })),
+      ),
+    },
+  };
+};
 
 export const proxyCurlProfile: ApiResolver = {
   name: 'proxycurl',
@@ -248,9 +271,10 @@ export const proxyCurlProfile: ApiResolver = {
 
     if (response.ok) {
       const json: PersonProfileResponse = await response.json();
-
+      const mediaPromises = new Map<string, Promise<void>>();
       return {
-        data: await buildDataFromResponse(json),
+        data: json ? await buildDataFromResponse(json, mediaPromises) : {},
+        mediaPromises,
       };
     } else {
       return {
@@ -298,14 +322,25 @@ export const proxyCurlPicture: ApiResolver = {
         tmp_profile_pic_url: string;
       } = await response.json();
 
+      const avatar = json?.tmp_profile_pic_url
+        ? uploadMediaFromUrl(json.tmp_profile_pic_url)
+        : null;
+
+      let avatarId;
+      if (avatar) {
+        avatar.promise
+          .then(() => {
+            avatarId = avatar.id;
+          })
+          .catch(() => {
+            avatarId = undefined;
+          });
+      }
+
       return {
         data: {
           contact: {
-            avatarId: json.tmp_profile_pic_url
-              ? await uploadMediaFromUrl(json.tmp_profile_pic_url).catch(
-                  () => undefined,
-                )
-              : undefined,
+            avatarId,
           },
         },
       };

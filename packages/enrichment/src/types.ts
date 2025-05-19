@@ -35,6 +35,7 @@ export type ApiResult = {
     message?: string; // Optional error message
     httpStatusCode?: number; // Optional HTTP status code for tracking
   };
+  mediaPromises?: Map<string, Promise<void>>; // Optional media upload promises
 };
 
 // Convenience types for keys of the two sections

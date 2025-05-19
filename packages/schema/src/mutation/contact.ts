@@ -14,14 +14,11 @@ import {
   transaction,
   updateContact,
   getContactById,
-  saveContactEnrichment,
-  incrementNbEnrichments,
   getEntitiesByIds,
   getContactEnrichmentById,
   getProfileById,
   updateContactEnrichment,
 } from '@azzapp/data';
-import { enrichContact as enrich } from '@azzapp/enrichment';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
@@ -367,6 +364,7 @@ export const removeContacts: MutationResolvers['removeContacts'] = async (
 export const enrichContact: MutationResolvers['enrichContact'] = async (
   _,
   { contactId: gqlContactId },
+  { enrichContact },
 ) => {
   const user = await getSessionUser();
   if (!user) {
@@ -390,34 +388,11 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
-  const {
-    enriched: { contact, profile: publicProfile },
-    trace,
-  } = await enrich({
-    contact: existingContact,
+  await updateContact(contactId, {
+    enrichmentStatus: 'pending',
   });
 
-  const medias = [
-    contact.avatarId,
-    contact.logoId,
-    ...(publicProfile?.positions?.map(p => p.logoId) ?? []),
-    ...(publicProfile?.education?.map(e => e.logoId) ?? []),
-  ].filter(isDefined);
-
-  await checkMedias(medias);
-
-  if (Object.keys(trace).length > 0) {
-    await transaction(async () => {
-      await referencesMedias(medias, null);
-      await saveContactEnrichment({
-        contactId,
-        fields: contact,
-        publicProfile,
-        trace,
-      });
-      await incrementNbEnrichments(user.id);
-    });
-  }
+  enrichContact(user.id, existingContact);
 
   return {
     contact: existingContact,

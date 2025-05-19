@@ -118,6 +118,9 @@ export const Contact: ContactResolvers = {
     return null;
   },
   enrichment: async contact => {
-    return getContactEnrichmentByContactId(contact.id);
+    if (contact.enrichmentStatus && contact.enrichmentStatus !== 'failed') {
+      return getContactEnrichmentByContactId(contact.id);
+    }
+    return null;
   },
 };

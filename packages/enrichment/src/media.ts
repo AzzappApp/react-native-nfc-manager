@@ -2,8 +2,11 @@ import { createMedia, createId } from '@azzapp/data';
 import { encodeMediaId } from '@azzapp/service/mediaServices/imageHelpers';
 import { createPresignedUpload } from '@azzapp/service/mediaServices/mediaServices';
 
-export const uploadMedia = async (buffer: Blob): Promise<string> => {
-  const mediaId = encodeMediaId(createId(), 'image');
+export const uploadMedia = async (
+  buffer: Blob,
+  givenMediaId?: string,
+): Promise<string> => {
+  const mediaId = givenMediaId ?? encodeMediaId(createId(), 'image');
 
   await createMedia({
     id: mediaId,
@@ -38,11 +41,22 @@ export const uploadMedia = async (buffer: Blob): Promise<string> => {
   return result.public_id;
 };
 
-export const uploadMediaFromUrl = async (url: string): Promise<string> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch image from ${url}`);
-  }
-  const blob = await res.blob();
-  return uploadMedia(blob);
+export const uploadMediaFromUrl = (url: string) => {
+  const mediaId = encodeMediaId(createId(), 'image');
+
+  const promise = fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Failed to fetch image from ${url}`);
+      }
+      return res.blob();
+    })
+    .then(blob => {
+      uploadMedia(blob, mediaId);
+    });
+
+  return {
+    id: mediaId,
+    promise,
+  };
 };

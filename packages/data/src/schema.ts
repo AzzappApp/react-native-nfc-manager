@@ -991,6 +991,12 @@ export const ContactTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
     note: cols.text(),
+    enrichmentStatus: cols.enum('enrichmentStatus', [
+      'pending',
+      'running',
+      'completed',
+      'failed',
+    ]),
   },
   table => {
     return {
@@ -1097,6 +1103,7 @@ export type Position = {
   startDate?: string | null;
   endDate?: string | null;
   logoId?: string | null;
+  tempLogoId?: string | null;
 };
 
 export type Education = {
@@ -1105,6 +1112,7 @@ export type Education = {
   school?: string | null;
   logoId?: string | null;
   summary?: string | null;
+  tempLogoId?: string | null;
 };
 
 export type PublicProfile = {

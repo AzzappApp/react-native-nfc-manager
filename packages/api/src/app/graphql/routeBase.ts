@@ -45,7 +45,6 @@ import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import { inngest } from '#inngest/client';
 import packageJSON from '../../../package.json';
-import type { WebCard } from '@azzapp/data';
 import type { Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -175,7 +174,7 @@ const { handleRequest } = createYoga({
       notifyGooglePassWallet: notifyGooglePassWallet(apiEndpoint),
       apiEndpoint,
       intl: createServerIntl(locale ?? DEFAULT_LOCALE),
-      sendEmailSignatures: async (profileIds: string[], webCard: WebCard) => {
+      sendEmailSignatures: async (profileIds, webCard) => {
         waitUntil(
           inngest
             .send({
@@ -190,7 +189,7 @@ const { handleRequest } = createYoga({
             }),
         );
       },
-      notifyWebCardUsers: async (webCard: WebCard, editorUserId: string) => {
+      notifyWebCardUsers: async (webCard, editorUserId) => {
         if (webCard.isMultiUser) {
           waitUntil(
             inngest
@@ -206,6 +205,21 @@ const { handleRequest } = createYoga({
               }),
           );
         }
+      },
+      enrichContact: async (userId, contact) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'send/enrichContact',
+              data: {
+                userId,
+                contact,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
       },
     };
   },
