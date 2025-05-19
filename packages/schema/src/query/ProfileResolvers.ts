@@ -18,7 +18,6 @@ import {
   searchContacts,
   getActiveContactCardAccess,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -56,7 +55,7 @@ import type {
   ProfileResolvers,
 } from '#/__generated__/types';
 import type { PexelsSearchResult } from '#helpers/pexelsClient';
-import type { Profile, User } from '@azzapp/data';
+import type { Profile } from '@azzapp/data';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
 import type { Photo, Video } from 'pexels';
 
@@ -178,21 +177,11 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       !profileIsAssociatedToCurrentUser(profile) &&
       !(await hasWebCardProfileRight(profile.webCardId))
     ) {
-      // TODO schema error, the field should be nullable, but it's not until we
-      // can change the schema, we return a fake user here
-      return {
-        id: profile.userId,
-        ...fakeUser,
-      };
+      return null;
     }
     const user = await userLoader.load(profile.userId);
     if (!user || user.deleted) {
-      // TODO schema error, the field should be nullable, but it's not until we
-      // can change the schema, we return a fake user here
-      return {
-        id: profile.userId,
-        ...fakeUser,
-      };
+      return null;
     }
     return user;
   },
@@ -732,30 +721,4 @@ const getContactCardUrl = async ({
     geolocation,
   );
   return url;
-};
-
-const fakeUser: Omit<User, 'id'> = {
-  createdAt: new Date(),
-  deletedAt: null,
-  email: null,
-  phoneNumber: null,
-  roles: [],
-  updatedAt: new Date(),
-  deleted: false,
-  deletedBy: null,
-  emailConfirmed: false,
-  phoneNumberConfirmed: false,
-  invited: false,
-  locale: DEFAULT_LOCALE,
-  note: null,
-  password: null,
-  termsOfUseAcceptedVersion: null,
-  termsOfUseAcceptedAt: null,
-  hasAcceptedCommunications: false,
-  replacedBy: null,
-  nbFreeScans: 0,
-  userContactData: null,
-  appleId: null,
-  cookiePreferences: null,
-  nbEnrichments: 0,
 };
