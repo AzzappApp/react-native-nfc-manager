@@ -1,3 +1,7 @@
+## 1.9.26-rc.10
+
+
+
 ## 1.9.26-rc.9
 
 * **feat:**  - [#8777](https://github.com/AzzappApp/azzapp/pull/8777) add link to switch to offline mode in loader ([#8782](https://github.com/AzzappApp/azzapp/pull/8782))
