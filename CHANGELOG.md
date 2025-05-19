@@ -1,3 +1,7 @@
+## 1.10.0-canary.221
+
+* **feat:**  - **enrichment:** set enrichment as async process ([#8820](https://github.com/AzzappApp/azzapp/pull/8820))
+
 ## 1.10.0-canary.220
 
 * **feat:**  - **Contact:** Grouped contact for a user ([#8818](https://github.com/AzzappApp/azzapp/pull/8818))
