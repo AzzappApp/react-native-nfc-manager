@@ -1120,8 +1120,34 @@ export type PublicProfile = {
 };
 
 export type EnrichedContactFields = Partial<
-  NullableFields<Omit<Contact, 'contactProfileId' | 'id' | 'ownerProfileId'>>
+  NullableFields<
+    Omit<
+      Contact,
+      | 'contactProfileId'
+      | 'createdAt'
+      | 'deleted'
+      | 'deletedAt'
+      | 'deletedBy'
+      | 'id'
+      | 'meetingDate'
+      | 'meetingLocation'
+      | 'meetingPlace'
+      | 'note'
+      | 'ownerProfileId'
+      | 'type'
+    >
+  >
 >;
+
+export type EnrichedContactHiddenFields = {
+  contact?: {
+    [K in keyof EnrichedContactFields]?: NonNullable<
+      EnrichedContactFields[K]
+    > extends any[]
+      ? boolean[] | null
+      : boolean | null;
+  };
+};
 
 export const ContactEnrichmentTable = cols.table(
   'ContactEnrichment',
@@ -1136,6 +1162,9 @@ export const ContactEnrichmentTable = cols.table(
     publicProfile: cols.json('publicProfile').$type<PublicProfile>(),
     approved: cols.boolean('approved'),
     trace: cols.json('trace').$type<Record<string, string>>(),
+    hiddenFields: cols
+      .json('hiddenFields')
+      .$type<EnrichedContactHiddenFields>(),
   },
   table => ({
     pk: cols.index('contactId_idx').on(table.contactId, table.enrichedAt),

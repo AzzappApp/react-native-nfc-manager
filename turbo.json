@@ -16,7 +16,7 @@
     "app:build": { "dependsOn": ["build", "//#relay:build"] },
     "//#graphql-codegen": {
       "dependsOn": [],
-      "inputs": ["packages/schema/**/*.graphql"],
+      "inputs": ["packages/schema/**/*.graphql", "./codegen.yml"],
       "outputs": ["./schema.graphql", "./packages/schema/src/__generated__/**"]
     },
     "lint": {}

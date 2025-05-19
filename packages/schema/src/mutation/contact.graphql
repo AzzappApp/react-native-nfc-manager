@@ -14,9 +14,12 @@ extend type Mutation {
     input: RemoveContactsInput!
   ): RemoveContactPayload
 
-  enrichContact(
-    contactId: ID!
-  ): ContactPayload
+  enrichContact(contactId: ID!): ContactPayload
+
+  updateContactEnrichmentHiddenFields(
+    contactEnrichmentId: ID!
+    input: HiddenFieldInput!
+  ): ContactEnrichmentPayload!
 }
 
 input ContactInput {
@@ -67,6 +70,10 @@ type ContactPayload {
   contact: Contact!
 }
 
+type ContactEnrichmentPayload {
+  contactEnrichment: ContactEnrichment!
+}
+
 enum ContactType {
   contact
   shareback
@@ -78,4 +85,23 @@ input RemoveContactsInput {
 
 type RemoveContactPayload {
   removedContactIds: [ID!]!
+}
+
+input HiddenFieldInput {
+  contact: HiddenContactFieldsInput!
+}
+
+input HiddenContactFieldsInput {
+  firstName: Boolean
+  lastName: Boolean
+  company: Boolean
+  title: Boolean
+  birthday: Boolean
+  avatarId: Boolean
+  phoneNumbers: [Boolean!]
+  emails: [Boolean!]
+  addresses: [Boolean!]
+  socials: [Boolean!]
+  urls: [Boolean!]
+  logoId: Boolean
 }

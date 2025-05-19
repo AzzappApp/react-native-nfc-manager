@@ -1,7 +1,12 @@
-import { getWebCardByProfileId, getEnrichmentByContactId } from '@azzapp/data';
+import {
+  getWebCardByProfileId,
+  getContactEnrichmentByContactId,
+} from '@azzapp/data';
 import { profileLoader } from '#loaders';
+import { filterHiddenContactFields } from '#helpers/contactHelpers';
 import { idResolver } from '#helpers/relayIdHelpers';
 import type {
+  ContactEnrichmentResolvers,
   ContactResolvers,
   EducationResolvers,
   EnrichedContactFieldsResolvers,
@@ -69,6 +74,15 @@ export const PublicProfile: PublicProfileResolvers = {
   },
 };
 
+export const ContactEnrichment: ContactEnrichmentResolvers = {
+  id: idResolver('ContactEnrichment'),
+  fields: enrichment => {
+    return enrichment.fields
+      ? filterHiddenContactFields(enrichment.fields, enrichment.hiddenFields)
+      : null;
+  },
+};
+
 export const Contact: ContactResolvers = {
   id: idResolver('Contact'),
   avatar: contact => {
@@ -103,8 +117,6 @@ export const Contact: ContactResolvers = {
     return null;
   },
   enrichment: async contact => {
-    const enrichment = await getEnrichmentByContactId(contact.id);
-
-    return enrichment;
+    return getContactEnrichmentByContactId(contact.id);
   },
 };

@@ -62,4 +62,5 @@ export type {
   Position,
   Education,
   ContactEnrichment,
+  EnrichedContactHiddenFields,
 } from './schema';

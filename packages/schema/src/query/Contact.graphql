@@ -23,7 +23,7 @@ type Contact implements Node {
   meetingPlace: Address
   meetingDate: DateTime
   note: String
-  enrichment: Enrichment
+  enrichment: ContactEnrichment
 }
 
 type EnrichedContactFields {
@@ -44,7 +44,8 @@ type EnrichedContactFields {
   logo: Media
 }
 
-type Enrichment {
+type ContactEnrichment {
+  id: ID!
   fields: EnrichedContactFields
   publicProfile: PublicProfile
 }
