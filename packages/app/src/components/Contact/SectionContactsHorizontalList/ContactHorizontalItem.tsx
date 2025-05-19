@@ -6,12 +6,11 @@ import useImageFromContact from '#hooks/useImageFromContact';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from '../ContactAvatar';
 import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 
 type Props = {
   contact: ContactType;
   onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
+  showContactAction: (arg: ContactType) => void;
 };
 
 const ContactHorizontalItem = ({
@@ -38,9 +37,7 @@ const ContactHorizontalItem = ({
   }, [contact.webCardUserName, contact.firstName, contact.lastName]);
 
   const onMore = useCallback(() => {
-    showContactAction({
-      contact,
-    });
+    showContactAction(contact);
   }, [contact, showContactAction]);
 
   const avatarSource = useImageFromContact(contact);

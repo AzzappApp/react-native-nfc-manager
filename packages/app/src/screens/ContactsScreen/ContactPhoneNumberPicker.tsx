@@ -4,10 +4,10 @@ import { FormattedMessage } from 'react-intl';
 import { BackHandler, Linking, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import { useContactPhoneLabels } from '#helpers/contactHelpers';
+import { getWhatsAppUrl } from '#helpers/whatsAppHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import { getWhatsAppUrl } from './isWhatsappSupportedContext';
 import type { ContactPhoneNumberType } from '#helpers/contactTypes';
 
 type ContactPhoneNumberPickerProps = {

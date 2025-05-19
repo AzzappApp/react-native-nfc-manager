@@ -3,6 +3,9 @@ extend type Mutation {
     profileId: ID!
     input: removeContactsFromWebCardInput!
   ): removeContactsFromWebCardPayload
+  @deprecated(
+    reason: "No longer used. Use removeContacts instead."
+  )
 }
 
 input removeContactsFromWebCardInput {

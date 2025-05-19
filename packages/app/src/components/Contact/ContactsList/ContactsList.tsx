@@ -4,8 +4,11 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsListItem from './ContactsListItem';
 import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
-import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
+import type {
+  SectionListData,
+  SectionListRenderItemInfo,
+  ViewStyle,
+} from 'react-native';
 
 type Props = {
   sections: Array<{ title: string; data: ContactType[] }>;
@@ -13,14 +16,19 @@ type Props = {
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
-  listFooterComponent: JSX.Element;
+  showContactAction: (arg: ContactType) => void;
   renderSectionHeader: (args: {
     section: SectionListData<
       ContactType,
       { title: string; data: ContactType[] }
     >;
   }) => JSX.Element | null;
+  ListFooterComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  contentContainerStyle?: ViewStyle;
 };
 
 const ContactsList = ({
@@ -30,8 +38,9 @@ const ContactsList = ({
   refreshing,
   onShowContact,
   showContactAction,
-  listFooterComponent,
   renderSectionHeader,
+  ListFooterComponent,
+  contentContainerStyle,
 }: Props) => {
   const renderListItem = useCallback(
     ({
@@ -63,9 +72,10 @@ const ContactsList = ({
       refreshing={refreshing}
       onRefresh={onRefresh}
       ItemSeparatorComponent={ItemSeparator}
-      ListFooterComponent={listFooterComponent}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
+      ListFooterComponent={ListFooterComponent}
+      contentContainerStyle={contentContainerStyle}
     />
   );
 };

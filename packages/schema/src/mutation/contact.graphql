@@ -10,7 +10,7 @@ extend type Mutation {
   ): ContactPayload
 
   removeContacts(
-    profileId: ID!
+    profileId: ID @deprecated(reason: "No longer used")
     input: RemoveContactsInput!
   ): RemoveContactPayload
 

@@ -3,6 +3,11 @@ import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Image as ImageCompressor } from 'react-native-compressor';
+import {
+  ConnectionHandler,
+  type RecordProxy,
+  type RecordSourceProxy,
+} from 'relay-runtime';
 import VCard from 'vcard-creator';
 import * as z from 'zod';
 import {
@@ -369,3 +374,358 @@ export const contactSchema = z
   );
 
 export type contactFormValues = z.infer<typeof contactSchema>;
+
+const getContactsConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  connectionName: string,
+) => {
+  const userContactsConnectionId = ConnectionHandler.getConnectionID(
+    user.getDataID(),
+    connectionName,
+  );
+  return userContactsConnectionId ? store.get(userContactsConnectionId) : null;
+};
+
+const getContactsByDateConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnection(store, user, 'currentUser_contactsByDates');
+};
+
+const getContactsByLocationConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnection(store, user, 'currentUser_contactsByLocation');
+};
+const getContactsByNameConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnection(store, user, 'currentUser_contacts');
+};
+
+export const addContactUpdater = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  newContact: RecordProxy,
+) => {
+  // Update currentUser nbContacts
+  const userNbContacts = user.getValue('nbContacts');
+  if (typeof userNbContacts === 'number') {
+    user.setValue(userNbContacts + 1, 'nbContacts');
+  }
+
+  // Update user by date connection
+
+  const userByDatesConnection = getContactsByDateConnection(store, user);
+  if (userByDatesConnection) {
+    const meetingDate = newContact.getValue('meetingDate');
+    if (meetingDate) {
+      const date = new Date(meetingDate.toString());
+      const dateEdge = userByDatesConnection
+        .getLinkedRecords('edges')
+        ?.find(edge => {
+          const node = edge?.getLinkedRecord('node');
+          if (!node) {
+            return false;
+          }
+          const edgeDateStr = node.getValue('date');
+          if (typeof edgeDateStr !== 'string') {
+            return false;
+          }
+          const edgeDate = new Date(edgeDateStr);
+          return (
+            edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
+            edgeDate.getUTCMonth() === date.getUTCMonth() &&
+            edgeDate.getUTCDate() === date.getUTCDate()
+          );
+        });
+      if (dateEdge) {
+        const dateEdgeNode = dateEdge.getLinkedRecord('node');
+        const nbContacts = dateEdgeNode?.getValue('nbContacts');
+        dateEdgeNode?.setValue(
+          typeof nbContacts === 'number' ? nbContacts + 1 : 1,
+          'nbContacts',
+        );
+        dateEdgeNode?.setLinkedRecords(
+          [newContact, ...(dateEdgeNode?.getLinkedRecords('contacts') ?? [])],
+          'contacts',
+        );
+      } else {
+        const node = store.create(
+          `${user.getDataID()}_${date.toISOString()}`,
+          'ContactsByDate',
+        );
+        node.setValue(date.toISOString(), 'date');
+        node.setLinkedRecords([newContact], 'contacts');
+        node.setValue(1, 'nbContacts');
+        const newDateEdge = ConnectionHandler.createEdge(
+          store,
+          userByDatesConnection,
+          node,
+          'ContactsByDateEdge',
+        );
+        const nextEdge = userByDatesConnection
+          .getLinkedRecords('edges')
+          ?.find(edge => {
+            const node = edge?.getLinkedRecord('node');
+            if (!node) {
+              return false;
+            }
+            const edgeDateStr = node.getValue('date');
+            if (typeof edgeDateStr !== 'string') {
+              return false;
+            }
+            const edgeDate = new Date(edgeDateStr);
+            return edgeDate < date;
+          });
+        ConnectionHandler.insertEdgeBefore(
+          userByDatesConnection,
+          newDateEdge,
+          nextEdge?.getValue('cursor') as string | undefined,
+        );
+      }
+    }
+  }
+
+  // Update user by name connection
+  const userContactsConnection = getContactsByNameConnection(store, user);
+  if (userContactsConnection) {
+    const edge = ConnectionHandler.createEdge(
+      store,
+      userContactsConnection,
+      newContact,
+      'ContactEdge',
+    );
+
+    const getCursorForContact = (contact: RecordProxy): string =>
+      [
+        contact.getValue('lastName'),
+        contact.getValue('firstName'),
+        contact.getValue('company'),
+        contact.getLinkedRecord('webCard')?.getValue('userName'),
+        contact.getValue('id'),
+      ]
+        .filter(Boolean)
+        .join('\u0001');
+
+    const cursorCompare = getCursorForContact(newContact);
+    const prevRecordEdge = userContactsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const cursor = getCursorForContact(node);
+        return cursor > cursorCompare;
+      });
+
+    ConnectionHandler.insertEdgeBefore(
+      userContactsConnection,
+      edge,
+      prevRecordEdge?.getValue('cursor') as string | undefined,
+    );
+  }
+
+  // Update user by location connection
+  const userByLocationsConnection = getContactsByLocationConnection(
+    store,
+    user,
+  );
+  if (userByLocationsConnection) {
+    const meetingPlace = newContact.getLinkedRecord('meetingPlace');
+    const location: string | null = meetingPlace
+      ? (getFriendlyNameFromLocation({
+          city: meetingPlace?.getValue('city') as string | null,
+          region: meetingPlace?.getValue('region') as string | null,
+          subregion: meetingPlace?.getValue('subregion') as string | null,
+          country: meetingPlace?.getValue('country') as string | null,
+        }) ?? null)
+      : null;
+
+    const locationEdge = userByLocationsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const locationName = node.getValue('location');
+        return (locationName ?? null) === location;
+      });
+
+    if (locationEdge) {
+      const locationEdgeNode = locationEdge.getLinkedRecord('node');
+      const nbContacts = locationEdgeNode?.getValue('nbContacts');
+      locationEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts + 1 : 1,
+        'nbContacts',
+      );
+      locationEdgeNode?.setLinkedRecords(
+        [newContact, ...(locationEdgeNode?.getLinkedRecords('contacts') ?? [])],
+        'contacts',
+      );
+    } else {
+      const node = store.create(
+        `${user.getDataID()}_${location}`,
+        'ContactsByLocation',
+      );
+      node.setValue(location, 'location');
+      node.setLinkedRecords([newContact], 'contacts');
+      node.setValue(1, 'nbContacts');
+      const newLocationEdge = ConnectionHandler.createEdge(
+        store,
+        userByLocationsConnection,
+        node,
+        'ContactsByLocationEdge',
+      );
+      if (location) {
+        const nextEdge = userByLocationsConnection
+          .getLinkedRecords('edges')
+          ?.find(edge => {
+            const node = edge?.getLinkedRecord('node');
+            if (!node) {
+              return false;
+            }
+            const locationName = node.getValue('location');
+            if (typeof locationName !== 'string') {
+              //Every valid location is before the null one
+              return true;
+            }
+            return locationName > location;
+          });
+        ConnectionHandler.insertEdgeBefore(
+          userByLocationsConnection,
+          newLocationEdge,
+          nextEdge?.getValue('cursor') as string | undefined,
+        );
+      } else {
+        ConnectionHandler.insertEdgeAfter(
+          userByLocationsConnection,
+          newLocationEdge,
+        );
+      }
+    }
+  }
+};
+
+export const removeContactUpdater = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  contactID: string,
+) => {
+  const deleteContact = store.get(contactID);
+  if (!deleteContact) {
+    return;
+  }
+  // Update currentUser nbContacts
+  const userNbContacts = user.getValue('nbContacts');
+  if (typeof userNbContacts === 'number') {
+    user.setValue(userNbContacts - 1, 'nbContacts');
+  }
+  // Update user by date connection
+  const userByDatesConnection = getContactsByDateConnection(store, user);
+  if (userByDatesConnection) {
+    const meetingDate = deleteContact.getValue('meetingDate');
+    if (meetingDate) {
+      const date = new Date(meetingDate.toString());
+      const dateEdge = userByDatesConnection
+        .getLinkedRecords('edges')
+        ?.find(edge => {
+          const node = edge?.getLinkedRecord('node');
+          if (!node) {
+            return false;
+          }
+          const edgeDateStr = node.getValue('date');
+          if (typeof edgeDateStr !== 'string') {
+            return false;
+          }
+          const edgeDate = new Date(edgeDateStr);
+          return (
+            edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
+            edgeDate.getUTCMonth() === date.getUTCMonth() &&
+            edgeDate.getUTCDate() === date.getUTCDate()
+          );
+        });
+      if (dateEdge) {
+        const dateEdgeNode = dateEdge.getLinkedRecord('node');
+        const nbContacts = dateEdgeNode?.getValue('nbContacts');
+        dateEdgeNode?.setValue(
+          typeof nbContacts === 'number' ? nbContacts - 1 : 0,
+          'nbContacts',
+        );
+        const dateEdgeContacts =
+          dateEdgeNode
+            ?.getLinkedRecords('contacts')
+            ?.filter(contact => contact.getDataID() !== contactID) ?? [];
+
+        if (dateEdgeNode && dateEdgeContacts.length === 0) {
+          ConnectionHandler.deleteNode(
+            userByDatesConnection,
+            dateEdgeNode.getDataID(),
+          );
+        } else {
+          dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
+        }
+      }
+    }
+  }
+
+  const userContactsConnection = getContactsByNameConnection(store, user);
+  if (userContactsConnection) {
+    ConnectionHandler.deleteNode(userContactsConnection, contactID);
+  }
+  // Update user by location connection
+  const userByLocationsConnection = getContactsByLocationConnection(
+    store,
+    user,
+  );
+  if (userByLocationsConnection) {
+    const meetingPlace = deleteContact.getLinkedRecord('meetingPlace');
+    const location: string | null = meetingPlace
+      ? (getFriendlyNameFromLocation({
+          city: meetingPlace?.getValue('city') as string | null,
+          region: meetingPlace?.getValue('region') as string | null,
+          subregion: meetingPlace?.getValue('subregion') as string | null,
+          country: meetingPlace?.getValue('country') as string | null,
+        }) ?? null)
+      : null;
+
+    const locationEdge = userByLocationsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const locationName = node.getValue('location');
+        return (locationName ?? null) === location;
+      });
+
+    if (locationEdge) {
+      const locationEdgeNode = locationEdge.getLinkedRecord('node');
+      const nbContacts = locationEdgeNode?.getValue('nbContacts');
+      locationEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts - 1 : 0,
+        'nbContacts',
+      );
+      const locationEdgeContacts =
+        locationEdgeNode
+          ?.getLinkedRecords('contacts')
+          ?.filter(contact => contact.getDataID() !== contactID) ?? [];
+
+      if (locationEdgeNode && locationEdgeContacts.length === 0) {
+        ConnectionHandler.deleteNode(
+          userByLocationsConnection,
+          locationEdgeNode.getDataID(),
+        );
+      } else {
+        locationEdgeNode?.setLinkedRecords(locationEdgeContacts, 'contacts');
+      }
+    }
+  }
+};

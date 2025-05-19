@@ -2,27 +2,37 @@ import { Image } from 'expo-image';
 import parsePhoneNumberFromString, {
   isValidPhoneNumber,
 } from 'libphonenumber-js';
-import { memo } from 'react';
+import { Suspense, use } from 'react';
 import { Linking, StyleSheet } from 'react-native';
+import { getWhatsAppUrl, isWhatsAppSupported } from '#helpers/whatsAppHelpers';
 import useBoolean from '#hooks/useBoolean';
 import ContactPhoneNumberPicker from '#screens/ContactsScreen/ContactPhoneNumberPicker';
-import {
-  getWhatsAppUrl,
-  useIsWhatsAppSupportedContext,
-} from '#screens/ContactsScreen/isWhatsappSupportedContext';
 import PressableNative from '#ui/PressableNative';
 import type { ContactPhoneNumberType } from '#helpers/contactTypes';
 import type { PressableNativeProps } from '#ui/PressableNative';
 
-const WhatsappButton = ({
+type WhatsappButtonProps = PressableNativeProps & {
+  phoneNumbers?: ContactPhoneNumberType[] | null;
+};
+
+const WhatsappButton = (props: WhatsappButtonProps) => {
+  return (
+    <Suspense>
+      <WhatsappButtonInner {...props} />
+    </Suspense>
+  );
+};
+
+export default WhatsappButton;
+
+const WhatsappButtonInner = ({
   phoneNumbers,
   ...props
-}: PressableNativeProps & {
-  phoneNumbers?: ContactPhoneNumberType[] | null;
-}) => {
+}: WhatsappButtonProps) => {
   // check whatsapp is installed
-  const isWhatsappSupported = useIsWhatsAppSupportedContext();
   const [pickerDisplayed, showPicker, hidePicker] = useBoolean(false);
+
+  const whatsAppSupported = use(isWhatsAppSupported());
 
   // filter out invalid phone numbers
   const validPhoneNumbers = phoneNumbers?.filter(
@@ -40,7 +50,7 @@ const WhatsappButton = ({
 
   // check contact has phone number
   if (
-    !isWhatsappSupported ||
+    !whatsAppSupported ||
     !validPhoneNumbers ||
     validPhoneNumbers.length === 0
   ) {
@@ -75,5 +85,3 @@ const WhatsappButton = ({
 const styles = StyleSheet.create({
   image: { width: 31, height: 31 },
 });
-
-export default memo(WhatsappButton);

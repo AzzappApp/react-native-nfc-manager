@@ -15,7 +15,7 @@ module.exports = {
       output: 'packages/app/src/relayArtifacts',
       customScalarTypes: {
         JSON: 'Record<string, unknown>',
-        DateTime: 'Date',
+        DateTime: 'string',
       },
       featureFlags: {},
       eagerEsModules: false,

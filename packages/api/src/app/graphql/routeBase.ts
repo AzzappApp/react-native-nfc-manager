@@ -26,6 +26,11 @@ import {
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
 import { schema, type GraphQLContext } from '@azzapp/schema';
+import {
+  getPerformanceLogs,
+  isPerformanceLoggingEnabled,
+  startPerformanceLogging,
+} from '@azzapp/schema/schema';
 import { createServerIntl } from '@azzapp/service/i18nServices';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import { checkServerAuth } from '@azzapp/service/serverAuthServices';
@@ -215,9 +220,7 @@ const { handleRequest } = createYoga({
           if (eventName === 'execute-end') {
             const infos = getDatabaseConnectionsInfos();
             if (infos) {
-              const gqlName = /query\s*(\S+)\s*[{(]/g.exec(
-                args.contextValue.params.query,
-              )?.[1];
+              const gqlName = getQueryName(args.contextValue.params.query);
               console.log(
                 `-------------------- Graphql Query : ${gqlName} --------------------`,
               );
@@ -231,6 +234,74 @@ const { handleRequest } = createYoga({
                 '----------------------------------------------------------------',
               );
             }
+          }
+        }
+        if (isPerformanceLoggingEnabled()) {
+          if (eventName === 'execute-start') {
+            startPerformanceLogging();
+          }
+          if (eventName === 'execute-end') {
+            const gqlName = getQueryName(args.contextValue.params.query);
+            const performanceLogs = getPerformanceLogs();
+            console.log(
+              `-------------------- Graphql Query : ${gqlName} Performance Summary --------------------`,
+            );
+            if (!performanceLogs) {
+              console.log('No fields recorded.');
+              return;
+            }
+
+            const queryDuration =
+              performance.now() - performanceLogs.requestStart;
+            console.log(`Total query duration: ${queryDuration}ms`);
+
+            if (performanceLogs.fieldLogs.length === 0) {
+              console.log('No fields recorded.');
+              return;
+            }
+            const fieldStats = new Map<
+              string,
+              { count: number; total: number; min: number; max: number }
+            >();
+
+            for (const log of performanceLogs.fieldLogs) {
+              const stats = fieldStats.get(log.path) ?? {
+                count: 0,
+                total: 0,
+                min: log.duration,
+                max: log.duration,
+              };
+
+              stats.count += 1;
+              stats.total += log.duration;
+              stats.min = Math.min(stats.min, log.duration);
+              stats.max = Math.max(stats.max, log.duration);
+
+              fieldStats.set(log.path, stats);
+            }
+            const sortedFieldStats = Array.from(fieldStats.entries())
+              .map(
+                ([path, stats]) =>
+                  [
+                    path,
+                    {
+                      path,
+                      count: Math.round(stats.count),
+                      avg: Math.round(stats.total / stats.count),
+                      min: Math.round(stats.min),
+                      max: Math.round(stats.max),
+                    },
+                  ] as const,
+              )
+              .sort(([, a], [, b]) => b.avg - a.avg);
+            for (const [path, stats] of sortedFieldStats) {
+              console.log(
+                `${path} — calls: ${stats.count}, avg: ${stats.avg}ms, min: ${stats.min}ms, max: ${stats.max}ms`,
+              );
+            }
+            console.log(
+              '----------------------------------------------------------------',
+            );
           }
         }
       },
@@ -369,3 +440,11 @@ const notifyGooglePassWallet =
       })(),
     );
   };
+
+const getQueryName = (query: string) => {
+  const queryName = /query\s*(\S+)\s*[{(]/g.exec(query)?.[1];
+  if (!queryName) {
+    return `Unnamed query`;
+  }
+  return queryName;
+};

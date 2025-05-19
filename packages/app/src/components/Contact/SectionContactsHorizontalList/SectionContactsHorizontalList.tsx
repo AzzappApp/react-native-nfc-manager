@@ -4,19 +4,27 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsScreenSection from './ContactsHorizontalList';
 import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
-import type { ListRenderItemInfo } from 'react-native';
+import type { ListRenderItemInfo, ViewStyle } from 'react-native';
 
 type Props = {
-  sections: Array<{ title: string; data: ContactType[] }>;
+  sections: Array<{
+    title: string;
+    count?: number;
+    onSeeAll?: () => void;
+    contacts: ContactType[];
+  }>;
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
   onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
-  listFooterComponent: JSX.Element;
-  onPressAll?: (title: string) => void;
+  showContactAction: (arg: ContactType | ContactType[]) => void;
   showLocationInSubtitle?: boolean;
+  ListFooterComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  contentContainerStyle?: ViewStyle;
 };
 
 const SectionContactsHorizontalList = ({
@@ -26,26 +34,34 @@ const SectionContactsHorizontalList = ({
   refreshing,
   onShowContact,
   showContactAction,
-  listFooterComponent,
-  onPressAll,
   showLocationInSubtitle,
+  ListFooterComponent,
+  contentContainerStyle,
 }: Props) => {
   const styles = useStyleSheet(stylesheet);
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<{ title: string; data: ContactType[] }>) => {
+    ({
+      item,
+    }: ListRenderItemInfo<{
+      title: string;
+      count?: number;
+      contacts: ContactType[];
+      onSeeAll?: () => void;
+    }>) => {
       return (
         <ContactsScreenSection
-          data={item.data}
+          contacts={item.contacts}
           onShowContact={onShowContact}
           title={item.title}
           showContactAction={showContactAction}
-          onPressAll={onPressAll}
+          onSeeAll={item.onSeeAll}
+          count={item.count}
           showLocationInSubtitle={showLocationInSubtitle}
         />
       );
     },
-    [showLocationInSubtitle, onPressAll, onShowContact, showContactAction],
+    [showLocationInSubtitle, onShowContact, showContactAction],
   );
 
   return (
@@ -56,14 +72,14 @@ const SectionContactsHorizontalList = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
       snapToAlignment="start"
       decelerationRate="fast"
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
-      ListFooterComponent={listFooterComponent}
+      ListFooterComponent={ListFooterComponent}
+      contentContainerStyle={[styles.content, contentContainerStyle]}
     />
   );
 };

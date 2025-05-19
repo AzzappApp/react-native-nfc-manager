@@ -11,12 +11,11 @@ import Text from '#ui/Text';
 import ContactAvatar from '../ContactAvatar';
 import WhatsappButton from '../WhatsappButton';
 import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 
-type Props = {
+type ContactListItemProps = {
   contact: ContactType;
   onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg?: ContactActionProps) => void;
+  showContactAction: (arg: ContactType) => void;
 };
 
 const COVER_WIDTH = 35;
@@ -25,15 +24,13 @@ const ContactListItem = ({
   contact,
   onShowContact,
   showContactAction,
-}: Props) => {
+}: ContactListItemProps) => {
   const onShow = useCallback(() => {
     onShowContact(contact);
   }, [contact, onShowContact]);
 
   const onMore = useCallback(() => {
-    showContactAction({
-      contact,
-    });
+    showContactAction(contact);
   }, [contact, showContactAction]);
 
   const avatarSource = useImageFromContact(contact);

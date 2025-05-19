@@ -1,6 +1,6 @@
+import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
-
 import {
   createContact as createNewContact,
   getContactByProfiles,
@@ -16,6 +16,7 @@ import {
   getContactById,
   saveContactEnrichment,
   incrementNbEnrichments,
+  getEntitiesByIds,
   getContactEnrichmentById,
   getProfileById,
   updateContactEnrichment,
@@ -39,7 +40,7 @@ import {
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
-import type { Contact, ContactRow, NewContact } from '@azzapp/data';
+import type { Contact, ContactRow, NewContact, Profile } from '@azzapp/data';
 
 export const createContact: MutationResolvers['createContact'] = async (
   _,
@@ -309,32 +310,57 @@ export const saveContact: MutationResolvers['saveContact'] = async (
 
 export const removeContacts: MutationResolvers['removeContacts'] = async (
   _,
-  { profileId: gqlProfileId, input },
+  { input },
 ) => {
-  const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-
   const user = await getSessionUser();
   if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-  const profile = await profileLoader.load(profileId);
-
-  if (profile?.userId !== user.id) {
-    throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
   const contactIdsToRemove = input.contactIds.map(contactIdToRemove =>
     fromGlobalIdWithType(contactIdToRemove, 'Contact'),
   );
 
-  const data = await getWebcardsMediaFromContactIds(contactIdsToRemove);
-  if (data.length) {
-    await referencesMedias([], data);
+  let profiles: Array<Profile | null> = [];
+  let mediaIds: string[] = [];
+  let contacts: Contact[] = [];
+  try {
+    contacts = (await getEntitiesByIds('Contact', contactIdsToRemove)).filter(
+      contact => !!contact,
+    );
+    const profileIds = contacts.map(contact => contact.ownerProfileId);
+    [profiles, mediaIds] = await Promise.all([
+      getEntitiesByIds('Profile', profileIds),
+      getWebcardsMediaFromContactIds(contactIdsToRemove).then(ids =>
+        ids.filter(mediaId => !!mediaId),
+      ),
+    ]);
+  } catch (error) {
+    Sentry.captureException(error);
+    console.error(error);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-  await deleteContact(profileId, contactIdsToRemove);
+  if (!profiles.every(profile => profile && profile.userId === user.id)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN);
+  }
+
+  try {
+    await transaction(async () => {
+      if (mediaIds.length) {
+        await referencesMedias([], mediaIds);
+      }
+      await deleteContact(contactIdsToRemove);
+    });
+  } catch (error) {
+    Sentry.captureException(error);
+    console.error(error);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
 
   return {
-    removedContactIds: input.contactIds,
+    removedContactIds: contacts.map(contact => {
+      return toGlobalId('Contact', contact.id);
+    }),
   };
 };
 

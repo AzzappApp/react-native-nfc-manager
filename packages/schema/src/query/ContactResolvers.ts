@@ -1,8 +1,5 @@
-import {
-  getWebCardByProfileId,
-  getContactEnrichmentByContactId,
-} from '@azzapp/data';
-import { profileLoader } from '#loaders';
+import { getContactEnrichmentByContactId } from '@azzapp/data';
+import { profileLoader, webCardLoader } from '#loaders';
 import { filterHiddenContactFields } from '#helpers/contactHelpers';
 import { idResolver } from '#helpers/relayIdHelpers';
 import type {
@@ -101,9 +98,13 @@ export const Contact: ContactResolvers = {
         }
       : null;
   },
-  webCard: contact => {
+  webCard: async contact => {
     if (contact.contactProfileId) {
-      return getWebCardByProfileId(contact.contactProfileId);
+      const profile = await profileLoader.load(contact.contactProfileId);
+      const webCard = profile
+        ? await webCardLoader.load(profile.webCardId)
+        : null;
+      return webCard;
     }
     return null;
   },

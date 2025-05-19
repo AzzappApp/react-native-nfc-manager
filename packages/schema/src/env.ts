@@ -15,6 +15,10 @@ export const schema = z.object({
     .string()
     .default('10')
     .describe('Max enrichments per user'),
+  ENABLE_GRAPHQL_PERFORMANCE_LOGGING: z
+    .enum(['true', 'false'])
+    .default('false')
+    .describe('Enable graphql schema performance logging'),
 });
 
 const env = schema.safeParse(process.env);

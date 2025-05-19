@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import { buildContactTypeFromContactNode } from '#helpers/contactListHelpers';
+import { readContactData } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useOnInviteContact from '#hooks/useOnInviteContact';
@@ -15,75 +15,9 @@ import type { ContactsDetailScreenQuery } from '#relayArtifacts/ContactsDetailSc
 import type { ContactDetailsRoute } from '#routes';
 
 const query = graphql`
-  query ContactsDetailScreenQuery(
-    $contactId: ID!
-    $cappedPixelRatio: Float!
-    $screenWidth: Float!
-  ) {
-    contact: node(id: $contactId) {
-      ... on Contact {
-        id
-        firstName
-        lastName
-        company
-        title
-        meetingDate
-        note
-        emails {
-          label
-          address
-        }
-        phoneNumbers {
-          label
-          number
-        }
-        addresses {
-          address
-          label
-        }
-        socials {
-          label
-          url
-        }
-        urls {
-          url
-        }
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $cappedPixelRatio, format: png)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $cappedPixelRatio, format: png)
-        }
-        birthday
-        meetingPlace {
-          city
-          region
-          subregion
-          country
-        }
-        contactProfile {
-          id
-          webCard {
-            ...ContactDetailsBody_webCard
-            id
-            cardIsPublished
-            userName
-            hasCover
-            coverMedia {
-              id
-              ... on MediaVideo {
-                webcardThumbnail: thumbnail(
-                  width: $screenWidth
-                  pixelRatio: $cappedPixelRatio
-                )
-              }
-            }
-            ...CoverRenderer_webCard
-          }
-        }
-      }
+  query ContactsDetailScreenQuery($contactId: ID!) {
+    node(id: $contactId) {
+      ...contactListHelpersReadContact_contact @alias(as: "contact")
     }
   }
 `;
@@ -95,13 +29,14 @@ const ContactDetailsScreen = ({
   const styles = useStyleSheet(stylesheet);
 
   const router = useRouter();
-  const { contact } = usePreloadedQuery<ContactsDetailScreenQuery>(
+  const { node } = usePreloadedQuery<ContactsDetailScreenQuery>(
     query,
     preloadedQuery,
   );
+  const contact = node?.contact;
 
   const displayedContact = useMemo(
-    () => params.scannedContact ?? buildContactTypeFromContactNode(contact),
+    () => params.scannedContact ?? (contact ? readContactData(contact) : null),
     [contact, params.scannedContact],
   );
 

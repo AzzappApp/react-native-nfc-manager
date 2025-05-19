@@ -6,37 +6,30 @@ import { colors } from '#theme';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Button from '#ui/Button';
-import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
 import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
 import type { ListRenderItemInfo } from 'react-native';
 
 type ContactsScreenSectionProps = {
   title: string;
-  data: ContactType[];
+  count?: number;
+  contacts: ContactType[];
   onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
+  showContactAction: (arg: ContactType | ContactType[]) => void;
   showLocationInSubtitle?: boolean;
-  onPressAll?: (title: string) => void;
+  onSeeAll?: () => void;
 };
 
 const ContactsScreenSection = ({
   title,
-  data,
+  count,
+  contacts,
   onShowContact,
   showContactAction,
-  onPressAll,
+  onSeeAll,
   showLocationInSubtitle,
 }: ContactsScreenSectionProps) => {
-  const onMore = useCallback(() => {
-    showContactAction({
-      contact: data,
-    });
-  }, [data, showContactAction]);
-
   const renderProfile = useCallback(
     ({ item }: ListRenderItemInfo<ContactType>) => {
       return (
@@ -56,7 +49,7 @@ const ContactsScreenSection = ({
   const locations = showLocationInSubtitle
     ? Array.from(
         new Set(
-          data
+          contacts
             .map(x => getFriendlyNameFromLocation(x.meetingPlace))
             .filter(isDefined),
         ),
@@ -73,23 +66,25 @@ const ContactsScreenSection = ({
           <Text variant="small" style={styles.count}>
             <FormattedMessage
               defaultMessage="{contacts, plural,
-              =0 {# contacts received}
-              =1 {# contact received}
-              other {# contacts received}
-      }"
+                =0 {# contacts received}
+                =1 {# contact received}
+                other {# contacts received}
+              }"
               description="ContactsScreen - Contacts counter under section by location or date"
-              values={{ contacts: data.length }}
+              values={{ contacts: count ?? contacts.length }}
             />
             {locations}
           </Text>
         </View>
-        <PressableNative onPress={onMore}>
+        {/* This functionality is disabled for now, since not all contacts are
+          loaded anymore. So action needs to be refactored to adapt the new logic */}
+        {/* <PressableNative onPress={onMore}>
           <Icon icon="more" />
-        </PressableNative>
+        </PressableNative> */}
       </View>
 
       <FlatList
-        data={data}
+        data={contacts}
         keyExtractor={keyExtractor}
         renderItem={renderProfile}
         horizontal
@@ -100,7 +95,7 @@ const ContactsScreenSection = ({
         scrollEventThrottle={16}
         nestedScrollEnabled
       />
-      {onPressAll ? (
+      {onSeeAll ? (
         <View style={styles.seeAll}>
           <Button
             variant="little_round"
@@ -108,7 +103,7 @@ const ContactsScreenSection = ({
               defaultMessage: 'See all',
               description: 'See all found contacts',
             })}
-            onPress={() => onPressAll?.(title)}
+            onPress={onSeeAll}
           />
         </View>
       ) : null}

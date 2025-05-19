@@ -7,8 +7,17 @@ import {
   resetSessionResourceAfterMutationMiddleware,
 } from '#GraphQLContext';
 import { typeDefs } from '#/__generated__/types';
+import performanceLoggingMiddleware, {
+  isPerformanceLoggingEnabled,
+  getPerformanceLogs,
+  startPerformanceLogging,
+} from '#helpers/performanceLoggingMiddleware';
 import MutationResolvers from './mutation';
 import QueryResolvers from './query';
+import type {
+  GQLPerformanceInfos,
+  FieldLog,
+} from '#helpers/performanceLoggingMiddleware';
 import type { Resolvers } from './__generated__/types';
 
 const resolvers: Resolvers = {
@@ -24,10 +33,23 @@ const buildSchema = () => {
   });
 };
 
-const schema = applyMiddleware(
-  applyDirectiveSchemaTransform(buildSchema()),
+const middlewares = [
   asyncLocalStorageContextMiddleware,
   resetSessionResourceAfterMutationMiddleware,
+  isPerformanceLoggingEnabled() ? performanceLoggingMiddleware : undefined,
+].filter(middleware => middleware !== undefined);
+
+const schema = applyMiddleware(
+  applyDirectiveSchemaTransform(buildSchema()),
+  ...middlewares,
 );
 
 export default schema;
+
+export {
+  isPerformanceLoggingEnabled,
+  getPerformanceLogs,
+  startPerformanceLogging,
+};
+
+export type { GQLPerformanceInfos, FieldLog };

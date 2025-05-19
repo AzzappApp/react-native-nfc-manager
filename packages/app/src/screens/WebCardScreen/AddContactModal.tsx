@@ -4,18 +4,14 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import {
-  ConnectionHandler,
-  graphql,
-  useFragment,
-  useMutation,
-} from 'react-relay';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { addContactUpdater } from '#helpers/contactHelpers';
 import {
   stringToContactAddressLabelType,
   stringToContactEmailLabelType,
@@ -95,6 +91,7 @@ const AddContactModal = ({
       ) {
         contact {
           id
+          ...contactListHelpersReadContact_contact
         }
       }
     }
@@ -239,19 +236,14 @@ const AddContactModal = ({
       },
       updater: (store, response) => {
         if (response && response.createContact) {
-          const profile = store.get(viewer);
-          const nbContacts = profile?.getValue('nbContacts');
-
-          if (typeof nbContacts === 'number') {
-            profile?.setValue(nbContacts + 1, 'nbContacts');
+          const user = store.getRoot().getLinkedRecord('currentUser');
+          const newContact = store
+            .getRootField('createContact')
+            ?.getLinkedRecord('contact');
+          if (!user || !newContact) {
+            return;
           }
-
-          if (profile) {
-            ConnectionHandler.getConnection(
-              profile,
-              'Profile_searchContacts',
-            )?.invalidateRecord();
-          }
+          addContactUpdater(store, user, newContact);
         } else {
           console.warn('fail to add contact ?');
         }

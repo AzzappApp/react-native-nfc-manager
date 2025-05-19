@@ -2,17 +2,16 @@ import * as Sentry from '@sentry/react-native';
 import { ContactTypes } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
+import { graphql, readInlineData } from 'relay-runtime';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
-import type { ContactsDetailScreenQuery$data } from '#relayArtifacts/ContactsDetailScreenQuery.graphql';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
+import type { contactListHelpersReadContact_contact$key } from '#relayArtifacts/contactListHelpersReadContact_contact.graphql';
 import type {
   ContactAddressLabelType,
   ContactEmailLabelType,
   ContactType,
 } from './contactTypes';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact as ExpoContact, Date as ExpoDate } from 'expo-contacts';
 
 export function prefixWithHttp(link: string): string;
@@ -24,6 +23,7 @@ export function prefixWithHttp(link?: string): string | undefined {
   }
   return `https://${link}`;
 }
+
 export const buildExpoContact = async (
   contact: ContactType,
 ): Promise<ExpoContact> => {
@@ -119,6 +119,7 @@ export const stringToContactAddressLabelType = (
       return 'Other'; // Fallback to 'Other'
   }
 };
+
 export const stringToContactEmailLabelType = (
   str: string,
 ): ContactEmailLabelType => {
@@ -160,27 +161,91 @@ export const stringToContactPhoneNumberLabelType = (
   }
 };
 
-type ContactSearchNode = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<
-        ContactsScreenLists_contacts$data['searchContacts']['edges']
-      >
-    >
-  >['node']
->;
-export const buildContactTypeFromContactNode = (
-  inputContact?:
-    | ContactsDetailScreenQuery$data['contact']
-    | ContactSearchNode
-    | null,
-): ContactType | null => {
-  if (!inputContact) {
-    return null;
-  }
-  const contact: ContactType = {
+export const readContactData = (
+  data: contactListHelpersReadContact_contact$key,
+): ContactType => {
+  const inputContact = readInlineData(
+    graphql`
+      fragment contactListHelpersReadContact_contact on Contact
+      @inline
+      @argumentDefinitions(
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
+        id
+        firstName
+        lastName
+        company
+        title
+        meetingDate
+        note
+        emails {
+          label
+          address
+        }
+        phoneNumbers {
+          label
+          number
+        }
+        addresses {
+          address
+          label
+        }
+        socials {
+          label
+          url
+        }
+        urls {
+          url
+        }
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+        }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+        }
+        birthday
+        meetingPlace {
+          city
+          region
+          subregion
+          country
+        }
+        contactProfile {
+          id
+          webCard {
+            id
+            cardIsPublished
+            userName
+            hasCover
+            ...CoverRenderer_webCard
+            coverMedia {
+              id
+              ... on MediaVideo {
+                webcardThumbnail: thumbnail(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+            }
+          }
+        }
+      }
+    `,
+    data,
+  );
+
+  return {
     id: inputContact.id,
-    meetingDate: inputContact.meetingDate || new Date(),
+    meetingDate:
+      (typeof inputContact.meetingDate === 'string'
+        ? new Date(inputContact.meetingDate)
+        : null) ?? new Date(),
     firstName: inputContact.firstName,
     lastName: inputContact.lastName,
     title: inputContact.title,
@@ -251,5 +316,4 @@ export const buildContactTypeFromContactNode = (
         : undefined,
     note: inputContact.note,
   };
-  return contact;
 };

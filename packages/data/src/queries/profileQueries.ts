@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import {
@@ -103,6 +103,42 @@ export const getProfileByUserAndWebCard = async (
       ),
     )
     .then(res => res[0] ?? null);
+
+/**
+ * find a list of profiles by their userId and webCardId
+ *
+ * @returns The profile if found, otherwise null
+ */
+export const getProfilesByUserAndWebCards = async (
+  userWebCardTuples: Array<[userId: string, webCardId: string]>,
+): Promise<Array<Profile | null>> => {
+  return db()
+    .select()
+    .from(ProfileTable)
+    .where(
+      or(
+        ...userWebCardTuples.map(([userId, webCardId]) =>
+          and(
+            eq(ProfileTable.userId, userId),
+            eq(ProfileTable.webCardId, webCardId),
+          ),
+        ),
+      ),
+    )
+    .then(res => {
+      const map = new Map<string, Profile>();
+      res.forEach(profile => {
+        const key = `${profile.userId}-${profile.webCardId}`;
+        if (!map.has(key)) {
+          map.set(key, profile);
+        }
+      });
+      return userWebCardTuples.map(([userId, webCardId]) => {
+        const key = `${userId}-${webCardId}`;
+        return map.get(key) ?? null;
+      });
+    });
+};
 
 /**
  * Retrieves the list of profiles associated to a user

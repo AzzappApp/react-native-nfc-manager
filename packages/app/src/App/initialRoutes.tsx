@@ -20,10 +20,6 @@ export const mainRoutes: RouterInit = createRouterInit('MAIN', {
       route: 'HOME',
     },
     {
-      id: 'CONTACTS',
-      route: 'CONTACTS',
-    },
-    {
       id: 'MEDIA',
       route: 'MEDIA',
     },

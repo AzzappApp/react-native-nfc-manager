@@ -8,7 +8,6 @@ import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
@@ -202,11 +201,10 @@ const ContactDetailsBody = ({
   });
 
   const onRemoveContacts = useCallback(() => {
-    const profileId = getAuthState().profileInfos?.profileId;
-    if (!profileId || !contact.id) {
+    if (!contact.id) {
       return;
     }
-    removeContact([contact.id], profileId);
+    removeContact([contact.id]);
   }, [contact.id, removeContact]);
 
   const onEditContact = useCallback(() => {

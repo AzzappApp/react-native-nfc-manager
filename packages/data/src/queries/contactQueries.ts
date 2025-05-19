@@ -3,17 +3,20 @@ import {
   eq,
   like,
   or,
-  type InferInsertModel,
   count,
   desc,
   inArray,
   sql,
+  gte,
+  lte,
+  gt,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { ContactTable, ProfileTable, UserTable, WebCardTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
 import type { Contact, NewContact, Profile } from '../schema';
+import type { InferInsertModel, SQL } from 'drizzle-orm';
 
 export type ContactRow = InferInsertModel<typeof ContactTable>;
 
@@ -222,6 +225,464 @@ export const searchContacts = async (
   return contacts;
 };
 
+/**
+ * Return the number of contacts for all the profiles of a user
+ *
+ * @param userId  - The user's ID
+ * @returns  The number of contacts for all the profiles of the user
+ */
+export const getUserContactsCount = async (userId: string): Promise<number> => {
+  const res = await db()
+    .select({ count: count() })
+    .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .where(
+      and(eq(ProfileTable.userId, userId), eq(ContactTable.deleted, false)),
+    )
+    .then(rows => rows[0].count);
+  return res;
+};
+
+const SEPARATOR = '\u0001';
+/**
+ * Get a user's profiles contacts ordered by name
+ * @param userId - The user's ID
+ * @param search - The search term to filter contacts by name
+ * @param after - The cursor for pagination
+ * @param limit - The maximum number of contacts to return
+ * @returns An object containing the contacts and a boolean indicating if there are more contacts to fetch
+ */
+export const getUserContactsOrderedByName = async (
+  userId: string,
+  search?: string | null,
+  location?: string | null,
+  date?: Date | null,
+  after?: string | null,
+  limit = 50,
+): Promise<{
+  contactsWithCursor: Array<{
+    contact: Contact;
+    cursor: string;
+  }>;
+  hasMore: boolean;
+}> => {
+  // Cursor handling
+  let afterClause: SQL | undefined = undefined;
+  if (after) {
+    const [
+      afterLastName,
+      afterFirstName,
+      afterCompany,
+      afterUserName,
+      afterId,
+    ] = after.split(SEPARATOR);
+    if (afterId) {
+      afterClause = sql`
+        (
+          COALESCE(${ContactTable.lastName}, ''), 
+          COALESCE(${ContactTable.firstName}, ''), 
+          COALESCE(${ContactTable.company}, ''), 
+          COALESCE(${WebCardTable.userName}, ''), 
+          ${ContactTable.id}
+        ) > (
+          ${afterLastName}, 
+          ${afterFirstName}, 
+          ${afterCompany}, 
+          ${afterUserName}, 
+          ${afterId}
+        )
+      `;
+    }
+  }
+
+  // Build WHERE clause dynamically
+
+  // Query the DB
+  const data = await db()
+    .select({
+      Contact: ContactTable,
+      WebCard: WebCardTable,
+      cursorOrder: sql`COALESCE(       
+        NULLIF(${ContactTable.lastName}, ''),
+        NULLIF(${ContactTable.firstName}, ''),    
+        NULLIF(${ContactTable.company}, ''),
+        NULLIF(${WebCardTable.userName}, ''),
+        ''
+      )`.as('cursorOrder'),
+    })
+    .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .leftJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ContactTable.deleted, false),
+        afterClause,
+        search
+          ? or(
+              like(ContactTable.firstName, `%${search}%`),
+              like(ContactTable.lastName, `%${search}%`),
+              like(ContactTable.company, `%${search}%`),
+              like(WebCardTable.userName, `%${search}%`),
+            )
+          : undefined,
+        location
+          ? eq(
+              sql<string>`COALESCE(
+                NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
+                NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
+                NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
+                NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), ''),
+                '\uFFFF' -- No location should be at the end
+              )`,
+              location,
+            )
+          : undefined,
+        date
+          ? eq(
+              sql<string>`DATE(${ContactTable.meetingDate})`,
+              sql<string>`DATE(${date})`,
+            )
+          : undefined,
+      ),
+    )
+    .orderBy(
+      sql`COALESCE(       
+        NULLIF(${ContactTable.lastName}, ''),
+        NULLIF(${ContactTable.firstName}, ''),    
+        NULLIF(${ContactTable.company}, ''),
+        NULLIF(${WebCardTable.userName}, ''),
+        ''
+      )`,
+      sql`COALESCE(       
+        NULLIF(${ContactTable.firstName}, ''),    
+        NULLIF(${ContactTable.company}, ''),
+        NULLIF(${WebCardTable.userName}, ''),
+        ''
+      )`,
+      sql`COALESCE(       
+        NULLIF(${ContactTable.company}, ''),
+        NULLIF(${WebCardTable.userName}, ''),
+        ''
+      )`,
+      sql`COALESCE(${WebCardTable.userName}, '')`,
+      ContactTable.id,
+    )
+    .limit(limit + 1); // fetch one extra to check for hasMore
+
+  const contactsWithCursor = data
+    .slice(0, limit)
+    .map(({ Contact: contact, WebCard: webCard }) => ({
+      contact,
+      cursor: [
+        contact.lastName ?? '',
+        contact.firstName ?? '',
+        contact.company ?? '',
+        webCard?.userName ?? '',
+        contact.id,
+      ].join(SEPARATOR),
+    }));
+
+  return {
+    contactsWithCursor,
+    hasMore: data.length > limit,
+  };
+};
+
+/**
+ * Get a user's profiles contacts grouped by meeting date
+ *
+ * @param userId - The user's ID
+ * @param search - The search term to filter contacts by name
+ * @param nbContactsByDate - The number of contacts to display per location
+ * @param after - The cursor for pagination
+ * @param limit - The maximum number of contacts to return
+ * @returns An object containing the contacts grouped by date and a boolean indicating if there are more contacts to fetch
+ */
+export const getUserContactsGroupedByDate = async (
+  userId: string,
+  search?: string | null,
+  nbContactsByDate = 5,
+  after?: Date | null,
+  limit = 50,
+): Promise<{
+  dates: Array<{
+    date: Date;
+    nbContacts: number;
+    contacts: Contact[];
+  }>;
+  hasMore: boolean;
+}> => {
+  const whereConditions = [
+    eq(ProfileTable.userId, userId),
+    eq(ContactTable.deleted, false),
+    search
+      ? or(
+          like(ContactTable.firstName, `%${search}%`),
+          like(ContactTable.lastName, `%${search}%`),
+          like(ContactTable.company, `%${search}%`),
+        )
+      : undefined,
+  ].filter(Boolean);
+
+  const dates = (
+    await db()
+      .selectDistinct({
+        date: sql<string>`DATE(meetingDate)`.as('date'),
+      })
+      .from(ContactTable)
+      .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+      .where(
+        and(
+          ...whereConditions,
+          after ? sql`${ContactTable.meetingDate} < ${after}` : undefined,
+        ),
+      )
+      .orderBy(sql`date DESC`)
+      .limit(limit + 1)
+  ).map(date => new Date(date.date));
+
+  const hasMore = dates.length > limit;
+  if (hasMore) {
+    dates.pop();
+  }
+
+  const firstDate = dates.at(0) ?? null;
+  firstDate?.setHours(23, 59, 59, 999);
+  const lastDate = dates.at(-1) ?? null;
+
+  const data =
+    firstDate && lastDate
+      ? await db()
+          .select()
+          .from(ContactTable)
+          .innerJoin(
+            ProfileTable,
+            eq(ContactTable.ownerProfileId, ProfileTable.id),
+          )
+          .where(
+            and(
+              ...whereConditions,
+              gte(ContactTable.meetingDate, lastDate),
+              lte(ContactTable.meetingDate, firstDate),
+            ),
+          )
+      : [];
+  const dateMap = new Map<string, Contact[]>();
+  for (const { Contact: contact } of data) {
+    const dateKey = contact.meetingDate.toISOString().split('T')[0];
+    if (!dateMap.has(dateKey)) {
+      dateMap.set(dateKey, []);
+    }
+    dateMap.get(dateKey)?.push(contact);
+  }
+
+  return {
+    dates: dates.map(date => {
+      const contacts = dateMap.get(date.toISOString().split('T')[0]) ?? [];
+      return {
+        date,
+        nbContacts: contacts.length,
+        contacts: contacts.splice(0, nbContactsByDate),
+      };
+    }),
+    hasMore,
+  };
+};
+
+/**
+ * Get a user's profiles contacts grouped by meeting location
+ *
+ * @param userId - The user's ID
+ * @param search - The search term to filter contacts by name
+ * @param nbContactsByLocations - The number of contacts to display per location
+ * @param after - The cursor for pagination
+ * @param limit - The maximum number of contacts to return
+ * @returns An object containing the contacts grouped by date and a boolean indicating if there are more contacts to fetch
+ */
+export const getUserContactsGroupedByLocation = async (
+  userId: string,
+  search?: string | null,
+  nbContactsByLocations = 5,
+  after?: string | null,
+  limit = 50,
+): Promise<{
+  locations: Array<{
+    location: string | null;
+    nbContacts: number;
+    contacts: Contact[];
+  }>;
+  hasMore: boolean;
+}> => {
+  const locationExpr = sql<string>`COALESCE(
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), ''),
+    '\uFFFF' -- No location should be at the end
+  )`;
+
+  const whereConditions = [
+    eq(ProfileTable.userId, userId),
+    eq(ContactTable.deleted, false),
+    search
+      ? or(
+          like(ContactTable.firstName, `%${search}%`),
+          like(ContactTable.lastName, `%${search}%`),
+          like(ContactTable.company, `%${search}%`),
+        )
+      : undefined,
+  ].filter(Boolean);
+
+  const locations = (
+    await db()
+      .selectDistinct({
+        locationStr: locationExpr.as('locationStr'),
+      })
+      .from(ContactTable)
+      .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+      .where(
+        and(...whereConditions, after ? gt(locationExpr, after) : undefined),
+      )
+      .orderBy(sql<string>`locationStr`)
+      .limit(limit + 1)
+  ).map(({ locationStr }) => (locationStr === '\uFFFF' ? null : locationStr));
+
+  const hasMore = locations.length > limit;
+  if (hasMore) {
+    locations.pop();
+  }
+
+  const data = locations.length
+    ? await db()
+        .select()
+        .from(ContactTable)
+        .innerJoin(
+          ProfileTable,
+          eq(ContactTable.ownerProfileId, ProfileTable.id),
+        )
+        .where(
+          and(
+            ...whereConditions,
+            inArray(
+              locationExpr,
+              locations.map(location => location ?? '\uFFFF'),
+            ),
+          ),
+        )
+        .orderBy(desc(ContactTable.meetingDate))
+    : [];
+
+  const locationMap = new Map<string | null, Contact[]>();
+  for (const { Contact: contact } of data) {
+    const locationKey =
+      [
+        contact.meetingPlace?.city || null,
+        contact.meetingPlace?.subregion || null,
+        contact.meetingPlace?.region || null,
+        contact.meetingPlace?.country || null,
+      ]
+        .filter(Boolean)
+        .at(0) ?? null;
+    if (!locationMap.has(locationKey)) {
+      locationMap.set(locationKey, []);
+    }
+    locationMap.get(locationKey)?.push(contact);
+  }
+
+  return {
+    locations: locations.map(location => {
+      const contacts = locationMap.get(location) ?? [];
+      return {
+        location,
+        nbContacts: contacts.length,
+        contacts: contacts.splice(0, nbContactsByLocations),
+      };
+    }),
+    hasMore,
+  };
+};
+
+export const searchProfileContactByLocation = async (
+  ownerProfileId: string,
+  search?: string | null,
+  after?: Date | null,
+  limit = 50,
+): Promise<{
+  dates: Array<{
+    date: Date;
+    contacts: Contact[];
+  }>;
+  hasMore: boolean;
+}> => {
+  const whereConditions = [
+    eq(ContactTable.ownerProfileId, ownerProfileId),
+    eq(ContactTable.deleted, false),
+    search
+      ? or(
+          like(ContactTable.firstName, `%${search}%`),
+          like(ContactTable.lastName, `%${search}%`),
+          like(ContactTable.company, `%${search}%`),
+        )
+      : undefined,
+  ].filter(Boolean);
+
+  const dates = (
+    await db()
+      .selectDistinct({
+        date: sql<string>`DATE(meetingDate)`.as('date'),
+      })
+      .from(ContactTable)
+      .where(
+        and(
+          ...whereConditions,
+          after ? sql`${ContactTable.meetingDate} < ${after}` : undefined,
+        ),
+      )
+      .orderBy(sql`date DESC`)
+      .limit(limit + 1)
+  ).map(date => new Date(date.date));
+
+  const hasMore = dates.length > limit;
+  if (hasMore) {
+    dates.pop();
+  }
+
+  const firstDate = dates.at(0) ?? null;
+  firstDate?.setHours(23, 59, 59, 999);
+  const lastDate = dates.at(-1) ?? null;
+
+  const contacts =
+    firstDate && lastDate
+      ? await db()
+          .select()
+          .from(ContactTable)
+          .where(
+            and(
+              ...whereConditions,
+              gte(ContactTable.meetingDate, lastDate),
+              lte(ContactTable.meetingDate, firstDate),
+            ),
+          )
+      : [];
+  const dateMap = new Map<string, Contact[]>();
+  for (const contact of contacts) {
+    const dateKey = contact.meetingDate.toISOString().split('T')[0];
+    if (!dateMap.has(dateKey)) {
+      dateMap.set(dateKey, []);
+    }
+    dateMap.get(dateKey)?.push(contact);
+  }
+
+  return {
+    dates: dates.map(date => ({
+      date,
+      contacts: dateMap.get(date.toISOString().split('T')[0]) ?? [],
+    })),
+    hasMore,
+  };
+};
+
 export const searchContactsByWebcardId = async ({
   limit,
   offset,
@@ -334,22 +795,14 @@ export const getContactCountWithWebcardId = (
     .then(res => res[0].count || 0);
 };
 
-export const removeContacts = async (
-  ownerProfileId: string,
-  contactIds: string[],
-) => {
+export const removeContacts = async (contactIds: string[]) => {
   return db()
     .update(ContactTable)
     .set({
       deleted: true,
       deletedAt: new Date(),
     })
-    .where(
-      and(
-        eq(ContactTable.ownerProfileId, ownerProfileId),
-        inArray(ContactTable.id, contactIds),
-      ),
-    );
+    .where(and(inArray(ContactTable.id, contactIds)));
 };
 
 export const refreshContactsLastView = async (ownerProfileId: string) => {

@@ -495,7 +495,6 @@ const ItemRenderComponent = ({
                 onReadyForDisplay={onReady}
                 onError={onError}
                 onLongPress={openWebcardModal}
-                prefetch
               />
             )}
             {!coverIsUploading &&

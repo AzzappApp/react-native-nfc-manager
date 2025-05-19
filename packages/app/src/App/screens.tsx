@@ -10,7 +10,7 @@ import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardC
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactEditScreen from '#screens/ContactEditScreen/ContactEditScreen';
-import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
+import ContactsFilteredListScreen from '#screens/ContactsFilteredListScreen';
 import ContactsScreen from '#screens/ContactsScreen';
 import CookieContentScreen from '#screens/CookieConsentsScreen';
 import CookieSettingsScreen from '#screens/CookieSettingsScreen';
@@ -106,7 +106,8 @@ const screens = {
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
-  CONTACTS_BY_LOCATION: ContactsByLocationScreen,
+  CONTACTS_BY_LOCATION: ContactsFilteredListScreen,
+  CONTACTS_BY_DATE: ContactsFilteredListScreen,
   SHAKE_AND_SHARE: ShakeAndShareScreen,
 } satisfies ScreenMap;
 

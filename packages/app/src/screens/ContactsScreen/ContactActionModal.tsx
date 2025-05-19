@@ -5,7 +5,6 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import ShareContact from '#helpers/ShareContact';
 import useOnInviteContact from '#hooks/useOnInviteContact';
@@ -17,16 +16,15 @@ import ContactActionModalOption from './ContactActionModalOption';
 import type { ContactType } from '#helpers/contactTypes';
 import type { Icons } from '#ui/Icon';
 import type { ContactActionModalOptionProps } from './ContactActionModalOption';
-import type { ContactActionProps } from './ContactsScreenLists';
 
 type ContactActionModalProps = {
   close: () => void;
-  contactActionData?: ContactActionProps;
+  data?: ContactType | ContactType[];
   onShow: (contact: ContactType) => void;
 };
 
 const ContactActionModal = ({
-  contactActionData,
+  data,
   close,
   onShow,
 }: ContactActionModalProps) => {
@@ -37,39 +35,29 @@ const ContactActionModal = ({
   const removeContact = useRemoveContact();
 
   const onRemoveContacts = (contactIds: ContactType | ContactType[]) => {
-    const profileId = getAuthState().profileInfos?.profileId;
-    if (!profileId) {
-      return;
-    }
     const removedIds = (Array.isArray(contactIds) ? contactIds : [contactIds])
       .map(contact => contact.id)
       .filter(isDefined);
 
-    removeContact(removedIds, profileId);
+    removeContact(removedIds);
   };
 
   const onShowWebcard = useCallback(async () => {
-    if (
-      !contactActionData?.contact ||
-      Array.isArray(contactActionData.contact)
-    ) {
+    if (!data || Array.isArray(data)) {
       return;
     }
-    const targetRoute = buildWebUrl(contactActionData.contact?.webCardUserName);
+    const targetRoute = buildWebUrl(data?.webCardUserName);
     const route = await matchUrlWithRoute(targetRoute);
     if (route) {
       router?.push(route);
     }
     close();
-  }, [close, contactActionData?.contact, router]);
+  }, [close, data, router]);
 
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
-    const multiSelection =
-      contactActionData?.contact && Array.isArray(contactActionData.contact);
+    const multiSelection = data && Array.isArray(data);
     return [
-      contactActionData?.contact &&
-      !Array.isArray(contactActionData.contact) &&
-      contactActionData?.contact.webCardUserName
+      data && !Array.isArray(data) && data.webCardUserName
         ? {
             icon: 'preview' as Icons,
             text: intl.formatMessage({
@@ -88,11 +76,8 @@ const ContactActionModal = ({
               description: 'ContactsScreen - More option alert - share',
             }),
             onPress: async () => {
-              if (
-                contactActionData?.contact &&
-                !Array.isArray(contactActionData?.contact)
-              ) {
-                ShareContact(contactActionData?.contact);
+              if (data && !Array.isArray(data)) {
+                ShareContact(data);
               }
             },
           }
@@ -105,9 +90,7 @@ const ContactActionModal = ({
               description: 'ContactsScreen - More option alert - view',
             }),
             onPress: () =>
-              contactActionData?.contact &&
-              !Array.isArray(contactActionData?.contact) &&
-              onShow(contactActionData?.contact as ContactType),
+              data && !Array.isArray(data) && onShow(data as ContactType),
           }
         : undefined,
       {
@@ -117,38 +100,28 @@ const ContactActionModal = ({
           description: 'ContactsScreen - More option alert - save',
         }),
         onPress: () => {
-          if (contactActionData?.contact) {
-            onInviteContact(contactActionData.contact);
+          if (data) {
+            onInviteContact(data);
             close();
           }
         },
       },
     ].filter(isDefined);
-  }, [
-    close,
-    contactActionData?.contact,
-    intl,
-    onInviteContact,
-    onShow,
-    onShowWebcard,
-  ]);
+  }, [close, data, intl, onInviteContact, onShow, onShowWebcard]);
 
-  const onRemoveContactAction = contactActionData?.contact
+  const onRemoveContactAction = data
     ? () => {
-        if (contactActionData?.contact)
-          onRemoveContacts(contactActionData?.contact);
+        if (data) onRemoveContacts(data);
         close();
       }
     : undefined;
 
-  const contactsCount = Array.isArray(contactActionData?.contact)
-    ? contactActionData?.contact?.length
-    : 1;
+  const contactsCount = Array.isArray(data) ? data?.length : 1;
 
   return (
     <BottomSheetModal
       index={0}
-      visible={!!contactActionData}
+      visible={!!data}
       onDismiss={close}
       enablePanDownToClose
     >

@@ -323,10 +323,17 @@ export type ModulePreviewRoute = {
   };
 };
 
-export type ContactByLocationRoute = {
+export type ContactsByLocationRoute = {
   route: 'CONTACTS_BY_LOCATION';
   params: {
-    location: string;
+    location: string | null;
+  };
+};
+
+export type ContactsByDateRoute = {
+  route: 'CONTACTS_BY_DATE';
+  params: {
+    date: string;
   };
 };
 
@@ -344,12 +351,13 @@ export type Route =
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
-  | ContactByLocationRoute
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCreateRoute
   | ContactDetailsRoute
   | ContactEditRoute
+  | ContactsByDateRoute
+  | ContactsByLocationRoute
   | ContactsRoute
   | CookieConsentRoute
   | CookieSettingsRoute

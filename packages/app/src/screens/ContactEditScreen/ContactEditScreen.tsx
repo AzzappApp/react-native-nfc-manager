@@ -16,7 +16,11 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
-import { contactSchema } from '#helpers/contactHelpers';
+import {
+  addContactUpdater,
+  contactSchema,
+  removeContactUpdater,
+} from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   prepareAvatarForUpload,
@@ -29,7 +33,6 @@ import {
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
 import useScreenInsets from '#hooks/useScreenInsets';
-import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -61,44 +64,9 @@ const ContactEditScreen = ({
     mutation ContactEditScreenMutation(
       $contactId: ID!
       $contact: ContactInput!
-      $cappedPixelRatio: Float!
     ) {
       saveContact(contactId: $contactId, input: $contact) {
-        id
-        firstName
-        lastName
-        title
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $cappedPixelRatio, format: png)
-        }
-        company
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $cappedPixelRatio, format: png)
-        }
-        phoneNumbers {
-          label
-          number
-        }
-        emails {
-          address
-          label
-        }
-        urls {
-          url
-        }
-        addresses {
-          address
-          label
-        }
-        birthday
-        socials {
-          label
-          url
-        }
-        note
-        meetingDate
+        ...contactListHelpersReadContact_contact
       }
     }
   `);
@@ -221,7 +189,6 @@ const ContactEditScreen = ({
       commit({
         variables: {
           contactId: params.contact.id,
-          cappedPixelRatio: CappedPixelRatio(),
           contact: {
             avatarId,
             logoId,
@@ -247,9 +214,18 @@ const ContactEditScreen = ({
             lastName: data.lastName || '',
             title: data.title || '',
             birthday: data.birthday?.birthday,
-            meetingDate: data.meetingDate,
+            meetingDate: data.meetingDate?.toISOString(),
             note: data.note || '',
           },
+        },
+        updater: store => {
+          const user = store.getRoot().getLinkedRecord('currentUser');
+          const newContact = store.getRootField('saveContact');
+          if (!user || !newContact) {
+            return;
+          }
+          removeContactUpdater(store, user, newContact.getDataID());
+          addContactUpdater(store, user, newContact);
         },
         onCompleted: () => {
           router.back();

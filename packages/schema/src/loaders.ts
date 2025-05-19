@@ -6,12 +6,12 @@ import {
   getLocalizationMessagesByKeys,
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
-  getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
   getUserSubscriptions,
   getContactCountPerOwner,
   getNbNewContactsPerOwner,
+  getProfilesByUserAndWebCards,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -86,6 +86,7 @@ export const contactLoader = createSessionDataLoader(
   'ContactLoader',
   createEntitiesBatchLoadFunction('Contact'),
 );
+
 export const moduleBackgroundLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ModuleBackground'),
 );
@@ -135,10 +136,14 @@ export const webCardOwnerLoader = createSessionDataLoader(
 
 export const profileByWebCardIdAndUserIdLoader = createSessionDataLoader(
   'ProfileByWebCardIdAndUserIdLoader',
-  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) =>
-    Promise.all(
-      keys.map(key => getProfileByUserAndWebCard(key.userId, key.webCardId)),
-    ),
+  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) => {
+    if (keys.length === 0) {
+      return [];
+    }
+    return getProfilesByUserAndWebCards(
+      keys.map(({ userId, webCardId }) => [userId, webCardId]),
+    );
+  },
   {
     cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
   },

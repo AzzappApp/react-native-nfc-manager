@@ -21,7 +21,11 @@ import {
 
 import { emitContactAddedToProfile } from '#helpers/addContactHelper';
 import { getAuthState } from '#helpers/authStore';
-import { contactSchema, type contactFormValues } from '#helpers/contactHelpers';
+import {
+  addContactUpdater,
+  contactSchema,
+  type contactFormValues,
+} from '#helpers/contactHelpers';
 import {
   getVCardAddresses,
   getVCardBirthday,
@@ -96,6 +100,7 @@ const ContactCreateScreen = ({
       ) {
         contact {
           id
+          ...contactListHelpersReadContact_contact
         }
       }
     }
@@ -249,9 +254,10 @@ const ContactCreateScreen = ({
                   region: address.region,
                 }
               : null,
-            meetingDate: data.meetingDate
+            meetingDate: (data.meetingDate
               ? new Date(data.meetingDate)
-              : new Date(),
+              : new Date()
+            ).toISOString(),
           },
         },
         onCompleted: () => {
@@ -259,13 +265,15 @@ const ContactCreateScreen = ({
           router.back();
         },
         updater: (store, response) => {
-          if (response && response.createContact && profileId) {
-            const profile = store.get(profileId);
-            const nbContacts = profile?.getValue('nbContacts');
-
-            if (typeof nbContacts === 'number') {
-              profile?.setValue(nbContacts + 1, 'nbContacts');
+          if (response && response.createContact) {
+            const user = store.getRoot().getLinkedRecord('currentUser');
+            const newContact = store
+              .getRootField('createContact')
+              ?.getLinkedRecord('contact');
+            if (!user || !newContact) {
+              return;
             }
+            addContactUpdater(store, user, newContact);
           }
         },
         onError: e => {

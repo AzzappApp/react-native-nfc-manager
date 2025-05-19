@@ -301,11 +301,13 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   },
   webCard: async profile => {
     const webcard = await webCardLoader.load(profile.webCardId);
-
+    if (!webcard) {
+      return null;
+    }
     if (
+      webcard.cardIsPublished ||
       profileIsAssociatedToCurrentUser(profile) ||
-      (await hasWebCardProfileRight(profile.webCardId)) ||
-      webcard?.cardIsPublished
+      (await hasWebCardProfileRight(profile.webCardId))
     ) {
       return webcard;
     }
