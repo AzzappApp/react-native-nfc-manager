@@ -1,3 +1,7 @@
+## 1.10.0-canary.220
+
+* **feat:**  - **Contact:** Grouped contact for a user ([#8818](https://github.com/AzzappApp/azzapp/pull/8818))
+
 ## 1.10.0-canary.219
 
 * **feat:**  - **enrichment:** hide fields ([#8808](https://github.com/AzzappApp/azzapp/pull/8808))
