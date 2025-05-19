@@ -1,3 +1,7 @@
+## 1.10.0-canary.222
+
+* **fix:**  - remove fake user ([#8833](https://github.com/AzzappApp/azzapp/pull/8833))
+
 ## 1.10.0-canary.221
 
 * **feat:**  - **enrichment:** set enrichment as async process ([#8820](https://github.com/AzzappApp/azzapp/pull/8820))
