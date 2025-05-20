@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { colors } from '#theme';
 import type { ForwardedRef } from 'react';
@@ -7,7 +7,10 @@ import type {
   PressableAndroidRippleConfig,
   LayoutChangeEvent,
   View,
+  GestureResponderEvent,
 } from 'react-native';
+
+const TIMEOUT = 200;
 
 type PressableNativeProps = PressableProps & {
   activeOpacity?: number;
@@ -15,13 +18,31 @@ type PressableNativeProps = PressableProps & {
   animationDuration?: number;
   easing?: unknown;
   ripple?: PressableAndroidRippleConfig;
+  onDoublePress?: () => void;
 };
 
 const PressableNative = (
-  { ripple, ...props }: PressableNativeProps,
+  { ripple, onDoublePress, ...props }: PressableNativeProps,
   ref: ForwardedRef<View>,
 ) => {
   const [width, setWidth] = useState(0);
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
+  const onPress = (e: GestureResponderEvent) => {
+    if (timer.current && onDoublePress) {
+      clearTimeout(timer.current);
+      timer.current = null;
+      onDoublePress();
+    } else if (onDoublePress) {
+      timer.current = setTimeout(() => {
+        timer.current = null;
+        props.onPress?.(e);
+      }, TIMEOUT);
+    } else {
+      props.onPress?.(e);
+    }
+  };
+
   const onLayout = (e: LayoutChangeEvent) => {
     setWidth(e.nativeEvent.layout.width);
   };
@@ -38,6 +59,7 @@ const PressableNative = (
       android_ripple={androidRipple}
       onLayout={onLayout}
       {...props}
+      onPress={onPress}
     />
   );
 };
