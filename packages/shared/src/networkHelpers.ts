@@ -57,6 +57,7 @@ export const fetchJSON = async <JSON>(
   } catch (error: any) {
     data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
   }
+
   throw new FetchError({
     message: data.message ?? response.statusText,
     response,
@@ -185,6 +186,19 @@ export class FetchError extends Error {
    * The json data of the request
    */
   data: any;
+  /**
+   * The HTTP status code of the response
+   */
+  status?: number;
+  /**
+   * The URL that was requested
+   */
+  url?: string;
+  /**
+   * Additional details about the error
+   */
+  details?: string;
+
   constructor({
     message,
     response,
@@ -194,13 +208,55 @@ export class FetchError extends Error {
     response?: Response;
     data?: any;
   }) {
+    // Keep the original message format
     super(data?.message ?? message);
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, FetchError);
     }
+
     this.name = 'FetchError';
     this.response = response;
     this.data = data;
+
+    if (response) {
+      this.status = response.status;
+      this.url = response.url;
+    }
+
+    // Store additional details separately
+    let details = '';
+    if (response) {
+      details += `Status: ${response.status} ${response.statusText}`;
+      if (response.url) {
+        details += `\nURL: ${response.url}`;
+      }
+    }
+
+    if (data) {
+      if (typeof data === 'object') {
+        if (data.error) {
+          details += `\nError: ${data.error}`;
+        }
+        if (data.message) {
+          details += `\nDetails: ${data.message}`;
+        }
+        if (data.details) {
+          details += `\nAdditional Details: ${data.details}`;
+        }
+      } else {
+        details += `\nResponse: ${data}`;
+      }
+    }
+
+    this.details = details;
+  }
+
+  /**
+   * Returns a string representation of the error
+   */
+  toString(): string {
+    return `FetchError: ${this.message}${this.details ? `\n${this.details}` : ''}`;
   }
 }
 
