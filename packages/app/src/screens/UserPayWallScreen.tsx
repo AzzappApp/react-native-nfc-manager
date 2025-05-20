@@ -121,8 +121,10 @@ const UserPayWallScreen = ({
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
   const currentSubscription = useMemo(() => {
-    return data.currentUser?.userSubscription;
-  }, [data.currentUser?.userSubscription]);
+    return data.currentUser?.isPremium
+      ? data.currentUser?.userSubscription
+      : null;
+  }, [data.currentUser]);
 
   // this concept comes from Francois and Mickael, i am not responsible
   const [shouldWaitDatabase, startWaitDatabase] = useBoolean(false);
@@ -140,6 +142,11 @@ const UserPayWallScreen = ({
           Platform.OS === 'ios')));
 
   useEffect(() => {
+    console.log(
+      'wiating',
+      shouldWaitDatabase,
+      currentSubscription?.subscriptionId === waitedSubscriptionId,
+    );
     if (
       shouldWaitDatabase &&
       currentSubscription?.subscriptionId === waitedSubscriptionId

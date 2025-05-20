@@ -80,6 +80,24 @@ export const updateSubscriptionFreeSeats = async (
     .where(eq(UserSubscriptionTable.id, subscriptionId));
 };
 
+export const getIAPSubscriptions = async (userId: string) => {
+  return db()
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        or(
+          eq(UserSubscriptionTable.issuer, 'apple'),
+          eq(UserSubscriptionTable.issuer, 'google'),
+        ),
+      ),
+    )
+    .orderBy(
+      desc(UserSubscriptionTable.startAt), // Finally, the most recently started subscriptions
+    );
+};
+
 export const getUserSubscriptions = async ({
   userIds,
   issuers,
@@ -185,6 +203,24 @@ export const getExpiredSubscription = async (limit: number) => {
       ),
     )
     .limit(limit);
+};
+
+export const updateActiveInAppUserSubscription = async (
+  id: string,
+  subscription: Partial<UserSubscription>,
+) => {
+  await db()
+    .update(UserSubscriptionTable)
+    .set(subscription)
+    .where(
+      and(
+        eq(UserSubscriptionTable.id, id),
+        or(
+          eq(UserSubscriptionTable.issuer, 'apple'),
+          eq(UserSubscriptionTable.issuer, 'google'),
+        ),
+      ),
+    );
 };
 
 /**
