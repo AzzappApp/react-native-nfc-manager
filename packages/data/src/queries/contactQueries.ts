@@ -453,7 +453,8 @@ export const getUserContactsGroupedByDate = async (
     dates.pop();
   }
 
-  const firstDate = dates.at(0) ?? null;
+  let firstDate = dates.at(0) ?? null;
+  firstDate = firstDate ? new Date(firstDate) : null;
   firstDate?.setHours(23, 59, 59, 999);
   const lastDate = dates.at(-1) ?? null;
 
