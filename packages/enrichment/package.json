@@ -11,7 +11,8 @@
     "dev": "tsc --watch",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
+    "test": "jest"
   },
   "devScripts": [
     "dev"
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "eslint": "^9.24.0",
+    "jest": "^29.7.0",
     "typescript": "^5.8.3"
   }
 }

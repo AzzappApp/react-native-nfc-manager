@@ -179,8 +179,8 @@ export const enrichContact = async (
           );
         }
 
-        const newContact = deduplicateContactFields(
-          cleanObject(diffValues(initialContact, contact)),
+        const newContact = cleanObject(
+          deduplicateContactFields(diffValues(initialContact, contact)),
         );
         const newProfile = cleanObject(diffValues(initialProfile, profile));
 

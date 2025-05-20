@@ -8,6 +8,9 @@ import {
   FormControlLabel,
   Card,
   Switch,
+  CardHeader,
+  CardContent,
+  FormGroup,
 } from '@mui/material';
 import * as Sentry from '@sentry/nextjs';
 import { useEffect, useState, useTransition } from 'react';
@@ -67,70 +70,80 @@ const UserForm = ({ user, profiles }: UserFormProps) => {
   }, [debouncedNote, user.id]);
 
   return (
-    <Box display="flex" flexDirection="column">
-      <Typography variant="h4" component="h1" sx={{ mb: 5 }}>
-        User {user.id}
-      </Typography>
-      <FormControlLabel
-        control={
-          <Switch
-            name="active"
-            checked={!user.deleted}
-            onChange={() => {
-              setConfirm(true);
-            }}
-          />
-        }
-        label="Active"
-        disabled={loading}
-      />
-
-      <Typography variant="h5" sx={{ mb: 5, mt: 5 }}>
-        {`Webcards: ${profiles.filter(({ profile: { invited } }) => !invited).length} / ${profiles.filter(({ profile: { invited } }) => invited).length} (invited)`}
-      </Typography>
-
-      <Card
-        sx={{
+    <Box display="flex" flexDirection="column" sx={{ gap: 5 }}>
+      <Box
+        style={{
           display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-around',
-          padding: 2,
-          height: 500,
-          overflow: 'auto',
+          gap: 20,
+          flexDirection: 'row',
+          alignItems: 'center',
         }}
       >
-        {profiles.map(({ webCard, profile: { profileRole } }) => {
-          if (!webCard?.userName) {
-            return undefined;
-          }
-          return (
-            <WebCardCover
-              key={webCard.id}
-              webcard={webCard}
-              role={profileRole}
-              onRemoveWebCard={() => removeWebCard(user.id, webCard.id)}
-              onToggleStar={() => {
-                toggleStar(user.id, webCard.id);
+        <Typography variant="h6" component="h1">
+          <b>User id:</b> {user.id}
+        </Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              name="active"
+              checked={!user.deleted}
+              onChange={() => {
+                setConfirm(true);
               }}
             />
-          );
-        })}
+          }
+          label="Active"
+          disabled={loading}
+        />
+      </Box>
+
+      <Card>
+        <CardHeader
+          title={`Webcards: ${profiles.filter(({ profile: { invited } }) => !invited).length} / ${profiles.filter(({ profile: { invited } }) => invited).length} (invited)`}
+        />
+        <CardContent
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            padding: 2,
+            maxHeight: 500,
+            overflow: 'auto',
+            gap: 2,
+          }}
+        >
+          {profiles.map(({ webCard, profile: { profileRole } }) => {
+            if (!webCard?.userName) {
+              return undefined;
+            }
+            return (
+              <WebCardCover
+                key={webCard.id}
+                webcard={webCard}
+                role={profileRole}
+                onRemoveWebCard={() => removeWebCard(user.id, webCard.id)}
+                onToggleStar={() => {
+                  toggleStar(user.id, webCard.id);
+                }}
+              />
+            );
+          })}
+        </CardContent>
       </Card>
       <Box
         sx={{
           display: 'flex',
           gap: 2,
           width: '100%',
-          marginTop: 2,
-          marginBottom: 2,
         }}
       >
         <TextField
           sx={{ flex: 1 }}
           value={user.email}
           label="Email"
-          inputProps={{
-            readOnly: true,
+          slotProps={{
+            htmlInput: {
+              readOnly: true,
+            },
           }}
           disabled={!user.email}
         />
@@ -138,8 +151,10 @@ const UserForm = ({ user, profiles }: UserFormProps) => {
           sx={{ flex: 1 }}
           value={user.phoneNumber || ''}
           label="Phone Number"
-          inputProps={{
-            readOnly: true,
+          slotProps={{
+            htmlInput: {
+              readOnly: true,
+            },
           }}
           disabled={!user.phoneNumber}
         />
@@ -153,20 +168,32 @@ const UserForm = ({ user, profiles }: UserFormProps) => {
         value={user.note}
         onChange={onNoteChange}
       />
-      {Object.values(ROLES).map(role => (
-        <FormControlLabel
-          key={role}
-          control={
-            <Checkbox
-              name={role}
-              checked={user.roles?.includes(role)}
-              onChange={() => onToggleRole(role)}
-            />
-          }
-          label={role}
-          disabled={loading}
-        />
-      ))}
+
+      <Card>
+        <CardHeader title="Roles management" />
+        <CardContent>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Select the roles for this user.
+          </Typography>
+          <FormGroup>
+            {Object.values(ROLES).map(role => (
+              <FormControlLabel
+                key={role}
+                control={
+                  <Checkbox
+                    name={role}
+                    checked={user.roles?.includes(role) ?? false}
+                    onChange={() => onToggleRole(role)}
+                  />
+                }
+                label={role}
+                disabled={loading}
+              />
+            ))}
+          </FormGroup>
+        </CardContent>
+      </Card>
+
       <ConfirmDialog
         open={confirm}
         onClose={() => {

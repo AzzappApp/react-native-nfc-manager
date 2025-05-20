@@ -78,7 +78,7 @@ export const Subscription = ({
       : 'web.monthly';
 
   return (
-    <Paper elevation={3} sx={{ p: 3 }}>
+    <Paper elevation={2} sx={{ p: 3 }}>
       <Box display="flex" flexDirection="column" gap={2}>
         <Typography variant="subtitle1" color="GrayText">
           Subscription <b>{userSubscription.subscriptionId}</b> started at

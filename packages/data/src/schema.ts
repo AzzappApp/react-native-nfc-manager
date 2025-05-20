@@ -734,6 +734,7 @@ export const UserTable = cols.table(
       functional: boolean;
     }>(),
     nbEnrichments: cols.int('nbEnrichments').default(0).notNull(),
+    freeEnrichments: cols.boolean('freeEnrichments').default(false).notNull(),
   },
   table => {
     return {

@@ -374,7 +374,10 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  if (user.nbEnrichments >= parseInt(env.MAX_ENRICHMENTS_PER_USER, 10)) {
+  if (
+    !user.freeEnrichments &&
+    user.nbEnrichments >= parseInt(env.MAX_ENRICHMENTS_PER_USER, 10)
+  ) {
     throw new GraphQLError(ERRORS.MAX_ENRICHMENTS_REACHED);
   }
 

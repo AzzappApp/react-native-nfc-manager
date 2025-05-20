@@ -821,6 +821,7 @@ __metadata:
     "@sentry/nextjs": "npm:^7.113.0"
     eslint: "npm:^9.24.0"
     i18n-iso-countries: "npm:^7.14.0"
+    jest: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
     peopledatalabs: "npm:^12.0.0"
     typescript: "npm:^5.8.3"
