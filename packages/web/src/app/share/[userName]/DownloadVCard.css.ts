@@ -3,24 +3,6 @@ import { textButton, textLargeSemiBold, vars } from '#app/[userName]/theme.css';
 
 const AVATAR_CONTAINER_TOP_POSITION = 35;
 
-const overlay = style({
-  position: 'absolute',
-  right: 0,
-  left: 0,
-  bottom: 0,
-  opacity: 0,
-  transition: 'all 450ms cubic-bezier(0.32,1,0.23,1) 0ms',
-});
-
-const openedOverlay = style([
-  {
-    position: 'fixed',
-    top: 0,
-    opacity: 1,
-    zIndex: 5,
-  },
-]);
-
 const dialog = style({
   backgroundColor: 'white',
   padding: '20px',
@@ -67,53 +49,6 @@ const avatarContainer = style({
   gap: '20px',
 });
 
-const addContact = style({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  position: 'fixed',
-  bottom: 75,
-  right: 15,
-  borderRadius: 200,
-  zIndex: 3,
-  width: 50,
-  height: 50,
-  cursor: 'pointer',
-  background: 'rgba(14, 18, 22, 0.40)',
-});
-
-const whatsappAvatar = style({
-  width: 50,
-  height: 50,
-  borderRadius: 200,
-  boxShadow: 'none',
-});
-
-const whatsappContainer = style({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  position: 'fixed',
-  bottom: 15,
-  right: 15,
-  borderRadius: 200,
-  zIndex: 3,
-  width: 50,
-  height: 50,
-  cursor: 'pointer',
-  textDecoration: 'none',
-});
-
-const whatsappIcon = style({
-  position: 'absolute',
-  bottom: -7,
-  right: 0,
-  borderRadius: 200,
-  width: 28,
-  height: 28,
-  cursor: 'pointer',
-});
-
 const buttonLink = style({
   backgroundColor: vars.color.grey1000,
   borderRadius: 45,
@@ -158,15 +93,12 @@ const storeContainer = style({
 });
 
 const styles = {
-  overlay,
   dialog,
   message,
   closeButton,
-  openedOverlay,
   closedDialog,
   openDialog,
   avatarContainer,
-  addContact,
   buttonLink,
   userName,
   subtitle,
@@ -174,9 +106,6 @@ const styles = {
   poweredByContainer,
   poweredByLabel,
   storeContainer,
-  whatsappContainer,
-  whatsappIcon,
-  whatsappAvatar,
 };
 
 export default styles;

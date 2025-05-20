@@ -59,11 +59,21 @@
          <EnvironmentVariable
             key = "_XCAppClipURL"
             value = "https://appclip.apple.com/?p=com.azzapp.app.Clip-dev&amp;u=dddeaz&amp;c=NoIgOiwRCWDGBbAXgEwI4CYCscAcAXAD2hABoSBzATiwGsBnKlABgCMMAWDk88EAERQoeJAKooAhvgCmwvrwgAVafXwACOAHsECAA4SAdgE8RfHsCh8AEtummIAagDMTgGwB2Kh47MsTkgC6AaQWJDYIdvIk9NKsAHQoAK6sADYwBgACFAgSMClxWgiBwcDBJBjMzO4AtMwc1QCMroHQAE5gBmQgWA0ACu4IAMJWhBgA7ikAmpMMmgCiAGIA0gDySwCSDZMAigD6AGb4Y4cSrShWDa26FADi6wDqALJkAN4gKZpwUjCanQBcbxS33wiRQ0hAfw4TjiWCwrlwDSc7lwricWHcLlI71+FBgILBEKwcScVBoGDRTWRHCoDQAvliJEJWip6BC3nA8UYISAAIIwQjVaQGaq9VqaABuQrg4KxWkSBnwrS5fxAC1ahmlXWZuN+3NFEql0mqPJSuhU1UGABeZGoUAByHlIRKtLr0ZLan7-EAAIU0iTgAAtzUlqgAlAOWgzg2m0gJAA"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "_XCAppClipURL"
             value = "https://appclip.apple.com/?p=com.azzapp.app.Clip-dev&amp;u=dddeaz&amp;c=NoIgOiwRCWDGBbAXgEwI4CYCscAcAXAD2hABoSBzATiwGsBnKlABgCMMAWDk88EAERQoeJAKooAhvgCmwvrwgAVafXwACOAHsECAA4SAdgE8RfHsCh8AEtummIAagDMTgGwB2Kh47MsTkgC6pJYQNgh28iTOTlROzLg+VLgYgcEkYREQCiDRzEnMGDEJgUEW6bb2IPTSrAB0KACurAA2MAYAAhQIEjDNtVoIJcFBJBjMzO4AtMwckwCMroHQAE5gBmQgALIASkYAFgCS9ACCzPgYAMIAGjAA7mgAYgjMAFLNAG4AMntzFwD6nwACqxJgBpQoAcQAchD3AAzACKcLQF2OIACQA"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "_XCAppClipURL"
+            value = "http://shared.azzapp.com/dddeaz?k=NoIg7gpg5gzgNgCwKwwEwE8AeAjEAaEAOwEcAWALwDcBDQgRQHUAXAaQEkwAzASwBEBXAPYBjAFKoAWhKQBmdACt+ARgASdJADYVTQgAVKATQC2MSlAC8+QvzhwAukA"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "_XCAppClipURL"
+            value = "https://shared.azzapp.com/dddeaz?k=NoIgzgFgXgxg7gOwE5QMwBMBsB7EAaEAdQDUAJMANwFsBRAMQAcqAzAZQC1MBBeAGwBEkxAJYAXdABkwATwCaAWQDCASQAeAelkSA1FwBGADQBKUefIC8+YABZUAOgCsDzAA4AjKmcBOVC68eHPAc7VC8vBzcAJi8XB39MAHYHFwIuYVUAWgBTBAyABSRsChyYLPwQACFsAFcYCCywDPRqjKMIABeEMoICopKsjK5eBgaMxXbRLIACdAByLihqpHK6JABDBFKQAF1toA"
             isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>

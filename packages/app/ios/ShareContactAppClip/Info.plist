@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<dict>
+	<key>CFBundleShortVersionString</key>
+	<string>1.10.0</string>
+	<key>CFBundleVersion</key>
+	<string>55</string>
+	<key>NSAppClip</key>
 	<dict>
-		<key>CFBundleShortVersionString</key>
-		<string>1.10.0</string>
-		<key>CFBundleVersion</key>
-		<string>55</string>
-		<key>NSAppClip</key>
-		<dict>
-			<key>NSAppClipRequestEphemeralUserNotification</key>
-			<false />
-			<key>NSAppClipRequestLocationConfirmation</key>
-			<false />
-		</dict>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>We need your location to share it with the contact you're connecting with.</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>We need your location to share it with the contact you're connecting with.</string>
-		<key>NSLocationUsageDescription</key>
-		<string>We need your location to share it with the contact you're connecting with.</string>
+		<key>NSAppClipRequestEphemeralUserNotification</key>
+		<false/>
+		<key>NSAppClipRequestLocationConfirmation</key>
+		<false/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to share it with the contact you&apos;re connecting with.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to share it with the contact you&apos;re connecting with.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>We need your location to share it with the contact you&apos;re connecting with.</string>
+	<key>NSAppClipLocalExperience</key>
+	<array>
+		<dict>
+			<key>NSAppClipLocalExperienceURL</key>
+			<string>http://192.168.2.1:3002</string>
+			<key>NSAppClipLocalExperienceBundleIdentifier</key>
+			<string>com.azzapp.app-dev.Clip</string>
+		</dict>
+	</array>
+	<key>AZZAPP_API_URL</key>
+	<string>$(AZZAPP_API_URL)</string>
+	<key>AZZAPP_WEB_URL</key>
+	<string>$(AZZAPP_WEB_URL)</string>
+</dict>
 </plist>

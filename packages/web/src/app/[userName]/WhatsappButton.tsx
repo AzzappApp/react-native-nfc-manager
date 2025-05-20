@@ -7,7 +7,7 @@ import styles from './WhatsappButton.css';
 import type { ModalActions } from '#ui/Modal';
 
 type Props = {
-  contactInitials: string;
+  contactInitials?: string;
   phoneNumbers: Array<{
     label: string;
     number: string;
@@ -42,10 +42,6 @@ const WhatsappButton = ({
     }
   };
 
-  const onCloseModal = () => {
-    phoneNumbersModal.current?.close();
-  };
-
   return (
     <>
       <div role="button" className={styles.whatsappContainer} onClick={onClick}>
@@ -60,7 +56,7 @@ const WhatsappButton = ({
           <Avatar
             className={styles.whatsappAvatar}
             variant="initials"
-            initials={contactInitials}
+            initials={contactInitials ?? ''}
           />
         )}
         <Image
@@ -71,12 +67,7 @@ const WhatsappButton = ({
           height={19}
         />
       </div>
-      <Modal
-        ref={phoneNumbersModal}
-        className={styles.modal}
-        onClose={onCloseModal}
-        hideCloseButton
-      >
+      <Modal ref={phoneNumbersModal} className={styles.modal} hideCloseButton>
         <div className={styles.modalTitle}>
           <FormattedMessage
             defaultMessage="Select a number to contact on WhatsApp"

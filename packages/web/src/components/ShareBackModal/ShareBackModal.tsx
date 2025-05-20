@@ -26,22 +26,13 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   webcardId: string;
   initials: string;
   onClose: () => void;
-  onReady?: () => void;
 };
 
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const {
-      name,
-      avatarUrl,
-      token,
-      userId,
-      webcardId,
-      initials,
-      onClose,
-      onReady,
-    } = props;
+    const { name, avatarUrl, token, userId, webcardId, initials, onClose } =
+      props;
 
     const internalRef = useRef<ModalActions | null>(null);
 
@@ -54,15 +45,11 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
       },
     }));
 
-    const setInternalRef = useCallback(
-      (node: ModalActions | null) => {
-        if (node) {
-          internalRef.current = node;
-          onReady?.();
-        }
-      },
-      [onReady],
-    );
+    const setInternalRef = useCallback((node: ModalActions | null) => {
+      if (node) {
+        internalRef.current = node;
+      }
+    }, []);
 
     return (
       <AppIntlProvider>

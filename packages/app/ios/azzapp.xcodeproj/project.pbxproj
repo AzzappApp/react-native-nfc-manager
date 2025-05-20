@@ -94,6 +94,12 @@
 		96DD48BE2C5D42FA00620722 /* ShareContactAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */; };
 		96DD48C22C5D42FB00620722 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C12C5D42FB00620722 /* Assets.xcassets */; };
 		96DD48C52C5D42FB00620722 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */; };
+		96ECFF0A2DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF022DCA4E25002BA714 /* ContactViewControllerHandler.swift */; };
+		96ECFF0B2DCA4E25002BA714 /* ContactModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF042DCA4E25002BA714 /* ContactModels.swift */; };
+		96ECFF0E2DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF022DCA4E25002BA714 /* ContactViewControllerHandler.swift */; };
+		96ECFF0F2DCA4E25002BA714 /* ContactModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF042DCA4E25002BA714 /* ContactModels.swift */; };
+		96ECFF122DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF022DCA4E25002BA714 /* ContactViewControllerHandler.swift */; };
+		96ECFF132DCA4E25002BA714 /* ContactModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ECFF042DCA4E25002BA714 /* ContactModels.swift */; };
 		BC8C40CC2DC0ED520051878F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C40CA2DC0ED520051878F /* AppDelegate.swift */; };
 		BC8C40CD2DC0ED520051878F /* AZPCustomRevealTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C40CB2DC0ED520051878F /* AZPCustomRevealTransition.swift */; };
 		BC8C40CE2DC0ED520051878F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C40CA2DC0ED520051878F /* AppDelegate.swift */; };
@@ -322,6 +328,7 @@
 		9642B14B2D11B4F2008E236B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		9642B14D2D11B4F2008E236B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "azzappWidgetExtension-dev.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9662B2012DD3A81000B7DE80 /* ShareContactAppClip-devDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ShareContactAppClip-devDebug.entitlements"; sourceTree = "<group>"; };
 		96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Bold.ttf"; path = "../../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
 		96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Regular.ttf"; path = "../../assets/fonts/PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
 		96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
@@ -352,6 +359,8 @@
 		96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		96DD48C62C5D42FB00620722 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96DD48C72C5D42FB00620722 /* ShareContactAppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareContactAppClip.entitlements; sourceTree = "<group>"; };
+		96ECFF022DCA4E25002BA714 /* ContactViewControllerHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactViewControllerHandler.swift; sourceTree = "<group>"; };
+		96ECFF042DCA4E25002BA714 /* ContactModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactModels.swift; sourceTree = "<group>"; };
 		9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "HelveticaNeue-Bold.ttf"; path = "../assets/fonts/HelveticaNeue-Bold.ttf"; sourceTree = "<group>"; };
 		A55BE713148562C8B54D4A6D /* libPods-common-azzapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9A58D92E966BE3884BD1C2F /* libPods-common-azzapp-staging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-staging.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -577,6 +586,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				9662B2012DD3A81000B7DE80 /* ShareContactAppClip-devDebug.entitlements */,
 				961CC3F12CAAD404003DF611 /* azzapp-staging.entitlements */,
 				FDFDBA6F2841006200621C0F /* resources */,
 				13B07FAE1A68108700A75B9A /* azzapp */,
@@ -666,10 +676,9 @@
 		96DD48BC2C5D42FA00620722 /* ShareContactAppClip */ = {
 			isa = PBXGroup;
 			children = (
-				962B866C2DB80D7200767BEF /* CountryModel.swift */,
-				962B86682DB80B2900767BEF /* PhoneInputField.swift */,
+				96ECFF032DCA4E25002BA714 /* Controllers */,
+				96ECFF052DCA4E25002BA714 /* Models */,
 				96B3C68D2DB28F5D0002977F /* Constants.swift */,
-				96B3C6892DB283BB0002977F /* WebView.swift */,
 				96B023FE2DAEA9A90053A5BA /* en.lproj */,
 				96B024012DAEA9A90053A5BA /* fr.lproj */,
 				96DD48C72C5D42FB00620722 /* ShareContactAppClip.entitlements */,
@@ -678,6 +687,8 @@
 				96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */,
 				966A0F2B2DAD1848007EDA87 /* ShareBackScreen.swift */,
 				96BAAEAD2C6262D7002902A2 /* LzString.swift */,
+				962B86682DB80B2900767BEF /* PhoneInputField.swift */,
+				96B3C6892DB283BB0002977F /* WebView.swift */,
 				96DD48C12C5D42FB00620722 /* Assets.xcassets */,
 				96DD48C62C5D42FB00620722 /* Info.plist */,
 				96DD48C32C5D42FB00620722 /* Preview Content */,
@@ -691,6 +702,23 @@
 				96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		96ECFF032DCA4E25002BA714 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				96ECFF022DCA4E25002BA714 /* ContactViewControllerHandler.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		96ECFF052DCA4E25002BA714 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				962B866C2DB80D7200767BEF /* CountryModel.swift */,
+				96ECFF042DCA4E25002BA714 /* ContactModels.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -1259,7 +1287,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1373,7 +1401,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		B7B8B42F9921CD1F7D0C7538 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1537,6 +1565,8 @@
 				96A9AE2E2C7F56BE009380FE /* ShareContactAppClipApp.swift in Sources */,
 				962B866A2DB80B2900767BEF /* PhoneInputField.swift in Sources */,
 				966A0F2D2DAD1848007EDA87 /* ShareBackScreen.swift in Sources */,
+				96ECFF122DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */,
+				96ECFF132DCA4E25002BA714 /* ContactModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1551,6 +1581,8 @@
 				96A9AE3B2C7F56CD009380FE /* ShareContactAppClipApp.swift in Sources */,
 				962B866B2DB80B2900767BEF /* PhoneInputField.swift in Sources */,
 				966A0F2E2DAD1848007EDA87 /* ShareBackScreen.swift in Sources */,
+				96ECFF0E2DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */,
+				96ECFF0F2DCA4E25002BA714 /* ContactModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1565,6 +1597,8 @@
 				96DD48BE2C5D42FA00620722 /* ShareContactAppClipApp.swift in Sources */,
 				962B86692DB80B2900767BEF /* PhoneInputField.swift in Sources */,
 				966A0F2C2DAD1848007EDA87 /* ShareBackScreen.swift in Sources */,
+				96ECFF0A2DCA4E25002BA714 /* ContactViewControllerHandler.swift in Sources */,
+				96ECFF0B2DCA4E25002BA714 /* ContactModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2237,6 +2271,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "http://api.staging.azzapp.com";
+				AZZAPP_WEB_URL = "https://staging.azzapp.com";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -2295,6 +2331,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "http://api.staging.azzapp.com";
+				AZZAPP_WEB_URL = "https://staging.azzapp.com";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -2348,13 +2386,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "http://192.168.2.1:3000";
+				AZZAPP_WEB_URL = "http://192.168.2.1:3002";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip-devDebug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 55;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2406,6 +2446,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "https://api.dev.azzapp.com";
+				AZZAPP_WEB_URL = "https://dev.azzapp.com";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -2459,6 +2501,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "https://api.azzapp.com";
+				AZZAPP_WEB_URL = "https://www.azzapp.com";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -2517,6 +2561,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AZZAPP_API_URL = "https://api.azzapp.com";
+				AZZAPP_WEB_URL = "https://www.azzapp.com";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

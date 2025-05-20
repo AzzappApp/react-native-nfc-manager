@@ -12,21 +12,19 @@ const whatsappContainer = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  position: 'fixed',
-  bottom: 15,
-  right: 15,
   borderRadius: 200,
   zIndex: 3,
   width: 50,
   height: 50,
   cursor: 'pointer',
+  backgroundColor: 'rgba(14, 18, 22, 0.40)',
+  position: 'relative',
 });
 
 const whatsappIcon = style({
   position: 'absolute',
   bottom: -7,
   right: 0,
-  borderRadius: 200,
   width: 28,
   height: 28,
 });

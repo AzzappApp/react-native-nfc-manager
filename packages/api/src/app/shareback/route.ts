@@ -5,6 +5,7 @@ import {
   saveShareBack,
   getUserById,
   getProfileByUserAndWebCard,
+  getProfileById,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { sendTemplateEmail } from '@azzapp/service/emailServices';
@@ -13,11 +14,12 @@ import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import type { VerifySignToken } from '../verifySign/route';
+import type { Profile } from '@azzapp/data';
 import type { JwtPayload } from 'jwt-decode';
 
 // Define the contact data schema
 const contactDataSchema = z.object({
-  webCardId: z.string(),
+  webCardId: z.string().optional(), //deprecated, use for the old QRCode
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   title: z.string().optional(),
@@ -82,6 +84,7 @@ const requestBodySchema = z.object({
   timestamp: z.number(),
   contactData: contactDataSchema,
   token: z.string(),
+  profileId: z.string().optional(), //used for the new QRCode Key
 });
 
 export type ShareBackFormData = z.infer<typeof contactDataSchema>;
@@ -92,7 +95,7 @@ export async function POST(request: Request) {
 
     // Validate the request body
     const validatedData = requestBodySchema.parse(body);
-    const { timestamp, contactData, token } = validatedData;
+    const { timestamp, contactData, token, profileId } = validatedData;
 
     // Check if timestamp is within 5 minutes
     const currentTime = Math.floor(Date.now() / 1000);
@@ -112,11 +115,17 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    let profile: Profile | null = null;
 
-    const profile = await getProfileByUserAndWebCard(
-      user.id,
-      contactData.webCardId,
-    );
+    if (profileId) {
+      profile = await getProfileById(profileId);
+    } else if (contactData.webCardId) {
+      profile = await getProfileByUserAndWebCard(
+        user.id,
+        contactData.webCardId,
+      );
+    }
+
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }

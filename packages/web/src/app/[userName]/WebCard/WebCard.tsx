@@ -3,23 +3,21 @@
 import cn from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
-import arrows from '@azzapp/web/public/arrows@3x.png';
-import { FlipIcon } from '#assets';
+import { FlipIcon, InviteIcon } from '#assets';
 import env from '#env';
 import { ButtonIcon } from '#ui';
-import ContactSteps from '#components/ContactSteps';
 import FullScreenOverlay from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import { DeviceType, getDeviceType } from '#helpers/userAgent';
-import DownloadVCard from '../DownloadVCard';
 import PostFeed from '../PostFeed';
 import WebCardPostNavigation from '../WebCardPostNavigation';
+import WhatsappButton from '../WhatsappButton';
 import styles from './WebCard.css';
 import type { WebCard, Media, PostWithCommentAndAuthor } from '@azzapp/data';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
@@ -36,9 +34,7 @@ type Step1Props = PropsWithChildren<{
   lastModuleBackgroundColor: string;
   color: string | null;
   isAzzappPlus: boolean;
-  isShareBack?: boolean;
   cardStyle: CardStyle;
-  handleCloseDownloadVCard: ({ token }: { token?: string }) => void;
 }>;
 
 const WebCard = ({
@@ -49,26 +45,53 @@ const WebCard = ({
   color,
   cardBackgroundColor,
   lastModuleBackgroundColor,
-  isShareBack,
   isAzzappPlus,
   cardStyle,
-  handleCloseDownloadVCard,
 }: Step1Props) => {
-  const intl = useIntl();
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
+  const router = useRouter();
+
   const searchParams = useSearchParams();
 
   const hasPosts = posts.length > 0;
 
-  const hasContactCard = !!searchParams.get('c') || !!searchParams.get('k');
+  const [shareData, setShareData] = useState<{
+    avatarUrl?: string;
+    contactInitials?: string;
+    phoneNumbers: Array<{
+      number: string;
+      label: string;
+    }>;
+  }>();
+
+  useEffect(() => {
+    if (
+      searchParams.get('source') === 'share' &&
+      typeof window !== 'undefined'
+    ) {
+      const storedData = sessionStorage.getItem(
+        `azzapp_share_${webCard.userName}`,
+      );
+
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData.expiresAt > Date.now()) {
+          setShareData(parsedData);
+        } else {
+          // Clear expired data
+          sessionStorage.removeItem(`azzapp_share_${webCard.userName}`);
+        }
+      }
+    }
+  }, [searchParams, webCard.userName]);
 
   return (
     <FullScreenOverlay cardStyle={cardStyle}>
       <div
         className={styles.wrapper}
         style={{
-          backgroundColor: !isShareBack ? cardBackgroundColor : 'transparent',
+          backgroundColor: cardBackgroundColor,
         }}
       >
         {posts.length > 0 && (
@@ -91,29 +114,9 @@ const WebCard = ({
             [styles.modulesWithPosts]: hasPosts && postsOpen,
           })}
         >
-          {isShareBack && (
-            <div className={styles.header}>
-              <ContactSteps step={2} />
-              <div className={styles.title}>
-                {intl.formatMessage({
-                  defaultMessage: 'Discover the WebCard',
-                  id: '5RopcC',
-                  description: 'Discover the WebCard title',
-                })}
-              </div>
-              <Image
-                style={{ marginTop: 20 }}
-                src={arrows.src}
-                alt=""
-                width={24}
-                height={35}
-              />
-            </div>
-          )}
           <div
             style={{
               position: 'relative',
-              marginTop: isShareBack ? 130 : 0,
             }}
           >
             <CoverRendererBackground media={media} />
@@ -125,12 +128,7 @@ const WebCard = ({
                 } 95%)`,
               }}
             >
-              <div
-                className={cn(
-                  styles.coverWrapper,
-                  isShareBack && styles.coverSharebackWrapper,
-                )}
-              >
+              <div className={cn(styles.coverWrapper)}>
                 <CoverRenderer webCard={webCard} media={media} priority />
               </div>
             </div>
@@ -184,38 +182,60 @@ const WebCard = ({
             </div>
           </aside>
         )}
-
-        {hasPosts && !hasContactCard && (
-          <ButtonIcon
-            Icon={FlipIcon}
-            size={24}
-            height={50}
-            width={50}
-            className={styles.switchContent}
-            color="white"
-            aria-label='Switch to "posts" / "card" view'
-            onClick={() => {
-              setDisplay(prevDisplay =>
-                prevDisplay === 'card' ? 'posts' : 'card',
-              );
-              window.scrollTo({ top: 0 });
-            }}
-          />
-        )}
-      </div>
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          width: '100%',
-          zIndex: 5,
-        }}
-      >
-        <DownloadVCard
-          webCard={webCard}
-          onClose={handleCloseDownloadVCard}
-          step={2}
-        />
+        <div className={styles.floatingButtonsContainer}>
+          {shareData && shareData.phoneNumbers.length > 0 && !postsOpen && (
+            <WhatsappButton
+              phoneNumbers={shareData.phoneNumbers}
+              contactInitials={shareData.contactInitials}
+              avatarUrl={shareData.avatarUrl}
+            />
+          )}
+          {shareData && !postsOpen && !shareData.avatarUrl && (
+            <ButtonIcon
+              Icon={InviteIcon}
+              size={24}
+              height={50}
+              width={50}
+              className={styles.addContact}
+              aria-label="Add contact"
+              onClick={() => {
+                router.back();
+              }}
+            />
+          )}
+          {shareData && !postsOpen && shareData && (
+            <div
+              className={styles.addContact}
+              onClick={() => {
+                router.back();
+              }}
+            >
+              <Image
+                alt="add contact"
+                src="/contact.svg"
+                width={20}
+                height={20}
+              />
+            </div>
+          )}
+          {hasPosts && (
+            <ButtonIcon
+              Icon={FlipIcon}
+              size={24}
+              height={50}
+              width={50}
+              className={styles.switchContent}
+              color="white"
+              aria-label='Switch to "posts" / "card" view'
+              onClick={() => {
+                setDisplay(prevDisplay =>
+                  prevDisplay === 'card' ? 'posts' : 'card',
+                );
+                window.scrollTo({ top: 0 });
+              }}
+            />
+          )}
+        </div>
       </div>
     </FullScreenOverlay>
   );

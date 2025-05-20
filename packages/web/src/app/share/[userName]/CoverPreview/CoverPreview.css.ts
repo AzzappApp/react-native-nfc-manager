@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery } from '../theme.css';
+import { MediaQuery } from '../../../[userName]/theme.css';
 
-const webCardPreviewContainer = style({
+const coverPreviewContainer = style({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -37,7 +37,7 @@ const coverContentClass = style({
 });
 
 const styles = {
-  webCardPreviewContainer,
+  coverPreviewContainer,
   coverContainer,
   cover,
   coverContentClass,

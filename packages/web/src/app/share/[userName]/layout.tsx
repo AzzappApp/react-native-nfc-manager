@@ -7,9 +7,9 @@ import { AxiomWebVitals } from 'next-axiom';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { getTranslationMessages } from '@azzapp/service/i18nServices';
 import env from '#env';
+import { cachedGetWebCardByUserName } from '#app/[userName]/dataAccess';
 import ClientWrapper from '#components/ClientWrapper';
-import { cachedGetWebCardByUserName } from './dataAccess';
-import { themeClass } from './theme.css';
+import { themeClass } from '../../[userName]/theme.css';
 import type { ClientWrapperProps } from '#components/ClientWrapper';
 import './styles.css';
 
@@ -23,15 +23,17 @@ const RootLayout = async (props: {
   params?: Promise<{ userName?: string }>;
 }) => {
   const userName = (await props.params)?.userName;
-
   const { children } = props;
+
+  const headersList = await headers();
+  const appleItunesAppMeta = `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}, ${env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID}`;
 
   const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
 
   let locale = webCard?.locale;
   if (locale == null) {
     locale =
-      (await headers())
+      headersList
         .get('accept-language')
         ?.split(',')?.[0]
         .split('-')?.[0]
@@ -82,10 +84,7 @@ const RootLayout = async (props: {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        <meta
-          name="apple-itunes-app"
-          content={`${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
-        />
+        <meta name="apple-itunes-app" content={appleItunesAppMeta} />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
@@ -98,7 +97,6 @@ const RootLayout = async (props: {
             }
             applyVH();
             window.addEventListener('resize', applyVH);
-
          `}
         </Script>
         <div id="portal" />

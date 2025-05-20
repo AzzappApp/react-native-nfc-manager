@@ -18,16 +18,6 @@ export function buildWebUrl(path?: string | null) {
 }
 
 /**
- * Builds a user URL from a user name.
- */
-export function buildReadableUserUrl(userName?: string | null) {
-  if (!userName) {
-    return 'azzapp.com';
-  }
-  return `azzapp.com/${userName}`;
-}
-
-/**
  * Builds a post URL from a user name and post.
  */
 export function buildPostUrl(userName: string, postId: string) {

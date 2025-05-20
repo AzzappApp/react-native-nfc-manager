@@ -1,5 +1,6 @@
 import { json2csv, csv2json } from 'csv42';
 import type { SocialLinkId } from './socialLinkHelpers';
+import type { VCardAdditionnalData } from './vCardHelpers';
 
 /**
  * A contact card
@@ -142,6 +143,65 @@ export const parseContactCard = (contactCardData: string) => {
   };
 };
 
+export const parseContactCardWithAdditionalData = (
+  contactCardData: string,
+  additionalData?: VCardAdditionnalData,
+): ContactCard => {
+  const data = csv2json<{
+    [key: string]: ParsedContactCard;
+  }>(contactCardData, { header: false });
+
+  const [
+    [
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _profileId,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _webCardId,
+      firstName,
+      lastName,
+      company,
+      title,
+      phoneNumbers,
+      emails,
+      addresses,
+      birthday,
+    ],
+  ] = Object.values(data[0]);
+
+  return {
+    firstName: firstName || null,
+    lastName: lastName || null,
+    company: company || null,
+    title: title || null,
+    phoneNumbers: phoneNumbers
+      ? phoneNumbers.map(([label, number]) => ({
+          label,
+          number,
+        }))
+      : null,
+    emails: emails
+      ? emails.map(([label, address]) => ({
+          label,
+          address,
+        }))
+      : null,
+    addresses: addresses
+      ? addresses.map(([label, address]) => ({
+          label,
+          address,
+        }))
+      : null,
+    birthday: birthday
+      ? {
+          birthday,
+        }
+      : null,
+    // Merge additional data
+    urls: additionalData?.urls || null,
+    socials: additionalData?.socials || null,
+  };
+};
+
 export const AVATAR_MAX_WIDTH = 2048;
 export const LOGO_MAX_WIDTH = 2048;
 
@@ -189,4 +249,13 @@ export const buildVCardFileName = (
   }
 
   return `${vCardFileName}.vcf`;
+};
+
+export const formatContactInitial = (
+  firstName?: string | null,
+  lastName?: string | null,
+): string => {
+  const firstInitial = firstName?.[0] || '';
+  const lastInitial = lastName?.[0] || '';
+  return `${firstInitial}${lastInitial}`;
 };

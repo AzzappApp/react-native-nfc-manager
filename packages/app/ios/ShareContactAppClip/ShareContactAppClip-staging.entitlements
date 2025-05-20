@@ -5,7 +5,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:staging.azzapp.com</string>
-		<string>appclips:staging.azzapp.com</string>
+		<string>appclips:staging.azzapp.com/share</string>
 	</array>
 	<key>com.apple.developer.parent-application-identifiers</key>
 	<array>

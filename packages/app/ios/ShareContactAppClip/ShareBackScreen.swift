@@ -77,7 +77,6 @@ struct ShareBackScreen: View {
   @State var isSubmitting: Bool = false
   @State private var showErrorAlert = false
   @State private var showWelcomeMessage = true
-  @State private var showWebView = false
   @State private var showPhoneNumberMenu = false
   @Binding var isPresented: Bool
   @FocusState private var focusedField: Field?
@@ -116,187 +115,135 @@ struct ShareBackScreen: View {
 
   var body: some View {
     ZStack {
-      // WebView with buttons overlay
-      ZStack {
-        WebView(url: URL(string: "\(Constants.WEB_URL)\(username)")!)
-          .edgesIgnoringSafeArea(.all)
-          .ignoresSafeArea(.all)
-
-        // Buttons overlay
-        if showWebView {
-          ZStack {
-            // WhatsApp button if phone numbers exist
-            if let phoneNumbers = contactData?.phoneNumbers, !phoneNumbers.isEmpty {
-              if phoneNumbers.count > 1 {
-                Button(action: { showPhoneNumberMenu = true }) {
-                  Image("whatsapp_icon")
-                    .resizable()
-                    .frame(width: 42, height: 42)
-                    .padding(4)
-                    .background(Color(hex: "25D366"))
-                    .clipShape(Circle())
-                }.position(x: 40, y: UIScreen.main.bounds.height - 40)
-              } else if let phoneNumber = phoneNumbers.first?[1], !phoneNumber.isEmpty {
-                Button(action: { openWhatsApp(phoneNumber: phoneNumber) }) {
-                  Image("whatsapp_icon")
-                    .resizable()
-                    .frame(width: 42, height: 42)
-                    .padding(4)
-                    .background(Color(hex: "25D366"))
-                    .clipShape(Circle())
-                }.position(x: 40, y: UIScreen.main.bounds.height - 40)
-              }
-            }
-            
-            // App Store download button
-            Button(action: openAppStore) {
-              Text(localizedString("create_webcard"))
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(maxWidth: 200)
-                .frame(height: 50)
-                .background(Color(hex: "0E1216"))
-                .opacity(0.6)
-                .cornerRadius(23.5)
-            }
-            .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height - 40)
-          }.ignoresSafeArea(.all)
-        }
-      }
-      .allowsHitTesting(showWebView)
-
-      // ShareBack form content
-      if !showWebView {
-        Color.black.opacity(0.5)
-          .edgesIgnoringSafeArea(.all)
-          .transition(.opacity)
-        HStack(spacing: 15) {
-          BorderCircle(avatarUrl: nil)
-          BorderCircle(avatarUrl: avatarUrl)
-        }
-        .position(x: UIScreen.main.bounds.width / 2, y: 50)
-        .zIndex(1)
-        .onAppear {
-          focusedField = .firstName
-        }
-        VStack(spacing: 0) {
-          ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-              ZStack {
-                // Centered title and username
-                VStack(alignment: .center, spacing: 0) {
-                  Text(localizedString("Share your details with"))
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(Color(white: 0.2))
-                  Text(username)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.black)
-                }
-                // X button on the left
-                HStack {
-                  Button(action: {
-                    withAnimation(.easeOut(duration: 0.3)) {
-                      showWebView = true
-                    }
-                  }) {
-                    Image(systemName: "xmark")
-                      .font(.system(size: 20, weight: .bold))
-                      .foregroundColor(.black)
-                      .padding(.leading, 16)
-                  }
-                  Spacer()
-                }
-              }
-              .frame(maxWidth: .infinity)
-              .frame(height: 50)
-              .padding(.top, 20)
-              .padding(.bottom, 20)
-
-              // Form fields
-              VStack {
-                InputField(
-                  title: localizedString("First name"),
-                  placeHolder: localizedString("Enter your first name"),
-                  keyboardType: .default,
-                  text: $firstName
-                )
-                .focused($focusedField, equals: .firstName)
-                InputField(
-                  title: localizedString("Last name"),
-                  placeHolder: localizedString("Enter your last name"),
-                  keyboardType: .default,
-                  text: $lastName
-                )
-                .focused($focusedField, equals: .lastName)
-                PhoneInputField(
-                  title: localizedString("Phone"),
-                  placeHolder: localizedString("Enter your number"),
-                  phone: $phone,
-                  selectedCountry: $selectedCountry
-                )
-                .focused($focusedField, equals: .phone)
-                InputField(
-                  title: localizedString("Email"),
-                  placeHolder: localizedString("Enter your email address"),
-                  keyboardType: .emailAddress,
-                  text: $email
-                )
-                .focused($focusedField, equals: .email)
-                InputField(
-                  title: localizedString("Company"),
-                  placeHolder: localizedString("Enter your company name"),
-                  keyboardType: .default,
-                  text: $company
-                )
-                .focused($focusedField, equals: .company)
-                InputField(
-                  title: localizedString("Title"),
-                  placeHolder: localizedString("Enter your title"),
-                  keyboardType: .default,
-                  text: $title
-                )
-                .focused($focusedField, equals: .title)
-              }
-            }
-            .padding(.top, 20)
-          }
-
-          Button(action: {
-            submitDetails()
-          }) {
-            if isSubmitting {
-              ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                .frame(maxWidth: .infinity)
-                .frame(height: 47)
-            } else {
-              Text(localizedString("Send"))
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 47)
-            }
-          }
-          .background(isFormValid ? Color(hex: "2C2B32") : Color.gray)
-          .cornerRadius(23.5)
-          .overlay(
-            RoundedRectangle(cornerRadius: 23.5)
-              .stroke(isFormValid ? Color.black : Color.gray, lineWidth: 2)
-          )
-          .disabled(!isFormValid || isSubmitting)
-          .padding(.horizontal, 20)
-          .padding(.bottom, 20)
-        }
-        .background(Color.white)
-        .cornerRadius(24)
-        .padding(.horizontal, 20)
-        .padding(.top, 50)
-        .padding(.bottom, 20)
-        .onTapGesture {
-          hideKeyboard()
-        }
+      Color.black.opacity(0.5)
+        .edgesIgnoringSafeArea(.all)
         .transition(.opacity)
+      HStack(spacing: 15) {
+        BorderCircle(avatarUrl: nil)
+        BorderCircle(avatarUrl: avatarUrl)
       }
+      .position(x: UIScreen.main.bounds.width / 2, y: 50)
+      .zIndex(1)
+      .onAppear {
+        focusedField = .firstName
+      }
+      VStack(spacing: 0) {
+        ScrollView {
+          VStack(alignment: .leading, spacing: 0) {
+            ZStack {
+              // Centered title and username
+              VStack(alignment: .center, spacing: 0) {
+                Text(localizedString("Share your details with"))
+                  .font(.system(size: 16, weight: .regular))
+                  .foregroundColor(Color(white: 0.2))
+                Text(username)
+                  .font(.system(size: 16, weight: .bold))
+                  .foregroundColor(.black)
+              }
+              // X button on the left
+              HStack {
+                Button(action: {
+                  withAnimation(.easeOut(duration: 0.3)) {
+                    isPresented = false
+                  }
+                }) {
+                  Image(systemName: "xmark")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.leading, 16)
+                }
+                Spacer()
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .padding(.top, 20)
+            .padding(.bottom, 20)
+
+            // Form fields
+            VStack {
+              InputField(
+                title: localizedString("First name"),
+                placeHolder: localizedString("Enter your first name"),
+                keyboardType: .default,
+                text: $firstName
+              )
+              .focused($focusedField, equals: .firstName)
+              InputField(
+                title: localizedString("Last name"),
+                placeHolder: localizedString("Enter your last name"),
+                keyboardType: .default,
+                text: $lastName
+              )
+              .focused($focusedField, equals: .lastName)
+              PhoneInputField(
+                title: localizedString("Phone"),
+                placeHolder: localizedString("Enter your number"),
+                phone: $phone,
+                selectedCountry: $selectedCountry
+              )
+              .focused($focusedField, equals: .phone)
+              InputField(
+                title: localizedString("Email"),
+                placeHolder: localizedString("Enter your email address"),
+                keyboardType: .emailAddress,
+                text: $email
+              )
+              .focused($focusedField, equals: .email)
+              InputField(
+                title: localizedString("Company"),
+                placeHolder: localizedString("Enter your company name"),
+                keyboardType: .default,
+                text: $company
+              )
+              .focused($focusedField, equals: .company)
+              InputField(
+                title: localizedString("Title"),
+                placeHolder: localizedString("Enter your title"),
+                keyboardType: .default,
+                text: $title
+              )
+              .focused($focusedField, equals: .title)
+            }
+          }
+          .padding(.top, 20)
+        }
+
+        Button(action: {
+          submitDetails()
+        }) {
+          if isSubmitting {
+            ProgressView()
+              .progressViewStyle(CircularProgressViewStyle(tint: .white))
+              .frame(maxWidth: .infinity)
+              .frame(height: 47)
+          } else {
+            Text(localizedString("Send"))
+              .font(.system(size: 18, weight: .semibold))
+              .foregroundColor(.white)
+              .frame(maxWidth: .infinity)
+              .frame(height: 47)
+          }
+        }
+        .background(isFormValid ? Color(hex: "2C2B32") : Color.gray)
+        .cornerRadius(23.5)
+        .overlay(
+          RoundedRectangle(cornerRadius: 23.5)
+            .stroke(isFormValid ? Color.black : Color.gray, lineWidth: 2)
+        )
+        .disabled(!isFormValid || isSubmitting)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
+      }
+      .background(Color.white)
+      .cornerRadius(24)
+      .padding(.horizontal, 20)
+      .padding(.top, 50)
+      .padding(.bottom, 20)
+      .onTapGesture {
+        hideKeyboard()
+      }
+      .transition(.opacity)
     }
     .sheet(isPresented: $showPhoneNumberMenu) {
       VStack {
@@ -383,7 +330,7 @@ struct ShareBackScreen: View {
     let timestamp = Int(Date().timeIntervalSince1970)
 
     // Construct the API URL
-    guard let url = URL(string: "\(Constants.API_URL)shareback") else {
+    guard let url = URL(string: "\(Constants.API_URL)/shareback") else {
       showErrorAlert = true
       isSubmitting = false
       return
@@ -451,6 +398,7 @@ struct ShareBackScreen: View {
       "timestamp": timestamp,
       "contactData": contactDataPayload,
       "token": contactData?.token ?? "",
+      "profileId": contactData?.profileId ?? "",
     ]
 
     // Create and configure the request
@@ -479,7 +427,7 @@ struct ShareBackScreen: View {
         if let httpResponse = response as? HTTPURLResponse {
           if httpResponse.statusCode == 200 {
             withAnimation(.easeOut(duration: 0.3)) {
-              showWebView = true
+              isPresented = false
             }
           } else {
             showErrorAlert = true
@@ -574,20 +522,20 @@ struct BorderCircle: View {
 
   var body: some View {
     ZStack {
-      // Outer circle (76px)
+      // Outer circle (38px)
       Circle()
         .fill(Color.white)
-        .frame(width: 76, height: 76)
+        .frame(width: 38, height: 38)
 
-      // Middle circle (72px) with 2px border
+      // Middle circle (36px) with 2px border
       Circle()
         .stroke(Color.black, lineWidth: 2)
-        .frame(width: 72, height: 72)
+        .frame(width: 36, height: 36)
 
-      // Inner circle (64px) with gray background and 2px border
+      // Inner circle (34px) with gray background and 2px border
       Circle()
         .fill(Color(hex: "F5F5F6"))
-        .frame(width: 68, height: 68)
+        .frame(width: 34, height: 34)
 
       // Image in the center (scaled to fit)
       if let urlString = avatarUrl, let url = URL(string: urlString) {
@@ -599,13 +547,13 @@ struct BorderCircle: View {
             image
               .resizable()
               .scaledToFill()
-              .frame(width: 68, height: 68)
+              .frame(width: 34, height: 34)
               .clipShape(Circle())
           case .failure:
             Image("Frame")
               .resizable()
               .scaledToFit()
-              .frame(width: 32, height: 32)
+              .frame(width: 16, height: 16)
               .foregroundColor(.white)
           @unknown default:
             EmptyView()
@@ -615,7 +563,7 @@ struct BorderCircle: View {
         Image("Frame")
           .resizable()
           .scaledToFit()
-          .frame(width: 32, height: 32)
+          .frame(width: 16, height: 16)
           .foregroundColor(.white)
       }
     }
