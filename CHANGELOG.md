@@ -1,3 +1,9 @@
+## 1.10.0-canary.229
+
+* **fix:**  - **Contact:** sort location contacts by date ([#8865](https://github.com/AzzappApp/azzapp/pull/8865))
+* **fix:**  - **Contacts:** properly handle case of single date in date grouping ([#8866](https://github.com/AzzappApp/azzapp/pull/8866))
+* **feat:**  - **enrichment:** add flag in backoffice to set unlimited enrichments ([#8860](https://github.com/AzzappApp/azzapp/pull/8860))
+
 ## 1.10.0-canary.228
 
 * **fix:**  - **Contact:** make search slide with scroll ([#8863](https://github.com/AzzappApp/azzapp/pull/8863))
