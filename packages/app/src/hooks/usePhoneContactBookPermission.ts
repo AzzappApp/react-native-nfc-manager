@@ -11,7 +11,7 @@ import { waitForAppState } from '#helpers/appState';
 /*
  * hook definition
  */
-export const usePhonebookPermission = () => {
+export const usePhoneContactBookPermission = () => {
   const intl = useIntl();
 
   const displaySettingsRedirectPopup =
@@ -63,7 +63,7 @@ export const usePhonebookPermission = () => {
   /*
    * common function with or without redirection
    */
-  const requestPhonebook = useCallback(
+  const requestPhoneContactBook = useCallback(
     async (redirectToSettings: boolean) => {
       if (Platform.OS === 'ios') {
         // ios
@@ -102,20 +102,20 @@ export const usePhonebookPermission = () => {
   /*
    * request phonebook permission. In case of failure redirect to settings
    */
-  const requestPhonebookPermissionAndRedirectToSettingsAsync =
+  const requestPhoneContactBookPermissionAndRedirectToSettingsAsync =
     useCallback(async () => {
-      return requestPhonebook(true);
-    }, [requestPhonebook]);
+      return requestPhoneContactBook(true);
+    }, [requestPhoneContactBook]);
 
   /*
    * request phonebook permission.
    */
-  const requestPhonebookPermissionAsync = useCallback(async () => {
-    return requestPhonebook(false);
-  }, [requestPhonebook]);
+  const requestPhoneContactBookPermissionAsync = useCallback(async () => {
+    return requestPhoneContactBook(false);
+  }, [requestPhoneContactBook]);
 
   return {
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-    requestPhonebookPermissionAsync,
+    requestPhoneContactBookPermissionAndRedirectToSettingsAsync,
+    requestPhoneContactBookPermissionAsync,
   };
 };

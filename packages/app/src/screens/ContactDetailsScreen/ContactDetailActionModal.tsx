@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet } from 'react-native';
 import { colors } from '#theme';
-import ContactActionModalOption from '#screens/ContactsScreen/ContactActionModalOption';
+import { ContactActionModalOption } from '#components/Contact/ContactActionModal';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactType } from '#helpers/contactTypes';
-import type { ContactActionModalOptionProps } from '#screens/ContactsScreen/ContactActionModalOption';
+import type { ContactActionModalOptionProps } from '#components/Contact/ContactActionModal';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { Icons } from '#ui/Icon';
 
 type ContactDetailActionModalProps = {

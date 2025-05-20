@@ -11,7 +11,7 @@ import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { NoteModalMutation } from '#relayArtifacts/NoteModalMutation.graphql';
 
 type NoteModalProps = {

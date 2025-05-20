@@ -8,7 +8,7 @@ import { getWhatsAppUrl } from '#helpers/whatsAppHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactPhoneNumberType } from '#helpers/contactTypes';
+import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 
 type ContactPhoneNumberPickerProps = {
   phoneNumbers: ContactPhoneNumberType[];

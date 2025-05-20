@@ -9,7 +9,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
 import { usePermissionContext } from '#helpers/PermissionContext';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import { usePhoneContactBookPermission } from '#hooks/usePhoneContactBookPermission';
 import IconButton from '#ui/IconButton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -52,8 +52,10 @@ const MultiUserAddList = ({
 
   const { contactPermission } = usePermissionContext();
 
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
+  const {
+    requestPhoneContactBookPermissionAndRedirectToSettingsAsync:
+      requestPhonebookPermissionAndRedirectToSettingsAsync,
+  } = usePhoneContactBookPermission();
 
   const loadContacts = useCallback(async () => {
     if (loadNextPage.current || !hasNextPage.current) return;

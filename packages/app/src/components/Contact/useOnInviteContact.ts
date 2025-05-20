@@ -6,18 +6,20 @@ import {
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
-import { buildExpoContact } from '#helpers/contactListHelpers';
+import { buildExpoContact } from '#helpers/contactHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
-import { usePhonebookPermission } from './usePhonebookPermission';
-import type { ContactType } from '#helpers/contactTypes';
+import { usePhoneContactBookPermission } from '#hooks/usePhoneContactBookPermission';
+import type { ContactType } from '#helpers/contactHelpers';
 
 const useOnInviteContact = () => {
   const intl = useIntl();
 
   const { contactPermission } = usePermissionContext();
 
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
+  const {
+    requestPhoneContactBookPermissionAndRedirectToSettingsAsync:
+      requestPhonebookPermissionAndRedirectToSettingsAsync,
+  } = usePhoneContactBookPermission();
 
   const onInviteContact = useCallback(
     async (contacts: ContactType | ContactType[]) => {

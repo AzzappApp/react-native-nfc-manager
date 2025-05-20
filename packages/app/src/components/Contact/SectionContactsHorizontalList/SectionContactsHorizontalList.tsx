@@ -3,7 +3,7 @@ import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsScreenSection from './ContactsHorizontalList';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactsHorizontalList_contacts$key } from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type { ListRenderItemInfo, ViewStyle } from 'react-native';
 
 type Props = {
@@ -11,13 +11,13 @@ type Props = {
     title: string;
     count?: number;
     onSeeAll?: () => void;
-    contacts: ContactType[];
+    contacts: ContactsHorizontalList_contacts$key;
   }>;
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType | ContactType[]) => void;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (arg: string[] | string) => void;
   showLocationInSubtitle?: boolean;
   ListFooterComponent?:
     | React.ComponentType<any>
@@ -38,7 +38,7 @@ const SectionContactsHorizontalList = ({
   onRefresh,
   refreshing,
   onShowContact,
-  showContactAction,
+  onShowContactAction,
   showLocationInSubtitle,
   ListFooterComponent,
   ListHeaderComponent,
@@ -50,7 +50,7 @@ const SectionContactsHorizontalList = ({
     }: ListRenderItemInfo<{
       title: string;
       count?: number;
-      contacts: ContactType[];
+      contacts: ContactsHorizontalList_contacts$key;
       onSeeAll?: () => void;
     }>) => {
       return (
@@ -58,14 +58,14 @@ const SectionContactsHorizontalList = ({
           contacts={item.contacts}
           onShowContact={onShowContact}
           title={item.title}
-          showContactAction={showContactAction}
+          onShowContactAction={onShowContactAction}
           onSeeAll={item.onSeeAll}
           count={item.count}
           showLocationInSubtitle={showLocationInSubtitle}
         />
       );
     },
-    [showLocationInSubtitle, onShowContact, showContactAction],
+    [showLocationInSubtitle, onShowContact, onShowContactAction],
   );
 
   return (

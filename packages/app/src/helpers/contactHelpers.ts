@@ -1,15 +1,22 @@
 import * as Sentry from '@sentry/react-native';
+import { ContactTypes } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { Platform } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
+import ShareCommand from 'react-native-share';
 import {
   ConnectionHandler,
+  graphql,
+  readInlineData,
   type RecordProxy,
   type RecordSourceProxy,
 } from 'relay-runtime';
 import VCard from 'vcard-creator';
 import * as z from 'zod';
+import { isDefined } from '@azzapp/shared/isDefined';
+import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import {
   addressLabelToVCardLabel,
   emailLabelToVCardLabel,
@@ -18,9 +25,87 @@ import {
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
-import { prefixWithHttp } from './contactListHelpers';
-import type { ContactMeetingPlaceType, ContactType } from './contactTypes';
+import { sanitizeFilePath } from './fileHelpers';
+import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
+import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type { Contact as ExpoContact, Date as ExpoDate } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
+
+/**
+ * This file defines all types for contacts management
+ * Types shall be as close as possible from graphql information
+ */
+export type ContactAddressLabelType = 'Home' | 'Main' | 'Other' | 'Work';
+
+export type ContactAddressType = {
+  address: string;
+  label: ContactAddressLabelType;
+};
+
+export type ContactMediaType = {
+  id?: string | null;
+  uri?: string | null;
+};
+
+export type ContactEmailLabelType = 'Home' | 'Main' | 'Other' | 'Work';
+
+export type ContactEmailType = {
+  address: string;
+  label: ContactEmailLabelType;
+};
+
+export type ContactPhoneNumberLabelType =
+  | 'Fax'
+  | 'Home'
+  | 'Main'
+  | 'Mobile'
+  | 'Other'
+  | 'Work';
+
+export type ContactPhoneNumberType = {
+  number: string;
+  label: ContactPhoneNumberLabelType;
+};
+
+// TODO - add fixed label support for socials
+export type ContactSocialType = {
+  label: string;
+  url: string;
+};
+
+export type ContactUrlType = {
+  url: string;
+};
+
+export type ContactMeetingPlaceType = {
+  city: string | null;
+  country: string | null;
+  region: string | null;
+  subregion: string | null;
+};
+
+export type ContactType = {
+  id?: string;
+  addresses?: ContactAddressType[] | null;
+  avatar?: ContactMediaType | null;
+  birthday?: string | null;
+  company?: string;
+  emails?: ContactEmailType[] | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  logo?: ContactMediaType | null;
+  meetingPlace?: ContactMeetingPlaceType | null;
+  meetingDate: Date;
+  phoneNumbers?: ContactPhoneNumberType[] | null;
+  socials?: ContactSocialType[] | null;
+  title?: string | null;
+  urls?: ContactUrlType[] | null;
+  webCardId?: string | null;
+  profileId?: string | null;
+  webCardUserName?: string | null;
+  webCardPreview?: ContactMediaType | null;
+  note?: string | null;
+};
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
@@ -299,6 +384,41 @@ export const buildVCard = async (contact: ContactType) => {
     }
   }
   return vCard;
+};
+
+export const shareContact = async (contact: ContactType) => {
+  const vCardData = await buildVCard(contact);
+
+  if (!vCardData) {
+    console.error('cannot generate VCard');
+    return;
+  }
+  const contactName =
+    `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim();
+  const filePath =
+    Paths.cache.uri +
+    sanitizeFilePath(contactName.length ? contactName : 'contact') +
+    '.vcf';
+
+  let file;
+  try {
+    file = new File(filePath);
+    file.create();
+    // generate file
+    file.write(vCardData.toString());
+    // share the file
+    await ShareCommand.open({
+      url: filePath,
+      type: 'text/x-vcard',
+      failOnCancel: false,
+    });
+    // clean up file afterward
+    file.delete();
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error(e);
+    file?.delete();
+  }
 };
 
 export const getFriendlyNameFromLocation = (
@@ -728,4 +848,303 @@ export const removeContactUpdater = (
       }
     }
   }
+};
+
+export function prefixWithHttp(link: string): string;
+export function prefixWithHttp(link: undefined): undefined;
+export function prefixWithHttp(link: string | undefined): string | undefined;
+export function prefixWithHttp(link?: string): string | undefined {
+  if (!link || link.startsWith('http://') || link.startsWith('https://')) {
+    return link;
+  }
+  return `https://${link}`;
+}
+
+export const buildExpoContact = async (
+  contact: ContactType,
+): Promise<ExpoContact> => {
+  let birthday: ExpoDate | undefined = undefined;
+  if (contact?.birthday) {
+    const contactBirthday = new Date(contact.birthday);
+    birthday = {
+      label: 'birthday',
+      year: contactBirthday.getFullYear(),
+      month: contactBirthday.getMonth(),
+      day: contactBirthday.getDate(),
+    };
+  }
+  let avatar: File | undefined;
+  try {
+    const contactAvatar =
+      contact?.avatar || contact?.logo || contact?.webCardPreview;
+    if (contactAvatar && contactAvatar.id) {
+      const existingFile = getLocalCachedMediaFile(contactAvatar.id, 'image');
+      if (existingFile) {
+        avatar = new File(existingFile);
+      }
+
+      if ((!avatar || !avatar.exists) && contactAvatar.uri) {
+        avatar = new File(Paths.cache.uri + contactAvatar.id);
+        if (!avatar.exists) {
+          await File.downloadFileAsync(contactAvatar.uri, avatar);
+        }
+      }
+    } else if (contactAvatar?.uri) {
+      // already in cache
+      avatar = new File(contactAvatar.uri);
+    }
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error('download avatar failure', e);
+  }
+  const image = avatar?.uri ? { uri: avatar.uri } : undefined;
+  return {
+    contactType: ContactTypes.Person,
+    firstName: contact.firstName || undefined,
+    lastName: contact.lastName || undefined,
+    company: contact.company || undefined,
+    jobTitle: contact.title || undefined,
+    name: formatDisplayName(contact.firstName, contact.lastName) || '',
+    birthday,
+    addresses: contact.addresses?.map(({ address, label }) => ({
+      address,
+      label,
+    })),
+    emails: contact.emails?.map(({ address, label }) => ({
+      email: address,
+      label,
+    })),
+    image,
+    imageAvailable: !!image,
+    urlAddresses: contact.urls?.map(addr => {
+      return {
+        label: 'default',
+        url: prefixWithHttp(addr.url),
+      };
+    }),
+    socialProfiles: contact.socials?.map(social => {
+      return {
+        ...social,
+        url: prefixWithHttp(social.url),
+      };
+    }),
+    phoneNumbers: contact.phoneNumbers?.map(number => {
+      return {
+        ...number,
+        label:
+          Platform.OS === 'android' && number.label === 'Fax'
+            ? 'otherFax'
+            : number.label,
+      };
+    }),
+    note: contact.note || undefined,
+  };
+};
+
+export const stringToContactAddressLabelType = (
+  str: string,
+): ContactAddressLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
+};
+
+export const stringToContactEmailLabelType = (
+  str: string,
+): ContactEmailLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
+};
+
+export const stringToContactPhoneNumberLabelType = (
+  str: string,
+): ContactPhoneNumberLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    case 'fax':
+      return 'Fax';
+    case 'mobile':
+      return 'Mobile';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
+};
+
+export const readContactData = (
+  data: contactHelpersReadContactData$key,
+): ContactType => {
+  const inputContact = readInlineData(
+    graphql`
+      fragment contactHelpersReadContactData on Contact
+      @inline
+      @argumentDefinitions(
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
+        id
+        firstName
+        lastName
+        company
+        title
+        meetingDate
+        note
+        emails {
+          label
+          address
+        }
+        phoneNumbers {
+          label
+          number
+        }
+        addresses {
+          address
+          label
+        }
+        socials {
+          label
+          url
+        }
+        urls {
+          url
+        }
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+        }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+        }
+        birthday
+        meetingPlace {
+          city
+          region
+          subregion
+          country
+        }
+        contactProfile {
+          id
+          webCard {
+            id
+            cardIsPublished
+            userName
+            hasCover
+            coverMedia {
+              id
+              ... on MediaVideo {
+                webCardPreview: thumbnail(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+              ... on MediaImage {
+                webCardPreview: uri(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+            }
+          }
+        }
+      }
+    `,
+    data,
+  );
+
+  return {
+    id: inputContact.id,
+    meetingDate:
+      (typeof inputContact.meetingDate === 'string'
+        ? new Date(inputContact.meetingDate)
+        : null) ?? new Date(),
+    firstName: inputContact.firstName,
+    lastName: inputContact.lastName,
+    title: inputContact.title,
+    socials: inputContact.socials?.map(social => ({
+      label: social.label,
+      url: social.url,
+    })),
+    phoneNumbers: inputContact.phoneNumbers
+      ?.map(phone =>
+        phone.number.length
+          ? {
+              label: stringToContactPhoneNumberLabelType(phone.label),
+              number: phone.number,
+            }
+          : undefined,
+      )
+      .filter(isDefined),
+    urls: inputContact.urls
+      ?.map(url => (url.url.length ? { url: url.url } : undefined))
+      .filter(isDefined),
+    emails: inputContact.emails
+      ?.map(email =>
+        email.address.length
+          ? {
+              label: stringToContactEmailLabelType(email.label),
+              address: email.address,
+            }
+          : undefined,
+      )
+      .filter(isDefined),
+    addresses: inputContact.addresses
+      ?.map(address =>
+        address.address
+          ? {
+              label: stringToContactAddressLabelType(address.label),
+              address: address.address,
+            }
+          : undefined,
+      )
+      .filter(isDefined),
+    birthday: inputContact.birthday,
+    meetingPlace: inputContact.meetingPlace,
+    company: inputContact.company,
+    avatar: inputContact.avatar,
+    logo: inputContact.logo,
+    profileId: inputContact.contactProfile?.id,
+
+    // webcard specific fields
+    // do not populate values if webcard is not published
+    // no need to expose webCardIsPublished then
+    webCardUserName: inputContact.contactProfile?.webCard?.cardIsPublished
+      ? inputContact.contactProfile?.webCard?.userName
+      : undefined,
+    webCardId: inputContact.contactProfile?.webCard?.cardIsPublished
+      ? inputContact.contactProfile?.webCard?.id
+      : undefined,
+    webCardPreview:
+      inputContact.contactProfile?.webCard?.cardIsPublished &&
+      inputContact?.contactProfile?.webCard?.coverMedia?.webCardPreview
+        ? {
+            id: inputContact?.contactProfile?.webCard?.coverMedia?.id,
+            uri: inputContact?.contactProfile?.webCard?.coverMedia
+              ?.webCardPreview,
+          }
+        : undefined,
+    note: inputContact.note,
+  };
 };

@@ -3,12 +3,13 @@ import { StyleSheet } from 'react-native';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import ContactsList from '#components/Contact/ContactsList';
-import { readContactData } from '#helpers/contactListHelpers';
 import ContactsByNameListQueryNode from '#relayArtifacts/ContactsByNameListQuery.graphql';
 import Container from '#ui/Container';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import Text from '#ui/Text';
-import type { ContactType } from '#helpers/contactTypes';
+import ContactActionModal from './ContactActionModal';
+import type { ContactsListItemType } from '#components/Contact/ContactsList/ContactsList';
+import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByNameList_root$key } from '#relayArtifacts/ContactsByNameList_root.graphql';
 import type { ContactsByNameListQuery } from '#relayArtifacts/ContactsByNameListQuery.graphql';
 import type { SectionListData, ViewStyle } from 'react-native';
@@ -31,8 +32,7 @@ type ContactsByNameListProps = {
    * Date to filter contacts by date
    */
   date: string | undefined;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType) => void;
+  onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
   fetchPolicy?: FetchPolicy;
   ListHeaderComponent?:
@@ -47,7 +47,6 @@ const ContactsByNameList = ({
   location,
   date,
   onShowContact,
-  showContactAction,
   contentContainerStyle,
   ListHeaderComponent,
   fetchPolicy = 'store-or-network',
@@ -82,7 +81,17 @@ const ContactsByNameList = ({
               __id
               edges {
                 node {
-                  ...contactListHelpersReadContact_contact
+                  id
+                  firstName
+                  lastName
+                  company
+                  contactProfile {
+                    webCard {
+                      userName
+                    }
+                  }
+                  ...ContactsListItem_contact
+                  ...contactHelpersReadContactData
                 }
               }
             }
@@ -124,9 +133,22 @@ const ContactsByNameList = ({
   const contacts = useMemo(
     () =>
       data?.currentUser?.contacts?.edges
-        ?.map(edge => (edge?.node ? readContactData(edge.node) : null))
+        ?.map(edge => edge?.node)
         .filter(contact => !!contact) ?? [],
     [data],
+  );
+
+  const [contactActionData, setContactActionData] = useState<
+    contactHelpersReadContactData$key | undefined
+  >(undefined);
+  const onShowContactAction = useCallback(
+    (contactId: string) => {
+      const contact = contacts.find(c => c.id === contactId);
+      if (contact) {
+        setContactActionData(contact);
+      }
+    },
+    [contacts],
   );
 
   const sections = useMemo(() => {
@@ -136,7 +158,7 @@ const ContactsByNameList = ({
           contact.lastName?.[0] ??
           contact.firstName?.[0] ??
           contact.company?.[0] ??
-          contact.webCardUserName?.[0] ??
+          contact.contactProfile?.webCard?.userName?.[0] ??
           ''
         ).toLocaleUpperCase();
 
@@ -152,7 +174,7 @@ const ContactsByNameList = ({
 
         return accumulator;
       },
-      [] as Array<{ title: string; data: ContactType[] }>,
+      [] as Array<{ title: string; data: ContactsListItemType[] }>,
     );
   }, [contacts]);
 
@@ -161,8 +183,8 @@ const ContactsByNameList = ({
       section: { title },
     }: {
       section: SectionListData<
-        ContactType,
-        { title: string; data: ContactType[] }
+        ContactsListItemType,
+        { title: string; data: ContactsListItemType[] }
       >;
     }) => {
       if (isNotFalsyString(title)) {
@@ -178,18 +200,25 @@ const ContactsByNameList = ({
   );
 
   return (
-    <ContactsList
-      sections={sections}
-      refreshing={refreshing}
-      renderSectionHeader={renderHeaderSection}
-      onEndReached={onEndReached}
-      onRefresh={onRefresh}
-      onShowContact={onShowContact}
-      showContactAction={showContactAction}
-      contentContainerStyle={contentContainerStyle}
-      ListHeaderComponent={ListHeaderComponent}
-      ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
-    />
+    <>
+      <ContactsList
+        sections={sections}
+        refreshing={refreshing}
+        renderSectionHeader={renderHeaderSection}
+        onEndReached={onEndReached}
+        onRefresh={onRefresh}
+        onShowContact={onShowContact}
+        onShowContactAction={onShowContactAction}
+        contentContainerStyle={contentContainerStyle}
+        ListHeaderComponent={ListHeaderComponent}
+        ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+      />
+      <ContactActionModal
+        data={contactActionData}
+        close={() => setContactActionData(undefined)}
+        onShow={onShowContact}
+      />
+    </>
   );
 };
 

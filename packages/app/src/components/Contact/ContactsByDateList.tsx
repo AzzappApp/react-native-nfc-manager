@@ -3,9 +3,9 @@ import { useIntl } from 'react-intl';
 import { graphql, usePaginationFragment } from 'react-relay';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import { useRouter } from '#components/NativeRouter';
-import { readContactData } from '#helpers/contactListHelpers';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { ContactType } from '#helpers/contactTypes';
+import ContactActionModal from './ContactActionModal';
+import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByDateList_root$key } from '#relayArtifacts/ContactsByDateList_root.graphql';
 import type { ContactsByDateListQuery } from '#relayArtifacts/ContactsByDateListQuery.graphql';
 import type { ViewStyle } from 'react-native';
@@ -15,8 +15,7 @@ type ContactsByDateListProps = {
   // to avoid double fetching the data
   queryRef: ContactsByDateList_root$key;
   search: string | undefined;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType | ContactType[]) => void;
+  onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
   ListHeaderComponent?:
     | React.ComponentType<any>
@@ -29,7 +28,6 @@ const ContactsByDateList = ({
   queryRef,
   search,
   onShowContact,
-  showContactAction,
   contentContainerStyle,
   ListHeaderComponent,
 }: ContactsByDateListProps) => {
@@ -58,7 +56,9 @@ const ContactsByDateList = ({
                   date
                   nbContacts
                   contacts {
-                    ...contactListHelpersReadContact_contact
+                    id
+                    ...ContactsHorizontalList_contacts
+                    ...contactHelpersReadContactData
                   }
                 }
               }
@@ -121,9 +121,7 @@ const ContactsByDateList = ({
             return null;
           }
           const date = node.date ? new Date(edge.node.date) : null;
-          const contacts = node.contacts
-            ?.filter(contact => !!contact)
-            ?.map(contact => readContactData(contact));
+          const contacts = node.contacts?.filter(contact => !!contact);
 
           if (!contacts?.length || !date) {
             return null;
@@ -156,19 +154,52 @@ const ContactsByDateList = ({
     );
   }, [data.currentUser?.contactsByDates?.edges, onSeeAll, intl]);
 
+  const contacts = useMemo(
+    () =>
+      data.currentUser?.contactsByDates.edges
+        ?.flatMap(edge => edge?.node?.contacts ?? [])
+        ?.filter(contact => !!contact) ?? [],
+    [data.currentUser?.contactsByDates.edges],
+  );
+  const [contactActionData, setContactActionData] = useState<
+    | contactHelpersReadContactData$key
+    | contactHelpersReadContactData$key[]
+    | undefined
+  >(undefined);
+  const onShowContactAction = useCallback(
+    (contactId: string[] | string) => {
+      if (Array.isArray(contactId)) {
+        setContactActionData(contacts.filter(c => contactId.includes(c.id)));
+        return;
+      }
+      const contact = contacts.find(c => c.id === contactId);
+      if (contact) {
+        setContactActionData(contact);
+      }
+    },
+    [contacts],
+  );
+
   return (
-    <SectionContactsHorizontalList
-      sections={sections}
-      onEndReached={onEndReached}
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      onShowContact={onShowContact}
-      showContactAction={showContactAction}
-      showLocationInSubtitle
-      contentContainerStyle={contentContainerStyle}
-      ListHeaderComponent={ListHeaderComponent}
-      ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
-    />
+    <>
+      <SectionContactsHorizontalList
+        sections={sections}
+        onEndReached={onEndReached}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onShowContact={onShowContact}
+        onShowContactAction={onShowContactAction}
+        showLocationInSubtitle
+        contentContainerStyle={contentContainerStyle}
+        ListHeaderComponent={ListHeaderComponent}
+        ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+      />
+      <ContactActionModal
+        data={contactActionData}
+        close={() => setContactActionData(undefined)}
+        onShow={onShowContact}
+      />
+    </>
   );
 };
 

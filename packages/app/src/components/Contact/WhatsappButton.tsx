@@ -4,11 +4,11 @@ import parsePhoneNumberFromString, {
 } from 'libphonenumber-js';
 import { Suspense, use } from 'react';
 import { Linking, StyleSheet } from 'react-native';
+import ContactPhoneNumberPicker from '#components/Contact/ContactPhoneNumberPicker';
 import { getWhatsAppUrl, isWhatsAppSupported } from '#helpers/whatsAppHelpers';
 import useBoolean from '#hooks/useBoolean';
-import ContactPhoneNumberPicker from '#screens/ContactsScreen/ContactPhoneNumberPicker';
 import PressableNative from '#ui/PressableNative';
-import type { ContactPhoneNumberType } from '#helpers/contactTypes';
+import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 import type { PressableNativeProps } from '#ui/PressableNative';
 
 type WhatsappButtonProps = PressableNativeProps & {

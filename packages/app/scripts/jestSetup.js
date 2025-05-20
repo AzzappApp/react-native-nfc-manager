@@ -164,6 +164,12 @@ jest.mock('react-native-compressor', () => ({
   },
 }));
 
+jest.mock('react-native-share', () => ({
+  ShareCommand: {
+    open: jest.fn(),
+  },
+}));
+
 jest.mock('react-native-quick-crypto', () => ({
   createHash: jest.fn(() => ({
     update: jest.fn(() => ({

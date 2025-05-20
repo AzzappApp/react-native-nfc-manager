@@ -1,17 +1,15 @@
 import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDebounce } from 'use-debounce';
+import ContactsByNameList from '#components/Contact/ContactsByNameList';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ContactActionModal from '#screens/ContactsScreen/ContactActionModal';
-import ContactsByNameList from '#screens/ContactsScreen/ContactsByNameList';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
 import SearchBarStatic from '#ui/SearchBarStatic';
-import type { ContactType } from '#helpers/contactTypes';
 import type { ContactsByDateRoute, ContactsByLocationRoute } from '#routes';
 
 const ContactsFilteredListScreen = ({
@@ -20,20 +18,12 @@ const ContactsFilteredListScreen = ({
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
 
-  const [contactActionData, setContactActionData] = useState<
-    ContactType | ContactType[] | undefined
-  >();
-
   const router = useRouter();
   const onShowContact = useCallback(
-    async (contact: ContactType) => {
+    async (contactId: string) => {
       router.push({
         route: 'CONTACT_DETAILS',
-        params: {
-          contactId: contact.id,
-          profileId: contact.profileId,
-          webCardId: contact.webCardId,
-        },
+        params: { contactId },
       });
     },
     [router],
@@ -46,37 +36,39 @@ const ContactsFilteredListScreen = ({
     route === 'CONTACTS_BY_LOCATION' ? params.location : undefined;
   const date = route === 'CONTACTS_BY_DATE' ? params.date : undefined;
 
+  const searchBar = (
+    <SearchBarStatic
+      style={styles.search}
+      value={search}
+      placeholder={intl.formatMessage({
+        defaultMessage: 'Search for name, company...',
+        description: 'Search placeholder in ContactsScreen',
+      })}
+      onChangeText={setSearch}
+    />
+  );
   return (
-    <>
-      <Container style={[styles.container, { paddingTop: top }]}>
-        <ContactsByLocationHeader location={location} date={date} />
-        <SearchBarStatic
-          style={styles.search}
-          value={search}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Search for name, company...',
-            description: 'Search placeholder in ContactsScreen',
-          })}
-          onChangeText={setSearch}
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <ContactsByLocationHeader location={location} date={date} />
+      <Suspense
+        fallback={
+          <View style={{ flex: 1 }}>
+            {searchBar}
+            <LoadingView />
+          </View>
+        }
+      >
+        <ContactsByNameList
+          search={debounceSearch}
+          location={location}
+          date={date}
+          onShowContact={onShowContact}
+          contentContainerStyle={{ paddingBottom: bottom }}
+          fetchPolicy="store-and-network"
+          ListHeaderComponent={searchBar}
         />
-        <Suspense fallback={<LoadingView />}>
-          <ContactsByNameList
-            search={debounceSearch}
-            location={location}
-            date={date}
-            onShowContact={onShowContact}
-            showContactAction={setContactActionData}
-            contentContainerStyle={{ paddingBottom: bottom }}
-            fetchPolicy="store-and-network"
-          />
-        </Suspense>
-      </Container>
-      <ContactActionModal
-        data={contactActionData}
-        close={() => setContactActionData(undefined)}
-        onShow={onShowContact}
-      />
-    </>
+      </Suspense>
+    </Container>
   );
 };
 

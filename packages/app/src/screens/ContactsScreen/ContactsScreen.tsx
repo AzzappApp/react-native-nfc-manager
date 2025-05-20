@@ -30,11 +30,9 @@ import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
-import ContactActionModal from './ContactActionModal';
-import ContactsByDateList from './ContactsByDateList';
-import ContactsByLocationList from './ContactsByLocationList';
-import ContactsByNameList from './ContactsByNameList';
-import type { ContactType } from '#helpers/contactTypes';
+import ContactsByDateList from '../../components/Contact/ContactsByDateList';
+import ContactsByLocationList from '../../components/Contact/ContactsByLocationList';
+import ContactsByNameList from '../../components/Contact/ContactsByNameList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
@@ -90,19 +88,11 @@ const ContactsScreen = ({
     });
   }, [commitContactsLastView]);
 
-  const [contactActionData, setContactActionData] = useState<
-    ContactType | ContactType[] | undefined
-  >();
-
   const onShowContact = useCallback(
-    async (contact: ContactType) => {
+    async (contactId: string) => {
       router.push({
         route: 'CONTACT_DETAILS',
-        params: {
-          contactId: contact.id,
-          profileId: contact.profileId,
-          webCardId: contact.webCardId,
-        },
+        params: { contactId },
       });
     },
     [router],
@@ -228,7 +218,6 @@ const ContactsScreen = ({
                           queryRef={data}
                           search={debounceSearch}
                           onShowContact={onShowContact}
-                          showContactAction={setContactActionData}
                           ListHeaderComponent={searchBar}
                         />
                       </Suspense>
@@ -243,7 +232,6 @@ const ContactsScreen = ({
                           location={undefined}
                           date={undefined}
                           onShowContact={onShowContact}
-                          showContactAction={setContactActionData}
                           ListHeaderComponent={searchBar}
                         />
                       </Suspense>
@@ -256,7 +244,6 @@ const ContactsScreen = ({
                         <ContactsByLocationList
                           search={debounceSearch}
                           onShowContact={onShowContact}
-                          showContactAction={setContactActionData}
                           ListHeaderComponent={searchBar}
                         />
                       </Suspense>
@@ -317,11 +304,6 @@ const ContactsScreen = ({
           onPress={onCreateContact}
         />
       </BottomSheetModal>
-      <ContactActionModal
-        data={contactActionData}
-        close={() => setContactActionData(undefined)}
-        onShow={onShowContact}
-      />
     </>
   );
 };

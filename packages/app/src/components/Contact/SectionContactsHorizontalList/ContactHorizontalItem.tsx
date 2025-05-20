@@ -1,25 +1,48 @@
 import { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
+import useImageFromContact from '#components/Contact/useImageFromContact';
 import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
-import useImageFromContact from '#hooks/useImageFromContact';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from '../ContactAvatar';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
+import type { ContactHorizontalItem_contact$key } from '#relayArtifacts/ContactHorizontalItem_contact.graphql';
 
-type Props = {
-  contact: ContactType;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType) => void;
+type ContactHorizontalItemProps = {
+  contact: ContactHorizontalItem_contact$key;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (contactId: string) => void;
 };
 
 const ContactHorizontalItem = ({
-  contact,
+  contact: contactKey,
   onShowContact,
-  showContactAction,
-}: Props) => {
+  onShowContactAction,
+}: ContactHorizontalItemProps) => {
+  const contact = useFragment(
+    graphql`
+      fragment ContactHorizontalItem_contact on Contact {
+        id
+        firstName
+        lastName
+        company
+        phoneNumbers {
+          number
+          label
+        }
+        webCard {
+          userName
+          ...CoverRenderer_webCard
+        }
+        ...useImageFromContact_contact
+      }
+    `,
+    contactKey,
+  );
+
   const onShow = useCallback(() => {
-    onShowContact(contact);
+    onShowContact(contact.id);
   }, [contact, onShowContact]);
 
   const [firstname, lastname, name] = useMemo(() => {
@@ -30,15 +53,17 @@ const ContactHorizontalItem = ({
         `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
       ];
     }
-    if (contact.webCardUserName) {
-      return [contact.webCardUserName, '', contact.webCardUserName];
+
+    if (contact.webCard?.userName) {
+      return [contact.webCard.userName, '', contact.webCard.userName];
     }
+
     return ['', '', ''];
-  }, [contact.webCardUserName, contact.firstName, contact.lastName]);
+  }, [contact.firstName, contact.lastName, contact.webCard?.userName]);
 
   const onMore = useCallback(() => {
-    showContactAction(contact);
-  }, [contact, showContactAction]);
+    onShowContactAction(contact.id);
+  }, [contact, onShowContactAction]);
 
   const avatarSource = useImageFromContact(contact);
 
@@ -58,7 +83,7 @@ const ContactHorizontalItem = ({
         )}
       </PressableNative>
       <WhatsappButton
-        phoneNumbers={contact?.phoneNumbers}
+        phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
         style={styles.invite}
       />
     </View>

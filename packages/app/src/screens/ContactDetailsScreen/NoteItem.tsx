@@ -7,7 +7,7 @@ import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import NoteModal from './NoteModal';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactType } from '#helpers/contactHelpers';
 
 const NoteItem = ({ contact }: { contact: ContactType }) => {
   const intl = useIntl();

@@ -66,7 +66,7 @@ const ContactEditScreen = ({
       $contact: ContactInput!
     ) {
       saveContact(contactId: $contactId, input: $contact) {
-        ...contactListHelpersReadContact_contact
+        ...contactHelpersReadContactData
       }
     }
   `);

@@ -8,11 +8,13 @@ import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
+import {
+  getFriendlyNameFromLocation,
+  shareContact,
+} from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
-import ShareContact from '#helpers/ShareContact';
 import useBoolean from '#hooks/useBoolean';
 import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -24,9 +26,8 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
 import NoteItem from './NoteItem';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -34,46 +35,14 @@ const BLUR_GAP = 20;
 
 type ContactDetailsBodyProps = {
   contact: ContactType;
+  webCard: ContactDetailsBody_webCard$key | null;
   onClose: () => void;
   onSave: () => void;
 };
 
-const ContactDetailItem = ({
-  onPress,
-  icon,
-  label,
-  content,
-  iconComponent,
-}: {
-  onPress?: () => void;
-  icon?: Icons;
-  label?: string;
-  content?: string;
-  iconComponent?: JSX.Element;
-}) => {
-  const styles = useStyleSheet(stylesheet);
-
-  return (
-    <View style={styles.item}>
-      <PressableNative onPress={onPress} style={styles.pressable}>
-        <View style={styles.label}>
-          {iconComponent ? (
-            iconComponent
-          ) : icon ? (
-            <Icon icon={icon} />
-          ) : undefined}
-          <Text variant="smallbold">{label}</Text>
-        </View>
-        <Text numberOfLines={1} style={styles.itemText}>
-          {content}
-        </Text>
-      </PressableNative>
-    </View>
-  );
-};
-
 const ContactDetailsBody = ({
   contact,
+  webCard: webCardKey,
   onSave,
   onClose,
 }: ContactDetailsBodyProps) => {
@@ -107,7 +76,7 @@ const ContactDetailsBody = ({
         }
       }
     `,
-    contact?.webCard as ContactDetailsBody_webCard$key,
+    webCardKey,
   );
 
   const avatarUrl = useMemo(() => {
@@ -136,7 +105,7 @@ const ContactDetailsBody = ({
 
   const birthday = contact?.birthday;
 
-  const onShare = async () => contact && ShareContact(contact);
+  const onShare = async () => contact && shareContact(contact);
   const appearance = useColorScheme();
 
   const { width: screenWidth } = useScreenDimensions();
@@ -265,10 +234,7 @@ const ContactDetailsBody = ({
               {avatarUrl ? (
                 <Image source={avatarUrl} style={styles.avatar} />
               ) : webCard ? (
-                <CoverRenderer
-                  width={AVATAR_WIDTH}
-                  webCard={contact.webCard as CoverRenderer_webCard$key}
-                />
+                <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
               ) : (
                 <Text style={styles.initials}>
                   {contact.firstName?.substring(0, 1)}
@@ -476,6 +442,40 @@ const getSocialUrl = (url: string) =>
   url.startsWith('http') ? url : `https://${url}`;
 
 const AVATAR_WIDTH = 112;
+
+const ContactDetailItem = ({
+  onPress,
+  icon,
+  label,
+  content,
+  iconComponent,
+}: {
+  onPress?: () => void;
+  icon?: Icons;
+  label?: string;
+  content?: string;
+  iconComponent?: JSX.Element;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  return (
+    <View style={styles.item}>
+      <PressableNative onPress={onPress} style={styles.pressable}>
+        <View style={styles.label}>
+          {iconComponent ? (
+            iconComponent
+          ) : icon ? (
+            <Icon icon={icon} />
+          ) : undefined}
+          <Text variant="smallbold">{label}</Text>
+        </View>
+        <Text numberOfLines={1} style={styles.itemText}>
+          {content}
+        </Text>
+      </PressableNative>
+    </View>
+  );
+};
 
 const stylesheet = createStyleSheet(appearance => ({
   container: {

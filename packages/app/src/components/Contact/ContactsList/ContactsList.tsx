@@ -3,24 +3,28 @@ import { SectionList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsListItem from './ContactsListItem';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
 import type {
   SectionListData,
   SectionListRenderItemInfo,
   ViewStyle,
 } from 'react-native';
 
-type Props = {
-  sections: Array<{ title: string; data: ContactType[] }>;
+export type ContactsListItemType = ContactsListItem_contact$key & {
+  id: string;
+};
+
+export type ContactListProps = {
+  sections: Array<{ title: string; data: ContactsListItemType[] }>;
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType) => void;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (contactId: string) => void;
   renderSectionHeader: (args: {
     section: SectionListData<
-      ContactType,
-      { title: string; data: ContactType[] }
+      ContactsListItemType,
+      { title: string; data: ContactsListItemType[] }
     >;
   }) => JSX.Element | null;
   ListHeaderComponent?:
@@ -42,28 +46,28 @@ const ContactsList = ({
   onRefresh,
   refreshing,
   onShowContact,
-  showContactAction,
+  onShowContactAction,
   renderSectionHeader,
   ListHeaderComponent,
   ListFooterComponent,
   contentContainerStyle,
-}: Props) => {
+}: ContactListProps) => {
   const renderListItem = useCallback(
     ({
       item,
     }: SectionListRenderItemInfo<
-      ContactType,
-      { title: string; data: ContactType[] }
+      ContactsListItemType,
+      { title: string; data: ContactsListItemType[] }
     >) => {
       return (
         <ContactsListItem
           contact={item}
           onShowContact={onShowContact}
-          showContactAction={showContactAction}
+          onShowContactAction={onShowContactAction}
         />
       );
     },
-    [showContactAction, onShowContact],
+    [onShowContactAction, onShowContact],
   );
 
   return (

@@ -8,7 +8,9 @@ import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
-import ContactDetailsScreen from '#screens/ContactDetailsScreen';
+import ContactDetailsScreen, {
+  ContactDetailsFromScannedContactScreen,
+} from '#screens/ContactDetailsScreen';
 import ContactEditScreen from '#screens/ContactEditScreen/ContactEditScreen';
 import ContactsFilteredListScreen from '#screens/ContactsFilteredListScreen';
 import ContactsScreen from '#screens/ContactsScreen';
@@ -72,6 +74,7 @@ const screens = {
   CONTACTS: ContactsScreen,
   OFFLINE_VCARD: OfflineVCardScreen,
   CONTACT_DETAILS: ContactDetailsScreen,
+  CONTACT_DETAILS_FROM_SCANNER: ContactDetailsFromScannedContactScreen,
   ADD_MODULE_SECTION: AddModuleSectionScreen,
   MODULE_PREVIEW: CardModuleConfirmationScreen,
   COOKIE_CONSENT: CookieContentScreen,

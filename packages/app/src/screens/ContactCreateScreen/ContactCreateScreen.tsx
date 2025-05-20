@@ -99,7 +99,7 @@ const ContactCreateScreen = ({
       ) {
         contact {
           id
-          ...contactListHelpersReadContact_contact
+          ...contactHelpersReadContactData
         }
       }
     }

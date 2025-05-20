@@ -9,20 +9,20 @@ import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { addContactUpdater } from '#helpers/contactHelpers';
 import {
   stringToContactAddressLabelType,
   stringToContactEmailLabelType,
   stringToContactPhoneNumberLabelType,
-} from '#helpers/contactListHelpers';
+  addContactUpdater,
+} from '#helpers/contactHelpers';
 import { createHash } from '#helpers/cryptoHelpers';
 import { isFileURL } from '#helpers/fileHelpers';
 import { prepareAvatarForUpload } from '#helpers/imageHelpers';
 import { uploadMedia } from '#helpers/MobileWebAPI';
 import useBoolean from '#hooks/useBoolean';
-import useOnInviteContact from '#hooks/useOnInviteContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -35,7 +35,7 @@ import Text from '#ui/Text';
 import AddContactModalProfiles, {
   AddContactModalProfilesFallback,
 } from './AddContactModalProfiles';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
 import type {
@@ -91,7 +91,7 @@ const AddContactModal = ({
       ) {
         contact {
           id
-          ...contactListHelpersReadContact_contact
+          ...contactHelpersReadContactData
         }
       }
     }
@@ -210,8 +210,10 @@ const AddContactModal = ({
           onPress: async () => {
             if (scanned) {
               router.push({
-                route: 'CONTACT_DETAILS',
-                params: { contact: scanned, webCardId: scanned.webCardId },
+                route: 'CONTACT_DETAILS_FROM_SCANNER',
+                params: {
+                  scannedContact: scanned,
+                },
               });
             }
           },

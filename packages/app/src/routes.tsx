@@ -1,5 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
@@ -303,9 +303,14 @@ export type ContactsRoute = {
 export type ContactDetailsRoute = {
   route: 'CONTACT_DETAILS';
   params: {
-    webCardId?: string | null;
-    contactId?: string | null;
-    scannedContact?: ContactType;
+    contactId: string;
+  };
+};
+
+export type ContactDetailsFromScannerRoute = {
+  route: 'CONTACT_DETAILS_FROM_SCANNER';
+  params: {
+    scannedContact: ContactType;
   };
 };
 
@@ -354,6 +359,7 @@ export type Route =
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCreateRoute
+  | ContactDetailsFromScannerRoute
   | ContactDetailsRoute
   | ContactEditRoute
   | ContactsByDateRoute

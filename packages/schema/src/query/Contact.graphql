@@ -15,8 +15,8 @@ type Contact implements Node {
   phoneNumbers: [ContactPhoneNumber!]!
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
-  @deprecated(reason: "Use profile webCard instead")
   webCard: WebCard
+  @deprecated(reason: "Use profile webCard instead")
   socials: [ContactSocial!]
   urls: [ContactUrl!]
   deleted: Boolean

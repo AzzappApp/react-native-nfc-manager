@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
@@ -11,15 +12,18 @@ import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
-import type { ContactType } from '#helpers/contactTypes';
+import type {
+  ContactsHorizontalList_contacts$data,
+  ContactsHorizontalList_contacts$key,
+} from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type { ListRenderItemInfo } from 'react-native';
 
-type ContactsScreenSectionProps = {
+export type ContactsScreenSectionProps = {
   title: string;
   count?: number;
-  contacts: ContactType[];
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType | ContactType[]) => void;
+  contacts: ContactsHorizontalList_contacts$key;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (arg: string[] | string) => void;
   showLocationInSubtitle?: boolean;
   onSeeAll?: () => void;
 };
@@ -27,23 +31,39 @@ type ContactsScreenSectionProps = {
 const ContactsScreenSection = ({
   title,
   count,
-  contacts,
+  contacts: contactsKey,
   onShowContact,
-  showContactAction,
+  onShowContactAction,
   onSeeAll,
   showLocationInSubtitle,
 }: ContactsScreenSectionProps) => {
+  const contacts = useFragment(
+    graphql`
+      fragment ContactsHorizontalList_contacts on Contact @relay(plural: true) {
+        id
+        meetingPlace {
+          city
+          country
+          region
+          subregion
+        }
+        ...ContactHorizontalItem_contact
+      }
+    `,
+    contactsKey,
+  );
+
   const renderProfile = useCallback(
-    ({ item }: ListRenderItemInfo<ContactType>) => {
+    ({ item }: ListRenderItemInfo<ItemType>) => {
       return (
         <ContactHorizontalItem
           contact={item}
           onShowContact={onShowContact}
-          showContactAction={showContactAction}
+          onShowContactAction={onShowContactAction}
         />
       );
     },
-    [onShowContact, showContactAction],
+    [onShowContact, onShowContactAction],
   );
 
   const intl = useIntl();
@@ -129,6 +149,8 @@ const ContactsScreenSection = ({
     </View>
   );
 };
+
+type ItemType = ContactsHorizontalList_contacts$data[number];
 
 const styles = StyleSheet.create({
   section: {

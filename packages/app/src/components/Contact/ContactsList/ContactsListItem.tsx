@@ -1,37 +1,67 @@
 import { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
+import useImageFromContact from '#components/Contact/useImageFromContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
-import useImageFromContact from '#hooks/useImageFromContact';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from '../ContactAvatar';
 import WhatsappButton from '../WhatsappButton';
-import type { ContactType } from '#helpers/contactTypes';
+import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
+import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
 
-type ContactListItemProps = {
-  contact: ContactType;
-  onShowContact: (contact: ContactType) => void;
-  showContactAction: (arg: ContactType) => void;
+type ContactsListItemProps = {
+  contact: ContactsListItem_contact$key;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (contactId: string) => void;
 };
 
 const COVER_WIDTH = 35;
 
-const ContactListItem = ({
-  contact,
+const ContactsListItem = ({
+  contact: contactKey,
   onShowContact,
-  showContactAction,
-}: ContactListItemProps) => {
+  onShowContactAction,
+}: ContactsListItemProps) => {
+  const contact = useFragment(
+    graphql`
+      fragment ContactsListItem_contact on Contact {
+        id
+        firstName
+        lastName
+        company
+        phoneNumbers {
+          number
+          label
+        }
+        meetingDate
+        meetingPlace {
+          city
+          country
+          region
+          subregion
+        }
+        webCard {
+          userName
+          ...CoverRenderer_webCard
+        }
+        ...useImageFromContact_contact
+      }
+    `,
+    contactKey,
+  );
+
   const onShow = useCallback(() => {
-    onShowContact(contact);
+    onShowContact(contact.id);
   }, [contact, onShowContact]);
 
   const onMore = useCallback(() => {
-    showContactAction(contact);
-  }, [contact, showContactAction]);
+    onShowContactAction(contact.id);
+  }, [contact, onShowContactAction]);
 
   const avatarSource = useImageFromContact(contact);
 
@@ -44,12 +74,12 @@ const ContactListItem = ({
       ];
     }
 
-    if (contact.webCardUserName) {
-      return [contact.webCardUserName, '', contact.webCardUserName];
+    if (contact.webCard?.userName) {
+      return [contact.webCard.userName, '', contact.webCard.userName];
     }
 
     return ['', '', ''];
-  }, [contact.firstName, contact.lastName, contact.webCardUserName]);
+  }, [contact.firstName, contact.lastName, contact.webCard?.userName]);
 
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
@@ -87,20 +117,24 @@ const ContactListItem = ({
           )}
           {!contact.firstName &&
             !contact.lastName &&
-            contact.webCardUserName && (
+            contact.webCard?.userName && (
               <Text variant="large" numberOfLines={1}>
-                {contact.webCardUserName}
+                {contact.webCard?.userName}
               </Text>
             )}
           {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}
           <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
-            {new Date(contact.meetingDate).toLocaleDateString()}
+            {contact.meetingDate
+              ? new Date(contact.meetingDate).toLocaleDateString()
+              : null}
             {location ? ` - ${location}` : ''}
           </Text>
         </View>
       </PressableNative>
       <View style={styles.actions}>
-        <WhatsappButton phoneNumbers={contact?.phoneNumbers} />
+        <WhatsappButton
+          phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
+        />
         <PressableNative onPress={onMore}>
           <Icon icon="more" />
         </PressableNative>
@@ -148,4 +182,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactListItem;
+export default ContactsListItem;
