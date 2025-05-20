@@ -19,7 +19,6 @@ import {
   useRouter,
 } from '#components/NativeRouter';
 
-import { emitContactAddedToProfile } from '#helpers/addContactHelper';
 import { getAuthState } from '#helpers/authStore';
 import {
   addContactUpdater,
@@ -261,7 +260,6 @@ const ContactCreateScreen = ({
           },
         },
         onCompleted: () => {
-          emitContactAddedToProfile();
           router.back();
         },
         updater: (store, response) => {
