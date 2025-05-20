@@ -297,6 +297,7 @@ const UserPayWallScreen = ({
       router.back();
     } catch (error) {
       //display error message
+      Sentry.captureException(error, { data: 'userPayWallScreen' });
       setProcessing(false);
       //@ts-expect-error error code is not in the type
       const errorCode = error?.code;
@@ -334,7 +335,6 @@ const UserPayWallScreen = ({
           description: 'Description of the payment process error alert',
         }),
       );
-      Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
     activateMultiUser,
