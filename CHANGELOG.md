@@ -1,3 +1,13 @@
+## 1.10.0-canary.227
+
+* **feat:**  - Update app clip, share path ([#8806](https://github.com/AzzappApp/azzapp/pull/8806))
+* **feat:**  - improve fetch error display message ([#8481](https://github.com/AzzappApp/azzapp/pull/8481))
+* **fix:**  - **Contact:** center header title in screens and double border in tab bar ([#8861](https://github.com/AzzappApp/azzapp/pull/8861))
+* **feat:**  - **enrichment:** add city of profile ([#8854](https://github.com/AzzappApp/azzapp/pull/8854))
+* **fix:**  - ensure deleted contact is readded ([#8846](https://github.com/AzzappApp/azzapp/pull/8846))
+* **fix:**  - **Contact:** refactoring ([#8859](https://github.com/AzzappApp/azzapp/pull/8859))
+* **fix:**  - **Contact:** crash on contact with cover only
+
 ## 1.10.0-canary.226
 
 * **feat:**  - **enrichment:** add mutation for enrichment approval ([#8844](https://github.com/AzzappApp/azzapp/pull/8844))
