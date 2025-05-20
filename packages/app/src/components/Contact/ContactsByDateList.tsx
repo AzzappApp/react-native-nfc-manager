@@ -8,7 +8,7 @@ import ContactActionModal from './ContactActionModal';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByDateList_root$key } from '#relayArtifacts/ContactsByDateList_root.graphql';
 import type { ContactsByDateListQuery } from '#relayArtifacts/ContactsByDateListQuery.graphql';
-import type { ViewStyle } from 'react-native';
+import type { ScrollViewProps, ViewStyle } from 'react-native';
 
 type ContactsByDateListProps = {
   // Unlike the other lists, we use the reference from the ContactScreenQuery
@@ -17,10 +17,8 @@ type ContactsByDateListProps = {
   search: string | undefined;
   onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
-  ListHeaderComponent?:
-    | React.ComponentType<any>
-    | React.ReactElement
-    | null
+  renderScrollComponent?:
+    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
     | undefined;
 };
 
@@ -28,8 +26,8 @@ const ContactsByDateList = ({
   queryRef,
   search,
   onShowContact,
+  renderScrollComponent,
   contentContainerStyle,
-  ListHeaderComponent,
 }: ContactsByDateListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment<ContactsByDateListQuery, ContactsByDateList_root$key>(
@@ -191,8 +189,8 @@ const ContactsByDateList = ({
         onShowContactAction={onShowContactAction}
         showLocationInSubtitle
         contentContainerStyle={contentContainerStyle}
-        ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+        renderScrollComponent={renderScrollComponent}
       />
       <ContactActionModal
         data={contactActionData}

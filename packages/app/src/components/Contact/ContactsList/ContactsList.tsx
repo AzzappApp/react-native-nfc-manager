@@ -5,6 +5,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsListItem from './ContactsListItem';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
 import type {
+  ScrollViewProps,
   SectionListData,
   SectionListRenderItemInfo,
   ViewStyle,
@@ -38,6 +39,9 @@ export type ContactListProps = {
     | null
     | undefined;
   contentContainerStyle?: ViewStyle;
+  renderScrollComponent?:
+    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
+    | undefined;
 };
 
 const ContactsList = ({
@@ -51,6 +55,7 @@ const ContactsList = ({
   ListHeaderComponent,
   ListFooterComponent,
   contentContainerStyle,
+  renderScrollComponent,
 }: ContactListProps) => {
   const renderListItem = useCallback(
     ({
@@ -87,6 +92,7 @@ const ContactsList = ({
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
       contentContainerStyle={contentContainerStyle}
+      renderScrollComponent={renderScrollComponent}
     />
   );
 };

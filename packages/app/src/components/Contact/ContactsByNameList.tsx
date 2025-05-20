@@ -12,7 +12,7 @@ import type { ContactsListItemType } from '#components/Contact/ContactsList/Cont
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByNameList_root$key } from '#relayArtifacts/ContactsByNameList_root.graphql';
 import type { ContactsByNameListQuery } from '#relayArtifacts/ContactsByNameListQuery.graphql';
-import type { SectionListData, ViewStyle } from 'react-native';
+import type { ScrollViewProps, SectionListData, ViewStyle } from 'react-native';
 import type { FetchPolicy } from 'react-relay';
 
 type ContactsByNameListProps = {
@@ -40,6 +40,9 @@ type ContactsByNameListProps = {
     | React.ReactElement
     | null
     | undefined;
+  renderScrollComponent?:
+    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
+    | undefined;
 };
 
 const ContactsByNameList = ({
@@ -47,9 +50,10 @@ const ContactsByNameList = ({
   location,
   date,
   onShowContact,
+  fetchPolicy = 'store-or-network',
   contentContainerStyle,
   ListHeaderComponent,
-  fetchPolicy = 'store-or-network',
+  renderScrollComponent,
 }: ContactsByNameListProps) => {
   const queryResult = useLazyLoadQuery<ContactsByNameListQuery>(
     ContactsByNameListQueryNode,
@@ -212,6 +216,7 @@ const ContactsByNameList = ({
         contentContainerStyle={contentContainerStyle}
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+        renderScrollComponent={renderScrollComponent}
       />
       <ContactActionModal
         data={contactActionData}

@@ -4,7 +4,11 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactsScreenSection from './ContactsHorizontalList';
 import type { ContactsHorizontalList_contacts$key } from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
-import type { ListRenderItemInfo, ViewStyle } from 'react-native';
+import type {
+  ListRenderItemInfo,
+  ScrollViewProps,
+  ViewStyle,
+} from 'react-native';
 
 type Props = {
   sections: Array<{
@@ -29,6 +33,9 @@ type Props = {
     | React.ReactElement
     | null
     | undefined;
+  renderScrollComponent?:
+    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
+    | undefined;
   contentContainerStyle?: ViewStyle;
 };
 
@@ -42,6 +49,7 @@ const SectionContactsHorizontalList = ({
   showLocationInSubtitle,
   ListFooterComponent,
   ListHeaderComponent,
+  renderScrollComponent,
   contentContainerStyle,
 }: Props) => {
   const renderItem = useCallback(
@@ -82,6 +90,7 @@ const SectionContactsHorizontalList = ({
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
+      renderScrollComponent={renderScrollComponent}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
       contentContainerStyle={[contentContainerStyle]}

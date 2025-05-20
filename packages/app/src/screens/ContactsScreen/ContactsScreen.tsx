@@ -1,8 +1,8 @@
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Animated, View } from 'react-native';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   graphql,
   useFragment,
@@ -135,23 +135,46 @@ const ContactsScreen = ({
     };
   });
 
-  const searchBar = (
-    <SearchBarStatic
-      style={styles.search}
-      value={search}
-      placeholder={intl.formatMessage({
-        defaultMessage: 'Search for name, company...',
-        description: 'Search placeholder in ContactsScreen',
-      })}
-      onChangeText={e => setSearch(e ?? '')}
-    />
+  const scrollByDateAnimatedValue = useMemo(() => new Animated.Value(0), []);
+  const scrollByDateEvent = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollByDateAnimatedValue } } }],
+    { useNativeDriver: false },
   );
+
+  const scrollByNameAnimatedValue = useMemo(() => new Animated.Value(0), []);
+  const scrollByNameEvent = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollByNameAnimatedValue } } }],
+    { useNativeDriver: false },
+  );
+  const scrollByLocationAnimatedValue = useMemo(
+    () => new Animated.Value(0),
+    [],
+  );
+  const scrollByLocationEvent = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollByLocationAnimatedValue } } }],
+    { useNativeDriver: false },
+  );
+
+  const scrollAnimatedValue = useMemo(() => {
+    if (currentTab === 'date') {
+      return scrollByDateAnimatedValue;
+    }
+    if (currentTab === 'name') {
+      return scrollByNameAnimatedValue;
+    }
+    return scrollByLocationAnimatedValue;
+  }, [
+    currentTab,
+    scrollByDateAnimatedValue,
+    scrollByLocationAnimatedValue,
+    scrollByNameAnimatedValue,
+  ]);
 
   return (
     <>
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
-          <Animated.View
+          <Reanimated.View
             style={[{ height: screenHeight - footHeight }, contentHeight]}
           >
             <Container style={[styles.container, { paddingTop: insets.top }]}>
@@ -207,6 +230,26 @@ const ContactsScreen = ({
                   style={styles.menuRight}
                 />
               </View>
+              <Animated.View
+                style={{
+                  height: scrollAnimatedValue.interpolate({
+                    inputRange: [0, 56],
+                    outputRange: [56, 0],
+                    extrapolate: 'clamp',
+                  }),
+                  overflow: 'hidden',
+                }}
+              >
+                <SearchBarStatic
+                  style={styles.search}
+                  value={search}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search for name, company...',
+                    description: 'Search placeholder in ContactsScreen',
+                  })}
+                  onChangeText={e => setSearch(e ?? '')}
+                />
+              </Animated.View>
               <TabView
                 currentTab={currentTab}
                 style={styles.content}
@@ -219,7 +262,12 @@ const ContactsScreen = ({
                           queryRef={data}
                           search={debounceSearch}
                           onShowContact={onShowContact}
-                          ListHeaderComponent={searchBar}
+                          renderScrollComponent={props => (
+                            <Animated.ScrollView
+                              {...props}
+                              onScroll={scrollByDateEvent}
+                            />
+                          )}
                         />
                       </Suspense>
                     ),
@@ -233,7 +281,12 @@ const ContactsScreen = ({
                           location={undefined}
                           date={undefined}
                           onShowContact={onShowContact}
-                          ListHeaderComponent={searchBar}
+                          renderScrollComponent={props => (
+                            <Animated.ScrollView
+                              {...props}
+                              onScroll={scrollByNameEvent}
+                            />
+                          )}
                         />
                       </Suspense>
                     ),
@@ -245,7 +298,12 @@ const ContactsScreen = ({
                         <ContactsByLocationList
                           search={debounceSearch}
                           onShowContact={onShowContact}
-                          ListHeaderComponent={searchBar}
+                          renderScrollComponent={props => (
+                            <Animated.ScrollView
+                              {...props}
+                              onScroll={scrollByLocationEvent}
+                            />
+                          )}
                         />
                       </Suspense>
                     ),
@@ -253,7 +311,7 @@ const ContactsScreen = ({
                 ]}
               />
             </Container>
-          </Animated.View>
+          </Reanimated.View>
         </View>
         <Container style={[styles.footer, { paddingBottom: insets.bottom }]}>
           <Button
