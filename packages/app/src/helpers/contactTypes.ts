@@ -2,7 +2,8 @@
  * This file defines all types for contacts management
  * Types shall be as close as possible from graphql information
  */
-import type { FragmentRefs } from 'relay-runtime';
+import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 
 export type ContactAddressLabelType = 'Home' | 'Main' | 'Other' | 'Work';
 
@@ -71,9 +72,7 @@ export type ContactType = {
   urls?: ContactUrlType[] | null;
 
   // azzapp contact information
-  webCard?: {
-    readonly ' $fragmentSpreads': FragmentRefs<'CoverRenderer_webCard'>;
-  } | null;
+  webCard?: ContactDetailsBody_webCard$key | CoverRenderer_webCard$key | null;
   webCardId?: string | null;
   profileId?: string | null;
   webCardUserName?: string | null;

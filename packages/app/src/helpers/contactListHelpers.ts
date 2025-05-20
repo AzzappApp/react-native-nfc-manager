@@ -224,6 +224,7 @@ export const readContactData = (
             userName
             hasCover
             ...CoverRenderer_webCard
+            ...ContactDetailsBody_webCard
             coverMedia {
               id
               ... on MediaVideo {
@@ -304,7 +305,7 @@ export const readContactData = (
       : undefined,
     webCard: inputContact.contactProfile?.webCard?.cardIsPublished
       ? inputContact?.contactProfile?.webCard
-      : undefined,
+      : null,
     webCardPreview:
       inputContact.contactProfile?.webCard?.cardIsPublished &&
       inputContact?.contactProfile?.webCard?.coverMedia?.webcardThumbnail

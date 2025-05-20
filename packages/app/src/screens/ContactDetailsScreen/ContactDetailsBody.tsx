@@ -25,6 +25,8 @@ import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
 import NoteItem from './NoteItem';
 import type { ContactType } from '#helpers/contactTypes';
+import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -105,7 +107,7 @@ const ContactDetailsBody = ({
         }
       }
     `,
-    contact?.webCard,
+    contact?.webCard as ContactDetailsBody_webCard$key,
   );
 
   const avatarUrl = useMemo(() => {
@@ -263,7 +265,10 @@ const ContactDetailsBody = ({
               {avatarUrl ? (
                 <Image source={avatarUrl} style={styles.avatar} />
               ) : webCard ? (
-                <CoverRenderer width={AVATAR_WIDTH} webCard={contact.webCard} />
+                <CoverRenderer
+                  width={AVATAR_WIDTH}
+                  webCard={contact.webCard as CoverRenderer_webCard$key}
+                />
               ) : (
                 <Text style={styles.initials}>
                   {contact.firstName?.substring(0, 1)}
