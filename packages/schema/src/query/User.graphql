@@ -77,7 +77,7 @@ type User {
 
 
   """
-  Returns the list of contacts for the user sorted by name
+  Returns the list of contacts of the user profiles
   """
   contacts(
     """
@@ -92,6 +92,11 @@ type User {
     The date to filter the contacts by
     """
     date: DateTime
+    """
+    The sorting order of the contacts
+    default is by name
+    """
+    orderBy: ContactOrderBy
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -151,6 +156,16 @@ type User {
 
 }
 
+enum ContactOrderBy {
+  """
+  Order by name
+  """
+  name
+  """
+  Order by date
+  """
+  date
+}
 
 type UserContactData {
   """
@@ -303,3 +318,4 @@ type EnrichmentData {
   """
   max: Int!
 }
+

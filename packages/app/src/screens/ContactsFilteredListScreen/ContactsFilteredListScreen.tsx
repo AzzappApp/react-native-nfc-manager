@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Animated, StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useDebounce } from 'use-debounce';
-import ContactsByNameList from '#components/Contact/ContactsByNameList';
+import UserContactsList from '#components/Contact/UserContactsList';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -35,6 +35,7 @@ const ContactsFilteredListScreen = ({
   const location =
     route === 'CONTACTS_BY_LOCATION' ? params.location : undefined;
   const date = route === 'CONTACTS_BY_DATE' ? params.date : undefined;
+  const orderBy = route === 'CONTACTS_BY_DATE' ? 'name' : 'date';
 
   const scrollAnimatedValue = useMemo(() => new Animated.Value(0), []);
   const scrollEvent = Animated.event(
@@ -68,10 +69,11 @@ const ContactsFilteredListScreen = ({
           />
         </Animated.View>
         <Suspense fallback={<LoadingView />}>
-          <ContactsByNameList
+          <UserContactsList
             search={debounceSearch}
             location={location}
             date={date}
+            orderBy={orderBy}
             onShowContact={onShowContact}
             fetchPolicy="store-and-network"
             renderScrollComponent={props => (

@@ -7,7 +7,7 @@ import {
   getTotalMultiUser,
   getLastTermsOfUse,
   getSharedWebCardRelation,
-  getUserContactsOrderedByName,
+  getUserContacts,
   getUserContactsGroupedByDate,
   getUserContactsCount,
   getUserContactsGroupedByLocation,
@@ -189,12 +189,13 @@ export const User: ProtectedResolver<UserResolvers> = {
     }
     return getUserContactsCount(user.id);
   },
-  contacts: async (user, { after, first, search, date, location }) => {
+  contacts: async (user, { after, first, search, orderBy, date, location }) => {
     if (!isSameUser(user)) {
       return emptyConnection;
     }
-    const { hasMore, contactsWithCursor } = await getUserContactsOrderedByName(
+    const { hasMore, contactsWithCursor } = await getUserContacts(
       user.id,
+      orderBy ?? 'name',
       search,
       location,
       date,

@@ -3,19 +3,19 @@ import { StyleSheet } from 'react-native';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import ContactsList from '#components/Contact/ContactsList';
-import ContactsByNameListQueryNode from '#relayArtifacts/ContactsByNameListQuery.graphql';
+import UserContactsListQueryNode from '#relayArtifacts/UserContactsListQuery.graphql';
 import Container from '#ui/Container';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import Text from '#ui/Text';
 import ContactActionModal from './ContactActionModal';
 import type { ContactsListItemType } from '#components/Contact/ContactsList/ContactsList';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
-import type { ContactsByNameList_root$key } from '#relayArtifacts/ContactsByNameList_root.graphql';
-import type { ContactsByNameListQuery } from '#relayArtifacts/ContactsByNameListQuery.graphql';
+import type { UserContactsList_root$key } from '#relayArtifacts/UserContactsList_root.graphql';
+import type { UserContactsListQuery } from '#relayArtifacts/UserContactsListQuery.graphql';
 import type { ScrollViewProps, SectionListData, ViewStyle } from 'react-native';
 import type { FetchPolicy } from 'react-relay';
 
-type ContactsByNameListProps = {
+type UserContactsListProps = {
   /**
    * Search string to filter contacts by name or company
    */
@@ -28,6 +28,11 @@ type ContactsByNameListProps = {
    * @default undefined
    */
   location: string | null | undefined;
+  /**
+   * Are the contacts ordered by date or by name
+   * @default name
+   */
+  orderBy?: 'date' | 'name';
   /**
    * Date to filter contacts by date
    */
@@ -45,32 +50,34 @@ type ContactsByNameListProps = {
     | undefined;
 };
 
-const ContactsByNameList = ({
+const UserContactsList = ({
   search,
   location,
   date,
+  orderBy = 'name',
   onShowContact,
   fetchPolicy = 'store-or-network',
   contentContainerStyle,
   ListHeaderComponent,
   renderScrollComponent,
-}: ContactsByNameListProps) => {
-  const queryResult = useLazyLoadQuery<ContactsByNameListQuery>(
-    ContactsByNameListQueryNode,
-    { location: location !== null ? location : '\uffff', date },
+}: UserContactsListProps) => {
+  const queryResult = useLazyLoadQuery<UserContactsListQuery>(
+    UserContactsListQueryNode,
+    { location: location !== null ? location : '\uffff', date, orderBy },
     { fetchPolicy },
   );
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
-    usePaginationFragment<ContactsByNameListQuery, ContactsByNameList_root$key>(
+    usePaginationFragment<UserContactsListQuery, UserContactsList_root$key>(
       graphql`
-        fragment ContactsByNameList_root on Query
-        @refetchable(queryName: "ContactsByNameListQuery")
+        fragment UserContactsList_root on Query
+        @refetchable(queryName: "UserContactsListQuery")
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 20 }
           search: { type: String, defaultValue: null }
           location: { type: String, defaultValue: null }
           date: { type: DateTime, defaultValue: null }
+          orderBy: { type: ContactOrderBy, defaultValue: null }
         ) {
           currentUser {
             id
@@ -81,6 +88,7 @@ const ContactsByNameList = ({
               search: $search
               location: $location
               date: $date
+              orderBy: $orderBy
             ) @connection(key: "currentUser_contacts") {
               __id
               edges {
@@ -89,6 +97,7 @@ const ContactsByNameList = ({
                   firstName
                   lastName
                   company
+                  meetingDate
                   contactProfile {
                     webCard {
                       userName
@@ -102,7 +111,7 @@ const ContactsByNameList = ({
           }
         }
       `,
-      queryResult as ContactsByNameList_root$key,
+      queryResult as UserContactsList_root$key,
     );
 
   const currentSearch = useRef<string | undefined>(undefined);
@@ -158,20 +167,29 @@ const ContactsByNameList = ({
   const sections = useMemo(() => {
     return contacts.reduce(
       (accumulator, contact) => {
-        const initial = (
-          contact.lastName?.[0] ??
-          contact.firstName?.[0] ??
-          contact.company?.[0] ??
-          contact.contactProfile?.webCard?.userName?.[0] ??
-          ''
-        ).toLocaleUpperCase();
+        let title: string;
+
+        if (orderBy === 'date') {
+          if (!contact.meetingDate) {
+            return accumulator;
+          }
+          title = new Date(contact.meetingDate).toLocaleDateString();
+        } else {
+          title = (
+            contact.lastName?.[0] ??
+            contact.firstName?.[0] ??
+            contact.company?.[0] ??
+            contact.contactProfile?.webCard?.userName?.[0] ??
+            ''
+          ).toLocaleUpperCase();
+        }
 
         const existingSection = accumulator.find(
-          section => section.title === initial,
+          section => section.title === title,
         );
 
         if (!existingSection) {
-          accumulator.push({ title: initial, data: [contact] });
+          accumulator.push({ title, data: [contact] });
         } else {
           existingSection.data.push(contact);
         }
@@ -180,7 +198,7 @@ const ContactsByNameList = ({
       },
       [] as Array<{ title: string; data: ContactsListItemType[] }>,
     );
-  }, [contacts]);
+  }, [contacts, orderBy]);
 
   const renderHeaderSection = useCallback(
     ({
@@ -237,4 +255,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactsByNameList;
+export default UserContactsList;

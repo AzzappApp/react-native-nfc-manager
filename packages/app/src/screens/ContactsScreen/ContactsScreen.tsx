@@ -32,7 +32,7 @@ import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import ContactsByDateList from '../../components/Contact/ContactsByDateList';
 import ContactsByLocationList from '../../components/Contact/ContactsByLocationList';
-import ContactsByNameList from '../../components/Contact/ContactsByNameList';
+import UserContactsList from '../../components/Contact/UserContactsList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
@@ -276,7 +276,7 @@ const ContactsScreen = ({
                     id: 'name',
                     element: (
                       <Suspense fallback={<LoadingView />}>
-                        <ContactsByNameList
+                        <UserContactsList
                           search={debounceSearch}
                           location={undefined}
                           date={undefined}

@@ -251,15 +251,17 @@ export const getUserContactsCount = async (userId: string): Promise<number> => {
 
 const SEPARATOR = '\u0001';
 /**
- * Get a user's profiles contacts ordered by name
+ * Get a user's profiles contacts
  * @param userId - The user's ID
+ * @param orderBy - The order by field ('date' or 'name')
  * @param search - The search term to filter contacts by name
  * @param after - The cursor for pagination
  * @param limit - The maximum number of contacts to return
  * @returns An object containing the contacts and a boolean indicating if there are more contacts to fetch
  */
-export const getUserContactsOrderedByName = async (
+export const getUserContacts = async (
   userId: string,
+  orderBy: 'date' | 'name',
   search?: string | null,
   location?: string | null,
   date?: Date | null,
@@ -353,26 +355,29 @@ export const getUserContactsOrderedByName = async (
       ),
     )
     .orderBy(
-      sql`COALESCE(       
+      ...[
+        orderBy === 'date' ? desc(ContactTable.meetingDate) : undefined,
+        sql`COALESCE(       
         NULLIF(${ContactTable.lastName}, ''),
         NULLIF(${ContactTable.firstName}, ''),    
         NULLIF(${ContactTable.company}, ''),
         NULLIF(${WebCardTable.userName}, ''),
         ''
       )`,
-      sql`COALESCE(       
+        sql`COALESCE(       
         NULLIF(${ContactTable.firstName}, ''),    
         NULLIF(${ContactTable.company}, ''),
         NULLIF(${WebCardTable.userName}, ''),
         ''
       )`,
-      sql`COALESCE(       
+        sql`COALESCE(       
         NULLIF(${ContactTable.company}, ''),
         NULLIF(${WebCardTable.userName}, ''),
         ''
       )`,
-      sql`COALESCE(${WebCardTable.userName}, '')`,
-      ContactTable.id,
+        sql`COALESCE(${WebCardTable.userName}, '')`,
+        ContactTable.id,
+      ].filter(val => val !== undefined),
     )
     .limit(limit + 1); // fetch one extra to check for hasMore
 
