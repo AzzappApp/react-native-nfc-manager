@@ -1,3 +1,7 @@
+## 1.10.0-canary.225
+
+* **fix:**  - remove unused emitContactAddedToProfile ([#8845](https://github.com/AzzappApp/azzapp/pull/8845))
+
 ## 1.10.0-canary.224
 
 * **fix:**  - **enrichment:** deduplicate duplicated fields ([#8835](https://github.com/AzzappApp/azzapp/pull/8835))
