@@ -1,3 +1,7 @@
+## 1.10.0-canary.228
+
+* **fix:**  - **Contact:** make search slide with scroll ([#8863](https://github.com/AzzappApp/azzapp/pull/8863))
+
 ## 1.10.0-canary.227
 
 * **feat:**  - Update app clip, share path ([#8806](https://github.com/AzzappApp/azzapp/pull/8806))
