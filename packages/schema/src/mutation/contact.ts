@@ -84,6 +84,8 @@ export const createContact: MutationResolvers['createContact'] = async (
     lastName: input.lastName || '',
     meetingDate: input.meetingDate ?? undefined,
     socials: input.socials === null ? [] : filterSocialLink(input.socials),
+    deleted: false,
+    deletedAt: null,
   };
 
   let contact: Contact;
