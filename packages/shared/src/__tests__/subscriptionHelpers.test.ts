@@ -2,6 +2,8 @@ import {
   extractSeatsFromSubscriptionId,
   getSubscriptionChangeStatus,
   removeDynamicPartFromId,
+  isSubscriptionBusinessWebcard,
+  shouldUnpublishWebCard,
 } from '../subscriptionHelpers';
 
 describe('extractSeatsFromSubscriptionId', () => {
@@ -229,5 +231,278 @@ describe('removeDynamicPartFromId', () => {
 
   test('should handle empty string', () => {
     expect(removeDynamicPartFromId('')).toBe('');
+  });
+});
+
+describe('isSubscriptionBusinessWebcard', () => {
+  test('should return true for non-personal webCardKind', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'business', isMultiUser: false },
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true for multi-user webCard', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: true },
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has company name', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: false },
+        profile: {
+          contactCard: { company: 'Test Company', urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has URLs', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: false },
+        profile: {
+          contactCard: {
+            company: null,
+            urls: [{ address: 'https://example.com' }],
+          },
+          logoId: null,
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has logo', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: false },
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: 'logo-123',
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return false for personal webCard without business features', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: false },
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  test('should handle null webCard', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: null,
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  test('should handle undefined webCard', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: undefined,
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  test('should handle null contactCard', () => {
+    expect(
+      isSubscriptionBusinessWebcard({
+        webCard: { webCardKind: 'personal', isMultiUser: false },
+        profile: {
+          contactCard: null,
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('shouldUnpublishWebCard', () => {
+  test('should return false if webCard is not published', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: false,
+          webCardKind: 'business',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(false);
+  });
+
+  test('should return false if webCard is null', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: null,
+        nbProfiles: 1,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(false);
+  });
+
+  test('should return false if webCard is undefined', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: undefined,
+        nbProfiles: 1,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(false);
+  });
+
+  test('should return true if number of profiles is greater than 2', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 3,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true for business webCard', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'business',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true for multi-user webCard', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: true,
+        },
+        nbProfiles: 1,
+        profile: { contactCard: null, logoId: null },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has company name', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: {
+          contactCard: { company: 'Test Company', urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has URLs', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: {
+          contactCard: {
+            company: null,
+            urls: [{ address: 'https://example.com' }],
+          },
+          logoId: null,
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return true when profile has logo', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: 'logo-123',
+        },
+      }),
+    ).toBe(true);
+  });
+
+  test('should return false for personal webCard without business features and less than 3 profiles', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 2,
+        profile: {
+          contactCard: { company: null, urls: [] },
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  test('should handle null contactCard', () => {
+    expect(
+      shouldUnpublishWebCard({
+        webCard: {
+          cardIsPublished: true,
+          webCardKind: 'personal',
+          isMultiUser: false,
+        },
+        nbProfiles: 1,
+        profile: {
+          contactCard: null,
+          logoId: null,
+        },
+      }),
+    ).toBe(false);
   });
 });

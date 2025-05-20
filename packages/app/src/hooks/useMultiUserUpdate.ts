@@ -16,6 +16,16 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         webCard {
           id
           isMultiUser
+          isPremium
+          subscription {
+            id
+            subscriptionId
+            issuer
+            status
+            availableSeats
+            totalSeats
+            subscriptionPlan
+          }
         }
       }
     }

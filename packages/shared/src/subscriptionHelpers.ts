@@ -1,3 +1,5 @@
+import type { ContactCard } from './contactCardHelpers';
+
 export const isWebCardKindSubscription = (kind: string) => {
   return kind !== 'personal';
 };
@@ -82,4 +84,40 @@ const getMonths = (duration: string | null): number => {
  */
 export function removeDynamicPartFromId(id: string): string {
   return id.split(':')[0];
+}
+
+export function shouldUnpublishWebCard({
+  webCard,
+  nbProfiles,
+  profile,
+}: {
+  webCard:
+    | { cardIsPublished?: boolean; webCardKind: string; isMultiUser: boolean }
+    | null
+    | undefined;
+  nbProfiles: number;
+  profile: { contactCard: ContactCard | null; logoId: string | null };
+}): boolean {
+  if (!webCard?.cardIsPublished) return false;
+  return nbProfiles > 2 || isSubscriptionBusinessWebcard({ webCard, profile });
+}
+
+export function isSubscriptionBusinessWebcard({
+  webCard,
+  profile,
+}: {
+  webCard:
+    | { cardIsPublished?: boolean; webCardKind: string; isMultiUser: boolean }
+    | null
+    | undefined;
+  profile: { contactCard: ContactCard | null; logoId: string | null };
+}): boolean {
+  if (!webCard) return false;
+  return (
+    webCard.webCardKind !== 'personal' ||
+    webCard.isMultiUser ||
+    !!profile.contactCard?.company ||
+    (profile.contactCard?.urls?.length ?? 0) > 0 ||
+    !!profile.logoId
+  );
 }

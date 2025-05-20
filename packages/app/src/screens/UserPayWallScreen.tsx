@@ -69,6 +69,23 @@ const userPayWallScreenQuery = graphql`
         subscriptionPlan
       }
       isPremium
+      profiles {
+        id
+        webCard {
+          id
+          isMultiUser
+          isPremium
+          subscription {
+            id
+            subscriptionId
+            issuer
+            status
+            availableSeats
+            totalSeats
+            subscriptionPlan
+          }
+        }
+      }
     }
   }
 `;
@@ -96,9 +113,10 @@ const UserPayWallScreen = ({
     setProcessing(false);
     router.back();
   }, [router]);
+
   const setAllowMultiUser = useMultiUserUpdate(onCompleted);
   const activateMultiUser = route.params?.activateFeature === 'MULTI_USER';
-  const waitDatabase = route.params?.waitDatabase;
+  const waitDatabase = route.params?.waitDatabase ?? true;
 
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
@@ -128,11 +146,14 @@ const UserPayWallScreen = ({
     ) {
       if (activateMultiUser) {
         setAllowMultiUser(true);
+      } else {
+        onCompleted();
       }
     }
   }, [
     activateMultiUser,
     currentSubscription,
+    onCompleted,
     router,
     setAllowMultiUser,
     shouldWaitDatabase,
@@ -252,7 +273,8 @@ const UserPayWallScreen = ({
         const { productIdentifier, productPlanIdentifier } =
           res.customerInfo.entitlements.active.multiuser;
         let subscriptionId = productIdentifier;
-        if (productPlanIdentifier) {
+        if (Platform.OS === 'android' && productPlanIdentifier) {
+          // add condition for android because the api should return null for ios, but return "base"
           //specific to android, we  want to use the official identifier with :{basePlan} instead of fixing the identifier manually
           subscriptionId = `${productIdentifier}:${productPlanIdentifier}`;
         }

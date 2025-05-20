@@ -32,24 +32,6 @@ export const createSubscription = (
     .$returningId()
     .then(res => res[0].id);
 
-export const updateActiveInAppUserSubscription = async (
-  userId: string,
-  subscription: Partial<UserSubscription>,
-) => {
-  await db()
-    .update(UserSubscriptionTable)
-    .set(subscription)
-    .where(
-      and(
-        eq(UserSubscriptionTable.userId, userId),
-        or(
-          eq(UserSubscriptionTable.issuer, 'apple'),
-          eq(UserSubscriptionTable.issuer, 'google'),
-        ),
-      ),
-    );
-};
-
 /**
  * Update a subscription
  *
