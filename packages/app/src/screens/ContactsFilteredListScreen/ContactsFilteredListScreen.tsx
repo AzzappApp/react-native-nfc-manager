@@ -121,6 +121,7 @@ const ContactsByLocationHeader = ({
           variant="icon"
         />
       }
+      rightElement={<View style={{ width: 47 }} />}
     />
   );
 };

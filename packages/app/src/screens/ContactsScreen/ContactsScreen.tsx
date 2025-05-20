@@ -173,6 +173,7 @@ const ContactsScreen = ({
                     <ContactScreenTitle user={currentUser} />
                   </Suspense>
                 }
+                rightElement={<View style={{ width: 24 }} />}
               />
               <View style={styles.menu}>
                 <RoundedMenuComponent
@@ -360,6 +361,7 @@ const stylesheet = createStyleSheet(appearance => ({
     flex: 1,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
+    borderRightWidth: 0,
   },
   menuMiddle: {
     flex: 1,
@@ -369,6 +371,7 @@ const stylesheet = createStyleSheet(appearance => ({
     flex: 1,
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
+    borderLeftWidth: 0,
   },
   search: {
     marginHorizontal: 20,
