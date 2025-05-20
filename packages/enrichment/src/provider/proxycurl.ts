@@ -165,6 +165,7 @@ const buildDataFromResponse = async (
       title: profile.headline,
       company: profile.occupation,
       country: profile.country_full_name,
+      city: profile.city,
       skills: profile.skills,
       positions: await Promise.all(
         (profile.experiences ?? [])?.map(async exp => ({

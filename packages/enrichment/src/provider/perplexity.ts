@@ -36,7 +36,7 @@ export const perplexity: ApiResolver = {
       !data.profile?.skills ? 'skills?: string[]|null; ' : ''
     }${!data.profile?.country ? 'country?: string|null; ' : ''}${
       !data.profile?.countryCode ? 'countryCode?: string|null; ' : ''
-    }
+    }${!data.profile?.city ? 'city?: string|null; ' : ''}
     ${
       !data.profile?.skills || !data.profile?.interests
         ? 'icons: Record<string,string>'

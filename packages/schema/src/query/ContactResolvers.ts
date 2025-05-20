@@ -69,6 +69,17 @@ export const PublicProfile: PublicProfileResolvers = {
         }))
       : [];
   },
+  location: profile => {
+    return profile.country
+      ? {
+          country: {
+            name: profile.country,
+            code: profile.countryCode,
+          },
+          city: profile.city,
+        }
+      : null;
+  },
 };
 
 export const ContactEnrichment: ContactEnrichmentResolvers = {

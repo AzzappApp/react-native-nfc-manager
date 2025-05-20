@@ -84,8 +84,17 @@ type PublicProfile {
   skills: [Skill!]
   positions: [Position!]
   education: [Education!]
-  country: String
-  countryCode: String
+  location: PublicProfileLocation
+}
+
+type PublicProfileLocation {
+  country: PublicProfileCountry!
+  city: String
+}
+
+type PublicProfileCountry {
+  name: String!
+  code: String
 }
 
 type Interest {

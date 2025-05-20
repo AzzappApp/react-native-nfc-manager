@@ -1122,6 +1122,7 @@ export type PublicProfile = {
   skills?: string[] | null;
   positions?: Position[] | null;
   education?: Education[] | null;
+  city?: string | null;
   country?: string | null;
   countryCode?: string | null;
   icons?: Record<string, string> | null;

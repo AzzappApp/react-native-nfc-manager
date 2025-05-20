@@ -203,7 +203,11 @@ const buildContact = async (
             })),
           )
         : undefined,
-      country: data.countries?.length ? data.countries[0] : undefined,
+      country: data.location_country,
+      city:
+        typeof data.location_locality === 'string'
+          ? data.location_locality
+          : undefined,
     },
   };
 };
@@ -247,7 +251,7 @@ export const peopleDataLabsIdentify: ApiResolver = {
       email: data.contact.emails?.[0]?.address || undefined,
       phone: data.contact.phoneNumbers?.[0]?.number || undefined,
       school: data.profile?.education?.[0]?.school || undefined,
-      locality: data.profile?.country || undefined,
+      locality: data.profile?.city || undefined,
     });
 
     if (response.status === 200) {
