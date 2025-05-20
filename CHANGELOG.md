@@ -1,3 +1,7 @@
+## 1.9.26-rc.13
+
+* **fix:**  - IAP database duplication, extradata function flashlist
+
 ## 1.9.26-rc.12
 
 
