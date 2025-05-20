@@ -12,7 +12,13 @@ import {
   gt,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
-import { ContactTable, ProfileTable, UserTable, WebCardTable } from '../schema';
+import {
+  ContactEnrichmentTable,
+  ContactTable,
+  ProfileTable,
+  UserTable,
+  WebCardTable,
+} from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
 import type { Contact, NewContact, Profile } from '../schema';
@@ -830,6 +836,23 @@ export const getContactById = async (contactId: string) => {
     .from(ContactTable)
     .where(eq(ContactTable.id, contactId))
     .then(rows => rows[0] ?? null);
+
+  return res;
+};
+
+export const getProfileByContactEnrichmentId = async (
+  enrichmentId: string,
+): Promise<Profile | null> => {
+  const res = await db()
+    .select({ profile: ProfileTable })
+    .from(ContactEnrichmentTable)
+    .innerJoin(
+      ContactTable,
+      eq(ContactTable.id, ContactEnrichmentTable.contactId),
+    )
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .where(eq(ContactEnrichmentTable.id, enrichmentId))
+    .then(rows => rows[0]?.profile ?? null);
 
   return res;
 };

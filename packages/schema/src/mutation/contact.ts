@@ -18,6 +18,7 @@ import {
   getContactEnrichmentById,
   getProfileById,
   updateContactEnrichment,
+  getProfileByContactEnrichmentId,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
@@ -427,6 +428,33 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
     await updateContactEnrichment(contactEnrichmentId, {
       hiddenFields: { contact: input.contact },
     });
+
+    return {
+      contactEnrichment: existingContactEnrichment,
+    };
+  };
+
+export const approveContactEnrichment: MutationResolvers['approveContactEnrichment'] =
+  async (_, { contactEnrichmentId: gqlContactEnrichmentId, approved }) => {
+    const user = await getSessionUser();
+    if (!user) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+
+    const contactEnrichmentId = fromGlobalId(gqlContactEnrichmentId).id;
+
+    const profile = await getProfileByContactEnrichmentId(contactEnrichmentId);
+
+    if (!profile || profile.userId !== user.id) {
+      throw new GraphQLError(ERRORS.FORBIDDEN);
+    }
+
+    await updateContactEnrichment(contactEnrichmentId, {
+      approved,
+    });
+
+    const existingContactEnrichment =
+      await getContactEnrichmentById(contactEnrichmentId);
 
     return {
       contactEnrichment: existingContactEnrichment,

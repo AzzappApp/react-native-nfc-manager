@@ -57,6 +57,7 @@ type ContactEnrichment {
   id: ID!
   fields: EnrichedContactFields
   publicProfile: PublicProfile
+  approved: Boolean
 }
 
 type Position {

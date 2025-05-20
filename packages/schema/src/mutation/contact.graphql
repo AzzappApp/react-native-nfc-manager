@@ -20,6 +20,21 @@ extend type Mutation {
     contactEnrichmentId: ID!
     input: HiddenFieldInput!
   ): ContactEnrichmentPayload!
+
+  """
+  Approves or rejects a contact enrichment request.
+  
+  Arguments:
+  - contactEnrichmentId: The unique identifier of the contact enrichment request to be approved or rejected.
+  - approved: A boolean indicating whether the request is approved (true) or rejected (false).
+  
+  Returns:
+  - The updated contact enrichment payload after the operation.
+  """
+  approveContactEnrichment(
+    contactEnrichmentId: ID!
+    approved: Boolean!
+  ): ContactEnrichmentPayload!
 }
 
 input ContactInput {
