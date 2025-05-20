@@ -1,3 +1,7 @@
+## 1.10.0-canary.226
+
+* **feat:**  - **enrichment:** add mutation for enrichment approval ([#8844](https://github.com/AzzappApp/azzapp/pull/8844))
+
 ## 1.10.0-canary.225
 
 * **fix:**  - remove unused emitContactAddedToProfile ([#8845](https://github.com/AzzappApp/azzapp/pull/8845))
