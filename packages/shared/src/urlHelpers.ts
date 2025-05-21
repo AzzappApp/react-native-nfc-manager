@@ -120,8 +120,8 @@ export function buildUserUrlWithKey({
       ]
     : undefined;
 
-  const dataWithKey = compressToEncodedURIComponent(
-    JSON.stringify([contactCardAccessId, key, geolocationTrimmed]),
+  const dataWithKey = encodeURIComponent(
+    btoa(JSON.stringify([contactCardAccessId, key, geolocationTrimmed])),
   );
 
   return `${buildWebUrl(userName)}?k=${dataWithKey}`;

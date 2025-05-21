@@ -172,7 +172,8 @@ export const matchUrlWithRoute = async (
       let geolocation: Geolocation;
       try {
         [contactCardAccessId, key, geolocation] = JSON.parse(
-          decompressFromEncodedURIComponent(keyData),
+          decompressFromEncodedURIComponent(keyData) ||
+            atob(decodeURIComponent(keyData)),
         );
 
         let builtGeolocation;

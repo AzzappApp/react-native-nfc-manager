@@ -88,7 +88,8 @@ const CoverPageLayout = ({ webCard, media }: CoverPageLayoutProps) => {
       } else if (keyData) {
         try {
           const [contactCardAccessId, key, geolocation] = JSON.parse(
-            decompressFromEncodedURIComponent(keyData),
+            decompressFromEncodedURIComponent(keyData) ||
+              atob(decodeURIComponent(keyData)),
           );
 
           const res = await fetch(
