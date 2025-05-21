@@ -1,3 +1,7 @@
+## 2.0.0-canary.8
+
+* **fix:**  - **contactCard:** [#8830](https://github.com/AzzappApp/azzapp/pull/8830) remove useless lz-string from new qrcodes ([#8882](https://github.com/AzzappApp/azzapp/pull/8882))
+
 ## 2.0.0-canary.7
 
 * **fix:**  - enrichment UI ([#8730](https://github.com/AzzappApp/azzapp/pull/8730))
