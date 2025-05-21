@@ -36,7 +36,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import IconButton from '#ui/IconButton';
+import HeaderButton from '#ui/HeaderButton';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import type {
   NativeScreenProps,
@@ -261,10 +261,13 @@ const ContactEditScreen = ({
             description: 'Edit Contact Card Modal title',
           })}
           leftElement={
-            <IconButton
-              icon="arrow_left"
+            <HeaderButton
+              variant="secondary"
               onPress={router.back}
-              style={styles.leftArrowIcon}
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Edit contact modal Cancel button label',
+              })}
             />
           }
           rightElement={
