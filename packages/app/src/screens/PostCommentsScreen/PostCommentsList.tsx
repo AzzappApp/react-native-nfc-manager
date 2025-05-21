@@ -3,13 +3,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import {
   FlatList,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   RefreshControl,
   StyleSheet,
   View,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import {
+  KeyboardAwareScrollView,
+  KeyboardAvoidingView,
+} from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
