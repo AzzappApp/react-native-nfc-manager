@@ -12,6 +12,7 @@ import {
 import { useDebounce } from 'use-debounce';
 import { shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import AnimatedScrollView from '#components/ui/AnimatedScrollView';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
@@ -131,28 +132,16 @@ const ContactsScreen = ({
       height:
         screenHeight -
         keyboardHeight.value -
-        (1 - keyboardProgress.value) * footHeight,
+        (1 - keyboardProgress.value) * footHeight +
+        SEARCHBAR_HEIGHT,
     };
   });
 
   const scrollByDateAnimatedValue = useMemo(() => new Animated.Value(0), []);
-  const scrollByDateEvent = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollByDateAnimatedValue } } }],
-    { useNativeDriver: false },
-  );
-
   const scrollByNameAnimatedValue = useMemo(() => new Animated.Value(0), []);
-  const scrollByNameEvent = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollByNameAnimatedValue } } }],
-    { useNativeDriver: false },
-  );
   const scrollByLocationAnimatedValue = useMemo(
     () => new Animated.Value(0),
     [],
-  );
-  const scrollByLocationEvent = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollByLocationAnimatedValue } } }],
-    { useNativeDriver: false },
   );
 
   const scrollAnimatedValue = useMemo(() => {
@@ -172,72 +161,79 @@ const ContactsScreen = ({
 
   return (
     <>
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
-          <Reanimated.View
-            style={[{ height: screenHeight - footHeight }, contentHeight]}
-          >
-            <Container style={[styles.container, { paddingTop: insets.top }]}>
-              <Header
-                leftElement={
-                  <IconButton icon="close" onPress={onBack} variant="icon" />
-                }
-                middleElement={
-                  <Suspense
-                    fallback={
-                      <Text variant="large" style={styles.title}>
-                        <FormattedMessage
-                          defaultMessage="Contacts"
-                          description="ContactsScreen - Default title"
-                        />
-                      </Text>
-                    }
-                  >
-                    <ContactScreenTitle user={currentUser} />
-                  </Suspense>
-                }
-                rightElement={<View style={{ width: 24 }} />}
+      <View style={styles.container}>
+        <Reanimated.View
+          style={[
+            { height: screenHeight - footHeight + SEARCHBAR_HEIGHT },
+            contentHeight,
+          ]}
+        >
+          <Container style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+              leftElement={
+                <IconButton icon="close" onPress={onBack} variant="icon" />
+              }
+              middleElement={
+                <Suspense
+                  fallback={
+                    <Text variant="large" style={styles.title}>
+                      <FormattedMessage
+                        defaultMessage="Contacts"
+                        description="ContactsScreen - Default title"
+                      />
+                    </Text>
+                  }
+                >
+                  <ContactScreenTitle user={currentUser} />
+                </Suspense>
+              }
+              rightElement={<View style={{ width: 24 }} />}
+            />
+            <View style={styles.menu}>
+              <RoundedMenuComponent
+                selected={currentTab === 'date'}
+                label={intl.formatMessage({
+                  defaultMessage: 'Date',
+                  description: 'Date selector label in ContactsScreen',
+                })}
+                id="date"
+                onSelect={() => setCurrentTab('date')}
+                style={styles.menuLeft}
               />
-              <View style={styles.menu}>
-                <RoundedMenuComponent
-                  selected={currentTab === 'date'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Date',
-                    description: 'Date selector label in ContactsScreen',
-                  })}
-                  id="date"
-                  onSelect={() => setCurrentTab('date')}
-                  style={styles.menuLeft}
-                />
-                <RoundedMenuComponent
-                  selected={currentTab === 'name'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Name',
-                    description: 'Name selector label in ContactsScreen',
-                  })}
-                  id="name"
-                  onSelect={() => setCurrentTab('name')}
-                  style={styles.menuMiddle}
-                />
-                <RoundedMenuComponent
-                  selected={currentTab === 'location'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Location',
-                    description: 'Location selector label in ContactsScreen',
-                  })}
-                  id="location"
-                  onSelect={() => setCurrentTab('location')}
-                  style={styles.menuRight}
-                />
-              </View>
+              <RoundedMenuComponent
+                selected={currentTab === 'name'}
+                label={intl.formatMessage({
+                  defaultMessage: 'Name',
+                  description: 'Name selector label in ContactsScreen',
+                })}
+                id="name"
+                onSelect={() => setCurrentTab('name')}
+                style={styles.menuMiddle}
+              />
+              <RoundedMenuComponent
+                selected={currentTab === 'location'}
+                label={intl.formatMessage({
+                  defaultMessage: 'Location',
+                  description: 'Location selector label in ContactsScreen',
+                })}
+                id="location"
+                onSelect={() => setCurrentTab('location')}
+                style={styles.menuRight}
+              />
+            </View>
+            <View style={styles.contentContainer}>
               <Animated.View
                 style={{
-                  height: scrollAnimatedValue.interpolate({
-                    inputRange: [0, 56],
-                    outputRange: [56, 0],
-                    extrapolate: 'clamp',
-                  }),
-                  overflow: 'hidden',
+                  flex: 1,
+                  transform: [
+                    {
+                      translateY: scrollAnimatedValue.interpolate({
+                        inputRange: [0, SEARCHBAR_HEIGHT],
+                        outputRange: [0, -SEARCHBAR_HEIGHT],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ],
                 }}
               >
                 <SearchBarStatic
@@ -249,70 +245,81 @@ const ContactsScreen = ({
                   })}
                   onChangeText={e => setSearch(e ?? '')}
                 />
+                <TabView
+                  currentTab={currentTab}
+                  style={styles.content}
+                  tabs={[
+                    {
+                      id: 'date',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByDateList
+                            queryRef={data}
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            renderScrollComponent={props => (
+                              <AnimatedScrollView
+                                {...props}
+                                scrollAnimatedValue={scrollByDateAnimatedValue}
+                              />
+                            )}
+                            contentContainerStyle={
+                              styles.listContentContainerStyle
+                            }
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'name',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <UserContactsList
+                            search={debounceSearch}
+                            location={undefined}
+                            date={undefined}
+                            onShowContact={onShowContact}
+                            renderScrollComponent={props => (
+                              <AnimatedScrollView
+                                {...props}
+                                scrollAnimatedValue={scrollByNameAnimatedValue}
+                              />
+                            )}
+                            contentContainerStyle={
+                              styles.listContentContainerStyle
+                            }
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'location',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByLocationList
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            renderScrollComponent={props => (
+                              <AnimatedScrollView
+                                {...props}
+                                scrollAnimatedValue={
+                                  scrollByLocationAnimatedValue
+                                }
+                              />
+                            )}
+                            contentContainerStyle={
+                              styles.listContentContainerStyle
+                            }
+                          />
+                        </Suspense>
+                      ),
+                    },
+                  ]}
+                />
               </Animated.View>
-              <TabView
-                currentTab={currentTab}
-                style={styles.content}
-                tabs={[
-                  {
-                    id: 'date',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <ContactsByDateList
-                          queryRef={data}
-                          search={debounceSearch}
-                          onShowContact={onShowContact}
-                          renderScrollComponent={props => (
-                            <Animated.ScrollView
-                              {...props}
-                              onScroll={scrollByDateEvent}
-                            />
-                          )}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                  {
-                    id: 'name',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <UserContactsList
-                          search={debounceSearch}
-                          location={undefined}
-                          date={undefined}
-                          onShowContact={onShowContact}
-                          renderScrollComponent={props => (
-                            <Animated.ScrollView
-                              {...props}
-                              onScroll={scrollByNameEvent}
-                            />
-                          )}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                  {
-                    id: 'location',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <ContactsByLocationList
-                          search={debounceSearch}
-                          onShowContact={onShowContact}
-                          renderScrollComponent={props => (
-                            <Animated.ScrollView
-                              {...props}
-                              onScroll={scrollByLocationEvent}
-                            />
-                          )}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                ]}
-              />
-            </Container>
-          </Reanimated.View>
-        </View>
+            </View>
+          </Container>
+        </Reanimated.View>
         <Container style={[styles.footer, { paddingBottom: insets.bottom }]}>
           <Button
             label={
@@ -402,6 +409,8 @@ const ContactScreenTitle = ({
   );
 };
 
+const SEARCHBAR_HEIGHT = 56;
+
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
@@ -431,6 +440,10 @@ const stylesheet = createStyleSheet(appearance => ({
     borderBottomLeftRadius: 0,
     borderLeftWidth: 0,
   },
+  contentContainer: {
+    flex: 1,
+    overflow: 'hidden',
+  },
   search: {
     marginHorizontal: 20,
   },
@@ -451,7 +464,16 @@ const stylesheet = createStyleSheet(appearance => ({
   content: {
     flex: 1,
   },
+  listContentContainerStyle: {
+    paddingBottom: SEARCHBAR_HEIGHT,
+  },
   footer: [
+    {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
     {
       padding: 20,
       justifyContent: 'center',
