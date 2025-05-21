@@ -189,7 +189,6 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       backgroundColor: 'transparent',
     },
     androidNoPadding: {
-      padding: 1, //for border
       overflow: 'hidden',
     },
   },
