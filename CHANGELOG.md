@@ -1,3 +1,7 @@
+## 2.0.0-canary.7
+
+* **fix:**  - enrichment UI ([#8730](https://github.com/AzzappApp/azzapp/pull/8730))
+
 ## 2.0.0-canary.6
 
 
