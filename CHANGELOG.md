@@ -1,3 +1,7 @@
+## 1.9.26-rc.14
+
+* **fix:**  - freeSeat calcul ([#8875](https://github.com/AzzappApp/azzapp/pull/8875))
+
 ## 1.9.26-rc.13
 
 * **fix:**  - IAP database duplication, extradata function flashlist
