@@ -1,3 +1,7 @@
+## 2.0.0-canary.4
+
+* **fix:**  - **Contact:** scroll events ([#8870](https://github.com/AzzappApp/azzapp/pull/8870))
+
 ## 2.0.0-canary.3
 
 
