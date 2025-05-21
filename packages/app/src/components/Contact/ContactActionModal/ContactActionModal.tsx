@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
@@ -35,6 +35,7 @@ const ContactActionModal = ({
   const onInviteContact = useOnInviteContact();
 
   const removeContact = useRemoveContact();
+
   const singleContact = useMemo(
     () => (data && !Array.isArray(data) ? readContactData(data) : null),
     [data],
@@ -123,12 +124,71 @@ const ContactActionModal = ({
     webCardUserName,
   ]);
 
+  const contactsDefined = contacts.map(contact => contact.id).filter(isDefined);
+
   const onRemoveContactAction = data
     ? () => {
-        removeContact(contacts.map(contact => contact.id).filter(isDefined));
+        if (data) {
+          removeContact(contactsDefined);
+        }
         close();
       }
     : undefined;
+
+  const confirmDelete = () => {
+    Alert.alert(
+      intl.formatMessage(
+        {
+          defaultMessage: `Delete {count, plural,
+          =1 {this contact}
+          other {these contacts}
+        }`,
+          description: 'Title of delete contacts Alert',
+        },
+        {
+          count: contactsDefined.length,
+        },
+      ),
+      intl.formatMessage(
+        {
+          defaultMessage: `Are you sure you want to delete {count, plural,
+          =1 {this contact}
+          other {these contacts}
+        }? This action is irreversible.`,
+          description: 'description of delete contacts Alert',
+        },
+        {
+          count: contactsDefined.length,
+        },
+      ),
+      [
+        {
+          text: intl.formatMessage(
+            {
+              defaultMessage: `Delete {count, plural,
+          =1 {this contact}
+          other {these contacts}
+        }`,
+              description: 'button of delete contacts Alert',
+            },
+            {
+              count: contactsDefined.length,
+            },
+          ),
+          onPress: onRemoveContactAction,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete contacts Alert',
+          }),
+          onPress: close,
+          isPreferred: true,
+        },
+      ],
+    );
+  };
 
   const contactsCount = Array.isArray(data) ? data?.length : 1;
 
@@ -142,10 +202,7 @@ const ContactActionModal = ({
       {elements.map((element, index) => {
         return <ContactActionModalOption key={index} {...element} />;
       })}
-      <PressableNative
-        style={styles.removeButton}
-        onPress={onRemoveContactAction}
-      >
+      <PressableNative style={styles.removeButton} onPress={confirmDelete}>
         <Text variant="button" style={styles.removeText}>
           <FormattedMessage
             defaultMessage="{contacts, plural,

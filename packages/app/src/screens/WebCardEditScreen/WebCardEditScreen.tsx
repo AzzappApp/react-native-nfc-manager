@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -218,6 +218,60 @@ const WebCardEditScreen = ({
     toggleSelectionMode();
   }, [toggleSelectionMode]);
 
+  const confirmDeleteSection = () => {
+    Alert.alert(
+      intl.formatMessage(
+        {
+          defaultMessage: `Delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }`,
+          description: 'Title of delete sections Alert',
+        },
+        {
+          count: nbSelectedModules,
+        },
+      ),
+      intl.formatMessage(
+        {
+          defaultMessage: `Are you sure you want to delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }? This action is irreversible.`,
+          description: 'description of delete sections Alert',
+        },
+        {
+          count: nbSelectedModules,
+        },
+      ),
+      [
+        {
+          text: intl.formatMessage(
+            {
+              defaultMessage: `Delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }`,
+              description: 'button of delete sections Alert',
+            },
+            {
+              count: nbSelectedModules,
+            },
+          ),
+          onPress: onDeleteSelectedModules,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete sections Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
+
   const onDuplicateSelectedModules = useCallback(() => {
     webCardBodyRef.current?.duplicateSelectedModules();
     toggleSelectionMode();
@@ -421,7 +475,7 @@ const WebCardEditScreen = ({
             onRequestColorPicker={openWebCardColorPicker}
             onRequestWebCardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
-            onDelete={onDeleteSelectedModules}
+            onDelete={confirmDeleteSection}
             onDuplicate={onDuplicateSelectedModules}
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
