@@ -279,7 +279,7 @@ const MultiUserScreenUserList = ({
   const { bottom } = useScreenInsets();
 
   const contentContainerStyle = useMemo(
-    () => ({ paddingBottom: 40 + bottom }),
+    () => ({ paddingBottom: bottom }),
     [bottom],
   );
 

@@ -42,6 +42,7 @@ import {
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
@@ -447,205 +448,210 @@ const MultiUserDetailsScreen = ({
     return normalizeArray(result.map(item => item.data));
   }, [profile?.statsSummary]);
 
+  const { top, bottom } = useScreenInsets();
+
+  const containerStyle = useMemo(
+    () => ({ flex: 1, paddingTop: top, paddingBottom: bottom }),
+    [top, bottom],
+  );
+
   if (!profileInfos?.profileId || profile == null) return null;
 
   return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header
-          leftElement={
-            <Button
-              variant="secondary"
-              label={intl.formatMessage({
-                defaultMessage: 'Cancel',
-                description: 'MultiUserDetailModal - Cancel button label',
-              })}
-              onPress={router.back}
-            />
-          }
-          middleElement={
-            <Text variant="large" style={styles.name}>
-              ~{firstName} {lastName}
-            </Text>
-          }
-          rightElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'MultiUserAddModal - Save button label',
-              })}
-              loading={saving || isSubmitting}
-              onPress={submit}
-            />
-          }
-        />
-        <ContactCardEditForm
-          webCard={webCard}
-          control={control as unknown as Control<ContactCardFormValues>}
-          footer={
-            !isCurrentProfile &&
-            role !== 'owner' && (
-              <PressableNative
-                style={styles.removeButton}
-                onPress={onConfirmRemoveUser}
-                disabled={deletionIsActive}
-              >
-                <Text variant="button" style={styles.removeText}>
-                  <FormattedMessage
-                    defaultMessage="Remove user"
-                    description="label for button to remove user from multi-user profile"
-                  />
-                </Text>
-              </PressableNative>
-            )
-          }
-        >
-          <View style={styles.contentPaddingHorizontal}>
-            <Controller
-              control={control}
-              name="selectedContact"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="xsmall" style={styles.title}>
-                    <FormattedMessage
-                      defaultMessage="Email address or phone number"
-                      description="MultiUserDetailModal - label for contact"
-                    />
-                  </Text>
-                  <TextInput
-                    value={value?.value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    style={[styles.input, styles.contactText]}
-                    editable={false}
-                  />
-                </View>
-              )}
-            />
-            <Controller
-              control={control}
-              name="role"
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="xsmall" style={styles.title}>
-                    <FormattedMessage
-                      defaultMessage="Role"
-                      description="MultiUserDetailModal - label for role"
-                    />
-                  </Text>
-                  <Select
-                    nativeID="role"
-                    disabled={isCurrentProfile || role === 'owner'}
-                    accessibilityLabelledBy="roleLabel"
-                    data={
-                      role === 'owner'
-                        ? [
-                            {
-                              id: 'owner',
-                              label: (
-                                <FormattedMessage
-                                  defaultMessage="Owner"
-                                  description="MultiUserDetailModal - Label for owner select input"
-                                />
-                              ),
-                            },
-                          ]
-                        : roles
-                    }
-                    selectedItemKey={value}
-                    keyExtractor={keyExtractor}
-                    onItemSelected={item => onChange(item.id)}
-                    itemContainerStyle={styles.selectItemContainerStyle}
-                    bottomSheetTitle={
-                      intl.formatMessage({
-                        defaultMessage: 'Select a role',
-                        description:
-                          'MultiUserDetailForm - Role BottomSheet - Title',
-                      }) as string
-                    }
-                    useFlatList={false}
-                  />
-                </View>
-              )}
-            />
-
-            {!profile.webCard?.profilePendingOwner && (
-              <Text variant="xsmall" style={styles.description}>
-                {role === 'user' && (
-                  <FormattedMessage
-                    defaultMessage="A 'user' can edit and use the ContactCard linked to the shared WebCard{azzappA}. However, a 'user' has a view-only access to the WebCard{azzappA} itself and to the posts, and 'user' cannot 'like', 'comment', or 'follow' on the posts and WebCards{azzappA} of others."
-                    description="MultiUserDetailModal - User description"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                )}
-                {role === 'editor' && (
-                  <FormattedMessage
-                    defaultMessage="An 'editor' can publish posts, edit WebCard{azzappA} contents, and interact with WebCards{azzappA} and posts of others. However, 'editor' does not have access to WebCard{azzappA} parameters and to the Multi-User settings."
-                    description="MultiUserDetailModal - Editor description"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                )}
-                {role === 'admin' && (
-                  <FormattedMessage
-                    defaultMessage="An 'admin' has a full control over the shared WebCard{azzappA}, including the ability to publish and unpublish it, to change the WebCard{azzappA} name, and to manage Multi-User collaborators. Also, ‘admin’ can manage payment details. However, an 'admin' cannot deactivate the Multi-User mode or delete the WebCard{azzappA}."
-                    description="MultiUserDetailModal - admin description"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                )}
-                {role === 'owner' && (
-                  <FormattedMessage
-                    defaultMessage="The 'owner' has a full control of the WebCard{azzappA}, including ability to deactivate the Multi-User mode, to transfer WebCard{azzappA} ownership, and to delete the WebCard{azzappA}. Also, ‘owner’ can manage payment details."
-                    description="MultiUserDetailModal - admin description"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                )}
-              </Text>
-            )}
-            {profile.webCard?.profilePendingOwner && (
-              <Text variant="xsmall" style={styles.description}>
+    <Container style={containerStyle}>
+      <Header
+        leftElement={
+          <Button
+            variant="secondary"
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'MultiUserDetailModal - Cancel button label',
+            })}
+            onPress={router.back}
+          />
+        }
+        middleElement={
+          <Text variant="large" style={styles.name}>
+            ~{firstName} {lastName}
+          </Text>
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'MultiUserAddModal - Save button label',
+            })}
+            loading={saving || isSubmitting}
+            onPress={submit}
+          />
+        }
+      />
+      <ContactCardEditForm
+        webCard={webCard}
+        control={control as unknown as Control<ContactCardFormValues>}
+        footer={
+          !isCurrentProfile &&
+          role !== 'owner' && (
+            <PressableNative
+              style={styles.removeButton}
+              onPress={onConfirmRemoveUser}
+              disabled={deletionIsActive}
+            >
+              <Text variant="button" style={styles.removeText}>
                 <FormattedMessage
-                  defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
-                  description="MultiUserDetailModal - Description for pending ownership transfer"
+                  defaultMessage="Remove user"
+                  description="label for button to remove user from multi-user profile"
                 />
               </Text>
-            )}
-            <View style={styles.stats}>
-              <ProfileStatisticsChart
-                width={
-                  windowWidth -
-                  styles.contentPaddingHorizontal.paddingHorizontal * 2 -
-                  styles.stats.paddingHorizontal * 2
-                }
-                height={170}
-                data={chartData}
-                variant={colorScheme ?? 'dark'}
-              />
-              <View style={styles.statsLabelContainer}>
-                <Text variant="xlarge" style={styles.statsLabel}>
-                  {profile.nbContactCardScans}
-                </Text>
-                <Text variant="smallbold" style={styles.statsLabel}>
+            </PressableNative>
+          )
+        }
+      >
+        <View style={styles.contentPaddingHorizontal}>
+          <Controller
+            control={control}
+            name="selectedContact"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.field}>
+                <Text variant="xsmall" style={styles.title}>
                   <FormattedMessage
-                    defaultMessage="Contact card{azzappA} views"
-                    description="Multi users statistics - Contact card views label"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
+                    defaultMessage="Email address or phone number"
+                    description="MultiUserDetailModal - label for contact"
                   />
                 </Text>
+                <TextInput
+                  value={value?.value ?? ''}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={[styles.input, styles.contactText]}
+                  editable={false}
+                />
               </View>
+            )}
+          />
+          <Controller
+            control={control}
+            name="role"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.field}>
+                <Text variant="xsmall" style={styles.title}>
+                  <FormattedMessage
+                    defaultMessage="Role"
+                    description="MultiUserDetailModal - label for role"
+                  />
+                </Text>
+                <Select
+                  nativeID="role"
+                  disabled={isCurrentProfile || role === 'owner'}
+                  accessibilityLabelledBy="roleLabel"
+                  data={
+                    role === 'owner'
+                      ? [
+                          {
+                            id: 'owner',
+                            label: (
+                              <FormattedMessage
+                                defaultMessage="Owner"
+                                description="MultiUserDetailModal - Label for owner select input"
+                              />
+                            ),
+                          },
+                        ]
+                      : roles
+                  }
+                  selectedItemKey={value}
+                  keyExtractor={keyExtractor}
+                  onItemSelected={item => onChange(item.id)}
+                  itemContainerStyle={styles.selectItemContainerStyle}
+                  bottomSheetTitle={
+                    intl.formatMessage({
+                      defaultMessage: 'Select a role',
+                      description:
+                        'MultiUserDetailForm - Role BottomSheet - Title',
+                    }) as string
+                  }
+                  useFlatList={false}
+                />
+              </View>
+            )}
+          />
+
+          {!profile.webCard?.profilePendingOwner && (
+            <Text variant="xsmall" style={styles.description}>
+              {role === 'user' && (
+                <FormattedMessage
+                  defaultMessage="A 'user' can edit and use the ContactCard linked to the shared WebCard{azzappA}. However, a 'user' has a view-only access to the WebCard{azzappA} itself and to the posts, and 'user' cannot 'like', 'comment', or 'follow' on the posts and WebCards{azzappA} of others."
+                  description="MultiUserDetailModal - User description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              )}
+              {role === 'editor' && (
+                <FormattedMessage
+                  defaultMessage="An 'editor' can publish posts, edit WebCard{azzappA} contents, and interact with WebCards{azzappA} and posts of others. However, 'editor' does not have access to WebCard{azzappA} parameters and to the Multi-User settings."
+                  description="MultiUserDetailModal - Editor description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              )}
+              {role === 'admin' && (
+                <FormattedMessage
+                  defaultMessage="An 'admin' has a full control over the shared WebCard{azzappA}, including the ability to publish and unpublish it, to change the WebCard{azzappA} name, and to manage Multi-User collaborators. Also, ‘admin’ can manage payment details. However, an 'admin' cannot deactivate the Multi-User mode or delete the WebCard{azzappA}."
+                  description="MultiUserDetailModal - admin description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              )}
+              {role === 'owner' && (
+                <FormattedMessage
+                  defaultMessage="The 'owner' has a full control of the WebCard{azzappA}, including ability to deactivate the Multi-User mode, to transfer WebCard{azzappA} ownership, and to delete the WebCard{azzappA}. Also, ‘owner’ can manage payment details."
+                  description="MultiUserDetailModal - admin description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              )}
+            </Text>
+          )}
+          {profile.webCard?.profilePendingOwner && (
+            <Text variant="xsmall" style={styles.description}>
+              <FormattedMessage
+                defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
+                description="MultiUserDetailModal - Description for pending ownership transfer"
+              />
+            </Text>
+          )}
+          <View style={styles.stats}>
+            <ProfileStatisticsChart
+              width={
+                windowWidth -
+                styles.contentPaddingHorizontal.paddingHorizontal * 2 -
+                styles.stats.paddingHorizontal * 2
+              }
+              height={170}
+              data={chartData}
+              variant={colorScheme ?? 'dark'}
+            />
+            <View style={styles.statsLabelContainer}>
+              <Text variant="xlarge" style={styles.statsLabel}>
+                {profile.nbContactCardScans}
+              </Text>
+              <Text variant="smallbold" style={styles.statsLabel}>
+                <FormattedMessage
+                  defaultMessage="Contact card{azzappA} views"
+                  description="Multi users statistics - Contact card views label"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              </Text>
             </View>
           </View>
-        </ContactCardEditForm>
-      </SafeAreaView>
+        </View>
+      </ContactCardEditForm>
       {isSubmitting || saving ? (
         /* Used to prevent user from interacting with the screen while saving */
         <View style={StyleSheet.absoluteFill} />
