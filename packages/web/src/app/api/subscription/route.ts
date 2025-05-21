@@ -62,7 +62,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats,
-              freeSeats: totalSeats - totalUsedSeats,
               status: 'active',
             });
           } else {
@@ -78,7 +77,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats,
-              freeSeats: totalSeats - totalUsedSeats,
               status: 'active',
             });
           }
@@ -112,7 +110,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
               status: 'canceled',
               invalidatedAt: new Date(),
             });
@@ -150,7 +147,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
               status: 'active',
             });
           } else {
@@ -190,7 +186,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats,
-              freeSeats: totalSeats - totalUsedSeats,
               status: 'active',
             });
           } else {
@@ -206,7 +201,6 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats,
-              freeSeats: totalSeats - totalUsedSeats,
               status: 'active',
             });
 
@@ -241,7 +235,6 @@ const subscriptionWebHook = async (req: Request) => {
                     : store === 'PLAY_STORE'
                       ? 'google'
                       : 'web',
-                freeSeats: 0,
                 status: 'active',
               });
             } else {
@@ -249,7 +242,6 @@ const subscriptionWebHook = async (req: Request) => {
                 endAt: new Date(grace_period_expiration_at_ms),
                 revenueCatId: rcId,
                 subscriptionId,
-                freeSeats: 0,
                 status: 'active',
               });
             }
