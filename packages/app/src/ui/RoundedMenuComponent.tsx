@@ -1,10 +1,11 @@
 import { memo, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { TextVariant } from './Text';
-import type { ViewStyle } from 'react-native';
+import type { TextStyle, ViewStyle } from 'react-native';
 
 type Props = {
   selected?: boolean;
@@ -12,7 +13,11 @@ type Props = {
   label: string;
   onSelect?: (id: string | null) => void;
   textVariant?: TextVariant;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
+  selectedStyle?: ViewStyle | ViewStyle[];
+  textStyle?: TextStyle;
+  selectedTextStyle?: TextStyle | TextStyle[];
+  rightElement?: JSX.Element;
 };
 
 const RoundedMenuComponent = ({
@@ -22,6 +27,10 @@ const RoundedMenuComponent = ({
   id,
   textVariant = 'button',
   style,
+  selectedStyle,
+  textStyle,
+  rightElement,
+  selectedTextStyle,
 }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -31,12 +40,28 @@ const RoundedMenuComponent = ({
     }
   }, [id, onSelect]);
 
+  const flattenStyle = StyleSheet.flatten(style);
+  const flattenSelectedStyle = selected
+    ? StyleSheet.flatten(selectedStyle)
+    : {};
+  const flattenSelectedTextStyle = selected
+    ? StyleSheet.flatten(selectedTextStyle)
+    : {};
+
   return (
     <PressableNative
-      style={[styles.menu, selected && styles.menuSelected, style]}
+      style={[
+        styles.menu,
+        selected && styles.menuSelected,
+        flattenStyle,
+        flattenSelectedStyle,
+      ]}
       onPress={onPress}
     >
-      <Text variant={textVariant}>{label}</Text>
+      <Text variant={textVariant} style={[textStyle, flattenSelectedTextStyle]}>
+        {label}
+      </Text>
+      {rightElement}
     </PressableNative>
   );
 };

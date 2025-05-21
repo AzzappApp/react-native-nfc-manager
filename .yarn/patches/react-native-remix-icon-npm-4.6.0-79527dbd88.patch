@@ -1,0 +1,42 @@
+diff --git a/src/index.d.ts b/src/index.d.ts
+index ad4a8b1faa9ce64551af1bc657e43afc4fdd8b59..9a3dbced62b335a45b0a8d0b64efd48e2b89b0e5 100644
+--- a/src/index.d.ts
++++ b/src/index.d.ts
+@@ -2,6 +2,7 @@ declare interface RemixIconProps {
+   name: IconName;
+   size?: number | string;
+   color?: string;
++  fallback?: JSX.Element | null;
+   [key: string]: any;
+ }
+ declare const RemixIcon: React.FC<RemixIconProps>;
+diff --git a/src/index.js b/src/index.js
+index a47edcdbddb68e12220f23a79bb60b4b8c6888c7..165ea686f2c198f0955481d56d45012c3e4cbf98 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -34,8 +34,12 @@ const RemixIcon = ({
+   name = "remixicon-fill",
+   color = "black",
+   size = 24,
++  fallback = undefined,
+   ...props
+ }) => {
++  if (!name) {
++    return fallback === undefined ? (<Text>Invalid Icon Name</Text>) : fallback;
++  }
+   // The icon name from remixicon.com UI starts with "ri-", so we need to remove this prefix if present.
+   name = name.startsWith("ri-") ? name.substring(3) : name;
+ 
+@@ -44,9 +48,9 @@ const RemixIcon = ({
+ 
+   return Component ? (
+     <Component {...props} fill={color || "black"} width={size} height={size} />
+-  ) : (
+-    <Text>Invalid Icon Name</Text>
+-  );
++  ) :
++    fallback === undefined ? (<Text>Invalid Icon Name</Text>) : fallback
++  ;
+ };
+ 
+ export default RemixIcon;

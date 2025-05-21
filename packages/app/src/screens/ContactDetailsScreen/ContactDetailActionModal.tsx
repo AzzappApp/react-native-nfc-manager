@@ -1,13 +1,16 @@
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
+import { isDefined } from '@azzapp/shared/isDefined';
+import { ENABLE_DATA_ENRICHMENT } from '#Config';
 import { colors } from '#theme';
 import { ContactActionModalOption } from '#components/Contact/ContactActionModal';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ContactActionModalOptionProps } from '#components/Contact/ContactActionModal';
-import type { ContactType } from '#helpers/contactHelpers';
+import type { ContactDetailActionModal_contact$key } from '#relayArtifacts/ContactDetailActionModal_contact.graphql';
 import type { Icons } from '#ui/Icon';
 
 type ContactDetailActionModalProps = {
@@ -17,20 +20,30 @@ type ContactDetailActionModalProps = {
   onSaveContact: () => void;
   onShare: () => void;
   onEdit: () => void;
-  details?: ContactType;
+  onEnrich?: () => void;
+  contact?: ContactDetailActionModal_contact$key | null;
 };
 
 const ContactDetailActionModal = ({
-  details,
+  contact: contactKey,
   visible,
   close,
   onRemoveContacts,
   onSaveContact,
   onShare,
   onEdit,
+  onEnrich,
 }: ContactDetailActionModalProps) => {
   const intl = useIntl();
-
+  const contact = useFragment(
+    graphql`
+      fragment ContactDetailActionModal_contact on Contact {
+        firstName
+        lastName
+      }
+    `,
+    contactKey,
+  );
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
     return [
       {
@@ -41,6 +54,16 @@ const ContactDetailActionModal = ({
         }),
         onPress: onEdit,
       },
+      ENABLE_DATA_ENRICHMENT && onEnrich
+        ? {
+            icon: 'filters' as Icons,
+            text: intl.formatMessage({
+              defaultMessage: 'Enrich with azzapp AI',
+              description: 'ContactsScreen - More option alert - Enrich',
+            }),
+            onPress: onEnrich,
+          }
+        : undefined,
       {
         icon: 'share' as Icons,
         text: intl.formatMessage({
@@ -57,8 +80,8 @@ const ContactDetailActionModal = ({
         }),
         onPress: onSaveContact,
       },
-    ];
-  }, [intl, onSaveContact, onShare, onEdit]);
+    ].filter(isDefined);
+  }, [intl, onEdit, onEnrich, onShare, onSaveContact]);
 
   const confirmDelete = () => {
     Alert.alert(
@@ -100,7 +123,7 @@ const ContactDetailActionModal = ({
       stackBehavior="push"
     >
       <Text variant="small" style={styles.titleText}>
-        {`${details?.firstName ?? ''} ${details?.lastName ?? ''}`.trim()}
+        {`${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim()}
       </Text>
 
       {elements.map((element, index) => {

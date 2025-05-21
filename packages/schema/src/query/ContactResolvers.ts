@@ -85,8 +85,13 @@ export const PublicProfile: PublicProfileResolvers = {
 export const ContactEnrichment: ContactEnrichmentResolvers = {
   id: idResolver('ContactEnrichment'),
   fields: enrichment => {
-    return enrichment.fields
+    return enrichment.fields && enrichment.approved !== false
       ? filterHiddenContactFields(enrichment.fields, enrichment.hiddenFields)
+      : null;
+  },
+  publicProfile: enrichment => {
+    return enrichment.publicProfile && enrichment.approved !== false
+      ? enrichment.publicProfile
       : null;
   },
 };

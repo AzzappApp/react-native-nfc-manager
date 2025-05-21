@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation } from 'react-relay';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import useRichTextManager from '#components/cardModules/tool/useRichTextManager';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -11,19 +11,37 @@ import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
-import type { ContactType } from '#helpers/contactHelpers';
+import type { NoteModal_contact$key } from '#relayArtifacts/NoteModal_contact.graphql';
 import type { NoteModalMutation } from '#relayArtifacts/NoteModalMutation.graphql';
 
 type NoteModalProps = {
-  contact: ContactType;
+  contact?: NoteModal_contact$key | null;
   visible: boolean;
   onDismiss: () => void;
 };
 
-const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
+const NoteModal = ({
+  visible,
+  onDismiss,
+  contact: contactKey,
+}: NoteModalProps) => {
   const intl = useIntl();
   const { top: topInset } = useScreenInsets();
-  const [text, setText] = useState(contact.note);
+
+  const contact = useFragment(
+    graphql`
+      fragment NoteModal_contact on Contact {
+        id
+        note
+        firstName
+        lastName
+        company
+      }
+    `,
+    contactKey,
+  );
+
+  const [text, setText] = useState(contact?.note);
 
   const [commit, loading] = useMutation<NoteModalMutation>(graphql`
     mutation NoteModalMutation($contactId: ID!, $contact: ContactInput!) {
@@ -35,7 +53,7 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
   `);
 
   const onSave = useCallback(() => {
-    if (contact.id) {
+    if (contact?.id) {
       commit({
         variables: {
           contactId: contact.id,
@@ -63,13 +81,13 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
   const { onSelectionChange, onChangeText, textAndSelection } =
     useRichTextManager({
       id: `text`,
-      defaultValue: contact.note || '',
+      defaultValue: contact?.note || '',
       setText,
     });
 
   useEffect(() => {
-    onChangeText(contact.note || '');
-  }, [contact.note, onChangeText]);
+    onChangeText(contact?.note || '');
+  }, [contact?.note, onChangeText]);
 
   return (
     <BottomSheetModal
@@ -81,9 +99,9 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
     >
       <Header
         middleElement={formatDisplayName(
-          contact.firstName,
-          contact.lastName,
-          contact.company,
+          contact?.firstName,
+          contact?.lastName,
+          contact?.company,
         )}
         style={[styles.header, { marginTop: topInset }]}
         rightElement={
@@ -93,7 +111,7 @@ const NoteModal = ({ contact, visible, onDismiss }: NoteModalProps) => {
               defaultMessage: 'Save',
               description: 'NoteModal - Save header button label',
             })}
-            disabled={contact.note === text}
+            disabled={contact?.note === text}
             loading={loading}
           />
         }

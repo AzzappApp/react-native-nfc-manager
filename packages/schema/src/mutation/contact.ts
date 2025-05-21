@@ -440,7 +440,10 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
   };
 
 export const approveContactEnrichment: MutationResolvers['approveContactEnrichment'] =
-  async (_, { contactEnrichmentId: gqlContactEnrichmentId, approved }) => {
+  async (
+    _,
+    { contactEnrichmentId: gqlContactEnrichmentId, approved, input },
+  ) => {
     const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -455,6 +458,7 @@ export const approveContactEnrichment: MutationResolvers['approveContactEnrichme
     }
 
     await updateContactEnrichment(contactEnrichmentId, {
+      hiddenFields: { contact: input?.contact },
       approved,
     });
 

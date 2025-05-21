@@ -259,8 +259,16 @@ const ContactCreateScreen = ({
             ).toISOString(),
           },
         },
-        onCompleted: () => {
-          router.back();
+        onCompleted: data => {
+          if (data.createContact?.contact.id) {
+            router.replace({
+              route: 'CONTACT_DETAILS',
+              params: {
+                contactId: data.createContact.contact.id,
+                overlay: 'tooltipVisible',
+              },
+            });
+          }
         },
         updater: (store, response) => {
           if (response && response.createContact) {

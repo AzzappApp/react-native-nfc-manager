@@ -1,111 +1,295 @@
+import MaskedView from '@react-native-masked-view/masked-view';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useMemo } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, Platform, useColorScheme, View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { graphql, useFragment } from 'react-relay';
-import { colors, shadow } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
+
+import Toast from 'react-native-toast-message';
+import { graphql, useFragment, useMutation } from 'react-relay';
+import { ENABLE_DATA_ENRICHMENT } from '#Config';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import {
-  getFriendlyNameFromLocation,
-  shareContact,
-} from '#helpers/contactHelpers';
+import { shareContact } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import useBoolean from '#hooks/useBoolean';
 import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
-import Button from '#ui/Button';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Container from '#ui/Container';
-import Icon, { SocialIcon } from '#ui/Icon';
+import Icon from '#ui/Icon';
+import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
+import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
-import NoteItem from './NoteItem';
+import { ContactDetailAvatar } from './ContactDetailAvatar';
+import { ContactDetailEnrichOverlay } from './ContactDetailEnrichOverlay';
+import { ContactDetailFragmentAI } from './ContactDetailFragmentAI';
+import { ContactDetailFragmentContact } from './ContactDetailFragmentContact';
 import type { ContactType } from '#helpers/contactHelpers';
-import type { ContactDetailsBody_webCard$key } from '#relayArtifacts/ContactDetailsBody_webCard.graphql';
-import type { Icons } from '#ui/Icon';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
+import type { ContactDetailAvatar_webCard$key } from '#relayArtifacts/ContactDetailAvatar_webCard.graphql';
+import type {
+  ContactDetailsBody_contact$data,
+  ContactDetailsBody_contact$key,
+} from '#relayArtifacts/ContactDetailsBody_contact.graphql';
+
+import type { ContactDetailsRoute } from '#routes';
+
+export type ContactDetailEnrichState =
+  | 'idle'
+  | 'loading'
+  | 'tooltipVisible'
+  | 'waitingApproval';
 
 const BLUR_GAP = 20;
 
 type ContactDetailsBodyProps = {
   contact: ContactType;
-  webCard: ContactDetailsBody_webCard$key | null;
+  webCard: ContactDetailAvatar_webCard$key | null;
+  contactKey: ContactDetailsBody_contact$key | null;
   onClose: () => void;
   onSave: () => void;
+  refreshQuery?: () => void;
+  hasFocus?: boolean;
+};
+
+export type HiddenFields = {
+  firstName: boolean;
+  lastName: boolean;
+  company: boolean;
+  title: boolean;
+  birthday: boolean;
+  avatarId: boolean;
+  logoId: boolean;
+  phoneNumbers: boolean[];
+  emails: boolean[];
+  addresses: boolean[];
+  socials: boolean[];
+  urls: boolean[];
 };
 
 const ContactDetailsBody = ({
   contact,
+  contactKey,
   webCard: webCardKey,
   onSave,
   onClose,
+  refreshQuery,
+  hasFocus,
 }: ContactDetailsBodyProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
 
-  const [isMoreVisible, showMore, hideMore] = useBoolean(false);
-
-  const webCard = useFragment(
+  const data = useFragment(
     graphql`
-      fragment ContactDetailsBody_webCard on WebCard
+      fragment ContactDetailsBody_contact on Contact
       @argumentDefinitions(
-        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
-        cappedPixelRatio: {
+        pixelRatio: {
           type: "Float!"
           provider: "CappedPixelRatio.relayprovider"
         }
         screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
         id
-        ...CoverRenderer_webCard
-        coverMedia {
+        ...ContactDetailFragmentContact_contact
+        ...ContactDetailFragmentAI_contact
+        ...ContactDetailAvatar_contact
+        ...ContactDetailActionModal_contact
+        enrichmentStatus
+        firstName
+        lastName
+        company
+        title
+        avatar {
           id
-          __typename
-          ... on MediaVideo {
-            uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+        }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+        }
+        enrichment {
+          id
+          approved
+          fields {
+            title
+            company
+            addresses {
+              address
+              label
+            }
+            avatar {
+              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+              id
+            }
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            socials {
+              label
+              url
+            }
+            urls {
+              url
+            }
+          }
+        }
+        contactProfile {
+          id
+          webCard {
+            id
+            cardIsPublished
+            userName
+            hasCover
+            coverMedia {
+              id
+              ... on MediaVideo {
+                webCardPreview: thumbnail(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+              ... on MediaImage {
+                webCardPreview: uri(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+            }
           }
         }
       }
     `,
-    webCardKey,
+    contactKey,
   );
 
-  const avatarUrl = useMemo(() => {
-    if (contact?.avatar) {
-      if (contact?.avatar?.id) {
-        const localFile = getLocalCachedMediaFile(contact.avatar.id, 'image');
-        if (localFile) {
-          return localFile;
-        }
-      }
-      if (contact?.avatar?.uri) {
-        return contact.avatar.uri;
-      }
-    }
-    if (contact?.logo) {
-      if (contact?.logo?.id) {
-        const localFile = getLocalCachedMediaFile(contact.logo.id, 'image');
-        if (localFile) {
-          return localFile;
-        }
-      }
-      return contact.logo.uri;
-    }
-    return undefined;
-  }, [contact.avatar, contact.logo]);
+  const [isMoreVisible, showMore, hideMore] = useBoolean(false);
 
-  const birthday = contact?.birthday;
+  const getDefaultContactEnrichmentHiddenFields = useCallback(() => {
+    return {
+      firstName: false,
+      lastName: false,
+      company: false,
+      title: false,
+      birthday: false,
+      avatarId: false,
+      phoneNumbers:
+        data?.enrichment?.fields?.phoneNumbers?.map(() => false) || [],
+      emails: data?.enrichment?.fields?.emails?.map(() => false) || [],
+      addresses: data?.enrichment?.fields?.addresses?.map(() => false) || [],
+      socials: data?.enrichment?.fields?.socials?.map(() => false) || [],
+      urls: data?.enrichment?.fields?.urls?.map(() => false) || [],
+      logoId: false,
+    };
+  }, [
+    data?.enrichment?.fields?.addresses,
+    data?.enrichment?.fields?.emails,
+    data?.enrichment?.fields?.phoneNumbers,
+    data?.enrichment?.fields?.socials,
+    data?.enrichment?.fields?.urls,
+  ]);
+
+  const [hiddenFields, setHiddenFields] = useState<HiddenFields>(
+    getDefaultContactEnrichmentHiddenFields(),
+  );
+
+  useEffect(() => {
+    // the goal here is to refresh precomputed map when data?.enrichment changes
+    setHiddenFields(getDefaultContactEnrichmentHiddenFields());
+  }, [getDefaultContactEnrichmentHiddenFields, data?.enrichment]);
+
+  const [commit] = useMutation(graphql`
+    mutation ContactDetailsBodyMutation($contactId: ID!) {
+      enrichContact(contactId: $contactId) {
+        contact {
+          id
+        }
+      }
+    }
+  `);
+
+  const [commitApproval] = useMutation(graphql`
+    mutation ContactDetailsBodyEnrichmentMutation(
+      $contactEnrichmentId: ID!
+      $approved: Boolean!
+      $input: HiddenFieldInput
+      $pixelRatio: Float!
+    ) {
+      approveContactEnrichment(
+        contactEnrichmentId: $contactEnrichmentId
+        approved: $approved
+        input: $input
+      ) {
+        contactEnrichment {
+          id
+          approved
+          fields {
+            addresses {
+              address
+              label
+            }
+            avatar {
+              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+              id
+            }
+            birthday
+            company
+            title
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            socials {
+              label
+              url
+            }
+            urls {
+              url
+            }
+          }
+        }
+      }
+    }
+  `);
+  const onEnrich = async () => {
+    commit({
+      variables: {
+        contactId: data?.id,
+      },
+      onCompleted: () => {
+        setOverlayState('loading');
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Enrichment failure',
+            description:
+              'ContactDetailsScreen - Error message when enrichment start failed',
+          }),
+        });
+        setOverlayState('idle');
+      },
+    });
+  };
 
   const onShare = async () => contact && shareContact(contact);
+
   const appearance = useColorScheme();
 
   const { width: screenWidth } = useScreenDimensions();
@@ -113,70 +297,84 @@ const ContactDetailsBody = ({
 
   const backgroundWidth = screenWidth + BLUR_GAP * 2;
   const backgroundImageUrl = useMemo(() => {
-    if (contact?.logo) {
-      if (contact?.logo?.id) {
-        const localFile = getLocalCachedMediaFile(contact.logo.id, 'image');
+    if (!hiddenFields.avatarId && data?.enrichment?.fields?.avatar) {
+      if (data?.enrichment?.fields?.avatar.id) {
+        const localFile = getLocalCachedMediaFile(
+          data?.enrichment?.fields?.avatar.id,
+          'image',
+        );
         if (localFile) {
           return localFile;
         }
       }
-      return contact.logo.uri;
+      return data?.enrichment?.fields?.avatar.uri;
     }
-    if (contact?.avatar) {
-      if (contact?.avatar?.id) {
-        const localFile = getLocalCachedMediaFile(contact.avatar.id, 'image');
+    if (data?.logo) {
+      if (data?.logo?.id) {
+        const localFile = getLocalCachedMediaFile(data?.logo.id, 'image');
         if (localFile) {
           return localFile;
         }
       }
-      if (contact?.avatar?.uri) {
-        return contact.avatar.uri;
+      return data.logo.uri;
+    }
+    if (data?.avatar) {
+      if (data?.avatar?.id) {
+        const localFile = getLocalCachedMediaFile(data.avatar.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      if (data?.avatar?.uri) {
+        return data.avatar.uri;
       }
     }
-    if (contact?.webCardPreview?.id) {
-      const localFile = getLocalCachedMediaFile(
-        contact.webCardPreview.id,
-        'image',
-      );
+    const webCardPreview =
+      data?.contactProfile?.webCard &&
+      data?.contactProfile?.webCard?.coverMedia?.webCardPreview
+        ? {
+            id: data?.contactProfile?.webCard?.coverMedia?.id,
+            uri: data?.contactProfile?.webCard?.coverMedia?.webCardPreview,
+          }
+        : {};
+    if (webCardPreview?.id) {
+      const localFile = getLocalCachedMediaFile(webCardPreview.id, 'image');
       if (localFile) {
         return localFile;
       }
     }
-    return contact?.webCardPreview?.uri ?? undefined;
+    return webCardPreview?.uri ?? undefined;
   }, [
-    contact?.logo,
-    contact?.avatar,
-    contact?.webCardPreview?.id,
-    contact?.webCardPreview?.uri,
+    hiddenFields.avatarId,
+    data?.enrichment?.fields?.avatar,
+    data?.logo,
+    data?.avatar,
+    data?.contactProfile?.webCard,
   ]);
-
-  const meetingPlace = contact?.meetingPlace
-    ? getFriendlyNameFromLocation(contact.meetingPlace)
-    : undefined;
-  const meetingDate = contact.meetingDate
-    ? new Date(contact.meetingDate).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : undefined;
 
   const removeContact = useRemoveContact({
     onCompleted: () => {
       hideMore();
       router.back();
     },
-    onError: e => {
-      console.error('Error removing contact', e);
+    onError: () => {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Contact removal failure',
+          description:
+            'ContactDetailsScreen - Error message when remove contact failed',
+        }),
+      });
     },
   });
 
   const onRemoveContacts = useCallback(() => {
-    if (!contact.id) {
+    if (!data?.id) {
       return;
     }
-    removeContact([contact.id]);
-  }, [contact.id, removeContact]);
+    removeContact([data?.id]);
+  }, [data?.id, removeContact]);
 
   const onEditContact = useCallback(() => {
     hideMore();
@@ -188,22 +386,168 @@ const ContactDetailsBody = ({
     });
   }, [contact, hideMore, router]);
 
+  const [subView, setSubView] = useState<'AI' | 'contact'>('contact');
+
+  const enrichStatusToOverlayState = useCallback(
+    (data: ContactDetailsBody_contact$data) => {
+      return data?.enrichmentStatus === 'pending' ||
+        data?.enrichmentStatus === 'running'
+        ? 'loading'
+        : (data?.enrichmentStatus === 'completed' ||
+              data?.enrichmentStatus === 'failed') &&
+            data?.enrichment?.approved !== null
+          ? 'idle'
+          : data?.enrichment?.approved === null
+            ? 'waitingApproval'
+            : 'idle';
+    },
+    [],
+  );
+
+  const initOverlayState = useCallback((): ContactDetailEnrichState => {
+    if (router.getCurrentRoute()?.route === 'CONTACT_DETAILS') {
+      const initialOverlayRoute = (
+        router.getCurrentRoute() as ContactDetailsRoute
+      ).params.overlay;
+      if (initialOverlayRoute) {
+        return initialOverlayRoute;
+      }
+    }
+    if (!data) return 'idle';
+    return enrichStatusToOverlayState(data);
+  }, [data, enrichStatusToOverlayState, router]);
+
+  const [overlayState, setOverlayState] = useState<ContactDetailEnrichState>(
+    () => initOverlayState(),
+  );
+
+  useEffect(() => {
+    if (data && overlayState !== 'tooltipVisible') {
+      setOverlayState(enrichStatusToOverlayState(data));
+    }
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, enrichStatusToOverlayState]);
+
+  useEffect(() => {
+    if (hasFocus && overlayState === 'loading') {
+      const itv = setInterval(() => {
+        refreshQuery?.();
+      }, 10000);
+      return () => {
+        clearInterval(itv);
+      };
+    }
+  }, [refreshQuery, hasFocus, overlayState]);
+
+  const onValidateEnrichment = useCallback(() => {
+    commitApproval({
+      variables: {
+        contactEnrichmentId: data?.enrichment?.id,
+        approved: true,
+        input: {
+          contact: hiddenFields,
+        },
+        pixelRatio: CappedPixelRatio(),
+      },
+      onCompleted: () => {
+        setOverlayState('idle');
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Enrichment validation failure',
+            description:
+              'ContactDetailsScreen - Error message when enrichment validation failed',
+          }),
+        });
+      },
+    });
+  }, [commitApproval, data?.enrichment?.id, hiddenFields, intl]);
+
+  const onRefuseEnrichment = useCallback(() => {
+    commitApproval({
+      variables: {
+        contactEnrichmentId: data?.enrichment?.id,
+        approved: false,
+        pixelRatio: CappedPixelRatio(),
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Enrichment failure',
+            description:
+              'ContactDetailsScreen - Error message when enrichment failed',
+          }),
+        });
+      },
+    });
+  }, [commitApproval, data?.enrichment?.id, intl]);
+
+  const onRemoveField = useCallback((field: string, index?: number) => {
+    setHiddenFields(prev => {
+      if (!field || !(field in prev)) {
+        return prev;
+      }
+      const newField = cloneDeep(prev);
+      const fieldValue = field as keyof typeof newField;
+
+      if (index === undefined) {
+        if (
+          fieldValue === 'avatarId' ||
+          fieldValue === 'birthday' ||
+          fieldValue === 'company' ||
+          fieldValue === 'firstName' ||
+          fieldValue === 'lastName' ||
+          fieldValue === 'title'
+        ) {
+          newField[fieldValue] = true;
+        }
+      } else if (Array.isArray(newField[fieldValue])) {
+        if (
+          (fieldValue === 'phoneNumbers' ||
+            fieldValue === 'emails' ||
+            fieldValue === 'addresses' ||
+            fieldValue === 'socials' ||
+            fieldValue === 'urls') &&
+          Array.isArray(prev[fieldValue]) &&
+          newField[fieldValue].length > index
+        ) {
+          newField[fieldValue][index] = true;
+        }
+      } else {
+        console.error('setting incorrect field', fieldValue);
+      }
+      return newField;
+    });
+  }, []);
+
   return (
     <Container style={styles.container}>
+      {ENABLE_DATA_ENRICHMENT && (
+        <ContactDetailEnrichOverlay
+          onEnrich={onEnrich}
+          state={overlayState}
+          onValidateEnrichment={onValidateEnrichment}
+          onRefuseEnrichment={onRefuseEnrichment}
+        />
+      )}
       {backgroundImageUrl ? (
         <View
           style={[styles.avatarBackgroundContainer, { width: backgroundWidth }]}
         >
           <Image
             source={backgroundImageUrl}
-            style={styles.avatarBackground}
+            style={styles.flex}
             blurRadius={8.2}
             contentFit="cover"
           />
           <LinearGradient
             colors={[
               appearance === 'dark' ? 'transparent' : 'rgba(255, 255, 255, 0)',
-              appearance === 'dark' ? colors.grey1000 : colors.white,
+              appearance === 'dark' ? colors.black : colors.white,
             ]}
             start={{ x: 0, y: 0.1 }}
             end={{ x: 0, y: 1 }}
@@ -219,291 +563,235 @@ const ContactDetailsBody = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scroll,
-          { paddingTop: top, paddingBottom: bottom + 100 },
+          {
+            paddingTop: top,
+            paddingBottom:
+              bottom + 100 + (overlayState === 'waitingApproval' ? 145 : 0),
+          },
         ]}
       >
         <View style={styles.content}>
           <PressableNative style={styles.close} onPress={onClose}>
-            <Icon icon="close" size={24} />
+            <Icon
+              icon="close"
+              size={24}
+              style={[
+                styles.centeredIcon,
+                data?.enrichmentStatus === 'running' ||
+                data?.enrichmentStatus === 'pending'
+                  ? styles.iconDisabled
+                  : undefined,
+              ]}
+            />
           </PressableNative>
           <PressableNative style={styles.share} onPress={onShare}>
-            <Icon icon="share" size={24} style={styles.shareIcon} />
+            <Icon
+              icon="share"
+              size={24}
+              style={[
+                styles.centeredIcon,
+                overlayState === 'loading' || overlayState === 'waitingApproval'
+                  ? styles.iconDisabled
+                  : undefined,
+              ]}
+            />
           </PressableNative>
-          <View style={styles.avatarContainer}>
-            <View style={[styles.avatar, styles.avatarWrapper]}>
-              {avatarUrl ? (
-                <Image source={avatarUrl} style={styles.avatar} />
-              ) : webCard ? (
-                <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
-              ) : (
-                <Text style={styles.initials}>
-                  {contact.firstName?.substring(0, 1)}
-                  {contact.lastName?.substring(0, 1)}
-                  {!contact.firstName &&
-                    !contact.lastName &&
-                    contact.company?.substring(0, 1)}
-                </Text>
-              )}
-            </View>
-          </View>
+          <ContactDetailAvatar
+            state={overlayState}
+            isHiddenField={hiddenFields.avatarId}
+            onRemoveField={() => onRemoveField('avatarId')}
+            webCard={webCardKey}
+            contactKey={data}
+          />
           <Text variant="large" style={styles.name}>
-            {`${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim()}
+            {`${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim()}
           </Text>
-          {contact.company && (
-            <Text style={styles.company}>{contact.company}</Text>
+          <DisposableText
+            text={data?.company}
+            enrichedText={
+              hiddenFields.company
+                ? undefined
+                : data?.enrichment?.fields?.company
+            }
+            onRemove={() => onRemoveField('company')}
+            state={overlayState}
+          />
+          <DisposableText
+            text={data?.title}
+            enrichedText={
+              hiddenFields.title ? undefined : data?.enrichment?.fields?.title
+            }
+            onRemove={() => onRemoveField('title')}
+            state={overlayState}
+          />
+          {ENABLE_DATA_ENRICHMENT && (
+            <View style={styles.saveContainer}>
+              <MenuItem
+                onSelect={() => setSubView('contact')}
+                label={intl.formatMessage({
+                  defaultMessage: 'Contact',
+                  description:
+                    'ContactDetailsModal - Button to switch to contact view',
+                })}
+                selected={subView === 'contact'}
+                overlayState={overlayState}
+              />
+              <MenuItem
+                onSelect={() => setSubView('AI')}
+                label={intl.formatMessage({
+                  defaultMessage: 'Profile',
+                  description:
+                    'ContactDetailsModal - Button to switch to AI profile view',
+                })}
+                selected={subView === 'AI'}
+                overlayState={overlayState}
+              />
+            </View>
           )}
-          {contact.title && <Text style={styles.job}>{contact.title}</Text>}
-          <View style={styles.saveContainer}>
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: "Save to my phone's contacts",
-                description: 'ContactDetailsModal - Button to save contact',
-              })}
-              style={styles.save}
-              onPress={onSave}
-            />
-            <Button
-              leftElement={
-                <Icon
-                  icon="more"
-                  style={styles.more}
-                  tintColor={
-                    appearance === 'dark' ? colors.black : colors.white
-                  }
-                  size={24}
-                />
-              }
-              textStyle={styles.moreContent}
-              style={styles.more}
-              onPress={showMore}
-            />
-          </View>
-          {meetingDate && (
-            <Text variant="small" style={{ color: colors.grey200 }}>
-              {meetingPlace
-                ? intl.formatMessage(
-                    {
-                      defaultMessage: 'Connected in {location} on {date}',
-                      description:
-                        'ContactDetailsModal - Connected label with location and date',
-                    },
-                    {
-                      location: meetingPlace,
-                      date: meetingDate,
-                    },
-                  )
-                : intl.formatMessage(
-                    {
-                      defaultMessage: 'Connected on {date}',
-                      description:
-                        'ContactDetailsModal - Connected label with date',
-                    },
-                    {
-                      date: meetingDate,
-                    },
-                  )}
-            </Text>
-          )}
-          <NoteItem contact={contact} />
-          {contact.phoneNumbers?.map((phoneNumber, index) => (
-            <ContactDetailItem
-              key={'phone' + index + '' + phoneNumber.number}
-              onPress={() => {
-                Linking.openURL(`tel:${phoneNumber.number}`);
-              }}
-              icon="mobile"
-              label={phoneNumber.label}
-              content={phoneNumber.number}
-            />
-          ))}
-          {contact.emails?.map((email, index) => (
-            <ContactDetailItem
-              key={'email' + index + '' + email.address}
-              onPress={() => {
-                Linking.openURL(`mailto:${email.address}`);
-              }}
-              icon="mail_line"
-              label={email.label}
-              content={email.address}
-            />
-          ))}
-          {birthday && (
-            <ContactDetailItem
-              key="birthday"
-              onPress={async () => {
-                openCalendar(birthday);
-              }}
-              icon="calendar"
-              label={intl.formatMessage({
-                defaultMessage: 'Birthday',
-                description: 'ContactDetailsBody - Title for birthday',
-              })}
-              content={new Date(birthday).toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            />
-          )}
-          {contact.urls?.map((urlAddress, index) => (
-            <ContactDetailItem
-              key={'url' + index + '' + urlAddress.url}
-              onPress={async () => {
-                if (urlAddress.url) {
-                  const route = await matchUrlWithRoute(urlAddress.url);
-                  if (route) {
-                    // move to route deeplink
-                    router?.push(route);
-                    return;
-                  }
-                  Linking.openURL(
-                    urlAddress.url.startsWith('http')
-                      ? urlAddress.url
-                      : `https://${urlAddress.url}`,
-                  );
-                }
-              }}
-              icon="link"
-              label={intl.formatMessage({
-                defaultMessage: 'Url',
-                description:
-                  'ContactDetailsBody - Title for item URL with empty label',
-              })}
-              content={urlAddress.url}
-            />
-          ))}
-          {contact.addresses?.map((address, index) => (
-            <ContactDetailItem
-              key={'street' + index + '' + address.address}
-              onPress={async () => {
-                const url = Platform.select({
-                  ios: `maps:0,0?q=${address.address}`,
-                  android: `geo:0,0?q=${address.address}`,
-                });
 
-                if (url) {
-                  Linking.openURL(url);
-                } else {
-                  console.warn(`${address.address} is not an adress`);
-                }
-              }}
-              icon="location"
-              label={address.label}
-              content={address.address}
+          {subView === 'contact' && (
+            <ContactDetailFragmentContact
+              showMore={showMore}
+              hiddenFields={hiddenFields}
+              onSave={onSave}
+              state={overlayState}
+              onRemoveField={onRemoveField}
+              contact={data}
             />
-          ))}
-          {contact.socials?.map((social, index) => (
-            <ContactDetailItem
-              key={'social' + index + '' + social.url}
-              onPress={() => {
-                if (social.url) {
-                  Linking.openURL(getSocialUrl(social.url));
-                }
-              }}
-              iconComponent={
-                <SocialIcon
-                  icon={social.label as SocialLinkId}
-                  style={styles.social}
-                />
-              }
-              label={social.label}
-              content={social.url}
-            />
-          ))}
+          )}
+          {subView === 'AI' && <ContactDetailFragmentAI contact={data} />}
         </View>
       </ScrollView>
-      {contact ? (
+      {data ? (
         <ContactDetailActionModal
           visible={isMoreVisible}
           close={hideMore}
           onRemoveContacts={onRemoveContacts}
           onSaveContact={onSave}
           onShare={onShare}
-          details={contact}
+          contact={data}
           onEdit={onEditContact}
+          onEnrich={onEnrich}
         />
       ) : undefined}
     </Container>
   );
 };
 
-const openCalendar = (date: string) => {
-  const birthDate = new Date(date).setFullYear(new Date().getFullYear());
-  if (Platform.OS === 'ios') {
-    const from = new Date('2001-01-01').getTime() / 1000;
-    const seconds = Math.floor(birthDate / 1000) - from;
-    Linking.openURL('calshow:' + seconds);
-  } else if (Platform.OS === 'android') {
-    Linking.openURL('content://com.android.calendar/time/' + birthDate);
-  }
-};
-
-const getSocialUrl = (url: string) =>
-  url.startsWith('http') ? url : `https://${url}`;
-
-const AVATAR_WIDTH = 112;
-
-const ContactDetailItem = ({
-  onPress,
-  icon,
+const MenuItem = ({
+  onSelect,
   label,
-  content,
-  iconComponent,
+  selected,
+  overlayState,
 }: {
-  onPress?: () => void;
-  icon?: Icons;
-  label?: string;
-  content?: string;
-  iconComponent?: JSX.Element;
+  onSelect: () => void;
+  label: string;
+  selected: boolean;
+  overlayState: ContactDetailEnrichState;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
   return (
-    <View style={styles.item}>
-      <PressableNative onPress={onPress} style={styles.pressable}>
-        <View style={styles.label}>
-          {iconComponent ? (
-            iconComponent
-          ) : icon ? (
-            <Icon icon={icon} />
-          ) : undefined}
-          <Text variant="smallbold">{label}</Text>
-        </View>
-        <Text numberOfLines={1} style={styles.itemText}>
-          {content}
-        </Text>
-      </PressableNative>
-    </View>
+    <RoundedMenuComponent
+      selected={selected}
+      label={label}
+      id="contact"
+      onSelect={onSelect}
+      style={styles.roundButton}
+      textStyle={styles.roundButtonTextStyle}
+      selectedTextStyle={styles.roundButtonSelectedTextStyle}
+      selectedStyle={styles.roundButtonSelectedStyle}
+      rightElement={
+        overlayState === 'waitingApproval' ? (
+          <Icon
+            icon="filters_ai_light"
+            size={24}
+            style={styles.menuAiIndicator}
+          />
+        ) : undefined
+      }
+    />
   );
+};
+
+const DisposableText = ({
+  text,
+  enrichedText,
+  onRemove,
+  state,
+}: {
+  text?: string | null;
+  enrichedText?: string | null;
+  onRemove: () => void;
+  state: ContactDetailEnrichState;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  if (!text && !enrichedText) return null;
+
+  if (state === 'waitingApproval' && enrichedText) {
+    return (
+      <View style={styles.textContainer}>
+        <Text style={styles.invisible}>{enrichedText}</Text>
+        <MaskedView
+          style={styles.textMaskStyle}
+          maskElement={<Text style={styles.flex}>{enrichedText}</Text>}
+        >
+          <LinearGradient
+            // Button Linear Gradient
+            colors={['#B02EFB', '#0B4693', '#0B4693', '#23CFCC']}
+            locations={[0, 0.05, 0.9, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.87, y: 0.87 }}
+            style={styles.flex}
+          />
+        </MaskedView>
+        <IconButton
+          size={14}
+          iconSize={12}
+          icon="close"
+          onPress={onRemove}
+          style={styles.textIconStyle}
+        />
+      </View>
+    );
+  }
+  return <Text style={styles.company}>{enrichedText || text}</Text>;
 };
 
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     position: 'relative',
-    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    overflow: 'visible',
   },
   close: {
     position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 10,
+    left: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 38,
+    justifyContent: 'center',
+    backgroundColor: appearance === 'dark' ? '#0000003F' : '#FFFFFF3F',
+    opacity: 0.75,
   },
   share: {
     position: 'absolute',
-    top: 20,
-    right: 20,
+    top: 10,
+    right: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 38,
+    justifyContent: 'center',
+    backgroundColor: appearance === 'dark' ? '#0000003F' : '#FFFFFF3F',
   },
-  shareIcon: { transform: [{ rotateZ: '30deg' }] },
+  centeredIcon: {
+    alignSelf: 'center',
+  },
   name: {
     marginTop: 20,
-  },
-  pressable: {
-    width: '100%',
-    height: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
   },
   content: {
     flexDirection: 'column',
@@ -524,79 +812,60 @@ const stylesheet = createStyleSheet(appearance => ({
     marginTop: 20,
     gap: 5,
   },
-  save: {
-    flex: 1,
-  },
-  more: {
-    width: 50,
-  },
-  moreContent: { transform: [{ scale: 1.5 }] },
-  item: {
-    width: '100%',
-    height: 52,
-    ...shadow({ appearance, direction: 'center' }),
-    marginTop: 15,
-    padding: 14,
-    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
-    borderRadius: 12,
-  },
-  itemText: {
-    flex: 1,
-    textAlign: 'right',
-  },
-  label: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
-  avatarContainer: Platform.OS === 'ios' && {
-    borderRadius: AVATAR_WIDTH / 2,
-    ...shadow({ appearance, direction: 'bottom' }),
-    paddingTop: 30,
-  },
   avatarBackgroundContainer: {
     top: -BLUR_GAP,
     left: -BLUR_GAP,
     position: 'absolute',
     height: 387,
   },
-  avatarBackground: {
+  flex: {
     flex: 1,
   },
   avatarBackgroundGradient: {
     position: 'absolute',
     height: 387,
   },
-  avatarWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    ...shadow({ appearance, direction: 'bottom' }),
-    backgroundColor: 'white',
-  },
-  avatar: {
-    width: AVATAR_WIDTH,
-    height: AVATAR_WIDTH,
-    borderRadius: AVATAR_WIDTH / 2,
-    borderWidth: 4,
-    borderColor: appearance === 'dark' ? colors.black : colors.white,
-    overflow: 'visible',
-    backgroundColor: colors.grey50,
-  },
   scroll: {
     marginHorizontal: 20,
+    overflow: 'visible',
   },
-  initials: {
-    color: colors.grey300,
-    fontSize: 50,
-    fontWeight: 500,
-    lineHeight: 60,
-    textTransform: 'uppercase',
+  menuAiIndicator: {
+    position: 'absolute',
+    right: 10,
+    tintColor: undefined,
   },
-  social: {
-    width: 24,
-    height: 24,
+  textIconStyle: {
+    position: 'absolute',
+    right: -19,
+    top: 2,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
+  roundButton: {
+    flex: 1,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    borderWidth: 1,
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
+  },
+  roundButtonTextStyle: {
+    color: appearance === 'dark' ? colors.white : colors.black,
+  },
+  roundButtonSelectedTextStyle: {
+    color: appearance === 'dark' ? colors.black : colors.white,
+  },
+  roundButtonSelectedStyle: {
+    backgroundColor: appearance === 'dark' ? colors.white : colors.black,
+  },
+  invisible: { opacity: 0 },
+  textMaskStyle: {
+    flexDirection: 'row',
+    gap: 5,
+    position: 'absolute',
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: { flexDirection: 'row', gap: 5, marginTop: 5 },
+  iconDisabled: { tintColor: colors.grey400 },
 }));
 
 export default ContactDetailsBody;

@@ -34,6 +34,7 @@ extend type Mutation {
   approveContactEnrichment(
     contactEnrichmentId: ID!
     approved: Boolean!
+    input: HiddenFieldInput
   ): ContactEnrichmentPayload!
 }
 

@@ -1045,6 +1045,46 @@ export const readContactData = (
           subregion
           country
         }
+        enrichmentStatus
+        enrichment {
+          id
+          approved
+          fields {
+            addresses {
+              address
+              label
+            }
+            avatar {
+              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+              id
+            }
+            birthday
+            company
+            emails {
+              address
+              label
+            }
+            logo {
+              id
+              uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+            }
+            firstName
+            lastName
+            phoneNumbers {
+              label
+              number
+            }
+            socials {
+              label
+              url
+            }
+            title
+            type
+            urls {
+              url
+            }
+          }
+        }
         contactProfile {
           id
           webCard {

@@ -97,7 +97,7 @@ const Tooltips = () => {
       {tooltipCarouselPosition && (
         <Tooltip
           from={new Point(tooltipCarouselPosition.x, tooltipCarouselPosition.y)}
-          toolipWidth={157}
+          tooltipWidth={157}
           placement={Placement.LEFT}
           description={
             <FormattedMessage
@@ -116,7 +116,7 @@ Shared alone, it displays the profile without contact details."
       )}
       {tooltipBottomPosition && (
         <Tooltip
-          toolipWidth={352}
+          tooltipWidth={352}
           from={new Point(tooltipBottomPosition.x, tooltipBottomPosition.y)}
           placement={Placement.BOTTOM}
           description={

@@ -7,6 +7,7 @@ import { useRouter } from '#components/NativeRouter';
 import { readContactData } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
+import { TooltipProvider } from '#helpers/TooltipContext';
 import ContactDetailsBody from './ContactDetailsBody';
 import type { NativeScreenProps } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -21,10 +22,18 @@ const query = graphql`
     node(id: $contactId) {
       ... on Contact @alias(as: "contact") {
         id
+        ...ContactDetailsBody_contact
         ...contactHelpersReadContactData
+        enrichment {
+          ...ContactDetailAIItemLocations_enrichment
+          ...ContactDetailAISummary_enrichment
+          ...ContactDetailAILabels_enrichment
+          ...ContactDetailAIItemProfessionalExperiences_enrichment
+          ...ContactDetailAIItemEducation_enrichment
+        }
         contactProfile {
           webCard {
-            ...ContactDetailsBody_webCard
+            ...ContactDetailAvatar_webCard
           }
         }
       }
@@ -34,6 +43,8 @@ const query = graphql`
 
 const ContactDetailsScreen = ({
   preloadedQuery,
+  refreshQuery,
+  hasFocus,
 }: RelayScreenProps<ContactDetailsRoute, ContactsDetailScreenQuery>) => {
   const router = useRouter();
   const { node } = usePreloadedQuery<ContactsDetailScreenQuery>(
@@ -60,16 +71,21 @@ const ContactDetailsScreen = ({
   /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
         Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */
   return (
-    <View collapsable={false} style={styles.container}>
-      {contact ? (
-        <ContactDetailsBody
-          contact={contact}
-          webCard={webCard}
-          onClose={router.back}
-          onSave={onInviteContactInner}
-        />
-      ) : undefined}
-    </View>
+    <TooltipProvider>
+      <View collapsable={false} style={styles.container}>
+        {contact ? (
+          <ContactDetailsBody
+            refreshQuery={refreshQuery}
+            contact={contact}
+            contactKey={node?.contact || null}
+            onClose={router.back}
+            webCard={webCard}
+            onSave={onInviteContactInner}
+            hasFocus={hasFocus}
+          />
+        ) : undefined}
+      </View>
+    </TooltipProvider>
   );
 };
 
@@ -85,6 +101,7 @@ export default relayScreen(ContactDetailsScreen, {
       stackAnimation: 'slide_from_bottom',
     };
   },
+  fetchPolicy: 'store-and-network',
 });
 
 export const ContactDetailsFromScannedContactScreen = ({
@@ -111,6 +128,7 @@ export const ContactDetailsFromScannedContactScreen = ({
         <ContactDetailsBody
           contact={contact}
           webCard={null}
+          contactKey={null}
           onClose={router.back}
           onSave={onInviteContactInner}
         />
@@ -126,6 +144,6 @@ ContactDetailsFromScannedContactScreen.options = {
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
-    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
 }));

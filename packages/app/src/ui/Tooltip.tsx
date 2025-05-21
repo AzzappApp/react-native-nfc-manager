@@ -8,7 +8,7 @@ import type { PublicPopoverProps } from 'react-native-popover-view/dist/Popover'
 import type { PopoverProps } from 'react-native-popover-view/dist/Types';
 
 const Tooltip = ({
-  toolipWidth = 240,
+  tooltipWidth = 240,
   header,
   description,
   children,
@@ -16,7 +16,7 @@ const Tooltip = ({
   ...props
 }: PopoverProps &
   PublicPopoverProps & {
-    toolipWidth?: number;
+    tooltipWidth?: number;
     header?: ReactNode;
     description?: ReactNode;
     onPress?: () => void;
@@ -34,7 +34,7 @@ const Tooltip = ({
         borderRadius: 10,
         backgroundColor: colors.white,
         padding: 10,
-        width: toolipWidth,
+        width: tooltipWidth,
         ...shadow({
           appearance: scheme || 'dark',
           direction: 'bottom',
@@ -43,27 +43,33 @@ const Tooltip = ({
       }}
       {...props}
     >
-      <PressableNative
-        activeOpacity={onPress ? 0.2 : 1}
-        style={styles.contentContainer}
-        accessibilityRole="button"
-        onPress={onPress}
-      >
-        {header && (
-          <Text variant="large" style={styles.contentHeader} appearance="light">
-            {header}
-          </Text>
-        )}
-        {description && (
-          <Text
-            variant="medium"
-            style={styles.contentDescription}
-            appearance="light"
-          >
-            {description}
-          </Text>
-        )}
-      </PressableNative>
+      {children || (
+        <PressableNative
+          activeOpacity={onPress ? 0.2 : 1}
+          style={styles.contentContainer}
+          accessibilityRole="button"
+          onPress={onPress}
+        >
+          {header && (
+            <Text
+              variant="large"
+              style={styles.contentHeader}
+              appearance="light"
+            >
+              {header}
+            </Text>
+          )}
+          {description && (
+            <Text
+              variant="medium"
+              style={styles.contentDescription}
+              appearance="light"
+            >
+              {description}
+            </Text>
+          )}
+        </PressableNative>
+      )}
     </Popover>
   );
 };

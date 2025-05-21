@@ -182,6 +182,9 @@ const icons = {
   get edit() {
     return require('./assets/edit.png');
   },
+  get education() {
+    return require('./assets/education.png');
+  },
   get empty() {
     return require('./assets/empty.png');
   },
@@ -193,6 +196,12 @@ const icons = {
   },
   get filters() {
     return require('./assets/filters.png');
+  },
+  get filters_ai_light() {
+    return require('./assets/filters_ai_light.png');
+  },
+  get filters_ai_dark() {
+    return require('./assets/filters_ai_light.png');
   },
   get fixed_ratio() {
     return require('./assets/fixed_ratio.png');
@@ -373,6 +382,9 @@ const icons = {
   },
   get phone_full() {
     return require('./assets/phone_full.png');
+  },
+  get professional() {
+    return require('./assets/professional.png');
   },
   get reduce() {
     return require('./assets/reduce.png');

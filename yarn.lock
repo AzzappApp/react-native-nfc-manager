@@ -603,6 +603,7 @@ __metadata:
     "@react-native-firebase/analytics": "npm:^22.2.0"
     "@react-native-firebase/app": "npm:^22.2.0"
     "@react-native-firebase/messaging": "npm:^22.2.0"
+    "@react-native-masked-view/masked-view": "npm:^0.3.2"
     "@react-native/babel-preset": "npm:^0.79.2"
     "@react-native/metro-config": "npm:^0.79.2"
     "@react-native/typescript-config": "npm:^0.79.2"
@@ -726,6 +727,7 @@ __metadata:
     react-native-quick-base64: "npm:^2.1.2"
     react-native-quick-crypto: "npm:^0.7.13"
     react-native-reanimated: "npm:^3.17.5"
+    react-native-remix-icon: "patch:react-native-remix-icon@npm%3A4.6.0#~/.yarn/patches/react-native-remix-icon-npm-4.6.0-79527dbd88.patch"
     react-native-safe-area-context: "npm:^5.4.0"
     react-native-screens: "patch:react-native-screens@npm%3A4.10.0#~/.yarn/patches/react-native-screens-npm-4.10.0-a9c3a4e55e.patch"
     react-native-share: "npm:^12.0.11"
@@ -11236,6 +11238,16 @@ __metadata:
     expo:
       optional: true
   checksum: 10/dbece9718898a7d38854b88df0dbc8a3898cde8d0fc081e8f88fef3d16501ee2fbc8acecee21b373f5756bde5f421a1fbd1b402e72d38d2533fdd9ca6dacc364
+  languageName: node
+  linkType: hard
+
+"@react-native-masked-view/masked-view@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "@react-native-masked-view/masked-view@npm:0.3.2"
+  peerDependencies:
+    react: ">=16"
+    react-native: ">=0.57"
+  checksum: 10/04ffbc01083aa563ca1e2d7ef6759e7b326b8129f5bb1aa5f3142348adab06d5e321a400cf70a5434324dfa906add383f8214640697c48c9e5311b30bfea03d9
   languageName: node
   linkType: hard
 
@@ -27936,6 +27948,24 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/63501d8ac0cb2039e60ac93bc779e946af267bb55f95cf53ed538bcf9bfca030fa5d84d5c9343dcbc4d8df0d5e9d7c58ca5647d43b17f8399dec11d812da11fc
+  languageName: node
+  linkType: hard
+
+"react-native-remix-icon@npm:4.6.0":
+  version: 4.6.0
+  resolution: "react-native-remix-icon@npm:4.6.0"
+  peerDependencies:
+    react-native-svg: "*"
+  checksum: 10/e556f407e80bd02cf1bfbf41ec78e1f385052a0d41300d0ae6fe8b92d6e3a6954cc56e236a471cad1c95f7753e79fe9bd2f987172336a7515a181391e6493df4
+  languageName: node
+  linkType: hard
+
+"react-native-remix-icon@patch:react-native-remix-icon@npm%3A4.6.0#~/.yarn/patches/react-native-remix-icon-npm-4.6.0-79527dbd88.patch":
+  version: 4.6.0
+  resolution: "react-native-remix-icon@patch:react-native-remix-icon@npm%3A4.6.0#~/.yarn/patches/react-native-remix-icon-npm-4.6.0-79527dbd88.patch::version=4.6.0&hash=b09338"
+  peerDependencies:
+    react-native-svg: "*"
+  checksum: 10/5aa5a444045cf56fce2d80d7331fdcc5270374ada640d36f8309a62f1cb59d7b181f8870eb4bc771559c9f519a0f723422492212fbf0a6fa09316bb6371a8d27
   languageName: node
   linkType: hard
 

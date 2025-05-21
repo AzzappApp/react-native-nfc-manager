@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import type { ContactType } from '#helpers/contactHelpers';
 import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
+import type { ContactDetailEnrichState } from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -304,6 +305,7 @@ export type ContactDetailsRoute = {
   route: 'CONTACT_DETAILS';
   params: {
     contactId: string;
+    overlay?: ContactDetailEnrichState;
   };
 };
 
@@ -311,6 +313,7 @@ export type ContactDetailsFromScannerRoute = {
   route: 'CONTACT_DETAILS_FROM_SCANNER';
   params: {
     scannedContact: ContactType;
+    overlay?: ContactDetailEnrichState;
   };
 };
 

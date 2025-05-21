@@ -213,6 +213,7 @@ const AddContactModal = ({
                 route: 'CONTACT_DETAILS_FROM_SCANNER',
                 params: {
                   scannedContact: scanned,
+                  overlay: 'tooltipVisible',
                 },
               });
             }
