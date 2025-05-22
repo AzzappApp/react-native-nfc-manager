@@ -1,3 +1,7 @@
+## 2.0.0-canary.11
+
+
+
 ## 2.0.0-canary.10
 
 * **fix:**  - **user:** [#8667](https://github.com/AzzappApp/azzapp/pull/8667) manage case when email does not exist ([#8884](https://github.com/AzzappApp/azzapp/pull/8884))
