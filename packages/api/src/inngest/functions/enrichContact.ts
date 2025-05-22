@@ -13,6 +13,14 @@ export const enrichContact = inngest.createFunction(
         match: 'data.contact.id',
       },
     ],
+    onFailure: ({ event }) => {
+      const contact = event.data.event.data?.contact;
+      if (contact) {
+        return updateContact(contact.id, {
+          enrichmentStatus: 'failed',
+        });
+      }
+    },
   },
   { event: 'send/enrichContact' },
   async ({ event }) => {
