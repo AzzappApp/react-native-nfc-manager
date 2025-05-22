@@ -3,8 +3,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import { CONTACT_CARD_ASPECT_RATIO } from '#components/ContactCard/ContactCard';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import Skeleton from '#components/Skeleton';
@@ -191,7 +191,7 @@ export const WebCardStatHeaderFallback = () => {
         <Skeleton
           style={{
             width: windowsWith / 3,
-            aspectRatio: CONTACT_CARD_ASPECT_RATIO,
+            aspectRatio: COVER_RATIO,
             borderRadius: 20,
           }}
         />

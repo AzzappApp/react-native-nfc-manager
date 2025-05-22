@@ -1,48 +1,26 @@
-import {
-  BlendColor,
-  Canvas,
-  Group,
-  ImageSVG,
-  Paint,
-  Skia,
-  fitbox,
-  rect,
-} from '@shopify/react-native-skia';
-import { toString } from 'qrcode';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Image, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildWebUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useContactCardAccess from '#hooks/useContactCardAccess';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import type {
   ContactCard_profile$data,
   ContactCard_profile$key,
 } from '#relayArtifacts/ContactCard_profile.graphql';
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type ContactCardProps = {
   profile: ContactCard_profile$key;
   style?: StyleProp<ViewStyle>;
   height: number;
   edit?: boolean;
-  rotation?: SharedValue<number>;
-  qrCodeKey?: string | null;
 };
 
 const ContactCard = ({
@@ -50,8 +28,6 @@ const ContactCard = ({
   height,
   style,
   edit,
-  rotation,
-  qrCodeKey,
 }: ContactCardProps) => {
   const data = useFragment(
     graphql`
@@ -64,13 +40,20 @@ const ContactCard = ({
         }
       ) {
         webCard {
-          userName
           cardColors {
             primary
           }
           isMultiUser
           commonInformation {
             company
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
           }
         }
         contactCard {
@@ -78,6 +61,14 @@ const ContactCard = ({
           lastName
           title
           company
+          emails {
+            label
+            address
+          }
+          phoneNumbers {
+            label
+            number
+          }
         }
         avatar {
           id
@@ -90,38 +81,6 @@ const ContactCard = ({
   );
 
   const { contactCard, avatar, webCard } = data;
-
-  const contactCardAccessData = useContactCardAccess(data);
-
-  const [contactCardSvg, setContactCardSvg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (
-      data?.webCard?.userName &&
-      contactCardAccessData?.contactCardAccessId &&
-      qrCodeKey
-    ) {
-      toString(
-        buildUserUrlWithKey({
-          userName: data.webCard?.userName,
-          contactCardAccessId: contactCardAccessData.contactCardAccessId,
-          key: qrCodeKey,
-        }),
-        {
-          errorCorrectionLevel: 'L',
-          width: 80,
-          type: 'svg',
-          color: {
-            dark: '#000',
-            light: '#0000',
-          },
-          margin: 0,
-        },
-      ).then(svg => {
-        setContactCardSvg(svg);
-      });
-    }
-  }, [data, contactCardAccessData?.contactCardAccessId, qrCodeKey]);
 
   const router = useRouter();
   const onEdit = useMemo(
@@ -142,10 +101,8 @@ const ContactCard = ({
       height={height}
       style={style}
       contactCard={contactCard}
-      contactCardQrCode={contactCardSvg}
       avatar={avatar}
       onEdit={onEdit}
-      rotation={rotation}
     />
   );
 };
@@ -158,95 +115,52 @@ type ContactCardComponentProps = {
   height: number;
   style?: StyleProp<ViewStyle>;
   contactCard?: ContactCard | null;
-  contactCardQrCode?: string | null;
   avatar?: ContactCard_profile$data['avatar'];
   onEdit?: (() => void) | null;
-  rotation?: SharedValue<number>;
 };
-
+const REFERENCE_HEIGHT = 197;
 export const ContactCardComponent = ({
   webCard,
   height,
   style,
   contactCard,
-  contactCardQrCode,
   avatar,
-  rotation,
   onEdit: onEditProp,
 }: ContactCardComponentProps) => {
-  const { userName, cardColors, commonInformation, isMultiUser } =
-    webCard ?? {};
+  //define a ratio display based on the initial figma to keep the display consistend on different screen
+  const ratioDisplay = height / REFERENCE_HEIGHT;
+
+  const { cardColors, commonInformation, isMultiUser } = webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
-  const readableColor = useMemo(
-    () => getTextColor(backgroundColor),
-    [backgroundColor],
-  );
+  const readableColor = getTextColor(backgroundColor);
 
-  const company = useMemo(() => {
-    if (isMultiUser) {
-      return commonInformation?.company || contactCard?.company;
-    } else {
-      return contactCard?.company;
-    }
-  }, [commonInformation?.company, contactCard?.company, isMultiUser]);
+  const company = isMultiUser
+    ? commonInformation?.company || contactCard?.company
+    : contactCard?.company;
 
-  const svg = contactCardQrCode
-    ? Skia.SVG.MakeFromString(contactCardQrCode)
-    : null;
+  const phone = isMultiUser
+    ? (contactCard?.phoneNumbers?.[0]?.number ??
+      commonInformation?.phoneNumbers?.[0]?.number ??
+      null)
+    : (contactCard?.phoneNumbers?.[0]?.number ?? null);
 
-  const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
+  const mail = isMultiUser
+    ? (contactCard?.emails?.[0]?.address ??
+      commonInformation?.emails?.[0]?.address ??
+      null)
+    : (contactCard?.emails?.[0]?.address ?? null);
 
-  const layoutWidth = useSharedValue(0);
-
-  const onTextLayout = ({ nativeEvent }: LayoutChangeEvent) => {
-    layoutWidth.set(nativeEvent.layout.width - 40); // remove the margins
-  };
-
-  const animatedFooterWidth = useAnimatedStyle(() => ({
-    width: layoutWidth.value,
-  }));
-
-  const avatarSource = useMemo(() => {
-    if (avatar?.uri) {
-      return {
+  const avatarSource = avatar?.uri
+    ? {
         uri: avatar.uri,
         mediaId: avatar.id ?? '',
         requestedSize: 112,
-      };
-    }
-    return null;
-  }, [avatar?.id, avatar?.uri]);
-
-  const qrCodeStyle = useAnimatedStyle(() => {
-    const size = interpolate(
-      rotation?.value ?? 0,
-      [0, 1],
-      [110, (layoutWidth.value / CONTACT_CARD_RATIO) * 0.8],
-    );
-
-    return {
-      width: size,
-      height: size,
-    };
-  });
-
-  const transform = useDerivedValue(() => {
-    const size = interpolate(
-      rotation?.value ?? 0,
-      [0, 1],
-      [80, (layoutWidth.value / CONTACT_CARD_RATIO) * 0.8],
-    );
-
-    const origin = interpolate(rotation?.value ?? 0, [0, 1], [15, 0]);
-
-    const dst = rect(origin, origin, size, size);
-
-    return fitbox('contain', src, dst);
-  });
+      }
+    : null;
 
   const onEdit = useCallback(() => {
     onEditProp?.();
@@ -264,12 +178,12 @@ export const ContactCardComponent = ({
           backgroundColor,
           height,
           borderRadius: height * CONTACT_CARD_RADIUS_HEIGHT,
+          paddingHorizontal: 20 * ratioDisplay,
         },
         style,
       ]}
     >
       <View
-        onLayout={onTextLayout}
         style={[
           styles.webCardBackground,
           {
@@ -297,121 +211,107 @@ export const ContactCardComponent = ({
           ]}
         />
       </View>
-      <View style={{ flex: 1 }}>
-        {!avatarSource && (
-          <View style={styles.firstLineView}>
-            <Image
-              source={require('#assets/logo-full_white.png')}
-              resizeMode="contain"
-              style={[styles.azzappImage, { tintColor: readableColor }]}
+      <View style={styles.webCardContent}>
+        <View
+          style={[
+            styles.avatarContainer,
+            {
+              maxHeight: 55 * ratioDisplay,
+              minHeight: 55 * ratioDisplay,
+              marginTop: 25 * ratioDisplay,
+              marginBottom: 10,
+            },
+          ]}
+        >
+          {avatarSource ? (
+            <MediaImageRenderer
+              source={avatarSource}
+              style={[styles.avatar, { width: 55 * ratioDisplay }]}
             />
-          </View>
-        )}
-
-        <View style={styles.webCardContent}>
-          <View style={styles.webcardText}>
-            {avatarSource && (
-              <MediaImageRenderer source={avatarSource} style={styles.avatar} />
-            )}
-            <Text
-              variant="large"
-              style={[
-                styles.webCardLabel,
-                { color: readableColor, fontSize: 14 },
-              ]}
-              numberOfLines={1}
+          ) : (
+            <View />
+          )}
+          {onEditProp != null && (
+            <TouchableOpacity
+              style={[styles.edit, { borderColor: readableColor }]}
+              onPress={onEdit}
+              hitSlop={20}
             >
-              {formatDisplayName(contactCard?.firstName, contactCard?.lastName)}
-            </Text>
-            {contactCard.title && (
-              <Text
-                variant="small"
-                style={[styles.webCardLabel, { color: readableColor }]}
-              >
-                {contactCard.title}
+              <Icon
+                icon="edit"
+                size={17}
+                style={{ tintColor: readableColor }}
+              />
+              <Text variant="button" style={{ color: readableColor }}>
+                <FormattedMessage
+                  defaultMessage="Edit"
+                  description="ContactCard - Label for edit button"
+                />
               </Text>
-            )}
-            {company && (
-              <Text
-                variant="large"
-                style={[styles.webCardLabel, { color: readableColor }]}
-              >
-                {company}
-              </Text>
-            )}
+            </TouchableOpacity>
+          )}
+        </View>
+        <View style={styles.webcardText}>
+          <Text
+            variant="large"
+            style={{
+              color: readableColor,
+              fontSize: 16 * ratioDisplay,
+              lineHeight: 20 * ratioDisplay,
+            }}
+            numberOfLines={1}
+          >
+            {formatDisplayName(contactCard?.firstName, contactCard?.lastName)}
+          </Text>
+          <View style={styles.webCardLabelContainer}>
+            <View key="left-panel" style={styles.leftPanel}>
+              {contactCard.title && (
+                <Text variant="small" style={{ color: readableColor }}>
+                  {contactCard.title}
+                </Text>
+              )}
+
+              {company && (
+                <Text variant="smallbold" style={{ color: readableColor }}>
+                  {company}
+                </Text>
+              )}
+            </View>
+            <View key="right-panel" style={styles.rightPanel}>
+              {phone && (
+                <Text
+                  variant="xsmall"
+                  style={{ color: readableColor, textAlign: 'right' }}
+                >
+                  {phone}
+                </Text>
+              )}
+              {mail && (
+                <Text
+                  variant="xsmall"
+                  style={{ color: readableColor, textAlign: 'right' }}
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                >
+                  {mail}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
-        <Animated.View style={[styles.webCardFooter, animatedFooterWidth]}>
-          {userName && (
-            <Text
-              variant="xsmall"
-              numberOfLines={1}
-              style={[
-                styles.webCardLabel,
-                { opacity: 0.5, color: readableColor },
-              ]}
-            >
-              {buildWebUrl(userName)}
-            </Text>
-          )}
-        </Animated.View>
-      </View>
-      <View style={styles.qrCodeContainer}>
-        {svg ? (
-          <Animated.View style={qrCodeStyle}>
-            <Canvas style={styles.qrCodeCanvas}>
-              <Group
-                layer={
-                  <Paint>
-                    <BlendColor color={readableColor} mode="srcATop" />
-                  </Paint>
-                }
-                transform={transform}
-              >
-                <ImageSVG svg={svg} />
-              </Group>
-            </Canvas>
-          </Animated.View>
-        ) : null}
-        {onEditProp != null && (
-          <TouchableOpacity
-            style={[
-              styles.edit,
-              {
-                backgroundColor: readableColor,
-              },
-            ]}
-            onPress={onEdit}
-            hitSlop={20}
-          >
-            <Icon
-              icon="edit"
-              size={17}
-              style={{ tintColor: backgroundColor }}
-            />
-            <Text variant="button" style={{ color: backgroundColor }}>
-              <FormattedMessage
-                defaultMessage="Edit"
-                description="ContactCard - Label for edit button"
-              />
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
 };
 
-export const CONTACT_CARD_RATIO = 1 / 0.6;
-export const CONTACT_CARD_RADIUS_HEIGHT = 1 / 10;
+export const CONTACT_CARD_RATIO = 1.7; //new ratio choose by @upmitt
+export const CONTACT_CARD_RADIUS_HEIGHT = 1 / 9;
 // use in list on HomeScreen
 export default memo(ContactCard);
 export const CONTACT_CARD_ASPECT_RATIO = 0.6;
 
 const stylesheet = createStyleSheet(appearance => ({
   webCardContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     aspectRatio: CONTACT_CARD_RATIO,
     overflow: 'visible',
     flexDirection: 'row',
@@ -434,63 +334,41 @@ const stylesheet = createStyleSheet(appearance => ({
     top: 0,
   },
   webCardContent: {
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flex: 1,
+    flexDirection: 'column',
+    width: '100%',
+  },
+  avatarContainer: {
     flex: 1,
     flexDirection: 'row',
-    rowGap: 10,
-  },
-  webCardLabel: { color: colors.white },
-  webCardFooter: {
-    justifyContent: 'flex-end',
-    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   webcardText: {
     flexDirection: 'column',
     height: '100%',
     flex: 1,
     alignItems: 'flex-start',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     rowGap: 5,
   },
-  qrCodeContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
+
+  webCardLabelContainer: {
+    flexDirection: 'row',
   },
-  editButtonText: {
-    fontSize: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    lineHeight: 20,
-  },
-  editButtonContainer: {
-    height: 33,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF4D',
-    borderRadius: 78,
-    width: 70,
-    ...shadow({ appearance: 'light', direction: 'center' }),
-    overflow: 'visible',
-  },
-  firstLineView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'visible',
-  },
-  azzappImage: {
-    width: 85,
-    position: 'absolute',
-    left: 0,
-    top: 3,
-  },
-  qrCodeCanvas: {
+  leftPanel: {
     flex: 1,
+    gap: 5,
+  },
+  rightPanel: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    gap: 5,
   },
   avatar: {
-    width: 55,
-    height: 55,
+    aspectRatio: 1,
     borderRadius: 55,
     display: 'flex',
     justifyContent: 'center',
@@ -502,10 +380,12 @@ const stylesheet = createStyleSheet(appearance => ({
   edit: {
     flexDirection: 'row',
     justifyContent: 'center',
+    gap: 5,
     alignItems: 'center',
     borderRadius: 27,
-    width: 80,
-    paddingVertical: 5,
-    gap: 5,
+    minWidth: 80,
+    height: 35,
+    borderWidth: 1,
+    paddingHorizontal: 10,
   },
 }));

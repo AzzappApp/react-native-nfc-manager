@@ -268,6 +268,17 @@ export const OfflineVCardScreenRenderer = ({
               title: contactCard?.title,
               company: company || null,
               id: webCard.id,
+              //we take contactCard first on purpose as we are displaying only one email/phone number on new contact card. Validated with @upmitt
+              emails: contactCard?.emails
+                ? contactCard?.emails
+                : webCard?.isMultiUser
+                  ? webCard?.commonInformation?.emails
+                  : null,
+              phoneNumbers: contactCard?.phoneNumbers
+                ? contactCard?.phoneNumbers
+                : webCard?.isMultiUser
+                  ? webCard.commonInformation?.phoneNumbers
+                  : null,
             };
           })
           .filter(isDefined) || [],
@@ -303,9 +314,12 @@ export const OfflineVCardScreenRenderer = ({
     const vCard = item;
     const webCard = {
       cardColors: { primary: vCard.primaryColor },
-      commonInformation: { company: vCard.company || null },
+      commonInformation: {
+        company: vCard.company || null,
+        emails: vCard.emails || null,
+        phoneNumbers: vCard.phoneNumbers || null,
+      },
       isMultiUser: vCard.isMultiUser,
-      userName: vCard.name,
     };
 
     const contactCard = {
@@ -313,6 +327,8 @@ export const OfflineVCardScreenRenderer = ({
       firstName: vCard.firstName || null,
       lastName: vCard.lastName || null,
       title: vCard.title || null,
+      emails: vCard.emails || null,
+      phoneNumbers: vCard.phoneNumbers || null,
     };
 
     return (

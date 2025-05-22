@@ -8,7 +8,6 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useQRCodeKey from '#hooks/useQRCodeKey';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
@@ -129,8 +128,6 @@ const ContactCardItem = ({
     item,
   );
 
-  const qrCodeKey = useQRCodeKey(profile);
-
   const router = useRouter();
 
   const openContactCard = useCallback(() => {
@@ -158,7 +155,6 @@ const ContactCardItem = ({
                 height={Math.min(height, height)}
                 style={styles.card}
                 edit
-                qrCodeKey={qrCodeKey}
               />
             </TouchableOpacity>
           </View>
