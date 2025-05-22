@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ContactListEmptyComponent from '../ContactListEmptyComponent';
 import ContactsScreenSection from './ContactsHorizontalList';
 import type { ContactsHorizontalList_contacts$key } from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type {
@@ -93,7 +94,9 @@ const SectionContactsHorizontalList = ({
       renderScrollComponent={renderScrollComponent}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      contentContainerStyle={[contentContainerStyle]}
+      style={{ flexGrow: 1 }}
+      contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
+      ListEmptyComponent={ContactListEmptyComponent}
     />
   );
 };

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { SectionList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ContactListEmptyComponent from '../ContactListEmptyComponent';
 import ContactsListItem from './ContactsListItem';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
 import type {
@@ -91,8 +92,10 @@ const ContactsList = ({
       keyboardShouldPersistTaps="always"
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      contentContainerStyle={contentContainerStyle}
+      style={{ flexGrow: 1 }}
+      contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
       renderScrollComponent={renderScrollComponent}
+      ListEmptyComponent={ContactListEmptyComponent}
     />
   );
 };
