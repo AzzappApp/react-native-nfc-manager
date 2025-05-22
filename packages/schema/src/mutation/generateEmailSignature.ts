@@ -1,58 +1,19 @@
 import { GraphQLError } from 'graphql';
 import { getProfileWithWebCardById } from '@azzapp/data';
-import { generateEmailSignature } from '@azzapp/service/emailSignatureServices';
+
 import ERRORS from '@azzapp/shared/errors';
+
+import { sendEmailSignature } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
-const generateEmailSignatureMutation: MutationResolvers['generateEmailSignature'] =
-  async (_parent, { profileId: gqlProfileId }, { intl, apiEndpoint }) => {
-    const user = await getSessionUser();
-    if (!user) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-    const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-
-    const res = await getProfileWithWebCardById(profileId);
-    if (!res) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-    const { profile, webCard } = res;
-    if (!profile?.contactCard || !webCard.userName) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
-    if (profile.userId !== user.id) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    await validateCurrentSubscription(
-      user.id,
-      {
-        action: 'GENERATE_EMAIL_SIGNATURE',
-        webCardIsMultiUser: webCard.isMultiUser,
-      },
-      apiEndpoint,
-    );
-
-    const linkUrl = await generateEmailSignature({
-      profile,
-      webCard,
-      intl,
-    });
-
-    return {
-      url: linkUrl,
-    };
-  };
-
 const generateEmailSignatureWithKey: MutationResolvers['generateEmailSignatureWithKey'] =
   async (
     _parent,
     { input: { profileId: gqlProfileId, deviceId, key } },
-    { intl, apiEndpoint },
+    { apiEndpoint },
   ) => {
     const user = await getSessionUser();
     if (!user) {
@@ -82,20 +43,9 @@ const generateEmailSignatureWithKey: MutationResolvers['generateEmailSignatureWi
       apiEndpoint,
     );
 
-    const linkUrl = await generateEmailSignature({
-      profile,
-      webCard,
-      intl,
-      deviceId,
-      key,
-    });
+    sendEmailSignature(profile.id, deviceId, key);
 
-    return {
-      url: linkUrl,
-    };
+    return { done: true };
   };
 
-export {
-  generateEmailSignatureMutation as generateEmailSignature,
-  generateEmailSignatureWithKey,
-};
+export { generateEmailSignatureWithKey };

@@ -50,6 +50,10 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
 
+jest.mock('@azzapp/service/notificationsHelpers', () => ({
+  sendPushNotification: jest.fn(),
+}));
+
 jest.mock('graphql-relay', () => ({
   fromGlobalId: jest
     .fn()
@@ -57,7 +61,11 @@ jest.mock('graphql-relay', () => ({
 }));
 
 // Mock context and info
-const mockContext: any = {};
+const mockContext: any = {
+  intl: {
+    formatMessage: jest.fn(),
+  },
+};
 const mockInfo: any = {};
 
 describe('addContact Mutation', () => {

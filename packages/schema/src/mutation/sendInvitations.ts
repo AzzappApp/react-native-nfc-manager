@@ -4,9 +4,10 @@ import { toGlobalId } from 'graphql-relay';
 import { getUsersFromWebCard, updateWebCardProfiles } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers, sendPushNotification } from '#externals';
+import { notifyUsers } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
+import { sendMultiUserInvitationPushNotification } from '#helpers/notificationsHelpers';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -148,18 +149,16 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
         guessLocale(user?.locale),
       );
     }
-    for (let i = 0; i < users.length; i++) {
-      const userToNotify = users[i].user;
-      if (userToNotify && webCard.userName) {
-        await sendPushNotification(userToNotify.id, {
-          notification: {
-            type: 'multiuser_invitation',
-          },
-          mediaId: webCard.coverMediaId,
-          localeParams: { userName: webCard.userName },
-          locale: guessLocale(userToNotify.locale),
-        });
-      }
+
+    const response = await Promise.allSettled(
+      users.map(({ user }) =>
+        sendMultiUserInvitationPushNotification(user, webCard, context.intl),
+      ),
+    );
+
+    if (response.some(({ status }) => status === 'rejected')) {
+      const errors = response.filter(({ status }) => status === 'rejected');
+      Sentry.captureException(new Error(`Push notification error: ${errors}`));
     }
   } catch (e) {
     Sentry.captureException(e);

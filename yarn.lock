@@ -992,7 +992,6 @@ __metadata:
   resolution: "@azzapp/service@workspace:packages/service"
   dependencies:
     "@azzapp/data": "workspace:^"
-    "@azzapp/i18n": "workspace:^"
     "@azzapp/shared": "workspace:^"
     eslint: "npm:^9.24.0"
     jest: "npm:^29.7.0"

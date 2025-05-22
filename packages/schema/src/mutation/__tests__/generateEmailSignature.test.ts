@@ -1,20 +1,19 @@
 import { GraphQLError } from 'graphql';
 import { getProfileWithWebCardById } from '@azzapp/data';
-import { generateEmailSignature } from '@azzapp/service/emailSignatureServices';
 import ERRORS from '@azzapp/shared/errors';
+import { sendEmailSignature } from '#externals';
+import { getSessionUser } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
-import { mockUser } from '../../../__mocks__/mockGraphQLContext';
-import { generateEmailSignature as generateEmailSignatureMutation } from '../generateEmailSignature';
-import type { GraphQLContext } from '#GraphQLContext';
 
-// Mocks
+import { generateEmailSignatureWithKey } from '../generateEmailSignature';
+
+// Mock dependencies
 jest.mock('@azzapp/data', () => ({
   getProfileWithWebCardById: jest.fn(),
 }));
 
-jest.mock('@azzapp/service/emailSignatureServices', () => ({
-  generateEmailSignature: jest.fn(),
+jest.mock('#GraphQLContext', () => ({
+  getSessionUser: jest.fn(),
 }));
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
@@ -23,131 +22,110 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
 
-const mockContext = {
-  intl: {
-    formatMessage: ({ defaultMessage }: any) => defaultMessage,
-  },
-} as GraphQLContext;
+jest.mock('#externals', () => ({
+  sendEmailSignature: jest.fn(),
+}));
 
-const mockInfo = {} as any;
+const mockContext: any = { apiEndpoint: 'https://api.test' };
+const mockInfo: any = {};
 
-describe('generateEmailSignatureMutation', () => {
-  const gqlProfileId = 'gql-profile-id';
-  const profileId = 'real-profile-id';
-  const userId = 'user-1';
+describe('generateEmailSignatureWithKey', () => {
+  const input = {
+    input: {
+      profileId: 'global-profile-id',
+      deviceId: 'device-xyz',
+      key: 'signature-key',
+    },
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUser(userId);
-    (fromGlobalIdWithType as jest.Mock).mockReturnValue(profileId);
   });
 
-  test('should throw UNAUTHORIZED if user is not logged in', async () => {
-    mockUser();
-
-    await expect(
-      generateEmailSignatureMutation(
-        {},
-        { profileId: gqlProfileId, config: { preview: '' } },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
-  });
-
-  test('should throw INVALID_REQUEST if no profile is found', async () => {
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue(null);
-
-    await expect(
-      generateEmailSignatureMutation(
-        {},
-        { profileId: gqlProfileId, config: { preview: '' } },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
-  });
-
-  test('should throw INVALID_REQUEST if profile has no contact card', async () => {
+  test('should return { done: true } when valid', async () => {
+    (getSessionUser as jest.Mock).mockResolvedValue({ id: 'user-1' });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-id');
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: { userId, contactCard: null },
-      webCard: { userName: 'test', isMultiUser: false },
+      profile: {
+        id: 'profile-id',
+        userId: 'user-1',
+        contactCard: { some: 'data' },
+      },
+      webCard: {
+        userName: 'demo',
+        isMultiUser: false,
+      },
     });
 
-    await expect(
-      generateEmailSignatureMutation(
-        {},
-        { profileId: gqlProfileId, config: { preview: '' } },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
-  });
-
-  test('should throw INVALID_REQUEST if webCard has no userName', async () => {
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: { userId, contactCard: { firstName: 'John' } },
-      webCard: { userName: null, isMultiUser: false },
-    });
-
-    await expect(
-      generateEmailSignatureMutation(
-        {},
-        { profileId: gqlProfileId, config: { preview: '' } },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
-  });
-
-  test('should throw UNAUTHORIZED if user is not owner of the profile', async () => {
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: { userId: 'another-user', contactCard: { firstName: 'John' } },
-      webCard: { userName: 'test', isMultiUser: false },
-    });
-
-    await expect(
-      generateEmailSignatureMutation(
-        {},
-        { profileId: gqlProfileId, config: { preview: '' } },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
-  });
-
-  test('should return url if everything is valid', async () => {
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: { userId, contactCard: { firstName: 'John' } },
-      webCard: { userName: 'test', isMultiUser: false },
-    });
-
-    (generateEmailSignature as jest.Mock).mockResolvedValue(
-      'https://signature.link',
-    );
-
-    const result = await generateEmailSignatureMutation(
+    const result = await generateEmailSignatureWithKey(
       {},
-      { profileId: gqlProfileId, config: { preview: 'testPreview' } },
+      input,
       mockContext,
       mockInfo,
     );
-
-    expect(validateCurrentSubscription).toHaveBeenCalledWith(
-      userId,
-      {
-        action: 'GENERATE_EMAIL_SIGNATURE',
-        webCardIsMultiUser: false,
-      },
-      mockContext.apiEndpoint,
+    expect(result).toEqual({ done: true });
+    expect(sendEmailSignature).toHaveBeenCalledWith(
+      'profile-id',
+      'device-xyz',
+      'signature-key',
     );
+  });
 
-    expect(generateEmailSignature).toHaveBeenCalledWith({
-      profile: expect.any(Object),
-      webCard: expect.any(Object),
-      intl: mockContext.intl,
+  test('should throw UNAUTHORIZED if no user in session', async () => {
+    (getSessionUser as jest.Mock).mockResolvedValue(null);
+
+    await expect(
+      generateEmailSignatureWithKey({}, input, mockContext, mockInfo),
+    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
+  });
+
+  test('should throw INVALID_REQUEST if profile not found', async () => {
+    (getSessionUser as jest.Mock).mockResolvedValue({ id: 'user-1' });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-id');
+    (getProfileWithWebCardById as jest.Mock).mockResolvedValue(null);
+
+    await expect(
+      generateEmailSignatureWithKey({}, input, mockContext, mockInfo),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
+  });
+
+  test('should throw INVALID_REQUEST if profile or webCard is incomplete', async () => {
+    (getSessionUser as jest.Mock).mockResolvedValue({ id: 'user-1' });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-id');
+    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
+      profile: {
+        id: 'profile-id',
+        userId: 'user-1',
+        contactCard: null,
+      },
+      webCard: {
+        userName: null,
+        isMultiUser: false,
+      },
     });
 
-    expect(result).toEqual({ url: 'https://signature.link' });
+    await expect(
+      generateEmailSignatureWithKey({}, input, mockContext, mockInfo),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
+  });
+
+  test('should throw UNAUTHORIZED if user does not own profile', async () => {
+    (getSessionUser as jest.Mock).mockResolvedValue({ id: 'user-42' });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('profile-id');
+    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
+      profile: {
+        id: 'profile-id',
+        userId: 'user-1',
+        contactCard: { some: 'data' },
+      },
+      webCard: {
+        userName: 'demo',
+        isMultiUser: false,
+      },
+    });
+
+    await expect(
+      generateEmailSignatureWithKey({}, input, mockContext, mockInfo),
+    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
   });
 });

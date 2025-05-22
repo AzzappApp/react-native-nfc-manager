@@ -2,36 +2,25 @@ import * as Sentry from '@sentry/nextjs';
 import { SignJWT, importPKCS8 } from 'jose'; // because of  edge (jsonwebToken, google-auth-library, etc are not supported on "you can do nothing" edge)import { getFcmTokensForUserId } from '@azzapp/data';
 import { getFcmTokensForUserId } from '@azzapp/data';
 import env from './env';
-import { createServerIntl } from './i18nServices';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
 } from './mediaServices/imageHelpers';
-import type { Locale } from '@azzapp/i18n';
-import type {
-  NotificationType,
-  PushNotificationType,
-} from '@azzapp/shared/notificationHelpers';
+import type { PushNotificationData } from '@azzapp/shared/notificationHelpers';
 
 let accessToken: string | null = null;
 let tokenExpiry = 0;
 type MessageType = {
-  notification: PushNotificationType;
   mediaId?: string | null;
-  sound?: string; // sound is optionnal, default will use the default sound, for custom sound they have to be compiled with the app
-  locale: Locale;
-  localeParams?: Record<string, string>;
+  sound?: string; // sound is optional, default will use the default sound, for custom sound they have to be compiled with the app
+  title: string;
+  body: string;
+  data?: PushNotificationData;
 };
 
 export const sendPushNotification = async (
   targetUserId: string,
-  {
-    notification,
-    mediaId,
-    sound = 'default',
-    locale,
-    localeParams,
-  }: MessageType,
+  { data, mediaId, sound = 'default', title, body }: MessageType,
 ) => {
   const fcms = await getFcmTokensForUserId(targetUserId);
   if (fcms.length === 0) {
@@ -41,10 +30,9 @@ export const sendPushNotification = async (
     accessToken = await getAccessToken();
   }
 
-  const message: Record<string, any> = {
-    notification: {
-      ...getLabel(notification.type, locale, localeParams),
-    },
+  const notification = {
+    title,
+    body,
   };
 
   let imageUrl = undefined;
@@ -66,54 +54,65 @@ export const sendPushNotification = async (
 
   for (const fcm of fcms) {
     if (fcm.fcmToken) {
-      message.token = fcm.fcmToken;
+      let message;
       if (fcm.deviceOS === 'ios') {
-        message.apns = {
-          payload: {
-            aps: {
-              sound,
-              'mutable-content': 1,
+        message = {
+          notification,
+          token: fcm.fcmToken,
+          apns: {
+            payload: {
+              aps: {
+                sound,
+                'mutable-content': 1,
+              },
+              ...data,
             },
-            ...notification,
-          },
-          fcm_options: {
-            image: imageUrl,
+            fcm_options: {
+              image: imageUrl,
+            },
           },
         };
       } else if (fcm.deviceOS === 'android') {
-        message.android = {
-          notification: {
-            sound,
-            image: imageUrl,
-          },
-          data: notification,
-        };
-      }
-
-      try {
-        await fetch(
-          `https://fcm.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/messages:send`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
+        message = {
+          token: fcm.fcmToken,
+          notification,
+          android: {
+            notification: {
+              sound,
+              image: imageUrl,
             },
-            body: JSON.stringify({ message }),
+            data,
           },
-        ).then(result => {
-          if (result.status !== 200) {
-            console.error(
-              'cannot send push notification message',
-              message,
-              ' result is ',
-              result,
-            );
-            Sentry.captureMessage('Fail to send fcm message');
-          }
-        });
-      } catch (error) {
-        console.error('Unexpected error:', error);
+        };
+      } else {
+        message = null;
+      }
+      if (message) {
+        try {
+          await fetch(
+            `https://fcm.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/messages:send`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({ message }),
+            },
+          ).then(result => {
+            if (result.status !== 200) {
+              console.error(
+                'cannot send push notification message',
+                message,
+                ' result is ',
+                result,
+              );
+              Sentry.captureMessage('Fail to send fcm message');
+            }
+          });
+        } catch (error) {
+          console.error('Unexpected error:', error);
+        }
       }
     }
   }
@@ -162,72 +161,3 @@ async function getAccessToken() {
   tokenExpiry = now + 3600;
   return accessToken;
 }
-
-const getLabel = (
-  type: NotificationType,
-  locale: Locale,
-  params?: Record<string, string>,
-) => {
-  const intl = createServerIntl(locale);
-  switch (type) {
-    case 'multiuser_invitation':
-      return {
-        title: intl.formatMessage({
-          defaultMessage: 'Invitation',
-          id: 'VTvMCa',
-          description: 'Push Notification title for multiuser invitation',
-        }),
-        body: intl.formatMessage(
-          {
-            defaultMessage: 'You have been invited to join {userName}',
-            id: '8oY4VO',
-            description:
-              'Push Notification body message for multiuser invitation',
-          },
-          {
-            userName: params?.userName,
-          },
-        ),
-      };
-    case 'shareBack':
-      return {
-        title: intl.formatMessage({
-          defaultMessage: 'Contact ShareBack',
-          id: '0j4O2Z',
-          description: 'Push Notification title for contact share back',
-        }),
-        body: intl.formatMessage({
-          defaultMessage: `Hello, You've received a new contact ShareBack.`,
-          id: 'rAeWtj',
-          description: 'Push Notification body message for contact share back',
-        }),
-      };
-    case 'webCardUpdate':
-      return {
-        title: intl.formatMessage(
-          {
-            defaultMessage: 'WebCard {webCardUserName} Update',
-            id: 'Klvd4Y',
-            description: 'Push Notification title for webcard update',
-          },
-          {
-            webCardUserName: params?.webCardUserName,
-          },
-        ),
-        body: intl.formatMessage(
-          {
-            defaultMessage:
-              'The WebCard {webCardUserName} has been updated. Click to view it.',
-            id: 'tE1mwA',
-            description: 'Push Notification body message for webcard update',
-          },
-          {
-            webCardUserName: params?.webCardUserName,
-          },
-        ),
-      };
-    default:
-      //should not happen,
-      return { title: 'Notification', body: 'You have a new notification' };
-  }
-};

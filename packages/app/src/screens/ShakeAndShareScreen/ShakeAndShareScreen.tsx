@@ -164,7 +164,7 @@ const ShakeAndShareScreen = ({
       $input: GenerateEmailSignatureWithKeyInput!
     ) {
       generateEmailSignatureWithKey(input: $input) {
-        url
+        done
       }
     }
   `);

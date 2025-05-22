@@ -19,9 +19,10 @@ import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { notifyUsers, sendPushNotification } from '#externals';
+import { notifyUsers } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
+import { sendMultiUserInvitationPushNotification } from '#helpers/notificationsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type {
@@ -256,14 +257,11 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       }
     }
     if (user && webCard.userName) {
-      await sendPushNotification(user.id, {
-        notification: {
-          type: 'multiuser_invitation',
-        },
-        mediaId: webCard.coverMediaId,
-        localeParams: { userName: webCard.userName },
-        locale: guessLocale(user?.locale),
-      });
+      await sendMultiUserInvitationPushNotification(
+        user,
+        webCard,
+        context.intl,
+      );
     }
   }
 

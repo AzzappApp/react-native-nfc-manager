@@ -1,3 +1,4 @@
+import { toGlobalId } from 'graphql-relay';
 import { jwtDecode } from 'jwt-decode';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -7,8 +8,9 @@ import {
   getProfileByUserAndWebCard,
   getProfileById,
 } from '@azzapp/data';
-import { guessLocale } from '@azzapp/i18n';
+import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { sendTemplateEmail } from '@azzapp/service/emailServices';
+import { createServerIntl } from '@azzapp/service/i18nServices';
 import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
@@ -139,14 +141,26 @@ export async function POST(request: Request) {
     });
 
     // Send push notification
+    const intl = createServerIntl(
+      isSupportedLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
+    );
     await sendPushNotification(profile.userId, {
-      notification: {
+      data: {
         type: 'shareBack',
-        webCardId: profile.webCardId,
+        webCardId: toGlobalId('WebCard', profile.webCardId),
       },
       mediaId: null,
       sound: 'default',
-      locale: guessLocale(user.locale),
+      title: intl.formatMessage({
+        defaultMessage: 'Contact ShareBack',
+        id: '0j4O2Z',
+        description: 'Push Notification title for contact share back',
+      }),
+      body: intl.formatMessage({
+        defaultMessage: `Hello, You've received a new contact ShareBack.`,
+        id: 'rAeWtj',
+        description: 'Push Notification body message for contact share back',
+      }),
     });
 
     // Send email with vCard

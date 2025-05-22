@@ -21,9 +21,10 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { notifyUsers, sendPushNotification } from '#externals';
+import { notifyUsers } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
+import { sendMultiUserInvitationPushNotification } from '#helpers/notificationsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -221,16 +222,12 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     });
 
     if (existingUser) {
-      const locale = guessLocale(existingUser?.locale ?? user.locale);
       if (webCard.userName) {
-        await sendPushNotification(existingUser.id, {
-          notification: {
-            type: 'multiuser_invitation',
-          },
-          mediaId: webCard.coverMediaId,
-          localeParams: { userName: webCard.userName },
-          locale,
-        });
+        await sendMultiUserInvitationPushNotification(
+          existingUser,
+          webCard,
+          context.intl,
+        );
       }
     }
 

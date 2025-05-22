@@ -48,9 +48,6 @@ export type ShareBackFormData = FormData & {
   email: string;
 };
 
-// TODO why no locale here that's clearly a bug
-const intl = getServerIntl();
-
 export const processShareBackSubmission = async (
   userId: string,
   webcardId: string,
@@ -65,6 +62,23 @@ export const processShareBackSubmission = async (
   });
 
   try {
+    // get user data from userId
+    const user = await getUserById(userId);
+
+    if (!user) {
+      Sentry.captureException(
+        new Error(
+          `No user found to send the share back with userId: ${userId} from token: ${token}`,
+        ),
+      );
+
+      return submission.reply({
+        formErrors: ['Contact not found'],
+      });
+    }
+
+    const intl = getServerIntl(guessLocale(user?.locale));
+
     // decode token
     const decodedToken = jwtDecode<JwtPayload & VerifySignToken>(token);
     // verify expiration date
@@ -91,20 +105,6 @@ export const processShareBackSubmission = async (
             description: 'ShareBack - Error message for invalid submission',
           }),
         ],
-      });
-    }
-    // get user data from userId
-    const user = await getUserById(userId);
-
-    if (!user) {
-      Sentry.captureException(
-        new Error(
-          `No user found to send the share back with userId: ${userId} from token: ${token}`,
-        ),
-      );
-
-      return submission.reply({
-        formErrors: ['Contact not found'],
       });
     }
 
@@ -172,13 +172,22 @@ export const processShareBackSubmission = async (
     } as NewContact);
 
     await sendPushNotification(profile.userId, {
-      notification: {
-        type: 'shareBack',
-        webCardId: toGlobalId('WebCard', profile.webCardId),
-      },
       mediaId: null,
       sound: 'default',
-      locale: guessLocale(user?.locale),
+      title: intl.formatMessage({
+        defaultMessage: 'Contact ShareBack',
+        id: '0j4O2Z',
+        description: 'Push Notification title for contact share back',
+      }),
+      body: intl.formatMessage({
+        defaultMessage: `Hello, You've received a new contact ShareBack.`,
+        id: 'rAeWtj',
+        description: 'Push Notification body message for contact share back',
+      }),
+      data: {
+        webCardId: toGlobalId('WebCard', profile.webCardId),
+        type: 'shareBack',
+      },
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

@@ -30,6 +30,10 @@ jest.mock('@azzapp/data', () => ({
   getContactById: jest.fn(),
 }));
 
+jest.mock('@azzapp/service/notificationsHelpers', () => ({
+  sendPushNotification: jest.fn(),
+}));
+
 jest.mock('@azzapp/i18n', () => ({
   guessLocale: jest.fn().mockReturnValue('en'),
 }));

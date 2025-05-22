@@ -11,8 +11,9 @@ import {
   getProfilesByIds,
 } from '@azzapp/data';
 
+import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers, sendPushNotification } from '#externals';
+import { notifyUsers } from '#externals';
 import {
   webCardLoader,
   profileLoader,
@@ -46,7 +47,6 @@ jest.mock('#loaders', () => ({
 
 jest.mock('#externals', () => ({
   notifyUsers: jest.fn(),
-  sendPushNotification: jest.fn(),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -59,6 +59,10 @@ jest.mock('@azzapp/shared/profileHelpers', () => ({
   profileHasAdminRight: jest.fn(() => true),
 }));
 
+jest.mock('@azzapp/service/notificationsHelpers', () => ({
+  sendPushNotification: jest.fn(),
+}));
+
 jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
@@ -67,7 +71,9 @@ jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
 }));
 
-const mockContext: any = {};
+const mockContext: any = {
+  intl: { formatMessage: jest.fn(({ defaultMessage }) => defaultMessage) },
+};
 const mockInfo: any = {};
 
 describe('inviteUsersListMutation', () => {

@@ -31,7 +31,7 @@ import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
+import type { PushNotificationData } from '@azzapp/shared/notificationHelpers';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
@@ -75,7 +75,7 @@ const HomeScreenContent = ({
   );
 
   const onDeepLinkInApp = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       if (notification.type === 'multiuser_invitation') {
         refreshQuery?.();
       }
@@ -88,7 +88,7 @@ const HomeScreenContent = ({
   const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const redirectDeepLink = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       switch (notification.type) {
         case 'shareBack':
           router.push({
@@ -111,7 +111,7 @@ const HomeScreenContent = ({
   );
 
   const onDeepLinkOpenedApp = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       if ('webCardId' in notification && user.profiles) {
         const webCardId = notification.webCardId;
         const newProfileIndex = user.profiles.findIndex(

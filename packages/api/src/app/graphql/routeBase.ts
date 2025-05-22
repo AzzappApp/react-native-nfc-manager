@@ -32,7 +32,6 @@ import {
   startPerformanceLogging,
 } from '@azzapp/schema/schema';
 import { createServerIntl } from '@azzapp/service/i18nServices';
-import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import { checkServerAuth } from '@azzapp/service/serverAuthServices';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
@@ -169,19 +168,33 @@ const { handleRequest } = createYoga({
       locale: locale ?? DEFAULT_LOCALE,
       notifyUsers: notifyUsers(apiEndpoint),
       validateMailOrPhone: validateMailOrPhone(apiEndpoint),
-      sendPushNotification,
       notifyApplePassWallet: notifyApplePassWallet(apiEndpoint),
       notifyGooglePassWallet: notifyGooglePassWallet(apiEndpoint),
       apiEndpoint,
       intl: createServerIntl(locale ?? DEFAULT_LOCALE),
-      sendEmailSignatures: async (profileIds, webCard) => {
+      sendEmailSignatures: async profileIds => {
         waitUntil(
           inngest
             .send({
               name: 'batch/emailSignature',
               data: {
                 profileIds,
-                webCard,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
+      },
+      sendEmailSignature: async (profileId, deviceId, key) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'send/emailSignature',
+              data: {
+                profileId,
+                deviceId,
+                key,
               },
             })
             .catch(err => {

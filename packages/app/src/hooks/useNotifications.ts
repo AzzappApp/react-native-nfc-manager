@@ -7,9 +7,9 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
-import { isSupportedNotificationType } from '@azzapp/shared/notificationHelpers';
+import { isSupportedNotificationData } from '@azzapp/shared/notificationHelpers';
 import { useRouter } from '#components/NativeRouter';
-import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
+import type { PushNotificationData } from '@azzapp/shared/notificationHelpers';
 import type { PermissionStatus } from 'react-native-permissions';
 import type { Environment } from 'react-relay';
 import type { MutationConfig, MutationParameters } from 'relay-runtime';
@@ -91,7 +91,7 @@ export const useNotificationsManager = () => {
 };
 
 type DeepLinkCallbackType =
-  | ((notification: PushNotificationType) => void)
+  | ((notification: PushNotificationData) => void)
   | null;
 
 type useNotificationsEventProp = {
@@ -109,8 +109,8 @@ const useNotificationsEvent = ({
     const unsubscribe = messaging.onNotificationOpenedApp(
       messaging.getMessaging(),
       remoteMessage => {
-        if (isSupportedNotificationType(remoteMessage.data?.type)) {
-          onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
+        if (isSupportedNotificationData(remoteMessage.data)) {
+          onDeepLinkOpenedApp?.(remoteMessage.data);
         }
       },
     );
@@ -119,8 +119,8 @@ const useNotificationsEvent = ({
       .getInitialNotification(messaging.getMessaging())
       .then(remoteMessage => {
         if (remoteMessage) {
-          if (isSupportedNotificationType(remoteMessage.data?.type)) {
-            onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
+          if (isSupportedNotificationData(remoteMessage.data)) {
+            onDeepLinkOpenedApp?.(remoteMessage.data);
           }
         }
       });
@@ -133,8 +133,8 @@ const useNotificationsEvent = ({
     const unsubscribe = messaging.onMessage(
       messaging.getMessaging(),
       remoteMessage => {
-        if (isSupportedNotificationType(remoteMessage.data?.type)) {
-          onDeepLinkInApp?.(remoteMessage.data as PushNotificationType);
+        if (isSupportedNotificationData(remoteMessage.data)) {
+          onDeepLinkInApp?.(remoteMessage.data);
         }
       },
     );

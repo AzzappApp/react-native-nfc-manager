@@ -53,6 +53,10 @@ jest.mock('#externals', () => ({
   sendPushNotification: jest.fn(),
 }));
 
+jest.mock('@azzapp/service/notificationsHelpers', () => ({
+  sendPushNotification: jest.fn(),
+}));
+
 jest.mock('#loaders', () => ({
   profileLoader: {
     load: jest.fn(),
@@ -75,7 +79,9 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
 }));
 
 // Mock context and info
-const mockContext: any = {};
+const mockContext: any = {
+  intl: { formatMessage: jest.fn(({ defaultMessage }) => defaultMessage) },
+};
 const mockInfo: any = {};
 
 describe('inviteUserMutation', () => {

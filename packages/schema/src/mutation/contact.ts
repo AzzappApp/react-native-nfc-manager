@@ -22,12 +22,13 @@ import {
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
+import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import env from '#env';
-import { notifyUsers, sendPushNotification } from '#externals';
+import { notifyUsers } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import {
   contactLoader,
@@ -217,14 +218,24 @@ export const createContact: MutationResolvers['createContact'] = async (
     if (profileToNotify) {
       const userToNotify = await userLoader.load(profileToNotify?.userId);
       if (userToNotify) {
-        await sendPushNotification(userToNotify.id, {
-          notification: {
-            type: 'shareBack',
-            webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
-          },
+        await sendPushNotification(profile.userId, {
           mediaId: null,
           sound: 'default',
-          locale: guessLocale(userToNotify?.locale),
+          title: context.intl.formatMessage({
+            defaultMessage: 'Contact ShareBack',
+            id: '0j4O2Z',
+            description: 'Push Notification title for contact share back',
+          }),
+          body: context.intl.formatMessage({
+            defaultMessage: `Hello, You've received a new contact ShareBack.`,
+            id: 'rAeWtj',
+            description:
+              'Push Notification body message for contact share back',
+          }),
+          data: {
+            webCardId: toGlobalId('WebCard', profile.webCardId),
+            type: 'shareBack',
+          },
         });
       }
     }
