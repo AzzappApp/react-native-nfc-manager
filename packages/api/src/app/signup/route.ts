@@ -12,7 +12,10 @@ import {
   transaction,
   updateUser,
 } from '@azzapp/data';
-import { sendTwilioVerificationCode } from '@azzapp/service/twilioHelpers';
+import {
+  sendTwilioVerificationCode,
+  handleTwilioError,
+} from '@azzapp/service/twilioHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import {
@@ -23,6 +26,7 @@ import {
 import { handleSignInAuthMethod } from '#helpers/auth';
 import { withPluginsRoute } from '#helpers/queries';
 import type { User } from '@azzapp/data';
+import type { FetchError } from '@azzapp/shared/networkHelpers';
 
 const SignupSchema = z
   .object({
@@ -166,21 +170,39 @@ export const POST = withPluginsRoute(async (req: Request) => {
     }
 
     const issuer = (email ?? userPhoneNumber) as string;
-    const verification = await sendTwilioVerificationCode(
-      issuer,
-      email ? 'email' : 'sms',
-      locale,
-    );
+    try {
+      const verification = await sendTwilioVerificationCode(
+        issuer,
+        email ? 'email' : 'sms',
+        locale,
+      );
 
-    if (verification && verification.status === 'canceled') {
-      throw new Error('Verification canceled');
+      if (verification && verification.status === 'canceled') {
+        throw new Error('Verification canceled');
+      }
+    } catch (error) {
+      if (handleTwilioError(error as FetchError) === 'invalid_recipient') {
+        return NextResponse.json(
+          {
+            message: email
+              ? ERRORS.EMAIL_NOT_VALID
+              : ERRORS.PHONENUMBER_NOT_VALID,
+          },
+          { status: 400 },
+        );
+      } else {
+        Sentry.captureException(error);
+        return NextResponse.json(
+          { message: ERRORS.INTERNAL_SERVER_ERROR },
+          { status: 500 },
+        );
+      }
     }
 
     return NextResponse.json({
       issuer,
     });
   } catch (error) {
-    console.error(error);
     Sentry.captureException(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },

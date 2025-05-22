@@ -1,5 +1,6 @@
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import env from './env';
+import type { FetchError } from '@azzapp/shared/networkHelpers';
 
 const TWILIO_ACCOUNT_SID = env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = env.TWILIO_AUTH_TOKEN;
@@ -74,6 +75,15 @@ export const sendTwilioVerificationCode = async (
       Locale: locale,
     },
   );
+};
+
+export const handleTwilioError = (error: FetchError) => {
+  switch (error.data?.code) {
+    case 60200:
+      return 'invalid_recipient';
+    default:
+      return null;
+  }
 };
 
 type TwilioVerificationCheckResponse = {

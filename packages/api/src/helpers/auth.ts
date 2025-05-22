@@ -3,7 +3,11 @@ import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { getWebCardById, type Profile, type User } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { sendTwilioVerificationCode } from '../../../service/src/twilioHelpers';
+import { FetchError } from '@azzapp/shared/networkHelpers';
+import {
+  sendTwilioVerificationCode,
+  handleTwilioError,
+} from '@azzapp/service/twilioHelpers';
 import { generateTokens } from './tokens';
 
 export const handleSignInAuthMethod = async (
@@ -18,6 +22,18 @@ export const handleSignInAuthMethod = async (
       (e.message === 'User deleted' || e.message === 'Verification canceled')
     ) {
       return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+    }
+    if (e instanceof FetchError) {
+      if (handleTwilioError(e) === 'invalid_recipient') {
+        return NextResponse.json(
+          {
+            message: user.email
+              ? ERRORS.EMAIL_NOT_VALID
+              : ERRORS.PHONENUMBER_NOT_VALID,
+          },
+          { status: 400 },
+        );
+      }
     }
     Sentry.captureException(e);
     console.error(e);

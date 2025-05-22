@@ -9,6 +9,7 @@ import Purchases from 'react-native-purchases';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
+import ERRORS from '@azzapp/shared/errors';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
@@ -124,15 +125,29 @@ const AccountDetailsPhoneNumberForm = ({
           issuer,
         },
       });
-    } catch (e) {
-      console.error(e);
-      setError('root.server', {
-        message: intl.formatMessage({
-          defaultMessage: 'Unknown error - Please retry',
-          description:
-            'Account Details Screen - Error Unknown error - Please retry',
-        }),
-      });
+    } catch (error) {
+      if (
+        error &&
+        typeof error == 'object' &&
+        'message' in error &&
+        error.message === ERRORS.PHONENUMBER_NOT_VALID
+      ) {
+        setError('phoneNumber', {
+          message: intl.formatMessage({
+            defaultMessage: 'Please enter a valid phone number',
+            description:
+              'Account Details Screen - Error Please enter a valid phone number',
+          }),
+        });
+      } else {
+        setError('root.server', {
+          message: intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description:
+              'Account Details Screen - Error Unknown error - Please retry',
+          }),
+        });
+      }
     }
   };
 

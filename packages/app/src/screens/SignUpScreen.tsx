@@ -155,23 +155,54 @@ const SignUpScreen = () => {
           });
         }
         setIsSubmitting(false);
-      } catch (error: any) {
-        setPhoneOrEmailError(
-          typeof error === 'object' &&
-            error &&
-            'message' in error &&
-            error.message === ERRORS.FORBIDDEN
-            ? intl.formatMessage({
-                defaultMessage:
-                  'Your account has been disabled. Please contact support.',
-                description:
-                  'Signup Screen - Error message when the account has been disabled',
-              })
-            : intl.formatMessage({
-                defaultMessage: 'Unknown error - Please retry',
-                description: 'Signup Screen - Error unknown',
-              }),
-        );
+      } catch (error) {
+        if (error && typeof error == 'object' && 'message' in error) {
+          switch (error.message) {
+            case ERRORS.EMAIL_NOT_VALID:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Please enter a valid email address',
+                  description:
+                    'Signup Screen - Error message for invalid email address',
+                }),
+              );
+              break;
+            case ERRORS.PHONENUMBER_NOT_VALID:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Please enter a valid phone number',
+                  description:
+                    'Signup Screen - Error message for invalid phone number',
+                }),
+              );
+              break;
+            case ERRORS.FORBIDDEN:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage:
+                    'Your account has been disabled. Please contact support.',
+                  description:
+                    'Signup Screen - Error message when the account has been disabled',
+                }),
+              );
+              break;
+
+            default:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Unknown error - Please retry',
+                  description: 'Signup Screen - Error unknown',
+                }),
+              );
+          }
+        } else {
+          setPhoneOrEmailError(
+            intl.formatMessage({
+              defaultMessage: 'Unknown error - Please retry',
+              description: 'Signup Screen - Error unknown',
+            }),
+          );
+        }
 
         setIsSubmitting(false);
       }
