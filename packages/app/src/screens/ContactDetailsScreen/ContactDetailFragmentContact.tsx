@@ -278,16 +278,18 @@ export const ContactDetailFragmentContact = ({
       ))}
       {data?.enrichment?.fields?.emails?.map((email, index) => {
         if (!hiddenFields?.emails?.[index]) {
-          <ContactDetailItem
-            key={'email' + index + '' + email.address}
-            onPress={onPressEmailLink(email)}
-            icon="mail_line"
-            label={email.label}
-            content={email.address}
-            isEnrichedItem
-            state={state}
-            onRemoveField={() => onRemoveField('emails', index)}
-          />;
+          return (
+            <ContactDetailItem
+              key={'email' + index + '' + email.address}
+              onPress={onPressEmailLink(email)}
+              icon="mail_line"
+              label={email.label}
+              content={email.address}
+              isEnrichedItem
+              state={state}
+              onRemoveField={() => onRemoveField('emails', index)}
+            />
+          );
         }
         return null;
       })}
@@ -327,20 +329,22 @@ export const ContactDetailFragmentContact = ({
       ))}
       {data?.enrichment?.fields?.urls?.map((urlAddress, index) => {
         if (!hiddenFields?.urls?.[index]) {
-          <ContactDetailItem
-            key={'url' + index + '' + urlAddress.url}
-            onPress={onPressURLLink(urlAddress)}
-            icon="link"
-            label={intl.formatMessage({
-              defaultMessage: 'Url',
-              description:
-                'ContactDetailsBody - Title for item URL with empty label',
-            })}
-            content={urlAddress.url}
-            isEnrichedItem
-            state={state}
-            onRemoveField={() => onRemoveField('urls', index)}
-          />;
+          return (
+            <ContactDetailItem
+              key={'url' + index + '' + urlAddress.url}
+              onPress={onPressURLLink(urlAddress)}
+              icon="link"
+              label={intl.formatMessage({
+                defaultMessage: 'Url',
+                description:
+                  'ContactDetailsBody - Title for item URL with empty label',
+              })}
+              content={urlAddress.url}
+              isEnrichedItem
+              state={state}
+              onRemoveField={() => onRemoveField('urls', index)}
+            />
+          );
         }
         return null;
       })}
