@@ -1,3 +1,7 @@
+## 2.0.0-canary.16
+
+* **fix:**  - **Contact:** search bar animation IOS only ([#8894](https://github.com/AzzappApp/azzapp/pull/8894))
+
 ## 2.0.0-canary.15
 
 
