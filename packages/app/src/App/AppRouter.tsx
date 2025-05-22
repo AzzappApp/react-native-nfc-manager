@@ -184,7 +184,7 @@ const MainRouter = () => {
     }
   }, [router]);
 
-  const resetCoolDown = useShakeDetector(toggleShakeShare);
+  useShakeDetector(toggleShakeShare);
 
   useEffect(() => {
     router.addRouteDidChangeListener(route => {
@@ -192,10 +192,9 @@ const MainRouter = () => {
         shakeAndShareOpened.current = true;
       } else if (shakeAndShareOpened.current) {
         shakeAndShareOpened.current = false;
-        resetCoolDown();
       }
     });
-  }, [resetCoolDown, router]);
+  }, [router]);
 
   return (
     <RouterProvider value={router}>
