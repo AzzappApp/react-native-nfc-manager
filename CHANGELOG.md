@@ -1,3 +1,11 @@
+## 2.0.0-canary.10
+
+* **fix:**  - **user:** [#8667](https://github.com/AzzappApp/azzapp/pull/8667) manage case when email does not exist ([#8884](https://github.com/AzzappApp/azzapp/pull/8884))
+* **fix:**  - **i18n:** [#8508](https://github.com/AzzappApp/azzapp/pull/8508) reorganize messages + add api  ([#8877](https://github.com/AzzappApp/azzapp/pull/8877))
+* **build:**  - error in version number variable
+* **fix:**  - **Contact:** properly handle all connections ([#8885](https://github.com/AzzappApp/azzapp/pull/8885))
+* **fix:**  - add missing return which prevent to display url and email ([#8886](https://github.com/AzzappApp/azzapp/pull/8886))
+
 ## 2.0.0-canary.9
 
 
