@@ -1,3 +1,7 @@
+## 2.0.0-canary.12
+
+* **fix:**  - **shakeAndShare:** [#8628](https://github.com/AzzappApp/azzapp/pull/8628) review implementation of shake detector ([#8892](https://github.com/AzzappApp/azzapp/pull/8892))
+
 ## 2.0.0-canary.11
 
 
