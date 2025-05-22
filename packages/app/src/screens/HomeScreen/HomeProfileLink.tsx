@@ -11,6 +11,7 @@ import Animated, {
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
+import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
