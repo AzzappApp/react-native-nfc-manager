@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -11,7 +11,6 @@ import Animated, {
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
-import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
@@ -115,7 +114,6 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
       >
         <Icon icon="link" style={styles.iconLink} />
         <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
-        <View style={styles.emptyViewCenter} />
       </PressableNative>
     </Animated.View>
   );
@@ -159,30 +157,24 @@ const styles = StyleSheet.create({
   },
   url: {
     maxWidth: '90%',
-    color: colors.white,
+    color: `${colors.white}BF`,
     lineHeight: 14,
     top: Platform.OS === 'ios' ? 1 : 0,
     height: 16,
-    paddingLeft: 5,
   },
   iconLink: {
-    tintColor: colors.white,
-    marginLeft: 10,
+    tintColor: `${colors.white}BF`,
     height: 18,
     width: 18,
   },
   containerText: {
     height: PROFILE_LINK_HEIGHT,
-    borderWidth: 1,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  emptyViewCenter: {
-    marginRight: 13,
-    height: 18,
+    backgroundColor: `${colors.white}1A`,
+    gap: 10,
+    paddingHorizontal: 13,
   },
 });
