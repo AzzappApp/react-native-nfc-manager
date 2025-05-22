@@ -11,8 +11,8 @@ import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
+import AccountHeader from '#components/AccountHeader';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import CoverRenderer from '#components/CoverRenderer';
 import MultiUserDescription from '#components/MultiUserDescription';
 import {
   useRouter,
@@ -26,7 +26,6 @@ import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -35,7 +34,6 @@ import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
-import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
@@ -81,6 +79,7 @@ const multiUserScreenQuery = graphql`
           }
           requiresSubscription
           isPremium
+          ...AccountHeader_webCard
         }
       }
     }
@@ -352,19 +351,12 @@ const MultiUserScreen = ({
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const [searching, setSearchMode, removeSearchMode] = useBoolean(false);
 
-  const { top } = useScreenInsets();
-
-  const contentContainerStyle = useMemo(
-    () => ({ flex: 1, paddingTop: top }),
-    [top],
-  );
-
   if (!profile) {
     return null;
   }
 
   return (
-    <Container style={contentContainerStyle}>
+    <Container style={styles.contentContainerStyle}>
       {transferOwnerMode ? (
         <Header
           middleElement={intl.formatMessage({
@@ -392,35 +384,12 @@ const MultiUserScreen = ({
           }
         />
       ) : (
-        <Header
-          middleElement={intl.formatMessage({
+        <AccountHeader
+          title={intl.formatMessage({
             defaultMessage: 'Multi user',
             description: 'MultiUserScreen - Multi user title',
           })}
-          rightElement={
-            <PressableNative
-              onPress={router.back}
-              accessibilityRole="link"
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Go back',
-                description: 'Go back button in multi user header',
-              })}
-            >
-              <CoverRenderer
-                webCard={profile?.webCard}
-                width={COVER_WIDTH}
-                style={{ marginBottom: -1 }}
-              />
-            </PressableNative>
-          }
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              onPress={router.back}
-              iconSize={28}
-              variant="icon"
-            />
-          }
+          webCard={profile.webCard}
         />
       )}
       <View style={styles.content}>
@@ -512,9 +481,10 @@ const MultiUserScreen = ({
   );
 };
 
-const COVER_WIDTH = 29;
-
 const styleSheet = createStyleSheet(appearance => ({
+  contentContainerStyle: {
+    flex: 1,
+  },
   sharedIcon: {
     margin: 'auto',
     marginTop: 15,
@@ -524,6 +494,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: 10,
+    paddingTop: 0,
     flex: 1,
   },
   loaderContainer: {
