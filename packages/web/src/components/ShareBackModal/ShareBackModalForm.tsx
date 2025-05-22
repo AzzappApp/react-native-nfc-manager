@@ -53,7 +53,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
       return isValid;
     },
     shouldValidate: 'onSubmit',
-    shouldRevalidate: 'onSubmit',
+    shouldRevalidate: 'onInput',
   });
 
   useEffect(() => {

@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const emailSchema = z.string().optional();
 export const phoneNumberSchema = z
   .object({
-    number: z.string().optional(),
-    countryCode: z.string().optional(),
+    countryCode: z.string(),
+    number: z.string(),
   })
   .optional();
 

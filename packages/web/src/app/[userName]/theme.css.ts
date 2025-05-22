@@ -8,6 +8,7 @@ export const [themeClass, vars] = createTheme({
     grey200: '#c8c7ca',
     grey300: '#B5B4B8',
     grey400: '#a1a1a5',
+    grey600: '#a1a1a5',
     grey900: '#45444c',
     grey1000: '#2C2B32;',
     green: '#0FD59E',
@@ -15,6 +16,8 @@ export const [themeClass, vars] = createTheme({
     pureBlack: '#000000',
     white: '#fff',
     transparent: 'transparent',
+    error: '#FF2E54',
+    warn: 'rgba(255,46,84,0.3)',
   },
   fontWeight: {
     extraBold: '800',
@@ -102,6 +105,12 @@ export const textHyperLink = style({
   fontSize: '12px',
   lineHeight: '15px',
   textDecoration: 'underline',
+});
+
+export const textFieldError = style({
+  fontWeight: vars.fontWeight.regular,
+  fontSize: '12px',
+  lineHeight: 'normal',
 });
 
 export enum MediaQuery {

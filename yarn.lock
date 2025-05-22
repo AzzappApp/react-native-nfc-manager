@@ -1065,6 +1065,7 @@ __metadata:
     react-lottie: "npm:^1.2.10"
     server-only: "npm:^0.0.1"
     sharp: "npm:^0.33.5"
+    use-debounce: "npm:^10.0.4"
     zod: "npm:^3.24.3"
   languageName: unknown
   linkType: soft
