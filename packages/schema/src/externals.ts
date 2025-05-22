@@ -6,6 +6,7 @@ import type { Locale } from '@azzapp/i18n';
 type Parameters = {
   profile?: Profile;
   contact?: Partial<ContactInput>;
+  qrCodeKey?: string | null;
 };
 
 export const notifyUsers =

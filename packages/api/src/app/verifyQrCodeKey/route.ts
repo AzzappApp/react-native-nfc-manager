@@ -2,20 +2,15 @@ import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import {
-  createId,
-  getContactCardAccessById,
-  updateContactCardAccessLastRead,
-  getProfileWithWebCardById,
-} from '@azzapp/data';
+import { createId } from '@azzapp/data';
 import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import { displayName } from '@azzapp/shared/contactCardHelpers';
-import { importPublicKey, verifyMessage } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { deserializeGeolocation } from '@azzapp/shared/urlHelpers';
 import env from '#env';
 import cors from '#helpers/cors';
+import { verifyContactCardAccess } from '#helpers/qrCode';
 import { withPluginsRoute } from '#helpers/queries';
 import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 
@@ -60,85 +55,58 @@ const verifyQrCodeKeyApi = async (req: Request) => {
     return new Response('Invalid request', { status: 400 });
   }
   const { key, contactCardAccessId, geolocation, userName } = result.data;
-
-  const contactCardAccess = await getContactCardAccessById(contactCardAccessId);
-
-  if (!contactCardAccess || contactCardAccess.isRevoked) {
-    return NextResponse.json(
-      { message: ERRORS.INVALID_REQUEST },
-      { status: 400 },
+  try {
+    const { profile, webCard } = await verifyContactCardAccess(
+      contactCardAccessId,
+      key,
+      userName,
     );
-  }
 
-  const cryptoKey = await importPublicKey(key);
+    if (profile) {
+      const avatarUrl = await buildAvatarUrl(profile, webCard);
 
-  const isValid = await verifyMessage(
-    cryptoKey,
-    contactCardAccess.profileId,
-    contactCardAccess.signature,
-  );
-
-  if (!isValid) {
-    return NextResponse.json(
-      { message: ERRORS.INVALID_REQUEST },
-      { status: 400 },
-    );
-  }
-
-  await updateContactCardAccessLastRead(contactCardAccessId);
-
-  const res = await getProfileWithWebCardById(contactCardAccess.profileId);
-  if (!res) {
-    return NextResponse.json(
-      { message: ERRORS.INVALID_REQUEST },
-      { status: 400 },
-    );
-  }
-  const { profile: storedProfile, webCard } = res;
-
-  if (webCard?.userName?.toLowerCase() !== userName.toLowerCase()) {
-    return NextResponse.json(
-      { message: ERRORS.INVALID_REQUEST },
-      { status: 400 },
-    );
-  }
-
-  if (storedProfile) {
-    const avatarUrl = await buildAvatarUrl(storedProfile, webCard);
-
-    // the payload has been copied from verifySign - don’t understand why we have all these fields (seems there is duplication with the response) - to be analyzed
-    const token = await new SignJWT({
-      avatarUrl,
-      userId: storedProfile.userId,
-      isMultiUser: webCard?.isMultiUser,
-      firstName: storedProfile.contactCard?.firstName ?? '',
-      lastName: storedProfile.contactCard?.lastName ?? '',
-      company: storedProfile.contactCard?.company ?? '',
-      title: storedProfile.contactCard?.title ?? '',
-      userName: webCard?.userName,
-      geolocation: geolocation ? deserializeGeolocation(geolocation) : null,
-    } satisfies VerifySignToken)
-      .setJti(createId())
-      .setIssuer('azzapp')
-      .setSubject('contact-card')
-      .setIssuedAt()
-      .setExpirationTime('20m')
-      .setProtectedHeader({ alg: 'HS256' })
-      .sign(new TextEncoder().encode(JWT_SECRET));
-    return NextResponse.json(
-      {
+      // the payload has been copied from verifySign - don’t understand why we have all these fields (seems there is duplication with the response) - to be analyzed
+      const token = await new SignJWT({
         avatarUrl,
-        profileId: storedProfile.id,
-        contactCard: mergeContactCardWithCommonInfos(
-          webCard,
-          storedProfile.contactCard,
-        ),
-        displayName: displayName(storedProfile.contactCard ?? {}, webCard),
-        token,
-      },
-      { status: 200 },
-    );
-  } else {
+        userId: profile.userId,
+        isMultiUser: webCard?.isMultiUser,
+        firstName: profile.contactCard?.firstName ?? '',
+        lastName: profile.contactCard?.lastName ?? '',
+        company: profile.contactCard?.company ?? '',
+        title: profile.contactCard?.title ?? '',
+        userName: webCard?.userName,
+        geolocation: geolocation ? deserializeGeolocation(geolocation) : null,
+      } satisfies VerifySignToken)
+        .setJti(createId())
+        .setIssuer('azzapp')
+        .setSubject('contact-card')
+        .setIssuedAt()
+        .setExpirationTime('20m')
+        .setProtectedHeader({ alg: 'HS256' })
+        .sign(new TextEncoder().encode(JWT_SECRET));
+      return NextResponse.json(
+        {
+          avatarUrl,
+          profileId: profile.id,
+          contactCard: mergeContactCardWithCommonInfos(
+            webCard,
+            profile.contactCard,
+          ),
+          displayName: displayName(profile.contactCard ?? {}, webCard),
+          token,
+        },
+        { status: 200 },
+      );
+    } else {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_REQUEST },
+        { status: 400 },
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },

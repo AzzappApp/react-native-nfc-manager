@@ -1,39 +1,19 @@
 import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
 import { type Profile, type WebCard } from '@azzapp/data';
-import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
+import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
 import { sendEmail, sendTemplateEmail } from '@azzapp/service/emailServices';
 import { createServerIntl } from '@azzapp/service/i18nServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
-import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import {
   AZZAPP_URL_WEBSITE,
   buildInviteUrl,
-  buildUserUrlWithContactCard,
+  buildUserUrlWithKey,
 } from '@azzapp/shared/urlHelpers';
-import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFromContactCard } from '@azzapp/shared/vCardHelpers';
 import { sendTwilioSMS } from '../../../service/src/twilioHelpers';
 import type { Locale } from '@azzapp/i18n';
-import type { VCardAdditionnalData } from '@azzapp/shared/vCardHelpers';
-
-const buildWebcardUrl = async (profile: Profile, webCard: WebCard) => {
-  const { data, signature } = await serializeAndSignContactCard(
-    webCard?.userName ?? '',
-    profile.id,
-    profile.webCardId,
-    profile.contactCard ?? {},
-    webCard.isMultiUser ? webCard?.commonInformation : null,
-  );
-
-  const url = buildUserUrlWithContactCard(
-    webCard?.userName ?? '',
-    data,
-    signature,
-  );
-
-  return url;
-};
 
 type Parameters = {
   profile?: Profile;
@@ -41,6 +21,7 @@ type Parameters = {
     firstName?: string;
     lastName?: string;
   };
+  qrCodeKey?: string | null;
 };
 
 export const notifyUsers =
@@ -258,45 +239,40 @@ export const notifyUsers =
                 webCard.commonInformation?.company ??
                 profile.contactCard?.company;
 
-              const additionalData: VCardAdditionnalData = {
-                urls: (webCard.commonInformation?.urls ?? [])?.concat(
-                  profile.contactCard?.urls ?? [],
-                ),
-                socials: (webCard.commonInformation?.socials ?? [])?.concat(
-                  profile.contactCard?.socials ?? [],
-                ),
-              };
-
               const avatarUrl = await buildAvatarUrl(
                 profile,
                 webCard,
                 false,
                 false,
               );
+              let avatar;
               if (avatarUrl) {
                 const data = await fetch(avatarUrl);
                 const blob = await data.arrayBuffer();
                 const base64 = Buffer.from(blob).toString('base64');
 
-                additionalData.avatar = {
+                avatar = {
                   type:
                     data.headers.get('content-type')?.split('/')[1] ?? 'png',
                   base64,
                 };
               }
-              const vCard = await buildVCardFromSerializedContact(
+
+              const { vCard } = await buildVCardFromContactCard(
                 webCard.userName,
-                serializeContactCard(
-                  profile.id,
-                  webCard.id,
-                  profile.contactCard,
-                  webCard.commonInformation,
-                ),
-                additionalData,
+                profile.id,
+                mergeContactCardWithCommonInfos(webCard, profile.contactCard),
+                avatar,
               );
 
               const coverUrl = `${apiEndpoint}/cover/${webCard.userName}?width=200&height=320&t=${webCard.updatedAt.getTime()}`;
-              const webCardUrl = await buildWebcardUrl(profile, webCard);
+              const webCardUrl = parameters.qrCodeKey
+                ? buildUserUrlWithKey({
+                    userName: webCard.userName,
+                    key: parameters.qrCodeKey,
+                  })
+                : undefined;
+
               const vcardName =
                 formatDisplayName(
                   profile.contactCard?.firstName,
@@ -309,7 +285,7 @@ export const notifyUsers =
                 attachments: vCard
                   ? [
                       {
-                        content: Buffer.from(vCard.vCard.toString()).toString(
+                        content: Buffer.from(vCard.toString()).toString(
                           'base64',
                         ),
                         filename: `${vcardName}.vcf`,

@@ -10,18 +10,12 @@ import {
   buildDefaultContactCard,
   getContactCardAccessById,
   getProfileById,
-  getProfileByUserAndWebCard,
   getWebCardById,
   updateContactCardAccessHasGooglePass,
   updateHasGooglePass,
 } from '@azzapp/data';
-import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import ERRORS from '@azzapp/shared/errors';
-import {
-  buildUserUrlWithContactCard,
-  buildUserUrlWithKey,
-  buildWebUrl,
-} from '@azzapp/shared/urlHelpers';
+import { buildUserUrlWithKey, buildWebUrl } from '@azzapp/shared/urlHelpers';
 import env from '#env';
 import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';
@@ -43,8 +37,6 @@ const getGoogleWalletPass = async (
 ) => {
   const searchParams = new URL(req.url).searchParams;
 
-  const webCardId = searchParams.get('webCardId');
-
   const contactCardAccessId = searchParams.get('contactCardAccessId');
 
   const key = searchParams.get('key');
@@ -64,15 +56,18 @@ const getGoogleWalletPass = async (
 
     let profile;
 
-    if (hasPassData) {
-      const contactCardAccess =
-        await getContactCardAccessById(contactCardAccessId);
+    if (!hasPassData) {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_REQUEST },
+        { status: 422 },
+      );
+    }
 
-      if (contactCardAccess && !contactCardAccess.isRevoked) {
-        profile = await getProfileById(contactCardAccess.profileId);
-      }
-    } else if (webCardId) {
-      profile = await getProfileByUserAndWebCard(userId, webCardId);
+    const contactCardAccess =
+      await getContactCardAccessById(contactCardAccessId);
+
+    if (contactCardAccess && !contactCardAccess.isRevoked) {
+      profile = await getProfileById(contactCardAccess.profileId);
     }
 
     if (!profile) {
@@ -126,29 +121,11 @@ const getGoogleWalletPass = async (
       contactCard = await buildDefaultContactCard(webCard, currentUserId);
     }
 
-    let barCodeUrl;
-
-    if (hasPassData) {
-      barCodeUrl = buildUserUrlWithKey({
-        userName: webCard?.userName ?? '',
-        contactCardAccessId,
-        key,
-      });
-    } else {
-      const { data, signature } = await serializeAndSignContactCard(
-        webCard?.userName ?? '',
-        profile.id,
-        profile.webCardId,
-        contactCard,
-        webCard?.isMultiUser ? webCard?.commonInformation : undefined,
-      );
-
-      barCodeUrl = buildUserUrlWithContactCard(
-        webCard?.userName ?? '',
-        data,
-        signature,
-      );
-    }
+    const barCodeUrl = buildUserUrlWithKey({
+      userName: webCard?.userName ?? '',
+      contactCardAccessId,
+      key,
+    });
 
     const objectData: GenericObject = {
       // Define the object data

@@ -43,7 +43,14 @@ import type { Contact, ContactRow, NewContact, Profile } from '@azzapp/data';
 
 export const createContact: MutationResolvers['createContact'] = async (
   _,
-  { profileId: gqlProfileId, input, notify, scanUsed, withShareBack },
+  {
+    profileId: gqlProfileId,
+    input,
+    notify,
+    scanUsed,
+    withShareBack,
+    qrCodeKey,
+  },
   context,
 ) => {
   const user = await getSessionUser();
@@ -255,6 +262,7 @@ export const createContact: MutationResolvers['createContact'] = async (
           firstName: input.firstName,
           lastName: input.lastName,
         },
+        qrCodeKey,
       },
     );
   }

@@ -139,16 +139,4 @@ export function buildEmailSignatureGenerationUrlWithKey(
   return `${buildWebUrl(userName)}/emailsignature?k=${compressedData}`;
 }
 
-export function buildEmailSignatureGenerationUrl(
-  userName: string,
-  serializedEmail: string,
-  signature: string,
-) {
-  const compressedData = compressToEncodedURIComponent(
-    JSON.stringify([serializedEmail, signature]),
-  );
-
-  return `${buildWebUrl(userName)}/emailsignature?e=${compressedData}`;
-}
-
 export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';

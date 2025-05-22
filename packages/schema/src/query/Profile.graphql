@@ -73,21 +73,6 @@ type Profile implements Node {
   """
   contactCardAccessId(deviceId: String!): ID
 
-  contactCardQrCode(
-    width: Int!
-    location: LocationInput
-    address: AddressInput
-    dark: String
-    light: String
-    deviceId: String
-    key: String
-  ): String! @deprecated(reason: "Use contact card url builder instead")
-
-  contactCardUrl(deviceId:String, key:String): String! @deprecated(reason: "Use contact card url builder instead")
-
-  serializedContactCard: String!
-    @deprecated(reason: "Use contactCardUrl instead")
-
   webCard: WebCard
 
   """

@@ -1,40 +1,37 @@
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
-import { getProfileById, getWebCardById } from '@azzapp/data';
-import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
+import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
-import {
-  buildVCardFileName,
-  parseContactCard,
-} from '@azzapp/shared/contactCardHelpers';
-import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
-import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
+import { buildVCardFromContactCard } from '@azzapp/shared/vCardHelpers';
 
 import cors from '#helpers/cors';
+import { verifyContactCardAccess } from '#helpers/qrCode';
 import { withPluginsRoute } from '#helpers/queries';
 import type { NextRequest } from 'next/server';
 
 const downloadVCard = async (req: NextRequest) => {
   const { searchParams } = req.nextUrl;
-  const c = searchParams.get('c');
+  const k = searchParams.get('k');
   const username = searchParams.get('u');
 
-  if (!c || !username) {
+  if (!k || !username) {
     return new NextResponse(null, {
       status: 400,
     });
   }
 
-  let contactData: string;
-  let signature: string;
+  let contactCardAccessId: string;
+  let key: string;
+
   try {
-    [contactData, signature] = JSON.parse(
-      decompressFromEncodedURIComponent(c as string),
+    [contactCardAccessId, key] = JSON.parse(
+      decompressFromEncodedURIComponent(k) || atob(decodeURIComponent(k)),
     );
   } catch {
     Sentry.captureException(
-      `ShareBack Invalid request - unable to parse contact data and signature from query string ${c}`,
+      `ShareBack Invalid request - unable to parse contact data and signature from query string ${k}`,
     );
 
     return new NextResponse(null, {
@@ -42,9 +39,9 @@ const downloadVCard = async (req: NextRequest) => {
     });
   }
 
-  if (!contactData || !signature) {
+  if (!contactCardAccessId || !key) {
     Sentry.captureException(
-      `ShareBack Invalid request - contact data or signature missing from query string ${c}`,
+      `ShareBack Invalid request - contact card access id or key missing from query string ${k}`,
     );
 
     return new NextResponse(null, {
@@ -52,63 +49,42 @@ const downloadVCard = async (req: NextRequest) => {
     });
   }
 
-  const isValid = await verifyHmacWithPassword(
-    CONTACT_CARD_SIGNATURE_SECRET,
-    signature,
-    decodeURIComponent(contactData),
-    { salt: username },
+  const { profile, webCard } = await verifyContactCardAccess(
+    contactCardAccessId,
+    key,
+    username,
   );
 
-  if (!isValid) {
-    Sentry.captureException(
-      `ShareBack Invalid request - signature is not valid from query string ${c}`,
-    );
-    return new NextResponse(null, {
-      status: 400,
-    });
-  }
+  const contactCard = mergeContactCardWithCommonInfos(
+    webCard,
+    profile.contactCard,
+  );
 
-  const buildVCardContact = parseContactCard(decodeURIComponent(contactData));
+  const avatarUrl = profile && (await buildAvatarUrl(profile, webCard));
 
-  const [storedProfile, webCard] = await Promise.all([
-    getProfileById(buildVCardContact.profileId),
-    getWebCardById(buildVCardContact.webCardId),
-  ]);
+  let avatar;
 
-  const avatarUrl =
-    storedProfile && (await buildAvatarUrl(storedProfile, webCard));
-
-  const additionalData = {
-    urls: (webCard?.commonInformation?.urls ?? []).concat(
-      storedProfile?.contactCard?.urls || [],
-    ),
-    socials: (webCard?.commonInformation?.socials ?? []).concat(
-      storedProfile?.contactCard?.socials || [],
-    ),
-    avatarUrl,
-    avatar: undefined as { type: string; base64: string } | undefined,
-  };
-
-  if (additionalData.avatarUrl) {
-    const data = await fetch(additionalData.avatarUrl);
+  if (avatarUrl) {
+    const data = await fetch(avatarUrl);
     const blob = await data.arrayBuffer();
     const base64 = Buffer.from(blob).toString('base64');
 
-    additionalData.avatar = {
+    avatar = {
       type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
       base64,
     };
   }
 
-  const { vCard } = await buildVCardFromSerializedContact(
-    webCard?.userName ?? '',
-    contactData,
-    additionalData,
+  const vCard = await buildVCardFromContactCard(
+    webCard.userName,
+    profile.id,
+    contactCard,
+    avatar,
   );
 
   const vCardContactString = vCard.toString();
 
-  const vCardFileName = buildVCardFileName('', buildVCardContact);
+  const vCardFileName = buildVCardFileName('', profile.contactCard ?? {});
 
   return new Response(vCardContactString, {
     headers: {

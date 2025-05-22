@@ -1,14 +1,15 @@
+import * as ed from '@noble/ed25519';
 import {
   getProfileWithWebCardById,
   getUserById,
   getActiveContactCardAccess,
+  createId,
+  saveOrUpdateContactCardAccess,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
+
 import { sendTemplateEmail } from '@azzapp/service/emailServices';
-import {
-  serializeAndSignEmailSignature,
-  serializeAndSignEmailSignatureLinkParams,
-} from '@azzapp/service/emailSignatureServices';
+import { serializeAndSignEmailSignatureLinkParams } from '@azzapp/service/emailSignatureServices';
 import { createServerIntl } from '@azzapp/service/i18nServices';
 import {
   buildAvatarUrl,
@@ -16,13 +17,12 @@ import {
   buildLogoUrl,
 } from '@azzapp/service/mediaServices/mediaServices';
 import { getEmailSignatureTitleColor } from '@azzapp/shared/colorsHelpers';
-import {
-  buildEmailSignatureGenerationUrl,
-  buildEmailSignatureGenerationUrlWithKey,
-} from '@azzapp/shared/urlHelpers';
+import { buildEmailSignatureGenerationUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { inngest } from '../client';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
+
+const SERVER_DEVICE_ID_PREFIX = 'azzapp-server';
 
 export const sendEmailSignatureBatch = inngest.createFunction(
   { id: 'emailSignatureBatch' },
@@ -47,10 +47,27 @@ export const sendEmailSignature = inngest.createFunction(
   { id: 'emailSignature' },
   { event: 'send/emailSignature' },
   async ({ event }) => {
-    const { profileId, deviceId, key } = event.data;
+    const { profileId } = event.data;
+
+    let { deviceId, key } = event.data;
 
     const res = await getProfileWithWebCardById(profileId);
     if (res) {
+      if (!deviceId || !key) {
+        const privateKey = ed.utils.randomPrivateKey();
+        const message = new TextEncoder().encode(profileId);
+        key = Buffer.from(await ed.getPublicKeyAsync(privateKey)).toString(
+          'base64',
+        );
+        const signature = Buffer.from(
+          await ed.signAsync(message, privateKey),
+        ).toString('base64');
+
+        deviceId = `${SERVER_DEVICE_ID_PREFIX}-${createId()}`;
+
+        await saveOrUpdateContactCardAccess(deviceId, profileId, signature);
+      }
+
       const { profile, webCard } = res;
       const user = await getUserById(profile.userId);
       const locale = isSupportedLocale(user?.locale)
@@ -83,8 +100,8 @@ const generateEmailSignature = async ({
   webCard: WebCard;
   profile: Profile;
   intl: IntlShape;
-  deviceId?: string;
-  key?: string;
+  deviceId: string;
+  key: string;
 }) => {
   if (!webCard.userName) {
     throw new Error('User name is required');
@@ -125,23 +142,6 @@ const generateEmailSignature = async ({
         signature,
       );
     }
-  }
-
-  if (!linkUrl) {
-    const { data, signature } = await serializeAndSignEmailSignature(
-      webCard.userName,
-      profile.id,
-      webCard.id,
-      profile.contactCard,
-      webCard.isMultiUser ? webCard.commonInformation : undefined,
-      avatarUrl,
-    );
-
-    linkUrl = buildEmailSignatureGenerationUrl(
-      webCard.userName,
-      data,
-      signature,
-    );
   }
 
   const user = await getUserById(profile.userId);

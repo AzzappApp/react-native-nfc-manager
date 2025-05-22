@@ -8,14 +8,9 @@ import {
   buildDefaultContactCard,
   getWebCardById,
 } from '@azzapp/data';
-import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
-import {
-  buildWebUrl,
-  buildUserUrlWithContactCard,
-  buildUserUrlWithKey,
-} from '@azzapp/shared/urlHelpers';
+import { buildWebUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import env from '#env';
 import type { Profile, WebCard } from '@azzapp/data';
 
@@ -169,23 +164,6 @@ export const buildApplePass = async ({
           contactCardAccessId,
           key,
         }),
-        format: 'PKBarcodeFormatQR',
-      });
-    } else {
-      const { data, signature } = await serializeAndSignContactCard(
-        webCard.userName ?? '',
-        profile.id,
-        webCard.id,
-        contactCard,
-        webCard.isMultiUser ? webCard.commonInformation : undefined,
-      );
-
-      pass.setBarcodes({
-        message: buildUserUrlWithContactCard(
-          webCard?.userName ?? '',
-          data,
-          signature,
-        ),
         format: 'PKBarcodeFormatQR',
       });
     }

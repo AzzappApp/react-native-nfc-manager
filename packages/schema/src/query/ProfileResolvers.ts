@@ -3,7 +3,6 @@ import {
   connectionFromArraySlice,
   cursorToOffset,
 } from 'graphql-relay';
-import { toString } from 'qrcode';
 import {
   getColorPalettes,
   getCardTemplateTypes,
@@ -18,15 +17,8 @@ import {
   searchContacts,
   getActiveContactCardAccess,
 } from '@azzapp/data';
-import { serializeAndSignContactCard } from '@azzapp/service/contactCardSerializationServices';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
-import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
-import {
-  buildWebUrl,
-  buildUserUrlWithContactCard,
-  buildUserUrlWithKey,
-} from '@azzapp/shared/urlHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
   contactCountForProfileLoader,
@@ -49,11 +41,7 @@ import {
 } from '#helpers/permissionsHelpers';
 import { searchPexelsPhotos, searchPexelsVideos } from '#helpers/pexelsClient';
 import { idResolver } from '#helpers/relayIdHelpers';
-import type {
-  LocationInput,
-  AddressInput,
-  ProfileResolvers,
-} from '#/__generated__/types';
+import type { ProfileResolvers } from '#/__generated__/types';
 import type { PexelsSearchResult } from '#helpers/pexelsClient';
 import type { Profile } from '@azzapp/data';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -253,40 +241,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return null;
     }
     return profileLoader.load(profile.invitedBy);
-  },
-  serializedContactCard: async profile => {
-    if (!profileIsAssociatedToCurrentUser(profile)) {
-      return '';
-    }
-    const webCard = await webCardLoader.load(profile.webCardId);
-    return serializeContactCard(
-      profile.id,
-      profile.webCardId,
-      profile.contactCard ?? {},
-      webCard?.isMultiUser ? webCard?.commonInformation : undefined,
-    );
-  },
-  contactCardUrl: async (profile, { deviceId, key }) => {
-    return getContactCardUrl({ profile, deviceId, key });
-  },
-  contactCardQrCode: async (
-    profile,
-    { width, location, address, dark, light, deviceId, key },
-  ) => {
-    const result = await toString(
-      await getContactCardUrl({ profile, location, address, deviceId, key }),
-      {
-        errorCorrectionLevel: 'L',
-        width,
-        type: 'svg',
-        color: {
-          dark: dark || '#000',
-          light: light || '#0000',
-        },
-        margin: 0,
-      },
-    );
-    return result;
   },
   webCard: async profile => {
     const webcard = await webCardLoader.load(profile.webCardId);
@@ -670,55 +624,3 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
 };
 
 export { ProfileResolverImpl as Profile };
-
-const getContactCardUrl = async ({
-  profile,
-  location,
-  address,
-  deviceId,
-  key,
-}: {
-  profile: Profile;
-  location?: LocationInput | null;
-  address?: AddressInput | null;
-  deviceId?: string | null;
-  key?: string | null;
-}) => {
-  const webCard = await webCardLoader.load(profile.webCardId);
-
-  if (!webCard?.userName || !profileIsAssociatedToCurrentUser(profile)) {
-    return buildWebUrl(webCard?.userName);
-  }
-
-  const geolocation = location && address ? { location, address } : null;
-
-  if (deviceId && key) {
-    const activeContactCardAccess = await getActiveContactCardAccess(
-      deviceId,
-      profile.id,
-    );
-    const url = buildUserUrlWithKey({
-      userName: webCard?.userName ?? '',
-      key,
-      contactCardAccessId: activeContactCardAccess?.id,
-      geolocation,
-    });
-    return url;
-  }
-
-  const { data, signature } = await serializeAndSignContactCard(
-    webCard?.userName ?? '',
-    profile.id,
-    profile.webCardId,
-    profile.contactCard ?? {},
-    webCard?.isMultiUser ? webCard?.commonInformation : null,
-  );
-
-  const url = buildUserUrlWithContactCard(
-    webCard?.userName ?? '',
-    data,
-    signature,
-    geolocation,
-  );
-  return url;
-};

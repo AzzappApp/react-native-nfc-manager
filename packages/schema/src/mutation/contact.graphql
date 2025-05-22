@@ -7,6 +7,7 @@ extend type Mutation {
     scanUsed: Boolean
     notify: Boolean
     withShareBack: Boolean!
+    qrCodeKey: String
   ): ContactPayload
 
   removeContacts(

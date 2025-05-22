@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { Keyboard, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useMutation } from 'react-relay';
+import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
@@ -18,8 +18,6 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
-
-import { getAuthState } from '#helpers/authStore';
 import {
   addContactUpdater,
   contactSchema,
@@ -50,8 +48,10 @@ import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useCurrentLocation } from '#hooks/useLocation';
+import useQRCodeKey from '#hooks/useQRCodeKey';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
@@ -61,19 +61,19 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCreateForm from './ContactCreateForm';
-import type {
-  NativeScreenProps,
-  ScreenOptions,
-} from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCreateScreenMutation } from '#relayArtifacts/ContactCreateScreenMutation.graphql';
+import type { ContactCreateScreenQuery } from '#relayArtifacts/ContactCreateScreenQuery.graphql';
 import type { ContactCreateRoute } from '#routes';
 import type { vCard } from '@lepirlouit/vcard-parser';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ContactCreateScreen = ({
+  preloadedQuery,
   route: { params },
-}: NativeScreenProps<ContactCreateRoute>) => {
+}: RelayScreenProps<ContactCreateRoute, ContactCreateScreenQuery>) => {
+  const { node } = usePreloadedQuery(contactCreateScreenQuery, preloadedQuery);
   const styles = useStyleSheet(stylesheet);
 
   const [notifyError, setNotifyError] = useState(false);
@@ -83,12 +83,15 @@ const ContactCreateScreen = ({
   const currentLocation = useCurrentLocation();
   const { location, address } = currentLocation?.value || {};
 
+  const qrCodeKey = useQRCodeKey(node?.profile);
+
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(
       $profileId: ID!
       $contact: ContactInput!
       $notify: Boolean!
       $scanUsed: Boolean!
+      $qrCodeKey: String
     ) {
       createContact(
         profileId: $profileId
@@ -96,6 +99,7 @@ const ContactCreateScreen = ({
         notify: $notify
         scanUsed: $scanUsed
         withShareBack: false
+        qrCodeKey: $qrCodeKey
       ) {
         contact {
           id
@@ -107,7 +111,7 @@ const ContactCreateScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
-  const profileId = getAuthState().profileInfos?.profileId;
+
   const [notify, toggleNotify] = useToggle(true);
   const [scanUsed, setScan] = useBoolean(false);
 
@@ -129,7 +133,7 @@ const ContactCreateScreen = ({
     setNotifyError(false);
     Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
-      if (!profileId) {
+      if (!node?.profile?.id) {
         return;
       }
       if (notify && data.emails.length <= 0) {
@@ -210,9 +214,10 @@ const ContactCreateScreen = ({
 
       commit({
         variables: {
-          profileId,
+          profileId: node.profile.id,
           scanUsed,
           notify,
+          qrCodeKey,
           contact: {
             avatarId,
             logoId,
@@ -303,8 +308,9 @@ const ContactCreateScreen = ({
     handleSubmit,
     intl,
     location,
+    node?.profile?.id,
     notify,
-    profileId,
+    qrCodeKey,
     router,
     scanUsed,
   ]);
@@ -617,8 +623,23 @@ const stylesheet = createStyleSheet(appearance => ({
   scanButton: { marginHorizontal: 20, marginVertical: 10 },
 }));
 
-ContactCreateScreen.getScreenOptions = (): ScreenOptions => ({
-  stackAnimation: 'slide_from_bottom',
-});
+const contactCreateScreenQuery = graphql`
+  query ContactCreateScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        id
+        ...useQRCodeKey_profile
+      }
+    }
+  }
+`;
 
-export default ContactCreateScreen;
+export default relayScreen(ContactCreateScreen, {
+  query: contactCreateScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId,
+  }),
+  getScreenOptions: () => ({
+    stackAnimation: 'slide_from_bottom',
+  }),
+});

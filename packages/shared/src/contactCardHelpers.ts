@@ -1,4 +1,4 @@
-import { json2csv, csv2json } from 'csv42';
+import { csv2json } from 'csv42';
 import type { SocialLinkId } from './socialLinkHelpers';
 import type { VCardAdditionnalData } from './vCardHelpers';
 
@@ -72,38 +72,6 @@ type ParsedContactCard = [
   Array<[string, string]>,
   string | undefined,
 ];
-
-/**
- * Serializes a contact card to a string
- */
-export const serializeContactCard = (
-  profileId: string,
-  webCardId: string,
-  card: ContactCard | null,
-  commonInformation?: CommonInformation | null,
-) => {
-  const serializedContactCard: ParsedContactCard = [
-    profileId,
-    webCardId,
-    card?.firstName ?? '',
-    card?.lastName ?? '',
-    (commonInformation?.company || card?.company) ?? '',
-    card?.title ?? '',
-    (commonInformation?.phoneNumbers ?? [])
-      .concat(card?.phoneNumbers ?? [])
-      .map(({ label, number }) => [label, number]),
-    (commonInformation?.emails ?? [])
-      .concat(card?.emails ?? [])
-      .map(({ label, address }) => [label, address]),
-    (commonInformation?.addresses ?? [])
-      .concat(card?.addresses ?? [])
-      .map(({ label, address }) => [label, address]),
-    card?.birthday?.birthday,
-  ];
-
-  return json2csv([serializedContactCard], { header: false });
-};
-
 /**
  * Parses a contact card from a string
  * @param contactCardData
