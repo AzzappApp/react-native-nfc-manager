@@ -1,3 +1,7 @@
+## 2.0.0-canary.19
+
+* **fix:**  - update status of enrichment on failure ([#8908](https://github.com/AzzappApp/azzapp/pull/8908))
+
 ## 2.0.0-canary.18
 
 * **fix:**  - **contactCard:** [#8714](https://github.com/AzzappApp/azzapp/pull/8714) remove contact card serialization ([#8900](https://github.com/AzzappApp/azzapp/pull/8900))
