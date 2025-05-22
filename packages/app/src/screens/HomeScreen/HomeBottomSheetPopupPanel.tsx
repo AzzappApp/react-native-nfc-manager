@@ -376,7 +376,7 @@ to be shared!"
         </View>
         <View style={styles.buttonContainer}>
           <Button
-            disabled={!!error}
+            disabled={!!error || (currentPage === 2 && !newUserName)}
             loading={isLoadingCommitUserName}
             onPress={onNextPageRequested}
             testID="home-bottom-sheet-popup-panel-next-button"
