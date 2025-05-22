@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import { useRouter } from '#components/NativeRouter';
-import { readContactData, shareContact } from '#helpers/contactHelpers';
+import { readContactData, useShareContact } from '#helpers/contactHelpers';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useRemoveContact from '#hooks/useRemoveContact';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -34,12 +35,22 @@ const ContactActionModal = ({
   const router = useRouter();
   const onInviteContact = useOnInviteContact();
 
+  const contactToShare = useFragment(
+    graphql`
+      fragment ContactActionModal_contact on Contact {
+        ...contactHelpersShareContactDataQuery_contact
+      }
+    `,
+    data && !Array.isArray(data) ? data : null,
+  );
+
   const removeContact = useRemoveContact();
 
   const singleContact = useMemo(
     () => (data && !Array.isArray(data) ? readContactData(data) : null),
     [data],
   );
+
   const webCardUserName = singleContact?.webCardUserName;
   const contacts = useMemo(
     () =>
@@ -49,6 +60,7 @@ const ContactActionModal = ({
       ).filter(contact => !!contact),
     [data, singleContact],
   );
+  const onShare = useShareContact(contactToShare);
 
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
     return [
@@ -78,7 +90,7 @@ const ContactActionModal = ({
               description: 'ContactsScreen - More option alert - share',
             }),
             onPress: async () => {
-              shareContact(singleContact);
+              onShare();
               close();
             },
           }
@@ -118,6 +130,7 @@ const ContactActionModal = ({
     data,
     intl,
     onInviteContact,
+    onShare,
     onShow,
     router,
     singleContact,

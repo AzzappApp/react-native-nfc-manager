@@ -24,6 +24,7 @@ const query = graphql`
         id
         ...ContactDetailsBody_contact
         ...contactHelpersReadContactData
+        ...contactHelpersShareContactDataQuery_contact
         enrichment {
           ...ContactDetailAIItemLocations_enrichment
           ...ContactDetailAISummary_enrichment

@@ -12,7 +12,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import { ENABLE_DATA_ENRICHMENT } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import { shareContact } from '#helpers/contactHelpers';
+import { useShareContact } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import useBoolean from '#hooks/useBoolean';
@@ -101,6 +101,7 @@ const ContactDetailsBody = ({
         ...ContactDetailFragmentAI_contact
         ...ContactDetailAvatar_contact
         ...ContactDetailActionModal_contact
+        ...contactHelpersShareContactDataQuery_contact
         enrichmentStatus
         firstName
         lastName
@@ -288,7 +289,7 @@ const ContactDetailsBody = ({
     });
   };
 
-  const onShare = async () => contact && shareContact(contact);
+  const onShare = useShareContact(data);
 
   const appearance = useColorScheme();
 
@@ -425,6 +426,7 @@ const ContactDetailsBody = ({
     if (data && overlayState !== 'tooltipVisible') {
       setOverlayState(enrichStatusToOverlayState(data));
     }
+
     // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, enrichStatusToOverlayState]);
@@ -584,7 +586,13 @@ const ContactDetailsBody = ({
               ]}
             />
           </PressableNative>
-          <PressableNative style={styles.share} onPress={onShare}>
+          <PressableNative
+            style={styles.share}
+            onPress={onShare}
+            disabled={
+              overlayState === 'loading' || overlayState === 'waitingApproval'
+            }
+          >
             <Icon
               icon="share"
               size={24}

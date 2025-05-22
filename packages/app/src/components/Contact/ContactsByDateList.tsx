@@ -55,6 +55,7 @@ const ContactsByDateList = ({
                   nbContacts
                   contacts {
                     id
+                    ...contactHelpersShareContactDataQuery_contact
                     ...ContactsHorizontalList_contacts
                     ...contactHelpersReadContactData
                   }

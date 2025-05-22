@@ -193,6 +193,137 @@ exports[`contactHelpers buildVCard full featured contact 1`] = `
 }
 `;
 
+exports[`contactHelpers buildVCard full featured contact AND enriched data 1`] = `
+{
+  "charset": "utf-8",
+  "contentType": "text/x-vcard",
+  "definedElements": {
+    "address": true,
+    "birthday": true,
+    "company": true,
+    "email": true,
+    "fullname": true,
+    "jobtitle": true,
+    "name": true,
+    "phoneNumber": true,
+    "social": true,
+    "url": true,
+  },
+  "fileExtension": "vcf",
+  "filename": "vcard",
+  "multiplePropertiesForElementAllowed": [
+    "address",
+    "email",
+    "phoneNumber",
+    "social",
+    "url",
+  ],
+  "properties": [
+    {
+      "key": "N;CHARSET=utf-8",
+      "value": "app;azz;;;",
+    },
+    {
+      "key": "FN;CHARSET=utf-8",
+      "value": "azz app",
+    },
+    {
+      "key": "TITLE;CHARSET=utf-8",
+      "value": "overloadedTitle",
+    },
+    {
+      "key": "BDAY",
+      "value": "2012-12-21",
+    },
+    {
+      "key": "ORG;CHARSET=utf-8",
+      "value": "overloaded",
+    },
+    {
+      "key": "TEL;type=HOME",
+      "value": "1",
+    },
+    {
+      "key": "TEL;type=WORK",
+      "value": "2",
+    },
+    {
+      "key": "TEL;type=HOME",
+      "value": "0001",
+    },
+    {
+      "key": "TEL;type=WORK",
+      "value": "0002",
+    },
+    {
+      "key": "EMAIL;INTERNET;type=HOME",
+      "value": "mail@azzap.com",
+    },
+    {
+      "key": "EMAIL;INTERNET;type=WORK",
+      "value": "mailWork@azzap.com",
+    },
+    {
+      "key": "EMAIL;INTERNET;type=WORK",
+      "value": "mailEMail@azzap.com",
+    },
+    {
+      "key": "EMAIL;INTERNET;type=HOME",
+      "value": "overloaded@azzapp.com",
+    },
+    {
+      "key": "EMAIL;INTERNET;type=WORK",
+      "value": "overloaded2&azzapp.com",
+    },
+    {
+      "key": "URL",
+      "value": "https://url.com",
+    },
+    {
+      "key": "URL",
+      "value": "https://url2.com",
+    },
+    {
+      "key": "URL",
+      "value": "https://overloadedurl.com",
+    },
+    {
+      "key": "X-SOCIALPROFILE;type=home",
+      "value": "https://web.azzapp.com",
+    },
+    {
+      "key": "X-SOCIALPROFILE;type=work",
+      "value": "https://facebook.com/azzapp",
+    },
+    {
+      "key": "X-SOCIALPROFILE;type=home",
+      "value": "https://overloadedazzapp.com",
+    },
+    {
+      "key": "X-SOCIALPROFILE;type=work",
+      "value": "https://overloadedfacebook.com/azzapp",
+    },
+    {
+      "key": "ADR;type=PREF;CHARSET=utf-8",
+      "value": ";;monaco;;;;",
+    },
+    {
+      "key": "ADR;type=WORK;CHARSET=utf-8",
+      "value": ";;paris;;;;",
+    },
+    {
+      "key": "ADR;type=PREF;CHARSET=utf-8",
+      "value": ";;overloaded;;;;",
+    },
+    {
+      "key": "ADR;type=WORK;CHARSET=utf-8",
+      "value": ";;overloaded;;;;",
+    },
+  ],
+  "useVCalendar": false,
+}
+`;
+
 exports[`contactHelpers buildVCard with avatar 1`] = `
 {
   "charset": "utf-8",

@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 import { Platform } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import ShareCommand from 'react-native-share';
+import { useFragment } from 'react-relay';
 import {
   ConnectionHandler,
   graphql,
@@ -29,6 +30,10 @@ import { sanitizeFilePath } from './fileHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import { getRelayEnvironment } from './relayEnvironment';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type {
+  contactHelpersShareContactDataQuery_contact$data,
+  contactHelpersShareContactDataQuery_contact$key,
+} from '#relayArtifacts/contactHelpersShareContactDataQuery_contact.graphql';
 import type { Contact as ExpoContact, Date as ExpoDate } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
 
@@ -313,19 +318,33 @@ export const useContactPhoneLabels = () => {
   return labelValues;
 };
 
-export const buildVCard = async (contact: ContactType) => {
+export const buildVCard = async (
+  contact: contactHelpersShareContactDataQuery_contact$data,
+) => {
   const vCard = new VCard();
   vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
-  if (contact.title) {
-    vCard.addJobtitle(contact.title);
+
+  const title = contact.enrichment?.fields?.title || contact.title;
+  if (title) {
+    vCard.addJobtitle(title);
   }
-  if (contact.birthday) {
-    vCard.addBirthday(contact.birthday.toString());
+
+  const birthday =
+    contact.enrichment?.fields?.birthday?.toString() ||
+    contact.birthday?.toString();
+  if (birthday) {
+    vCard.addBirthday(birthday);
   }
-  if (contact.company) {
-    vCard.addCompany(contact.company);
+  const company = contact.enrichment?.fields?.company || contact.company;
+  if (company) {
+    vCard.addCompany(company);
   }
-  contact.phoneNumbers?.forEach(number => {
+
+  const phoneNumbers = [
+    ...contact.phoneNumbers,
+    ...(contact.enrichment?.fields?.phoneNumbers ?? []),
+  ];
+  phoneNumbers.forEach(number => {
     if (number.number) {
       vCard.addPhoneNumber(
         `${number.number}`,
@@ -333,21 +352,37 @@ export const buildVCard = async (contact: ContactType) => {
       );
     }
   });
-  contact.emails?.forEach(email => {
+  const emails = [
+    ...contact.emails,
+    ...(contact.enrichment?.fields?.emails ?? []),
+  ];
+  emails?.forEach(email => {
     if (email.address)
       vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
   });
 
-  contact.urls?.forEach(url => {
+  const urls = [
+    ...(contact.urls ?? []),
+    ...(contact.enrichment?.fields?.urls ?? []),
+  ];
+  urls?.forEach(url => {
     if (url.url) vCard.addURL(prefixWithHttp(url.url));
   });
 
-  contact.socials?.forEach(social => {
+  const socials = [
+    ...(contact.socials ?? []),
+    ...(contact.enrichment?.fields?.socials ?? []),
+  ];
+  socials?.forEach(social => {
     if (social.url)
       vCard.addSocial(prefixWithHttp(social.url), social.label || '');
   });
 
-  contact.addresses?.forEach(addr => {
+  const addresses = [
+    ...(contact.addresses ?? []),
+    ...(contact.enrichment?.fields?.addresses ?? []),
+  ];
+  addresses?.forEach(addr => {
     if (addr.address) {
       vCard.addAddress(
         undefined,
@@ -362,8 +397,17 @@ export const buildVCard = async (contact: ContactType) => {
     }
   });
 
-  const contactImageUrl = contact.avatar?.uri || contact.logo?.uri;
-  const contactImageId = contact.avatar?.id || contact.logo?.id;
+  const contactImageUrl =
+    contact.enrichment?.fields?.avatar?.uri ||
+    contact.avatar?.uri ||
+    contact.enrichment?.fields?.logo?.uri ||
+    contact.logo?.uri;
+  const contactImageId =
+    contact.enrichment?.fields?.avatar?.id ||
+    contact.avatar?.id ||
+    contact.enrichment?.fields?.logo?.id ||
+    contact.logo?.id;
+
   if (contactImageId && contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
       const file = new File(Paths.cache.uri + contactImageId);
@@ -387,39 +431,123 @@ export const buildVCard = async (contact: ContactType) => {
   return vCard;
 };
 
-export const shareContact = async (contact: ContactType) => {
-  const vCardData = await buildVCard(contact);
-
-  if (!vCardData) {
-    console.error('cannot generate VCard');
-    return;
+export const shareContactFragment_contact = graphql`
+  fragment contactHelpersShareContactDataQuery_contact on Contact
+  @argumentDefinitions(
+    pixelRatio: { type: "Float!", provider: "CappedPixelRatio.relayprovider" }
+  ) {
+    id
+    firstName
+    lastName
+    title
+    company
+    note
+    phoneNumbers {
+      number
+      label
+    }
+    emails {
+      label
+      address
+    }
+    urls {
+      url
+    }
+    addresses {
+      label
+      address
+    }
+    birthday
+    meetingDate
+    socials {
+      url
+      label
+    }
+    avatar {
+      uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    logo {
+      uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    enrichment {
+      fields {
+        title
+        company
+        phoneNumbers {
+          label
+          number
+        }
+        emails {
+          address
+          label
+        }
+        urls {
+          url
+        }
+        addresses {
+          address
+          label
+        }
+        birthday
+        socials {
+          label
+          url
+        }
+        avatar {
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+      }
+    }
   }
-  const contactName =
-    `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim();
-  const filePath =
-    Paths.cache.uri +
-    sanitizeFilePath(contactName.length ? contactName : 'contact') +
-    '.vcf';
+`;
 
-  let file;
-  try {
-    file = new File(filePath);
-    file.create();
-    // generate file
-    file.write(vCardData.toString());
-    // share the file
-    await ShareCommand.open({
-      url: filePath,
-      type: 'text/x-vcard',
-      failOnCancel: false,
-    });
-    // clean up file afterward
-    file.delete();
-  } catch (e) {
-    Sentry.captureException(e);
-    console.error(e);
-    file?.delete();
-  }
+export const useShareContact = (
+  contactKey?: contactHelpersShareContactDataQuery_contact$key | null,
+) => {
+  const contact = useFragment(shareContactFragment_contact, contactKey);
+
+  return async () => {
+    if (!contact) return;
+    const vCardData = await buildVCard(contact);
+
+    if (!vCardData) {
+      console.error('cannot generate VCard');
+      return;
+    }
+    const contactName =
+      `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim();
+    const filePath =
+      Paths.cache.uri +
+      sanitizeFilePath(contactName.length ? contactName : 'contact') +
+      '.vcf';
+
+    let file;
+    try {
+      file = new File(filePath);
+      file.create();
+      // generate file
+      file.write(vCardData.toString());
+      // share the file
+      await ShareCommand.open({
+        url: filePath,
+        type: 'text/x-vcard',
+        failOnCancel: false,
+      });
+      // clean up file afterward
+      file.delete();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error(e);
+      file?.delete();
+    }
+  };
 };
 
 export const getFriendlyNameFromLocation = (
@@ -1157,6 +1285,7 @@ export const readContactData = (
           provider: "CappedPixelRatio.relayprovider"
         }
       ) {
+        ...contactHelpersShareContactDataQuery_contact
         id
         firstName
         lastName
