@@ -6,7 +6,8 @@ import ContactListEmptyComponent from '../ContactListEmptyComponent';
 import ContactsListItem from './ContactsListItem';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
 import type {
-  ScrollViewProps,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   SectionListData,
   SectionListRenderItemInfo,
   ViewStyle,
@@ -40,9 +41,7 @@ export type ContactListProps = {
     | null
     | undefined;
   contentContainerStyle?: ViewStyle;
-  renderScrollComponent?:
-    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
-    | undefined;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 };
 
 const ContactsList = ({
@@ -56,7 +55,7 @@ const ContactsList = ({
   ListHeaderComponent,
   ListFooterComponent,
   contentContainerStyle,
-  renderScrollComponent,
+  onScroll,
 }: ContactListProps) => {
   const renderListItem = useCallback(
     ({
@@ -94,7 +93,7 @@ const ContactsList = ({
       ListFooterComponent={ListFooterComponent}
       style={{ flexGrow: 1 }}
       contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
-      renderScrollComponent={renderScrollComponent}
+      onScroll={onScroll}
       ListEmptyComponent={ContactListEmptyComponent}
     />
   );

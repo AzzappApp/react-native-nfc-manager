@@ -8,7 +8,11 @@ import ContactActionModal from './ContactActionModal';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByDateList_root$key } from '#relayArtifacts/ContactsByDateList_root.graphql';
 import type { ContactsByDateListQuery } from '#relayArtifacts/ContactsByDateListQuery.graphql';
-import type { ScrollViewProps, ViewStyle } from 'react-native';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ViewStyle,
+} from 'react-native';
 
 type ContactsByDateListProps = {
   // Unlike the other lists, we use the reference from the ContactScreenQuery
@@ -17,16 +21,14 @@ type ContactsByDateListProps = {
   search: string | undefined;
   onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
-  renderScrollComponent?:
-    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
-    | undefined;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 };
 
 const ContactsByDateList = ({
   queryRef,
   search,
   onShowContact,
-  renderScrollComponent,
+  onScroll,
   contentContainerStyle,
 }: ContactsByDateListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
@@ -191,7 +193,7 @@ const ContactsByDateList = ({
         showLocationInSubtitle
         contentContainerStyle={contentContainerStyle}
         ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
-        renderScrollComponent={renderScrollComponent}
+        onScroll={onScroll}
       />
       <ContactActionModal
         data={contactActionData}

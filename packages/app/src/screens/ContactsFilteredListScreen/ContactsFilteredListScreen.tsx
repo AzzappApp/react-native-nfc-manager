@@ -1,13 +1,15 @@
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Animated, StyleSheet, View } from 'react-native';
-import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Platform, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { useDebounce } from 'use-debounce';
 import UserContactsList from '#components/Contact/UserContactsList';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
-import AnimatedScrollView from '#components/ui/AnimatedScrollView';
-import useKeyboardHeight from '#hooks/useKeyboardHeight';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -15,6 +17,7 @@ import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import type { ContactsByDateRoute, ContactsByLocationRoute } from '#routes';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 const ContactsFilteredListScreen = ({
   route: { params, route },
@@ -37,6 +40,41 @@ const ContactsFilteredListScreen = ({
     [router],
   );
 
+  const searchBarVisible = useSharedValue(1);
+  const toggleSearchBar = useCallback(
+    (show: boolean) => {
+      searchBarVisible.set(withTiming(show ? 1 : 0, { duration: 350 }));
+    },
+    [searchBarVisible],
+  );
+
+  const previousScrollPosition = useRef(0);
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const scrollPosition = event.nativeEvent.contentOffset.y;
+      if (
+        scrollPosition > SEARCHBAR_HEIGHT &&
+        scrollPosition > previousScrollPosition.current
+      ) {
+        toggleSearchBar(false);
+      } else if (
+        previousScrollPosition.current < SEARCHBAR_HEIGHT ||
+        previousScrollPosition.current - scrollPosition > 10
+      ) {
+        toggleSearchBar(true);
+      }
+      previousScrollPosition.current = scrollPosition;
+    },
+    [toggleSearchBar],
+  );
+
+  const isAndroid = Platform.OS === 'android';
+  const searchBarContainerStyle = useAnimatedStyle(() => {
+    return {
+      height: SEARCHBAR_HEIGHT * (isAndroid ? 1 : searchBarVisible.value),
+    };
+  });
+
   const intl = useIntl();
 
   const location =
@@ -44,80 +82,51 @@ const ContactsFilteredListScreen = ({
   const date = route === 'CONTACTS_BY_DATE' ? params.date : undefined;
   const orderBy = route === 'CONTACTS_BY_DATE' ? 'name' : 'date';
 
-  const { height: screenHeight } = useScreenDimensions();
-
-  const keyboardHeight = useKeyboardHeight();
-  const contentHeight = useAnimatedStyle(() => {
-    return {
-      height: screenHeight - keyboardHeight.value + SEARCHBAR_HEIGHT,
-    };
-  });
-
-  const scrollAnimatedValue = useMemo(() => new Animated.Value(0), []);
   const insets = useScreenInsets();
 
   return (
-    <Reanimated.View
-      style={[{ height: screenHeight + SEARCHBAR_HEIGHT }, contentHeight]}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <Container style={[styles.container, { paddingTop: insets.top }]}>
         <ContactsByLocationHeader location={location} date={date} />
-        <View style={styles.contentContainer}>
-          <Animated.View
-            style={{
-              flex: 1,
-              transform: [
-                {
-                  translateY: scrollAnimatedValue.interpolate({
-                    inputRange: [0, SEARCHBAR_HEIGHT],
-                    outputRange: [0, -SEARCHBAR_HEIGHT],
-                    extrapolate: 'clamp',
-                  }),
-                },
-              ],
-            }}
-          >
-            <SearchBarStatic
-              style={styles.search}
-              value={search}
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Search for name, company...',
-                description: 'Search placeholder in ContactsScreen',
-              })}
-              onChangeText={onChangeText}
-            />
-            <Suspense fallback={<LoadingView />}>
-              <UserContactsList
-                search={debounceSearch}
-                location={location}
-                date={date}
-                orderBy={orderBy}
-                onShowContact={onShowContact}
-                fetchPolicy="store-and-network"
-                renderScrollComponent={props => (
-                  <AnimatedScrollView
-                    {...props}
-                    scrollAnimatedValue={scrollAnimatedValue}
-                  />
-                )}
-                contentContainerStyle={{ paddingBottom: insets.bottom }}
-              />
-            </Suspense>
-          </Animated.View>
-        </View>
+        <Animated.View
+          style={[
+            { height: SEARCHBAR_HEIGHT, overflow: 'hidden' },
+            searchBarContainerStyle,
+          ]}
+        >
+          <SearchBarStatic
+            style={styles.search}
+            value={search}
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Search for name, company...',
+              description: 'Search placeholder in ContactsScreen',
+            })}
+            onChangeText={onChangeText}
+          />
+        </Animated.View>
+        <Suspense fallback={<LoadingView />}>
+          <UserContactsList
+            search={debounceSearch}
+            location={location}
+            date={date}
+            orderBy={orderBy}
+            onShowContact={onShowContact}
+            fetchPolicy="store-and-network"
+            onScroll={onScroll}
+            contentContainerStyle={{ paddingBottom: insets.bottom }}
+          />
+        </Suspense>
       </Container>
-    </Reanimated.View>
+    </KeyboardAvoidingView>
   );
 };
+
+export default ContactsFilteredListScreen;
 
 const SEARCHBAR_HEIGHT = 56;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
   search: {
     marginHorizontal: 20,
     marginTop: 10,
@@ -169,5 +178,3 @@ const ContactsByLocationHeader = ({
     />
   );
 };
-
-export default ContactsFilteredListScreen;

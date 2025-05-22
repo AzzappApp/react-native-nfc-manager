@@ -7,7 +7,8 @@ import ContactsScreenSection from './ContactsHorizontalList';
 import type { ContactsHorizontalList_contacts$key } from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type {
   ListRenderItemInfo,
-  ScrollViewProps,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   ViewStyle,
 } from 'react-native';
 
@@ -34,9 +35,8 @@ type Props = {
     | React.ReactElement
     | null
     | undefined;
-  renderScrollComponent?:
-    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
-    | undefined;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollEventThrottle?: number;
   contentContainerStyle?: ViewStyle;
 };
 
@@ -48,9 +48,9 @@ const SectionContactsHorizontalList = ({
   onShowContact,
   onShowContactAction,
   showLocationInSubtitle,
+  onScroll,
   ListFooterComponent,
   ListHeaderComponent,
-  renderScrollComponent,
   contentContainerStyle,
 }: Props) => {
   const renderItem = useCallback(
@@ -91,9 +91,9 @@ const SectionContactsHorizontalList = ({
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
-      renderScrollComponent={renderScrollComponent}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
+      onScroll={onScroll}
       style={{ flexGrow: 1 }}
       contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
       ListEmptyComponent={ContactListEmptyComponent}

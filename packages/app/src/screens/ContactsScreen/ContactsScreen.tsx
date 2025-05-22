@@ -1,14 +1,17 @@
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Animated, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
-import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import AnimatedScrollView from '#components/ui/AnimatedScrollView';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
@@ -35,6 +38,7 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { ContactsRoute } from '#routes';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery {
@@ -124,6 +128,49 @@ const ContactsScreen = ({
   const { height: screenHeight } = useScreenDimensions();
   const insets = useScreenInsets();
 
+  const searchBarVisible = useSharedValue(1);
+  const toggleSearchBar = useCallback(
+    (show: boolean) => {
+      searchBarVisible.set(withTiming(show ? 1 : 0, { duration: 350 }));
+    },
+    [searchBarVisible],
+  );
+
+  const previousScrollPosition = useRef(0);
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const scrollPosition = event.nativeEvent.contentOffset.y;
+      if (
+        scrollPosition > SEARCHBAR_HEIGHT &&
+        scrollPosition > previousScrollPosition.current
+      ) {
+        toggleSearchBar(false);
+      } else if (
+        previousScrollPosition.current < SEARCHBAR_HEIGHT ||
+        previousScrollPosition.current - scrollPosition > 10
+      ) {
+        toggleSearchBar(true);
+      }
+      previousScrollPosition.current = scrollPosition;
+    },
+    [toggleSearchBar],
+  );
+
+  const onTabChange = useCallback(
+    (tab: 'date' | 'location' | 'name') => {
+      setCurrentTab(tab);
+      toggleSearchBar(true);
+    },
+    [toggleSearchBar],
+  );
+
+  const isAndroid = Platform.OS === 'android';
+  const searchBarContainerStyle = useAnimatedStyle(() => {
+    return {
+      height: SEARCHBAR_HEIGHT * (isAndroid ? 1 : searchBarVisible.value),
+    };
+  }, [searchBarVisible]);
+
   const { progress: keyboardProgress } = useReanimatedKeyboardAnimation();
   const keyboardHeight = useKeyboardHeight();
   const footHeight = 20 + BUTTON_HEIGHT + insets.bottom;
@@ -132,42 +179,16 @@ const ContactsScreen = ({
       height:
         screenHeight -
         keyboardHeight.value -
-        (1 - keyboardProgress.value) * footHeight +
-        SEARCHBAR_HEIGHT,
+        (1 - keyboardProgress.value) * footHeight,
     };
   });
-
-  const scrollByDateAnimatedValue = useMemo(() => new Animated.Value(0), []);
-  const scrollByNameAnimatedValue = useMemo(() => new Animated.Value(0), []);
-  const scrollByLocationAnimatedValue = useMemo(
-    () => new Animated.Value(0),
-    [],
-  );
-
-  const scrollAnimatedValue = useMemo(() => {
-    if (currentTab === 'date') {
-      return scrollByDateAnimatedValue;
-    }
-    if (currentTab === 'name') {
-      return scrollByNameAnimatedValue;
-    }
-    return scrollByLocationAnimatedValue;
-  }, [
-    currentTab,
-    scrollByDateAnimatedValue,
-    scrollByLocationAnimatedValue,
-    scrollByNameAnimatedValue,
-  ]);
 
   return (
     <>
       {currentUser?.nbContacts ? (
         <View style={styles.container}>
-          <Reanimated.View
-            style={[
-              { height: screenHeight - footHeight + SEARCHBAR_HEIGHT },
-              contentHeight,
-            ]}
+          <Animated.View
+            style={[{ height: screenHeight - footHeight }, contentHeight]}
           >
             <Container style={[styles.container, { paddingTop: insets.top }]}>
               <Header
@@ -198,7 +219,7 @@ const ContactsScreen = ({
                     description: 'Date selector label in ContactsScreen',
                   })}
                   id="date"
-                  onSelect={() => setCurrentTab('date')}
+                  onSelect={() => onTabChange('date')}
                   style={styles.menuLeft}
                 />
                 <RoundedMenuComponent
@@ -208,7 +229,7 @@ const ContactsScreen = ({
                     description: 'Name selector label in ContactsScreen',
                   })}
                   id="name"
-                  onSelect={() => setCurrentTab('name')}
+                  onSelect={() => onTabChange('name')}
                   style={styles.menuMiddle}
                 />
                 <RoundedMenuComponent
@@ -218,113 +239,73 @@ const ContactsScreen = ({
                     description: 'Location selector label in ContactsScreen',
                   })}
                   id="location"
-                  onSelect={() => setCurrentTab('location')}
+                  onSelect={() => onTabChange('location')}
                   style={styles.menuRight}
                 />
               </View>
-              <View style={styles.contentContainer}>
-                <Animated.View
-                  style={{
-                    flex: 1,
-                    transform: [
-                      {
-                        translateY: scrollAnimatedValue.interpolate({
-                          inputRange: [0, SEARCHBAR_HEIGHT],
-                          outputRange: [0, -SEARCHBAR_HEIGHT],
-                          extrapolate: 'clamp',
-                        }),
-                      },
-                    ],
-                  }}
-                >
-                  <SearchBarStatic
-                    style={styles.search}
-                    value={search}
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Search for name, company...',
-                      description: 'Search placeholder in ContactsScreen',
-                    })}
-                    onChangeText={onChangeText}
-                  />
-                  <TabView
-                    currentTab={currentTab}
-                    style={styles.content}
-                    tabs={[
-                      {
-                        id: 'date',
-                        element: (
-                          <Suspense fallback={<LoadingView />}>
-                            <ContactsByDateList
-                              queryRef={data}
-                              search={debounceSearch}
-                              onShowContact={onShowContact}
-                              renderScrollComponent={props => (
-                                <AnimatedScrollView
-                                  {...props}
-                                  scrollAnimatedValue={
-                                    scrollByDateAnimatedValue
-                                  }
-                                />
-                              )}
-                              contentContainerStyle={
-                                styles.listContentContainerStyle
-                              }
-                            />
-                          </Suspense>
-                        ),
-                      },
-                      {
-                        id: 'name',
-                        element: (
-                          <Suspense fallback={<LoadingView />}>
-                            <UserContactsList
-                              search={debounceSearch}
-                              location={undefined}
-                              date={undefined}
-                              onShowContact={onShowContact}
-                              renderScrollComponent={props => (
-                                <AnimatedScrollView
-                                  {...props}
-                                  scrollAnimatedValue={
-                                    scrollByNameAnimatedValue
-                                  }
-                                />
-                              )}
-                              contentContainerStyle={
-                                styles.listContentContainerStyle
-                              }
-                            />
-                          </Suspense>
-                        ),
-                      },
-                      {
-                        id: 'location',
-                        element: (
-                          <Suspense fallback={<LoadingView />}>
-                            <ContactsByLocationList
-                              search={debounceSearch}
-                              onShowContact={onShowContact}
-                              renderScrollComponent={props => (
-                                <AnimatedScrollView
-                                  {...props}
-                                  scrollAnimatedValue={
-                                    scrollByLocationAnimatedValue
-                                  }
-                                />
-                              )}
-                              contentContainerStyle={
-                                styles.listContentContainerStyle
-                              }
-                            />
-                          </Suspense>
-                        ),
-                      },
-                    ]}
-                  />
-                </Animated.View>
-              </View>
+              <Animated.View
+                style={[
+                  { height: SEARCHBAR_HEIGHT, overflow: 'hidden' },
+                  searchBarContainerStyle,
+                ]}
+              >
+                <SearchBarStatic
+                  style={styles.search}
+                  value={search}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search for name, company...',
+                    description: 'Search placeholder in ContactsScreen',
+                  })}
+                  onChangeText={onChangeText}
+                />
+              </Animated.View>
+              <TabView
+                currentTab={currentTab}
+                style={styles.content}
+                tabs={[
+                  {
+                    id: 'date',
+                    element: (
+                      <Suspense fallback={<LoadingView />}>
+                        <ContactsByDateList
+                          queryRef={data}
+                          search={debounceSearch}
+                          onShowContact={onShowContact}
+                          onScroll={onScroll}
+                        />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    id: 'name',
+                    element: (
+                      <Suspense fallback={<LoadingView />}>
+                        <UserContactsList
+                          search={debounceSearch}
+                          location={undefined}
+                          date={undefined}
+                          onShowContact={onShowContact}
+                          onScroll={onScroll}
+                        />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    id: 'location',
+                    element: (
+                      <Suspense fallback={<LoadingView />}>
+                        <ContactsByLocationList
+                          search={debounceSearch}
+                          onShowContact={onShowContact}
+                          onScroll={onScroll}
+                        />
+                      </Suspense>
+                    ),
+                  },
+                ]}
+              />
             </Container>
-          </Reanimated.View>
+          </Animated.View>
           <Container style={[styles.footer, { paddingBottom: insets.bottom }]}>
             <Button
               label={
@@ -450,12 +431,9 @@ const stylesheet = createStyleSheet(appearance => ({
     borderBottomLeftRadius: 0,
     borderLeftWidth: 0,
   },
-  contentContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
   search: {
     marginHorizontal: 20,
+    marginBottom: 10,
   },
   addNewContactMenu: {
     padding: 20,
@@ -473,9 +451,6 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   content: {
     flex: 1,
-  },
-  listContentContainerStyle: {
-    paddingBottom: SEARCHBAR_HEIGHT,
   },
   footer: [
     {

@@ -9,22 +9,24 @@ import ContactActionModal from './ContactActionModal';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { ContactsByLocationList_root$key } from '#relayArtifacts/ContactsByLocationList_root.graphql';
 import type { ContactsByLocationListQuery } from '#relayArtifacts/ContactsByLocationListQuery.graphql';
-import type { ScrollViewProps, ViewStyle } from 'react-native';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ViewStyle,
+} from 'react-native';
 
 type ContactsByLocationListProps = {
   search: string | undefined;
   onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
-  renderScrollComponent?:
-    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
-    | undefined;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 };
 
 const ContactsByLocationList = ({
   search,
   onShowContact,
   contentContainerStyle,
-  renderScrollComponent,
+  onScroll,
 }: ContactsByLocationListProps) => {
   const queryResult = useLazyLoadQuery<ContactsByLocationListQuery>(
     ContactsByLocationListQueryNode,
@@ -180,7 +182,7 @@ const ContactsByLocationList = ({
         onShowContactAction={onShowContactAction}
         showLocationInSubtitle
         contentContainerStyle={contentContainerStyle}
-        renderScrollComponent={renderScrollComponent}
+        onScroll={onScroll}
         ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
       />
       <ContactActionModal
