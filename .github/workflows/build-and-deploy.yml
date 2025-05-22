@@ -316,7 +316,7 @@ jobs:
         run: |
           VERSION_NUMBER=$(jq -r '.version' package.json)
           BUILD_NUMBER=$(jq -r '.version' internal-version.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION_NUMBER" >> $GITHUB_OUTPUT
           echo "build=$BUILD_NUMBER" >> $GITHUB_OUTPUT
       
       - name: Build ios application
