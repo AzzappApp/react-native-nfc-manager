@@ -245,6 +245,7 @@ export type UserPayWallRoute = {
   route: 'USER_PAY_WALL';
   params?: {
     activateFeature: 'MULTI_USER';
+    waitDatabase?: boolean;
   };
 };
 

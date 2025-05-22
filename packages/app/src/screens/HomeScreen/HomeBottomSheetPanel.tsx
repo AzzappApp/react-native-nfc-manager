@@ -14,7 +14,6 @@ import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
-import { ENABLE_MULTI_USER } from '#Config';
 import env from '#env';
 import { colors } from '#theme';
 import Link from '#components/Link';
@@ -89,6 +88,11 @@ const HomeBottomSheetPanel = ({
     `,
     userKey ?? null,
   );
+
+  const isSubscriptionOnSamePlatform =
+    (user?.userSubscription?.issuer === 'google' &&
+      Platform.OS === 'android') ||
+    (user?.userSubscription?.issuer === 'apple' && Platform.OS === 'ios');
 
   const { bottom } = useScreenInsets();
   const intl = useIntl();
@@ -240,7 +244,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !user?.isPremium && ENABLE_MULTI_USER
+        !user?.isPremium
           ? {
               type: 'row',
               icon: 'plus',
@@ -286,7 +290,7 @@ const HomeBottomSheetPanel = ({
         },
         user?.isPremium &&
         user.userSubscription?.issuer !== 'web' &&
-        ENABLE_MULTI_USER
+        isSubscriptionOnSamePlatform
           ? {
               type: 'row',
               icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
@@ -325,8 +329,7 @@ const HomeBottomSheetPanel = ({
           : null,
         !profile?.invited &&
         profileInfoHasAdminRight(profile) &&
-        profile?.webCard?.hasCover &&
-        ENABLE_MULTI_USER
+        profile?.webCard?.hasCover
           ? {
               type: 'row',
               icon: 'shared_webcard',
@@ -434,13 +437,14 @@ const HomeBottomSheetPanel = ({
         },
       ]),
     [
-      close,
-      intl,
-      onLogout,
-      onShare,
-      profile,
-      user?.userSubscription?.issuer,
       user?.isPremium,
+      user?.userSubscription?.issuer,
+      intl,
+      close,
+      isSubscriptionOnSamePlatform,
+      profile,
+      onShare,
+      onLogout,
     ],
   );
 

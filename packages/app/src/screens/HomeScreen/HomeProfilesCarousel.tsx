@@ -21,7 +21,6 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
 import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
@@ -497,24 +496,23 @@ const ItemRenderComponent = ({
                 onLongPress={openWebcardModal}
               />
             )}
-            {!coverIsUploading &&
-              (profile.webCard?.coverIsPredefined ||
-                profile.webCard?.coverIsLogoPredefined) && (
-                <PressableNative
-                  style={styles.editUserContainer}
-                  onPress={onPressEdit}
-                  android_ripple={{
-                    borderless: true,
-                    foreground: true,
-                  }}
-                >
-                  <BlurView style={styles.multiUserIconContainer}>
-                    <View ref={refEdit} style={styles.tooltipTarget} />
-                    <Icon icon="edit" style={styles.multiUserIcon} />
-                  </BlurView>
-                </PressableNative>
-              )}
-            {isMultiUser && ENABLE_MULTI_USER && (
+            {(profile.webCard?.coverIsPredefined ||
+              profile.webCard?.coverIsLogoPredefined) && (
+              <PressableNative
+                style={styles.editUserContainer}
+                onPress={onPressEdit}
+                android_ripple={{
+                  borderless: true,
+                  foreground: true,
+                }}
+              >
+                <BlurView style={styles.multiUserIconContainer}>
+                  <View ref={refEdit} style={styles.tooltipTarget} />
+                  <Icon icon="edit" style={styles.multiUserIcon} />
+                </BlurView>
+              </PressableNative>
+            )}
+            {isMultiUser && (
               <PressableNative
                 style={styles.multiUserContainer}
                 onPress={onPressMultiUser}

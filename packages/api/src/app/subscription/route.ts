@@ -2,8 +2,8 @@ import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import {
   createSubscription,
+  getIAPSubscriptions,
   getTotalMultiUser,
-  getUserSubscriptions,
   getWebCardByUserId,
   transaction,
   updateActiveInAppUserSubscription,
@@ -12,7 +12,10 @@ import env from '#env';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
-import { unpublishWebCardForUser } from '#helpers/subscription';
+import {
+  unpublishWebCardForNoSeat,
+  unpublishWebCardForUser,
+} from '#helpers/subscription';
 
 const BEARER_HEADER = env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
@@ -42,10 +45,9 @@ const subscriptionWebHook = async (req: Request) => {
     switch (type) {
       case 'INITIAL_PURCHASE': {
         await transaction(async () => {
-          const sub = await getUserSubscriptions({
-            userIds: [userId],
-            issuers: ['apple', 'google'],
-          });
+          const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
+          const sub = await getIAPSubscriptions(userId);
+          const totalUsedSeats = await getTotalMultiUser(userId);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -59,12 +61,11 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
+              totalSeats,
               status: 'active',
             });
           } else {
-            await updateActiveInAppUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(sub[0].id, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
@@ -75,9 +76,14 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
+              totalSeats,
               status: 'active',
+            });
+          }
+          //android is messy, changing product is consiered a a INITIAL_PURCHASE
+          if (totalSeats - totalUsedSeats < 0) {
+            await unpublishWebCardForNoSeat({
+              userId,
             });
           }
         });
@@ -88,16 +94,13 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'EXPIRATION':
         await transaction(async () => {
-          const sub = await getUserSubscriptions({
-            userIds: [userId],
-            issuers: ['apple', 'google'],
-          });
+          const sub = await getIAPSubscriptions(userId);
 
           if (sub.length === 0) {
             await createSubscription({
               userId,
               subscriptionId,
-              startAt: new Date(purchased_at_ms),
+              startAt: new Date(expiration_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
               issuer:
@@ -107,13 +110,13 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
               status: 'canceled',
               invalidatedAt: new Date(),
             });
           } else {
-            await updateActiveInAppUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(sub[0].id, {
               subscriptionId,
+              startAt: new Date(expiration_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
               status: 'canceled',
@@ -129,10 +132,7 @@ const subscriptionWebHook = async (req: Request) => {
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
         await transaction(async () => {
-          const sub = await getUserSubscriptions({
-            userIds: [userId],
-            issuers: ['apple', 'google'],
-          });
+          const sub = await getIAPSubscriptions(userId);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -147,11 +147,10 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
               status: 'active',
             });
           } else {
-            await updateActiveInAppUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(sub[0].id, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
@@ -171,10 +170,8 @@ const subscriptionWebHook = async (req: Request) => {
       case 'RENEWAL':
         await transaction(async () => {
           const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
-          const sub = await getUserSubscriptions({
-            userIds: userId,
-            issuers: ['apple', 'google'],
-          });
+          const totalUsedSeats = await getTotalMultiUser(userId);
+          const sub = await getIAPSubscriptions(userId);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -189,11 +186,10 @@ const subscriptionWebHook = async (req: Request) => {
                     ? 'google'
                     : 'web',
               totalSeats,
-              freeSeats: 0,
               status: 'active',
             });
           } else {
-            await updateActiveInAppUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(sub[0].id, {
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
@@ -207,11 +203,10 @@ const subscriptionWebHook = async (req: Request) => {
               totalSeats,
               status: 'active',
             });
-            const totalUsedSeats = await getTotalMultiUser(userId);
+
             if (totalSeats - totalUsedSeats < 0) {
-              await unpublishWebCardForUser({
+              await unpublishWebCardForNoSeat({
                 userId,
-                forceUnpublishUser: true,
               });
             }
           }
@@ -226,10 +221,7 @@ const subscriptionWebHook = async (req: Request) => {
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
           await transaction(async () => {
-            const sub = await getUserSubscriptions({
-              userIds: [userId],
-              issuers: ['apple', 'google'],
-            });
+            const sub = await getIAPSubscriptions(userId);
             if (sub.length === 0) {
               await createSubscription({
                 userId,
@@ -243,16 +235,14 @@ const subscriptionWebHook = async (req: Request) => {
                     : store === 'PLAY_STORE'
                       ? 'google'
                       : 'web',
-                freeSeats: 0,
-                status: 'canceled',
+                status: 'active',
               });
             } else {
-              await updateActiveInAppUserSubscription(userId, {
+              await updateActiveInAppUserSubscription(sub[0].id, {
                 endAt: new Date(grace_period_expiration_at_ms),
                 revenueCatId: rcId,
                 subscriptionId,
-                freeSeats: 0,
-                status: 'canceled',
+                status: 'active',
               });
             }
           });

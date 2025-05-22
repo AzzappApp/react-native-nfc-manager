@@ -47,6 +47,9 @@ const icons = {
   get app_store() {
     return require('./assets/app_store.png');
   },
+  get app_store_square() {
+    return require('./assets/app_store_square.png');
+  },
   get approve() {
     return require('./assets/approve.png');
   },
@@ -407,6 +410,9 @@ const icons = {
   get play_store() {
     return require('./assets/play_store.png');
   },
+  get play_store_square() {
+    return require('./assets/play_store_square.png');
+  },
   get plus() {
     return require('./assets/plus.png');
   },
@@ -530,6 +536,9 @@ const icons = {
   get wall() {
     return require('./assets/wall.png');
   },
+  get webazzapp_square() {
+    return require('./assets/webazzapp_square.png');
+  },
   get whatsapp() {
     return require('./assets/whatsapp.png');
   },
@@ -539,6 +548,7 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
+
   //this list is alphabetically sorted, please keep it that way
 } as const;
 
@@ -555,11 +565,7 @@ const Icon = ({ icon, size = 24, ...props }: IconProps) => {
     <Animated.Image
       {...props}
       style={[
-        {
-          resizeMode: 'contain',
-          width: size,
-          height: size,
-        },
+        { resizeMode: 'contain', width: size, height: size },
         shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}
@@ -591,6 +597,12 @@ const shouldTintColor = (icon: Icons) => {
     case 'plus_white_border':
       return false;
     case 'menu':
+      return false;
+    case 'play_store_square':
+      return false;
+    case 'app_store_square':
+      return false;
+    case 'webazzapp_square':
       return false;
     default:
       return true;

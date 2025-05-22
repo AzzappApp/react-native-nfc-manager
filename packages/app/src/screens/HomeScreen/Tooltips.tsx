@@ -3,7 +3,6 @@ import { FormattedMessage } from 'react-intl';
 import { Platform } from 'react-native';
 import { PopoverMode } from 'react-native-popover-view';
 import { Placement, Point } from 'react-native-popover-view/dist/Types';
-import { ENABLE_MULTI_USER } from '#Config';
 import {
   useTooltipContext,
   useTooltipDataContext,
@@ -54,7 +53,7 @@ const Tooltips = () => {
 
   const onCloseToolTipEdit = useCallback(() => {
     closeTooltips(['profileEdit']);
-    if (ENABLE_MULTI_USER && tooltips['profileMulti']?.ref.current) {
+    if (tooltips['profileMulti']?.ref.current) {
       openTooltips(['profileMulti']);
     }
   }, [closeTooltips, openTooltips, tooltips]);

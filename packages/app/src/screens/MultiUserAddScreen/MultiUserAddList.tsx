@@ -141,7 +141,7 @@ const MultiUserAddList = ({
   }, [contactData, loadContacts, searchValue]);
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<Contacts.Contact>) => {
+    ({ item, extraData }: ListRenderItemInfo<Contacts.Contact>) => {
       if (item) {
         const displayName = formatDisplayName(item);
         if (isNotFalsyString(displayName)) {
@@ -149,14 +149,14 @@ const MultiUserAddList = ({
             <ContactItem
               displayName={displayName}
               item={item}
-              onPress={onAddSingleUser}
+              onPress={extraData.onAddSingleUser}
             />
           );
         }
       }
       return null;
     },
-    [onAddSingleUser],
+    [],
   );
 
   const ListFooterComponent = useMemo(
@@ -175,6 +175,7 @@ const MultiUserAddList = ({
       keyboardShouldPersistTaps="always"
       ListFooterComponent={ListFooterComponent}
       renderScrollComponent={KeyboardAwareScrollView}
+      extraData={{ onAddSingleUser }}
     />
   );
 };

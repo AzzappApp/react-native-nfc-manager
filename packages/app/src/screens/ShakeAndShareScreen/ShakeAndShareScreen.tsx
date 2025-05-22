@@ -27,7 +27,6 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
-import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors, shadow } from '#theme';
 import AddToWalletButton from '#components/AddToWalletButton';
 import ContactCardExportVcf from '#components/ContactCardExportVcf';
@@ -206,20 +205,10 @@ const ShakeAndShareScreen = ({
         },
         onError: e => {
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            if (PAYMENT_IS_ENABLED) {
-              router.push({
-                route: 'USER_PAY_WALL',
-              });
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'You can’t generate an email signature',
-                  description:
-                    'Error toast message when user tries to generate an email signature on android without a subscription',
-                }),
-              });
-            }
+            router.push({
+              route: 'USER_PAY_WALL',
+            });
+
             return;
           }
           Toast.show({

@@ -16,6 +16,7 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         webCard {
           id
           isMultiUser
+          isPremium
         }
       }
     }
@@ -36,6 +37,7 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
             webCard: {
               id: profileInfos?.webCardId ?? '',
               isMultiUser: value,
+              isPremium: value,
             },
           },
         },

@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import ERRORS from '@azzapp/shared/errors';
-import { PAYMENT_IS_ENABLED } from '#Config';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
 import Text from '#ui/Text';
@@ -36,19 +35,7 @@ const useOnSubscriptionError = (isWebSubscription: boolean) => {
             return;
           }
 
-          if (PAYMENT_IS_ENABLED) {
-            router.push({ route: 'USER_PAY_WALL' });
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'You have reached the limit of contact cards or you can’t publish such type of contact card.',
-                description:
-                  'Error toast message when reaching the limit of contact cards or trying to publish premium contact card on android',
-              }),
-            });
-          }
+          router.push({ route: 'USER_PAY_WALL' });
           return;
         } else {
           Toast.show({
