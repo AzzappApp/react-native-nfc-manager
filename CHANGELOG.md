@@ -1,3 +1,9 @@
+## 2.0.0-canary.18
+
+* **fix:**  - **contactCard:** [#8714](https://github.com/AzzappApp/azzapp/pull/8714) remove contact card serialization ([#8900](https://github.com/AzzappApp/azzapp/pull/8900))
+* **feat:**  - **home:** [#8822](https://github.com/AzzappApp/azzapp/pull/8822) update profile link appearance ([#8903](https://github.com/AzzappApp/azzapp/pull/8903))
+* **fix:**  - **emailSignature:** [#8646](https://github.com/AzzappApp/azzapp/pull/8646) wrong display in web ([#8905](https://github.com/AzzappApp/azzapp/pull/8905))
+
 ## 2.0.0-canary.17
 
 * **feat:**  - new contact card ([#8883](https://github.com/AzzappApp/azzapp/pull/8883))
