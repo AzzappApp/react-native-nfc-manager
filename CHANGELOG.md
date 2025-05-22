@@ -1,3 +1,7 @@
+## 2.0.0-canary.17
+
+* **feat:**  - new contact card ([#8883](https://github.com/AzzappApp/azzapp/pull/8883))
+
 ## 2.0.0-canary.16
 
 * **fix:**  - **Contact:** search bar animation IOS only ([#8894](https://github.com/AzzappApp/azzapp/pull/8894))
