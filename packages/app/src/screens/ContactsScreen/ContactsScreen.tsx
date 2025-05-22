@@ -63,6 +63,10 @@ const ContactsScreen = ({
   );
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
+  const onChangeText = useCallback((text: string | undefined) => {
+    setSearch(text || undefined);
+  }, []);
+
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
     useBoolean();
 
@@ -243,7 +247,7 @@ const ContactsScreen = ({
                     defaultMessage: 'Search for name, company...',
                     description: 'Search placeholder in ContactsScreen',
                   })}
-                  onChangeText={e => setSearch(e ?? '')}
+                  onChangeText={onChangeText}
                 />
                 <TabView
                   currentTab={currentTab}

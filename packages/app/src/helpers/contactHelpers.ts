@@ -27,6 +27,7 @@ import { createStyleSheet } from '#helpers/createStyles';
 import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 import { sanitizeFilePath } from './fileHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
+import { getRelayEnvironment } from './relayEnvironment';
 import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
 import type { Contact as ExpoContact, Date as ExpoDate } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
@@ -495,36 +496,134 @@ export const contactSchema = z
 
 export type contactFormValues = z.infer<typeof contactSchema>;
 
-const getContactsConnection = (
+const getContactsConnections = (
   store: RecordSourceProxy,
   user: RecordProxy,
   connectionName: string,
+  expectedType: string,
 ) => {
+  const environment = getRelayEnvironment();
+  const source = environment.getStore().getSource();
+  const recordIds = source.getRecordIDs();
   const userContactsConnectionId = ConnectionHandler.getConnectionID(
     user.getDataID(),
     connectionName,
   );
-  return userContactsConnectionId ? store.get(userContactsConnectionId) : null;
+  return recordIds
+    .filter(recordId => recordId.startsWith(userContactsConnectionId))
+    .map(recordId => store.get(recordId))
+    .filter(isDefined)
+    .filter(record => record.getType() === expectedType);
 };
 
 const getContactsByDateConnection = (
   store: RecordSourceProxy,
   user: RecordProxy,
 ) => {
-  return getContactsConnection(store, user, 'currentUser_contactsByDates');
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contactsByDates',
+    'ContactsByDateConnection',
+  );
 };
 
 const getContactsByLocationConnection = (
   store: RecordSourceProxy,
   user: RecordProxy,
 ) => {
-  return getContactsConnection(store, user, 'currentUser_contactsByLocation');
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contactsByLocation',
+    'ContactsByLocationConnection',
+  );
 };
+
 const getContactsByNameConnection = (
   store: RecordSourceProxy,
   user: RecordProxy,
 ) => {
-  return getContactsConnection(store, user, 'currentUser_contacts');
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contacts',
+    'ContactConnection',
+  );
+};
+
+/**
+ * Extracts the variables part from a Relay connection cache ID.
+ * Supports strings, numbers, and booleans.
+ * Example: (nbContactsByDate:10,search:"A,B",active:true)
+ */
+export const extractRelayConnectionVariables = (
+  relayId: string,
+): Record<string, any> => {
+  // Extract the substring inside the last parentheses in the id
+  const match = relayId.match(/\((.*)\)$/);
+  if (!match) return {};
+
+  const varsString = match[1];
+  const variables: Record<string, any> = {};
+
+  // Parse each key:value, taking care of quoted values with commas inside
+  let i = 0;
+  while (i < varsString.length) {
+    // Parse key
+    let key = '';
+    while (i < varsString.length && varsString[i] !== ':') {
+      key += varsString[i++];
+    }
+    i++; // skip ':'
+    // Parse value
+    let value = '';
+    let inQuotes = false;
+    while (i < varsString.length && (inQuotes || varsString[i] !== ',')) {
+      if (varsString[i] === '"') {
+        inQuotes = !inQuotes;
+      }
+      value += varsString[i++];
+    }
+    if (varsString[i] === ',') i++; // skip ','
+
+    value = value.trim();
+
+    // Parse value as string, number, or boolean
+    let parsedValue: any;
+    if (value.startsWith('"') && value.endsWith('"')) {
+      parsedValue = value.slice(1, -1);
+    } else if (/^\d+$/.test(value)) {
+      parsedValue = Number(value);
+    } else if (value === 'true') {
+      parsedValue = true;
+    } else if (value === 'false') {
+      parsedValue = false;
+    } else {
+      parsedValue = value;
+    }
+    variables[key.trim()] = parsedValue;
+  }
+
+  return variables;
+};
+
+const contactMatchSearch = (contact: RecordProxy, search: string): boolean => {
+  search = search.toLowerCase();
+  const firstName = contact.getValue('firstName');
+  const lastName = contact.getValue('lastName');
+  const company = contact.getValue('company');
+  const webCardUserName = contact
+    .getLinkedRecord('webCard')
+    ?.getValue('userName');
+  return (
+    (typeof firstName === 'string' &&
+      firstName.toLowerCase().includes(search)) ||
+    (typeof lastName === 'string' && lastName.toLowerCase().includes(search)) ||
+    (typeof company === 'string' && company.toLowerCase().includes(search)) ||
+    (typeof webCardUserName === 'string' &&
+      webCardUserName.toLowerCase().includes(search))
+  );
 };
 
 export const addContactUpdater = (
@@ -540,12 +639,66 @@ export const addContactUpdater = (
 
   // Update user by date connection
 
-  const userByDatesConnection = getContactsByDateConnection(store, user);
-  if (userByDatesConnection) {
+  const userByDatesConnections = getContactsByDateConnection(store, user);
+  userByDatesConnections.forEach(userByDatesConnection => {
+    const variables = extractRelayConnectionVariables(
+      userByDatesConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
     const meetingDate = newContact.getValue('meetingDate');
-    if (meetingDate) {
-      const date = new Date(meetingDate.toString());
-      const dateEdge = userByDatesConnection
+    if (!meetingDate) {
+      return;
+    }
+    const date = new Date(meetingDate.toString());
+    const dateEdge = userByDatesConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const edgeDateStr = node.getValue('date');
+        if (typeof edgeDateStr !== 'string') {
+          return false;
+        }
+        const edgeDate = new Date(edgeDateStr);
+        return (
+          edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
+          edgeDate.getUTCMonth() === date.getUTCMonth() &&
+          edgeDate.getUTCDate() === date.getUTCDate()
+        );
+      });
+    if (dateEdge) {
+      const dateEdgeNode = dateEdge.getLinkedRecord('node');
+      const nbContacts = dateEdgeNode?.getValue('nbContacts');
+      dateEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts + 1 : 1,
+        'nbContacts',
+      );
+      dateEdgeNode?.setLinkedRecords(
+        [newContact, ...(dateEdgeNode?.getLinkedRecords('contacts') ?? [])],
+        'contacts',
+      );
+    } else {
+      const node = store.create(
+        `${userByDatesConnection.getDataID()}_${user.getDataID()}_${date.toISOString()}`,
+        'ContactsByDate',
+      );
+      node.setValue(date.toISOString(), 'date');
+      node.setLinkedRecords([newContact], 'contacts');
+      node.setValue(1, 'nbContacts');
+      const newDateEdge = ConnectionHandler.createEdge(
+        store,
+        userByDatesConnection,
+        node,
+        'ContactsByDateEdge',
+      );
+      const nextEdge = userByDatesConnection
         .getLinkedRecords('edges')
         ?.find(edge => {
           const node = edge?.getLinkedRecord('node');
@@ -557,63 +710,54 @@ export const addContactUpdater = (
             return false;
           }
           const edgeDate = new Date(edgeDateStr);
-          return (
-            edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
-            edgeDate.getUTCMonth() === date.getUTCMonth() &&
-            edgeDate.getUTCDate() === date.getUTCDate()
-          );
+          return edgeDate < date;
         });
-      if (dateEdge) {
-        const dateEdgeNode = dateEdge.getLinkedRecord('node');
-        const nbContacts = dateEdgeNode?.getValue('nbContacts');
-        dateEdgeNode?.setValue(
-          typeof nbContacts === 'number' ? nbContacts + 1 : 1,
-          'nbContacts',
-        );
-        dateEdgeNode?.setLinkedRecords(
-          [newContact, ...(dateEdgeNode?.getLinkedRecords('contacts') ?? [])],
-          'contacts',
-        );
-      } else {
-        const node = store.create(
-          `${user.getDataID()}_${date.toISOString()}`,
-          'ContactsByDate',
-        );
-        node.setValue(date.toISOString(), 'date');
-        node.setLinkedRecords([newContact], 'contacts');
-        node.setValue(1, 'nbContacts');
-        const newDateEdge = ConnectionHandler.createEdge(
-          store,
-          userByDatesConnection,
-          node,
-          'ContactsByDateEdge',
-        );
-        const nextEdge = userByDatesConnection
-          .getLinkedRecords('edges')
-          ?.find(edge => {
-            const node = edge?.getLinkedRecord('node');
-            if (!node) {
-              return false;
-            }
-            const edgeDateStr = node.getValue('date');
-            if (typeof edgeDateStr !== 'string') {
-              return false;
-            }
-            const edgeDate = new Date(edgeDateStr);
-            return edgeDate < date;
-          });
-        ConnectionHandler.insertEdgeBefore(
-          userByDatesConnection,
-          newDateEdge,
-          nextEdge?.getValue('cursor') as string | undefined,
-        );
-      }
+      ConnectionHandler.insertEdgeBefore(
+        userByDatesConnection,
+        newDateEdge,
+        nextEdge?.getValue('cursor') as string | undefined,
+      );
     }
-  }
+  });
 
   // Update user by name connection
-  const userContactsConnection = getContactsByNameConnection(store, user);
-  if (userContactsConnection) {
+  const userContactsConnections = getContactsByNameConnection(store, user);
+  userContactsConnections.forEach(userContactsConnection => {
+    const variables = extractRelayConnectionVariables(
+      userContactsConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
+    if (variables?.date) {
+      const date = new Date(variables.date);
+      const meetingDate = newContact.getValue('meetingDate');
+      if (meetingDate) {
+        const meetingDateObj = new Date(meetingDate.toString());
+        if (
+          date.getUTCFullYear() !== meetingDateObj.getUTCFullYear() ||
+          date.getUTCMonth() !== meetingDateObj.getUTCMonth() ||
+          date.getUTCDate() !== meetingDateObj.getUTCDate()
+        ) {
+          return;
+        }
+      }
+    }
+    if (variables?.location) {
+      const meetingPlace = newContact.getLinkedRecord('meetingPlace');
+      const location = getFriendlyNameFromLocation({
+        city: meetingPlace?.getValue('city') as string | null,
+        region: meetingPlace?.getValue('region') as string | null,
+        subregion: meetingPlace?.getValue('subregion') as string | null,
+        country: meetingPlace?.getValue('country') as string | null,
+      });
+      if (location !== variables.location) {
+        return;
+      }
+    }
     const edge = ConnectionHandler.createEdge(
       store,
       userContactsConnection,
@@ -649,14 +793,23 @@ export const addContactUpdater = (
       edge,
       prevRecordEdge?.getValue('cursor') as string | undefined,
     );
-  }
+  });
 
   // Update user by location connection
-  const userByLocationsConnection = getContactsByLocationConnection(
+  const userByLocationsConnections = getContactsByLocationConnection(
     store,
     user,
   );
-  if (userByLocationsConnection) {
+  userByLocationsConnections.forEach(userByLocationsConnection => {
+    const variables = extractRelayConnectionVariables(
+      userByLocationsConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
     const meetingPlace = newContact.getLinkedRecord('meetingPlace');
     const location: string | null = meetingPlace
       ? (getFriendlyNameFromLocation({
@@ -691,7 +844,7 @@ export const addContactUpdater = (
       );
     } else {
       const node = store.create(
-        `${user.getDataID()}_${location}`,
+        `${userByLocationsConnection.getDataID()}_${user.getDataID()}_${location}`,
         'ContactsByLocation',
       );
       node.setValue(location, 'location');
@@ -730,7 +883,7 @@ export const addContactUpdater = (
         );
       }
     }
-  }
+  });
 };
 
 export const removeContactUpdater = (
@@ -748,8 +901,8 @@ export const removeContactUpdater = (
     user.setValue(userNbContacts - 1, 'nbContacts');
   }
   // Update user by date connection
-  const userByDatesConnection = getContactsByDateConnection(store, user);
-  if (userByDatesConnection) {
+  const userByDatesConnections = getContactsByDateConnection(store, user);
+  userByDatesConnections.forEach(userByDatesConnection => {
     const meetingDate = deleteContact.getValue('meetingDate');
     if (meetingDate) {
       const date = new Date(meetingDate.toString());
@@ -793,18 +946,18 @@ export const removeContactUpdater = (
         }
       }
     }
-  }
+  });
 
-  const userContactsConnection = getContactsByNameConnection(store, user);
-  if (userContactsConnection) {
+  const userContactsConnections = getContactsByNameConnection(store, user);
+  userContactsConnections.forEach(userContactsConnection => {
     ConnectionHandler.deleteNode(userContactsConnection, contactID);
-  }
+  });
   // Update user by location connection
-  const userByLocationsConnection = getContactsByLocationConnection(
+  const userByLocationsConnections = getContactsByLocationConnection(
     store,
     user,
   );
-  if (userByLocationsConnection) {
+  userByLocationsConnections.forEach(userByLocationsConnection => {
     const meetingPlace = deleteContact.getLinkedRecord('meetingPlace');
     const location: string | null = meetingPlace
       ? (getFriendlyNameFromLocation({
@@ -847,7 +1000,7 @@ export const removeContactUpdater = (
         locationEdgeNode?.setLinkedRecords(locationEdgeContacts, 'contacts');
       }
     }
-  }
+  });
 };
 
 export function prefixWithHttp(link: string): string;

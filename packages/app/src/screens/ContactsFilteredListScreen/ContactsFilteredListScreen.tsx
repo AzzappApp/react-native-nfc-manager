@@ -22,6 +22,10 @@ const ContactsFilteredListScreen = ({
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
 
+  const onChangeText = useCallback((text: string | undefined) => {
+    setSearch(text || undefined);
+  }, []);
+
   const router = useRouter();
   const onShowContact = useCallback(
     async (contactId: string) => {
@@ -80,7 +84,7 @@ const ContactsFilteredListScreen = ({
                 defaultMessage: 'Search for name, company...',
                 description: 'Search placeholder in ContactsScreen',
               })}
-              onChangeText={setSearch}
+              onChangeText={onChangeText}
             />
             <Suspense fallback={<LoadingView />}>
               <UserContactsList
