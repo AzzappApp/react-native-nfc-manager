@@ -109,6 +109,7 @@ const UserContactsList = ({
                   ...ContactsListItem_contact
                   ...contactHelpersReadContactData
                   ...contactHelpersShareContactDataQuery_contact
+                  ...ContactActionModal_contact
                 }
               }
             }

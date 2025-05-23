@@ -61,6 +61,7 @@ const ContactsByLocationList = ({
                     ...contactHelpersShareContactDataQuery_contact
                     ...ContactsHorizontalList_contacts
                     ...contactHelpersReadContactData
+                    ...ContactActionModal_contact
                   }
                 }
               }
