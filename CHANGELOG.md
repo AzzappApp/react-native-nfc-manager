@@ -1,3 +1,8 @@
+## 2.0.0-canary.24
+
+* **fix:**  - **android:** [#8855](https://github.com/AzzappApp/azzapp/pull/8855) review most of android ripples ([#8935](https://github.com/AzzappApp/azzapp/pull/8935))
+* **fix:**  - don’t rely on perplexity for countryCode ([#8936](https://github.com/AzzappApp/azzapp/pull/8936))
+
 ## 2.0.0-canary.23
 
 * **fix:**  - **contacts:** [#8901](https://github.com/AzzappApp/azzapp/pull/8901) missing fragments ([#8927](https://github.com/AzzappApp/azzapp/pull/8927))
