@@ -450,9 +450,10 @@ const MultiUserDetailsScreen = ({
 
   const { top, bottom } = useScreenInsets();
 
-  const containerStyle = useMemo(
-    () => ({ flex: 1, paddingTop: top, paddingBottom: bottom }),
-    [top, bottom],
+  const containerStyle = useMemo(() => ({ flex: 1, paddingTop: top }), [top]);
+  const RemoveButtonStyle = useMemo(
+    () => [styles.removeButton, { paddingBottom: bottom }],
+    [bottom, styles.removeButton],
   );
 
   if (!profileInfos?.profileId || profile == null) return null;
@@ -493,7 +494,7 @@ const MultiUserDetailsScreen = ({
           !isCurrentProfile &&
           role !== 'owner' && (
             <PressableNative
-              style={styles.removeButton}
+              style={RemoveButtonStyle}
               onPress={onConfirmRemoveUser}
               disabled={deletionIsActive}
             >
@@ -507,7 +508,7 @@ const MultiUserDetailsScreen = ({
           )
         }
       >
-        <View style={styles.contentPaddingHorizontal}>
+        <View style={[styles.contentPaddingHorizontal, styles.contentTop]}>
           <Controller
             control={control}
             name="selectedContact"
@@ -762,6 +763,9 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   cancelButton: {
     width: 136,
+  },
+  contentTop: {
+    paddingTop: 10,
   },
   contentPaddingHorizontal: {
     paddingHorizontal: 10,
