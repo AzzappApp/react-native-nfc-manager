@@ -1,3 +1,7 @@
+## 2.0.0-canary.23
+
+* **fix:**  - **contacts:** [#8901](https://github.com/AzzappApp/azzapp/pull/8901) missing fragments ([#8927](https://github.com/AzzappApp/azzapp/pull/8927))
+
 ## 2.0.0-canary.22
 
 
