@@ -1,3 +1,7 @@
+## 2.0.0-canary.22
+
+
+
 ## 2.0.0-canary.21
 
 * **fix:**  - **enrichment:** [#8918](https://github.com/AzzappApp/azzapp/pull/8918) don’t fail on logo ([#8914](https://github.com/AzzappApp/azzapp/pull/8914))
