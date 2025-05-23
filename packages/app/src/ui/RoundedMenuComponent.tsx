@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
@@ -49,20 +49,24 @@ const RoundedMenuComponent = ({
     : {};
 
   return (
-    <PressableNative
+    <View
       style={[
         styles.menu,
         selected && styles.menuSelected,
         flattenStyle,
         flattenSelectedStyle,
       ]}
-      onPress={onPress}
     >
-      <Text variant={textVariant} style={[textStyle, flattenSelectedTextStyle]}>
-        {label}
-      </Text>
-      {rightElement}
-    </PressableNative>
+      <PressableNative style={styles.menuPressable} onPress={onPress}>
+        <Text
+          variant={textVariant}
+          style={[textStyle, flattenSelectedTextStyle]}
+        >
+          {label}
+        </Text>
+        {rightElement}
+      </PressableNative>
+    </View>
   );
 };
 //using memo because part of a list
@@ -70,14 +74,19 @@ export default memo(RoundedMenuComponent);
 
 const styleSheet = createStyleSheet(appearance => ({
   menu: {
-    height: 32,
+    overflow: 'hidden',
     borderRadius: 16,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey900,
     borderWidth: 1,
+  },
+  menuPressable: {
     borderStyle: 'solid',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    height: 32,
   },
   menuSelected: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey900,

@@ -23,7 +23,6 @@ import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayp
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import Text from '#ui/Text';
 import ContactDetailActionModal from './ContactDetailActionModal';
@@ -573,37 +572,28 @@ const ContactDetailsBody = ({
         ]}
       >
         <View style={styles.content}>
-          <PressableNative style={styles.close} onPress={onClose}>
-            <Icon
-              icon="close"
-              size={24}
-              style={[
-                styles.centeredIcon,
-                data?.enrichmentStatus === 'running' ||
-                data?.enrichmentStatus === 'pending'
-                  ? styles.iconDisabled
-                  : undefined,
-              ]}
-            />
-          </PressableNative>
-          <PressableNative
-            style={styles.share}
-            onPress={onShare}
+          <IconButton
+            icon="close"
+            size={24}
+            disabled={
+              data?.enrichmentStatus === 'running' ||
+              data?.enrichmentStatus === 'pending'
+            }
+            variant="icon"
+            style={styles.close}
+            onPress={onClose}
+          />
+          <IconButton
+            icon="share"
+            size={24}
             disabled={
               overlayState === 'loading' || overlayState === 'waitingApproval'
             }
-          >
-            <Icon
-              icon="share"
-              size={24}
-              style={[
-                styles.centeredIcon,
-                overlayState === 'loading' || overlayState === 'waitingApproval'
-                  ? styles.iconDisabled
-                  : undefined,
-              ]}
-            />
-          </PressableNative>
+            variant="icon"
+            style={styles.share}
+            onPress={onShare}
+          />
+
           <ContactDetailAvatar
             state={overlayState}
             isHiddenField={hiddenFields.avatarId}
@@ -795,9 +785,6 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     backgroundColor: appearance === 'dark' ? '#0000003F' : '#FFFFFF3F',
   },
-  centeredIcon: {
-    alignSelf: 'center',
-  },
   name: {
     marginTop: 20,
   },
@@ -873,7 +860,6 @@ const stylesheet = createStyleSheet(appearance => ({
     height: '100%',
   },
   textContainer: { flexDirection: 'row', gap: 5, marginTop: 5 },
-  iconDisabled: { tintColor: colors.grey400 },
 }));
 
 export default ContactDetailsBody;

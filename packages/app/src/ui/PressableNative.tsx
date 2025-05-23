@@ -9,7 +9,7 @@ export type PressableNativeProps = PressableOpacityProps & {
   disabledOpacity?: number;
   animationDuration?: number;
   easing?: Easing;
-  ripple?: PressableAndroidRippleConfig;
+  android_ripple?: PressableAndroidRippleConfig;
 };
 
 const PressableNative = (

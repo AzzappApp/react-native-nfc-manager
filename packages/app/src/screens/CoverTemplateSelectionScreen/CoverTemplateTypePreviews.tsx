@@ -132,6 +132,12 @@ type ListItemComponentProps = {
   shouldPlay: boolean;
 };
 
+const LIST_ITEM_ANDROID_RIPPLE = {
+  foreground: true,
+  borderless: true,
+  radius: 140,
+};
+
 const ListItemComponent = ({
   coverTemplate,
   onSelect,
@@ -147,30 +153,35 @@ const ListItemComponent = ({
     return null;
   }
   return (
-    <PressableNative style={styles.preview} onPress={onPress}>
-      <MediaVideoRenderer
-        source={{
-          mediaId: coverTemplate.preview.id,
-          uri: coverTemplate.preview.uri!,
-          requestedSize: 512,
-        }}
-        thumbnailURI={coverTemplate.preview.thumbnail}
-        muted
-        style={styles.previewMedia}
-        videoEnabled={shouldPlay}
-      />
-      {coverTemplate.mediaCount != null && (
-        <View style={styles.badge}>
-          <View style={styles.badgeElements}>
-            <Icon size={16} icon="landscape" />
-            <Text variant="xsmall">
-              {coverTemplate.mediaCount -
-                coverTemplate.medias.filter(media => !media.editable).length}
-            </Text>
+    <View style={styles.preview}>
+      <PressableNative
+        android_ripple={LIST_ITEM_ANDROID_RIPPLE}
+        onPress={onPress}
+      >
+        <MediaVideoRenderer
+          source={{
+            mediaId: coverTemplate.preview.id,
+            uri: coverTemplate.preview.uri!,
+            requestedSize: 512,
+          }}
+          thumbnailURI={coverTemplate.preview.thumbnail}
+          muted
+          style={styles.previewMedia}
+          videoEnabled={shouldPlay}
+        />
+        {coverTemplate.mediaCount != null && (
+          <View style={styles.badge}>
+            <View style={styles.badgeElements}>
+              <Icon size={16} icon="landscape" />
+              <Text variant="xsmall">
+                {coverTemplate.mediaCount -
+                  coverTemplate.medias.filter(media => !media.editable).length}
+              </Text>
+            </View>
           </View>
-        </View>
-      )}
-    </PressableNative>
+        )}
+      </PressableNative>
+    </View>
   );
 };
 

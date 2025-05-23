@@ -128,7 +128,6 @@ const EmailOrPhoneInput = ({
         value={input.countryCodeOrEmail}
         options={SELECTORS}
         onChange={onChangeCode}
-        style={styles.countryCodeOrEmailButton}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Select a calling code or email',
           description:
@@ -205,8 +204,6 @@ const styles = StyleSheet.create({
   phoneOrEmailContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  countryCodeOrEmailButton: {
-    marginRight: 5,
+    gap: 5,
   },
 });

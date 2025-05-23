@@ -184,25 +184,27 @@ const Select = <ItemT,>({
 
   return (
     <>
-      <PressableNative
-        onPress={openDropDown}
-        style={[styles.input, isErrored && styles.error, style]}
-        accessibilityRole="combobox"
-        {...props}
-      >
-        {inputChildren != null ? (
-          inputChildren
-        ) : placeHolder ? (
-          <Text variant="textField" style={styles.placeholder}>
-            {placeHolder}
-          </Text>
-        ) : (
-          <View />
-        )}
-        {props.disabled ? null : (
-          <Icon icon="arrow_down" style={[styles.iconStyle, iconStyle]} />
-        )}
-      </PressableNative>
+      <View style={styles.inputContainer}>
+        <PressableNative
+          onPress={openDropDown}
+          style={[styles.input, isErrored && styles.error, style]}
+          accessibilityRole="combobox"
+          {...props}
+        >
+          {inputChildren != null ? (
+            inputChildren
+          ) : placeHolder ? (
+            <Text variant="textField" style={styles.placeholder}>
+              {placeHolder}
+            </Text>
+          ) : (
+            <View />
+          )}
+          {props.disabled ? null : (
+            <Icon icon="arrow_down" style={[styles.iconStyle, iconStyle]} />
+          )}
+        </PressableNative>
+      </View>
       <BottomSheetModal
         visible={showDropDown}
         height={bottomSheetHeight ? bottomSheetHeight + bottom : undefined}
@@ -230,7 +232,10 @@ const Select = <ItemT,>({
 
 export default Select;
 
+const SELECT_BORDER_RADIUS = 12;
+
 const styleSheet = createStyleSheet(appearance => ({
+  inputContainer: { overflow: 'hidden', borderRadius: SELECT_BORDER_RADIUS },
   input: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -238,7 +243,7 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 43,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderRadius: 12,
+    borderRadius: SELECT_BORDER_RADIUS,
     paddingLeft: 20,
     paddingRight: 20,
     borderWidth: 1,

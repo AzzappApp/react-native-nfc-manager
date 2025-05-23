@@ -323,7 +323,6 @@ const SimpleButtonSettingsEditionPanel = ({
               value={actionType as ActionType} //force type here, will not define country code is GraphQL
               options={SELECTORS}
               onChange={handleActionTypeChange}
-              style={styles.selectorsList}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Select a calling code, email or an URL link',
                 description:
@@ -432,6 +431,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     width: '100%',
+    gap: 5,
   },
   buttonContainer: {
     alignItems: 'center',
@@ -444,8 +444,5 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
     marginBottom: 15,
-  },
-  selectorsList: {
-    marginRight: 5,
   },
 });

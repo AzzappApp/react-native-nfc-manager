@@ -6,7 +6,7 @@ import { colors, textStyles } from '#theme';
 import useImageFromContact from '#components/Contact/useImageFromContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
-import Icon from '#ui/Icon';
+import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from '../ContactAvatar';
@@ -83,7 +83,7 @@ const ContactsListItem = ({
 
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
-    <View key={contact.id} style={styles.contact}>
+    <View key={contact.id}>
       <PressableNative
         onPress={onShow}
         onLongPress={onMore}
@@ -130,15 +130,13 @@ const ContactsListItem = ({
             {location ? ` - ${location}` : ''}
           </Text>
         </View>
+        <View style={styles.actions}>
+          <WhatsappButton
+            phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
+          />
+          <IconButton variant="icon" icon="more" onPress={onMore} hitSlop={5} />
+        </View>
       </PressableNative>
-      <View style={styles.actions}>
-        <WhatsappButton
-          phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
-        />
-        <PressableNative onPress={onMore}>
-          <Icon icon="more" />
-        </PressableNative>
-      </View>
     </View>
   );
 };
@@ -146,13 +144,9 @@ const ContactsListItem = ({
 const GAP = 15;
 
 const styles = StyleSheet.create({
-  contact: {
-    marginHorizontal: 10,
-    marginVertical: 20,
-    flexDirection: 'row',
-    columnGap: GAP,
-  },
   contactInfos: {
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     flexDirection: 'row',
     flex: 1,
     columnGap: GAP,

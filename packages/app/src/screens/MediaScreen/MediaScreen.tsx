@@ -349,7 +349,7 @@ const MediaScreenTabBar = ({
             top: 10,
             bottom: 10,
           }}
-          ripple={{
+          android_ripple={{
             borderless: true,
             radius: 20,
           }}

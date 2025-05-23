@@ -20,7 +20,10 @@ export type CountryCodeListOption<T extends string> = {
   icon: Icons;
 };
 
-type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
+type CountryCodeListWithOptionsProps<T extends string> = Omit<
+  ViewProps,
+  'style'
+> & {
   otherSectionTitle?: string;
   options: Array<CountryCodeListOption<T>>;
   phoneSectionTitle: string;
@@ -44,7 +47,6 @@ const CountryCodeListWithOptions = <T extends string>({
   onClose,
   onOpen,
   onDismiss,
-  style,
   ...props
 }: CountryCodeListWithOptionsProps<T>) => {
   const [showDropdown, openDropDown, closeDropDown] = useBoolean(false);
@@ -78,22 +80,24 @@ const CountryCodeListWithOptions = <T extends string>({
 
   return (
     <>
-      <PressableNative
-        {...props}
-        onPress={onButtonPress}
-        style={[styles.button, style]}
-        accessibilityRole="button"
-      >
-        {isSelectorType() ? (
-          <Icon icon={selectorIcon()!} style={[{ width: 24 }, styles.icon]} />
-        ) : (
-          <Image
-            source={{ uri: COUNTRY_FLAG[value as CountryCode] }}
-            style={{ width: 22, height: 16 }}
-          />
-        )}
-        <Icon icon="arrow_down" style={styles.chevronDown} />
-      </PressableNative>
+      <View style={styles.buttonContainer}>
+        <PressableNative
+          {...props}
+          onPress={onButtonPress}
+          accessibilityRole="button"
+          style={styles.button}
+        >
+          {isSelectorType() ? (
+            <Icon icon={selectorIcon()!} style={[{ width: 24 }, styles.icon]} />
+          ) : (
+            <Image
+              source={{ uri: COUNTRY_FLAG[value as CountryCode] }}
+              style={styles.country}
+            />
+          )}
+          <Icon icon="arrow_down" style={styles.chevronDown} />
+        </PressableNative>
+      </View>
       {showDropdown && (
         <BottomSheetModal
           visible={showDropdown}
@@ -150,9 +154,13 @@ const styleSheet = createStyleSheet(appearance => ({
     columnGap: 6,
     width: 50,
     height: 47,
-    borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
+  buttonContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  country: { width: 22, height: 16 },
   icon: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },

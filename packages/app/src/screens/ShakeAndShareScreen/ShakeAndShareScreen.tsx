@@ -304,34 +304,36 @@ const ShakeAndShareScreen = ({
                   });
                 }}
               />
-              <PressableNative
-                ripple={{
-                  foreground: true,
-                  color: colors.grey900,
-                }}
-                style={[styles.button, styles.smartEmailButton]}
-                onPress={generateEmailSignature}
-              >
-                {isGeneratingEmail ? (
-                  <ActivityIndicator
-                    color="white"
-                    style={styles.smartEmailIcon}
-                  />
-                ) : (
-                  <Icon
-                    icon="signature"
-                    style={styles.sharedIcon}
-                    size={24}
-                    tintColor={colors.white}
-                  />
-                )}
-                <Text variant="button" style={styles.smartEmailButtonText}>
-                  <FormattedMessage
-                    defaultMessage="Smart email Signature"
-                    description="Generate an email Signature button label"
-                  />
-                </Text>
-              </PressableNative>
+              <View style={[styles.button, styles.smartEmailButtonContainer]}>
+                <PressableNative
+                  android_ripple={{
+                    foreground: true,
+                    color: colors.grey900,
+                  }}
+                  style={styles.smartEmailButton}
+                  onPress={generateEmailSignature}
+                >
+                  {isGeneratingEmail ? (
+                    <ActivityIndicator
+                      color="white"
+                      style={styles.smartEmailIcon}
+                    />
+                  ) : (
+                    <Icon
+                      icon="signature"
+                      style={styles.sharedIcon}
+                      size={24}
+                      tintColor={colors.white}
+                    />
+                  )}
+                  <Text variant="button" style={styles.smartEmailButtonText}>
+                    <FormattedMessage
+                      defaultMessage="Smart email Signature"
+                      description="Generate an email Signature button label"
+                    />
+                  </Text>
+                </PressableNative>
+              </View>
               <Text
                 variant="xsmall"
                 style={{
@@ -402,15 +404,19 @@ const ShakeAndShareScreen = ({
             style={{ width: '100%', height }}
             pointerEvents="none"
           />
-          <IconButton
-            icon="close"
-            onPress={router.back}
-            iconStyle={styles.iconStyle}
+          <View
             style={[
               styles.iconContainerStyle,
               { bottom: Platform.OS === 'ios' ? bottom + 20 : 0 },
             ]}
-          />
+          >
+            <IconButton
+              icon="close"
+              onPress={router.back}
+              iconSize={24}
+              appearance="dark"
+            />
+          </View>
         </View>
 
         <IosAddWidgetPopup
@@ -510,8 +516,9 @@ const QR_CODE_WIDTH = Math.round(width * 0.57);
 const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
-    borderColor: 'white',
-    width: 24,
+    borderColor: colors.white,
+    borderWidth: 1,
+    borderRadius: 50,
   },
   contentContainer: {
     position: 'absolute',
@@ -535,14 +542,19 @@ const styles = StyleSheet.create({
     width: QR_CODE_WIDTH + 40,
     height: QR_CODE_WIDTH + 40,
   },
-  smartEmailButton: {
+  smartEmailButtonContainer: {
     width: '100%',
     height: 47,
     borderRadius: 12,
     backgroundColor: colors.black,
+    overflow: 'hidden',
+  },
+  smartEmailButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    flex: 1,
   },
+
   smartEmailIcon: {
     width: 38,
     height: 37,
@@ -574,9 +586,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: '100%',
-  },
-  iconStyle: {
-    tintColor: colors.white,
   },
   coverStyle: {
     marginBottom: 0,

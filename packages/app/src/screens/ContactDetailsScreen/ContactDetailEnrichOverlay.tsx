@@ -14,6 +14,7 @@ import {
   useTooltipDataContext,
 } from '#helpers/TooltipContext';
 import useScreenInsets from '#hooks/useScreenInsets';
+import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
@@ -175,28 +176,22 @@ export const ContactDetailEnrichOverlay = ({
               />
             </Text>
             <View style={styles.confirmationButtonsContainer}>
-              <RoundedMenuComponent
-                id={null}
+              <Button
                 label={intl.formatMessage({
                   defaultMessage: 'Refuse',
                   description:
                     'ContactDetail enrich overlay - Refuse button label',
                 })}
-                style={styles.confirmationRefuseStyle}
-                textVariant="button"
-                onSelect={onRefuseEnrichment}
+                variant="secondary"
+                onPress={onRefuseEnrichment}
               />
-              <RoundedMenuComponent
-                id={null}
+              <Button
                 label={intl.formatMessage({
                   defaultMessage: 'Validate',
                   description:
                     'ContactDetail enrich overlay - Validate button label',
                 })}
-                style={styles.confirmationValidateStyle}
-                textVariant="button"
-                textStyle={styles.confirmationValidateTextStyle}
-                onSelect={onValidateEnrichment}
+                onPress={onValidateEnrichment}
               />
             </View>
           </View>

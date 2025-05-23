@@ -69,7 +69,11 @@ const ContactHorizontalItem = ({
 
   return (
     <View style={styles.profile}>
-      <PressableNative onPress={onShow} onLongPress={onMore}>
+      <PressableNative
+        onPress={onShow}
+        android_ripple={{ borderless: true, foreground: true }}
+        onLongPress={onMore}
+      >
         {!avatarSource && contact.webCard ? (
           <CoverRenderer width={80} webCard={contact.webCard} />
         ) : (
@@ -94,6 +98,7 @@ const styles = StyleSheet.create({
   profile: {
     position: 'relative',
     marginBottom: 30,
+    overflow: 'hidden',
   },
   invite: {
     position: 'absolute',

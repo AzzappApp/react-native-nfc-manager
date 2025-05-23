@@ -150,7 +150,14 @@ const ContactEditFieldWrapper = <TFieldValues extends FieldValues>({
               onPress={onPressDelete}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative style={styles.labelSelector} onPress={open}>
+              <PressableNative
+                style={styles.labelSelector}
+                android_ripple={{
+                  foreground: true,
+                  borderless: true,
+                }}
+                onPress={open}
+              >
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,

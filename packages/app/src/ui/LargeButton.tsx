@@ -1,4 +1,4 @@
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -25,25 +25,27 @@ const LargeButton = ({
   const styles = useStyleSheet(styleSheet, colorScheme);
 
   return (
-    <PressableNative
-      ripple={{
-        foreground: true,
-        color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
-      }}
-      accessibilityRole="button"
-      style={[styles.button, style]}
-      onPress={onPress}
-    >
-      <Icon
-        icon={icon}
-        style={styles.icon}
-        size={24}
-        tintColor={colorScheme === 'dark' ? colors.black : colors.white}
-      />
-      <Text variant="button" style={styles.text}>
-        {title}
-      </Text>
-    </PressableNative>
+    <View style={[styles.button, style]}>
+      <PressableNative
+        android_ripple={{
+          foreground: true,
+          color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+        }}
+        accessibilityRole="button"
+        onPress={onPress}
+        style={styles.pressable}
+      >
+        <Icon
+          icon={icon}
+          style={styles.icon}
+          size={24}
+          tintColor={colorScheme === 'dark' ? colors.black : colors.white}
+        />
+        <Text variant="button" style={styles.text}>
+          {title}
+        </Text>
+      </PressableNative>
+    </View>
   );
 };
 
@@ -60,9 +62,9 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 47,
     borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
   },
+  pressable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   text: {
     color: appearance === 'light' ? colors.white : colors.black,
   },

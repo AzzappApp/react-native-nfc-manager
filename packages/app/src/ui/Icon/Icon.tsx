@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { type ImageProps } from 'react-native';
+import { type ImageProps, type ColorSchemeName } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -557,10 +557,12 @@ export type Icons = keyof typeof icons;
 export type IconProps = Omit<ImageProps, 'source'> & {
   icon: Icons;
   size?: number;
+  appearance?: ColorSchemeName;
 };
 
-const Icon = ({ icon, size = 24, ...props }: IconProps) => {
-  const styles = useStyleSheet(styleSheet);
+const Icon = ({ icon, size = 24, appearance, ...props }: IconProps) => {
+  const styles = useStyleSheet(styleSheet, appearance);
+
   return (
     <Animated.Image
       {...props}

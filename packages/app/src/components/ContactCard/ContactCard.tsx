@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
@@ -9,6 +9,7 @@ import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type {
   ContactCard_profile$data,
@@ -232,23 +233,25 @@ export const ContactCardComponent = ({
             <View />
           )}
           {onEditProp != null && (
-            <TouchableOpacity
-              style={[styles.edit, { borderColor: readableColor }]}
-              onPress={onEdit}
-              hitSlop={20}
-            >
-              <Icon
-                icon="edit"
-                size={17}
-                style={{ tintColor: readableColor }}
-              />
-              <Text variant="button" style={{ color: readableColor }}>
-                <FormattedMessage
-                  defaultMessage="Edit"
-                  description="ContactCard - Label for edit button"
+            <View style={styles.editContainer}>
+              <PressableNative
+                style={[styles.edit, { borderColor: readableColor }]}
+                onPress={onEdit}
+                hitSlop={20}
+              >
+                <Icon
+                  icon="edit"
+                  size={17}
+                  style={{ tintColor: readableColor }}
                 />
-              </Text>
-            </TouchableOpacity>
+                <Text variant="button" style={{ color: readableColor }}>
+                  <FormattedMessage
+                    defaultMessage="Edit"
+                    description="ContactCard - Label for edit button"
+                  />
+                </Text>
+              </PressableNative>
+            </View>
           )}
         </View>
         <View style={styles.webcardText}>
@@ -309,6 +312,8 @@ export const CONTACT_CARD_RADIUS_HEIGHT = 1 / 9;
 // use in list on HomeScreen
 export default memo(ContactCard);
 export const CONTACT_CARD_ASPECT_RATIO = 0.6;
+
+const EDIT_BORDER_RADIUS = 27;
 
 const stylesheet = createStyleSheet(appearance => ({
   webCardContainer: {
@@ -377,12 +382,13 @@ const stylesheet = createStyleSheet(appearance => ({
     borderWidth: 2,
     borderStyle: 'solid',
   },
+  editContainer: { overflow: 'hidden', borderRadius: EDIT_BORDER_RADIUS },
   edit: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 5,
     alignItems: 'center',
-    borderRadius: 27,
+    borderRadius: EDIT_BORDER_RADIUS,
     minWidth: 80,
     height: 35,
     borderWidth: 1,

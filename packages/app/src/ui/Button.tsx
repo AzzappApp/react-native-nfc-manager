@@ -109,6 +109,10 @@ const Button = (
             style,
             disabled && variantStyles.disabled,
           ]}
+          android_ripple={{
+            foreground: true,
+            borderless: true,
+          }}
         />
       </View>
     );

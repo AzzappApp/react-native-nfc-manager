@@ -127,12 +127,17 @@ const AddToWalletButton = ({
         </View>
       )}
       {Platform.OS === 'android' && (
-        <View>
+        <View
+          style={[
+            styles.googleWalletButtonContainer,
+            styles.googleWalletButton,
+          ]}
+        >
           <PressableNative
             testID="add-to-wallet-button"
             disabled={loadingPass}
             onPress={generateLoadingPass}
-            ripple={{
+            android_ripple={{
               foreground: true,
               borderless: false,
               color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
@@ -184,7 +189,6 @@ const styleSheet = createStyleSheet(appearance => ({
   addToWalletButtonText: {
     color: appearance === 'light' ? colors.white : colors.black,
   },
-
   googleWalletLogo: {
     height: 47,
     overflow: 'visible',
@@ -193,6 +197,10 @@ const styleSheet = createStyleSheet(appearance => ({
     aspectRatio: 283 / 50, // derived from google wallet logo svg
     height: 47,
     alignSelf: 'center',
+  },
+  googleWalletButtonContainer: {
+    overflow: 'hidden',
+    borderRadius: 40,
   },
   googleWalletLoadingContainer: {
     position: 'absolute',

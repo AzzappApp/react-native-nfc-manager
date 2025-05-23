@@ -69,7 +69,15 @@ const WhatsappButtonInner = ({
 
   return (
     <>
-      <PressableNative onPress={handleClick} {...props}>
+      <PressableNative
+        onPress={handleClick}
+        android_ripple={{
+          borderless: true,
+          foreground: true,
+        }}
+        hitSlop={5}
+        {...props}
+      >
         <Image style={styles.image} source={require('#assets/whatsapp.svg')} />
       </PressableNative>
       {pickerDisplayed && (

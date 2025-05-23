@@ -45,33 +45,37 @@ export const ContactDetailItem = ({
         />
       )}
       <View style={styles.itemContainer}>
-        <PressableNative onPress={onPress} style={styles.pressable}>
-          <View style={styles.label}>
-            {iconComponent ? (
-              iconComponent
-            ) : icon ? (
-              <Icon
-                icon={icon}
-                style={isEnrichmentOngoing ? styles.tintColorWhite : undefined}
-              />
-            ) : undefined}
+        <View style={styles.pressableContainer}>
+          <PressableNative onPress={onPress} style={styles.pressable}>
+            <View style={styles.label}>
+              {iconComponent ? (
+                iconComponent
+              ) : icon ? (
+                <Icon
+                  icon={icon}
+                  style={
+                    isEnrichmentOngoing ? styles.tintColorWhite : undefined
+                  }
+                />
+              ) : undefined}
+              <Text
+                variant="smallbold"
+                style={isEnrichmentOngoing ? styles.colorWhite : undefined}
+              >
+                {label}
+              </Text>
+            </View>
             <Text
-              variant="smallbold"
-              style={isEnrichmentOngoing ? styles.colorWhite : undefined}
+              numberOfLines={1}
+              style={[
+                styles.itemText,
+                isEnrichmentOngoing ? styles.colorWhite : undefined,
+              ]}
             >
-              {label}
+              {content}
             </Text>
-          </View>
-          <Text
-            numberOfLines={1}
-            style={[
-              styles.itemText,
-              isEnrichmentOngoing ? styles.colorWhite : undefined,
-            ]}
-          >
-            {content}
-          </Text>
-        </PressableNative>
+          </PressableNative>
+        </View>
         {isEnrichedItem && (
           <Icon
             size={18}
@@ -100,14 +104,19 @@ const stylesheet = createStyleSheet(appearance => ({
   item: {
     width: '100%',
     height: 52,
-    ...shadow({ appearance, direction: 'center' }),
+
     backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
-    borderRadius: 12,
   },
-  itemContainer: { flex: 1, padding: 14 },
+  itemContainer: { flex: 1 },
+  pressableContainer: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    ...shadow({ appearance, direction: 'center' }),
+  },
   pressable: {
-    width: '100%',
-    height: '100%',
+    padding: 14,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

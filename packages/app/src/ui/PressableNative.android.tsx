@@ -17,12 +17,12 @@ type PressableNativeProps = PressableProps & {
   disabledOpacity?: number;
   animationDuration?: number;
   easing?: unknown;
-  ripple?: PressableAndroidRippleConfig;
+  android_ripple?: PressableAndroidRippleConfig;
   onDoublePress?: () => void;
 };
 
 const PressableNative = (
-  { ripple, onDoublePress, ...props }: PressableNativeProps,
+  { android_ripple, onDoublePress, ...props }: PressableNativeProps,
   ref: ForwardedRef<View>,
 ) => {
   const [width, setWidth] = useState(0);
@@ -46,7 +46,10 @@ const PressableNative = (
   const onLayout = (e: LayoutChangeEvent) => {
     setWidth(e.nativeEvent.layout.width);
   };
-  let androidRipple = ripple ?? { borderless: false, color: colors.grey400 };
+  let androidRipple = android_ripple ?? {
+    borderless: false,
+    color: colors.grey400,
+  };
   if (!androidRipple.radius && androidRipple.borderless) {
     androidRipple = {
       ...androidRipple,

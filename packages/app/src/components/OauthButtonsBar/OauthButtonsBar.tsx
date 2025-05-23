@@ -233,7 +233,7 @@ const OauthButtonsBar = ({
         )}
         <PressableNative
           style={styles.button}
-          ripple={androidRippleConfig}
+          android_ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('linkedin')}
         >
           <View style={styles.button}>
@@ -245,7 +245,7 @@ const OauthButtonsBar = ({
         </PressableNative>
         <PressableNative
           style={styles.button}
-          ripple={androidRippleConfig}
+          android_ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('google')}
         >
           <View style={styles.button}>
