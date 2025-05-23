@@ -336,6 +336,7 @@ const MultiUserScreenUserList = ({
           contentContainerStyle={contentContainerStyle}
           onEndReachedThreshold={0.5}
           keyboardShouldPersistTaps="always"
+          automaticallyAdjustKeyboardInsets
         />
       </Suspense>
     </View>
