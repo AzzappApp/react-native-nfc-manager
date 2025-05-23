@@ -9,14 +9,7 @@ export const perplexity: ApiResolver = {
   priority: 4,
   provides: {
     contact: ['firstName', 'lastName', 'company', 'title', 'socials'],
-    profile: [
-      'headline',
-      'summary',
-      'interests',
-      'skills',
-      'country',
-      'countryCode',
-    ],
+    profile: ['headline', 'summary', 'interests', 'skills', 'country'],
   },
   dependsOn: {
     any: [
@@ -34,9 +27,7 @@ export const perplexity: ApiResolver = {
       !data.profile?.summary ? 'summary?: string|null; ' : ''
     }${!data.profile?.interests ? 'interests?: string[]|null; ' : ''}${
       !data.profile?.skills ? 'skills?: string[]|null; ' : ''
-    }${!data.profile?.country ? 'country?: string|null; ' : ''}${
-      !data.profile?.countryCode ? 'countryCode?: string|null; ' : ''
-    }${!data.profile?.city ? 'city?: string|null; ' : ''}
+    }${!data.profile?.country ? 'country?: string|null; ' : ''}${!data.profile?.city ? 'city?: string|null; ' : ''}
     ${
       !data.profile?.skills || !data.profile?.interests
         ? 'icons: Record<string,string>'
