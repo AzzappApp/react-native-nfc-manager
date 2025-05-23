@@ -57,6 +57,10 @@ export type EnrichResult = {
   trace: Record<string, string>; // field -> resolver name
 };
 
+const exclusivityGroups: Record<string, string[]> = {
+  proxycurl: ['peopledatalabs'],
+};
+
 // Main enrichContact function: applies API resolvers to enrich missing contact/profile fields
 export const enrichContact = async (
   userId: string,
@@ -123,6 +127,14 @@ export const enrichContact = async (
                 current.profile[field].filter(isDefined).length === 0),
           )
         );
+      })
+      .filter(r => {
+        // Ignore resolvers that are blocked by the current trace
+        return !Object.entries(exclusivityGroups).some(([leader, blocked]) => {
+          return (
+            Object.values(trace).includes(leader) && blocked.includes(r.name)
+          );
+        });
       })
       .sort((a, b) => a.priority - b.priority);
 
@@ -227,18 +239,13 @@ export const enrichContact = async (
           });
 
           if (mediaPromises) {
-            const result = await Promise.allSettled(
-              Array.from(mediaPromises.entries()).map(
-                async ([mediaId, mediaPromise]) => {
-                  await mediaPromise;
-                  return mediaId;
-                },
+            const result = await Promise.all(
+              mediaPromises.map(async mediaPromise =>
+                mediaPromise.then(mediaId => mediaId).catch(() => null),
               ),
             );
 
-            const successfulMediaIds = result
-              .map(r => (r.status === 'fulfilled' ? r.value : null))
-              .filter(isDefined);
+            const successfulMediaIds = result.filter(isDefined);
 
             if (enriched.profile?.positions) {
               enriched.profile.positions = finalizeLogos(
@@ -265,6 +272,7 @@ export const enrichContact = async (
         }
 
         if (!shouldRetry) usedResolvers.add(resolver.name);
+        break; // we reevaluate the resolvers after each round
       } catch (error) {
         usedResolvers.add(resolver.name);
         console.error(

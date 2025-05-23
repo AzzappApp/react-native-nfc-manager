@@ -87,11 +87,13 @@ export const uploadLogo = async (mediaId: string, hostname: string) => {
     const type = logo.headers.get('content-type') || '';
     if (type.includes('image')) {
       const buffer = await logo.blob();
-      await uploadMedia(buffer, mediaId);
-    } else {
-      throw new Error(
-        `Error fetching logo of ${hostname}: invalid content type ${type}, response ${logo.status}:  ${logo.statusText}`,
-      );
+      return uploadMedia(buffer, mediaId);
     }
+    throw new Error(
+      `Error fetching logo of ${hostname}: invalid content type ${type}, response ${logo.status}:  ${logo.statusText}`,
+    );
   }
+  throw new Error(
+    `Error fetching logo of ${hostname}: response ${logo.status}:  ${logo.statusText}`,
+  );
 };

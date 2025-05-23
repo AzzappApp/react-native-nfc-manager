@@ -45,7 +45,7 @@ export const peopleDataLabsEnrichment: ApiResolver = {
 
       if (response.status === 200) {
         const { data } = response;
-        const mediaPromises = new Map<string, Promise<void>>();
+        const mediaPromises = Array<Promise<string>>();
         return {
           data: await buildContact(data, mediaPromises),
           mediaPromises,
@@ -58,7 +58,7 @@ export const peopleDataLabsEnrichment: ApiResolver = {
 
 const buildContact = async (
   data: PersonResponse,
-  mediaPromises: Map<string, Promise<void>>,
+  mediaPromises: Array<Promise<string>>,
 ) => {
   const uniqueBrands = (
     data.experience?.map(position => ({
@@ -87,7 +87,7 @@ const buildContact = async (
       const logo = downloadMediaFromBrand(website);
       if (logo) {
         logoIdPerBrand.set(brand, logo.mediaId);
-        mediaPromises.set(logo.mediaId, logo.promise);
+        mediaPromises.push(logo.promise);
       }
       return {
         brand,
@@ -256,7 +256,7 @@ export const peopleDataLabsIdentify: ApiResolver = {
 
     if (response.status === 200) {
       const data = response.matches[0].data;
-      const mediaPromises = new Map<string, Promise<void>>();
+      const mediaPromises: Array<Promise<string>> = [];
       return {
         data: await buildContact(data, mediaPromises),
         mediaPromises,

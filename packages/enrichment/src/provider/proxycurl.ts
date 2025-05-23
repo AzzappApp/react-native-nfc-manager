@@ -56,7 +56,7 @@ export const proxyCurlLookup: ApiResolver = {
 
     if (response.ok) {
       const json: ProfileLookupEnrichedResponse = await response.json();
-      const mediaPromises = new Map<string, Promise<void>>();
+      const mediaPromises: Array<Promise<string>> = [];
       return {
         data: await buildDataFromResponse(
           json.profile,
@@ -78,7 +78,7 @@ export const proxyCurlLookup: ApiResolver = {
 
 const buildDataFromResponse = async (
   profile: PersonProfileResponse,
-  mediaPromises: Map<string, Promise<void>>,
+  mediaPromises: Array<Promise<string>>,
   linkedinProfileUrl?: string | null,
 ) => {
   const logos = new Set(
@@ -92,7 +92,7 @@ const buildDataFromResponse = async (
     const res = uploadMediaFromUrl(url);
 
     logoIdPerUrl.set(url, res.id);
-    mediaPromises.set(url, res.promise);
+    mediaPromises.push(res.promise);
   });
 
   const avatar = profile?.profile_pic_url
@@ -100,9 +100,9 @@ const buildDataFromResponse = async (
     : null;
   let avatarId;
   if (avatar) {
-    avatar.promise
-      .then(() => {
-        avatarId = avatar.id;
+    await avatar.promise
+      .then(res => {
+        avatarId = res;
       })
       .catch(() => {
         avatarId = undefined;
@@ -272,7 +272,7 @@ export const proxyCurlProfile: ApiResolver = {
 
     if (response.ok) {
       const json: PersonProfileResponse = await response.json();
-      const mediaPromises = new Map<string, Promise<void>>();
+      const mediaPromises: Array<Promise<string>> = [];
       return {
         data: json ? await buildDataFromResponse(json, mediaPromises) : {},
         mediaPromises,
@@ -329,9 +329,9 @@ export const proxyCurlPicture: ApiResolver = {
 
       let avatarId;
       if (avatar) {
-        avatar.promise
-          .then(() => {
-            avatarId = avatar.id;
+        await avatar.promise
+          .then(res => {
+            avatarId = res;
           })
           .catch(() => {
             avatarId = undefined;
