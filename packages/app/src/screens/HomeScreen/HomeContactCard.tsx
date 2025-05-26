@@ -168,6 +168,7 @@ const ContactCardItemMemo = memo(ContactCardItem);
 const styleSheet = createStyleSheet(appearance => ({
   contactCardList: {
     flex: 1,
+    marginLeft: 20,
   },
   card: {
     ...shadow({ appearance }),

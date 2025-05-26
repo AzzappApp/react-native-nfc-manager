@@ -560,26 +560,27 @@ export const getSharedWebCardRelation = async (
 };
 
 /**
- * Delete all profiles associated to a web card except the owner
+ * Get the total number of new contacts for a user since their last view
  *
- * @param webCardId - The id of the web card
+ * @param userId - The user's ID
+ * @returns The total number of new contacts
  */
-export const getNbNewContactsPerOwner = async (profileIds: string[]) => {
+export const getNbNewContactsForUser = async (
+  userId: string,
+): Promise<number> => {
   const res = await db()
-    .select({
-      ownerProfileId: ContactTable.ownerProfileId,
-      count: count(),
-    })
+    .select({ count: count() })
     .from(ContactTable)
-    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id)) // Join on profile ID
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
     .where(
       and(
-        inArray(ProfileTable.id, [...new Set(profileIds)]), // Ensure we filter only relevant profiles
+        eq(UserTable.id, userId),
         eq(ContactTable.deleted, false),
-        gt(ContactTable.createdAt, ProfileTable.lastContactViewAt), // Compare createdAt with profile's last view date
+        gt(ContactTable.createdAt, UserTable.lastContactViewAt), // Compare createdAt with user's last view date
       ),
     )
-    .groupBy(ContactTable.ownerProfileId);
+    .then(rows => rows[0].count);
 
   return res;
 };

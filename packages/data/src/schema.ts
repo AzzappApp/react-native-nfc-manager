@@ -584,10 +584,6 @@ export const ProfileTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
-    lastContactViewAt: cols
-      .dateTime('lastContactViewAt')
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
     hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
   },
   table => {
@@ -735,6 +731,10 @@ export const UserTable = cols.table(
     }>(),
     nbEnrichments: cols.int('nbEnrichments').default(0).notNull(),
     freeEnrichments: cols.boolean('freeEnrichments').default(false).notNull(),
+    lastContactViewAt: cols
+      .dateTime('lastContactViewAt')
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
   },
   table => {
     return {

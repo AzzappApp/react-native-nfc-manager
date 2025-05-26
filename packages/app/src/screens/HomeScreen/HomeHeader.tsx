@@ -5,20 +5,14 @@ import {
   Rect,
   useSVG,
 } from '@shopify/react-native-skia';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { getTextColor } from '@azzapp/shared/colorsHelpers';
-import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import { useIndexInterpolation } from './homeHelpers';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
 import type { DerivedValue } from 'react-native-reanimated';
@@ -29,47 +23,20 @@ type HomeHeaderProps = {
 };
 
 const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
-  const { isPremium, profiles } = useFragment(
+  const { isPremium } = useFragment(
     graphql`
       fragment HomeHeader_user on User {
         isPremium
-        profiles {
-          webCard {
-            id
-            cardColors {
-              primary
-            }
-          }
-        }
       }
     `,
     userKey,
   );
 
-  const { currentIndexSharedValue } = useHomeScreenContext();
+  const { currentIndexSharedValue, readableTextColor } = useHomeScreenContext();
   const { toggleTooltips } = useTooltipContext();
 
-  const readableColors = useMemo(
-    () => [
-      colors.white,
-      ...(profiles?.map(profile => {
-        return profile?.webCard?.cardColors?.primary
-          ? getTextColor(profile?.webCard.cardColors?.primary)
-          : colors.white;
-      }) ?? []),
-    ],
-    [profiles],
-  );
-
-  const color = useIndexInterpolation<string>(
-    currentIndexSharedValue,
-    readableColors,
-    colors.white,
-    interpolateColor,
-  );
-
   const iconStyles = useAnimatedStyle(() => ({
-    tintColor: color.value,
+    tintColor: readableTextColor.value,
   }));
 
   const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
@@ -101,7 +68,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
       middleElement={
         <AnimatedHomeHeaderCentralComponent
           isPremium={isPremium}
-          color={color}
+          color={readableTextColor}
         />
       }
       rightElement={

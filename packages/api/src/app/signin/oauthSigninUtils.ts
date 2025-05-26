@@ -310,6 +310,7 @@ export const oauthSigninCallback =
                 cookiePreferences: null,
                 nbEnrichments: 0,
                 freeEnrichments: false,
+                lastContactViewAt: new Date(),
               },
               null,
             ];

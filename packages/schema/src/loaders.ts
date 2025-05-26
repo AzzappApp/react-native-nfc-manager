@@ -10,7 +10,7 @@ import {
   getContactsByUser,
   getUserSubscriptions,
   getContactCountPerOwner,
-  getNbNewContactsPerOwner,
+  getNbNewContactsForUser,
   getProfilesByUserAndWebCards,
 } from '@azzapp/data';
 import {
@@ -283,16 +283,14 @@ export const contactCountForProfileLoader = createSessionDataLoader(
   },
 );
 
-export const newContactsCountForProfileLoader = createSessionDataLoader(
+export const newContactsCountForUserLoader = createSessionDataLoader(
   'newContactsCountForProfileLoader',
   async (keys: readonly string[]) => {
     if (keys.length === 0) {
       return [];
     }
 
-    const contacts = await getNbNewContactsPerOwner(keys as string[]);
-    return keys.map(
-      k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
-    );
+    const count = await getNbNewContactsForUser(keys[0]);
+    return [count];
   },
 );

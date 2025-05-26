@@ -1,16 +1,13 @@
-import concat from 'lodash/concat';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
   interpolate,
-  useAnimatedStyle,
   useAnimatedRef,
   useDerivedValue,
-  useAnimatedReaction,
-  runOnJS,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
@@ -19,16 +16,14 @@ import ProfileStatisticsChart, {
 } from '#components/ProfileStatisticsChart';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-import { useIndexInterpolation } from './homeHelpers';
-import { useHomeScreenContext } from './HomeScreenContext';
-import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
+import type { HomeStatistics_profile$key } from '#relayArtifacts/HomeStatistics_profile.graphql';
 import type { ReactNode } from 'react';
-import type { DerivedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 type HomeStatisticsProps = {
-  user: HomeStatistics_profiles$key;
+  user: HomeStatistics_profile$key | null | undefined;
   height: number;
   focused: boolean;
   initialStatsIndex?: number;
@@ -40,9 +35,9 @@ const HomeStatistics = ({
   focused,
   initialStatsIndex = 0,
 }: HomeStatisticsProps) => {
-  const profiles = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment HomeStatistics_profiles on Profile @relay(plural: true) {
+      fragment HomeStatistics_profile on Profile {
         id
         webCard {
           id
@@ -67,9 +62,6 @@ const HomeStatistics = ({
     user,
   );
 
-  const { currentIndexSharedValue, currentIndexProfileSharedValue } =
-    useHomeScreenContext();
-
   const { width } = useWindowDimensions();
   const intl = useIntl();
 
@@ -79,8 +71,8 @@ const HomeStatistics = ({
   });
 
   const chartsData = useMemo(() => {
-    if (!profiles) {
-      return [];
+    if (!profile) {
+      return {};
     }
     const days = dayRange.map(i => {
       const date = new Date();
@@ -91,41 +83,30 @@ const HomeStatistics = ({
       return utcDate.toISOString();
     });
 
-    return profiles?.map(profile => {
-      const profileStatsByDays = days.map(day =>
-        profile.statsSummary?.find(stats => stats.day === day),
-      );
-      const webCardStatsByDay = days.map(day =>
-        profile.webCard?.statsSummary?.find(stats => stats.day === day),
-      );
+    const profileStatsByDays = days.map(day =>
+      profile.statsSummary?.find(stats => stats.day === day),
+    );
+    const webCardStatsByDay = days.map(day =>
+      profile.webCard?.statsSummary?.find(stats => stats.day === day),
+    );
 
-      return {
-        contactCardScans: normalizeArray(
-          profileStatsByDays.map(stats => stats?.contactCardScans ?? 0),
-        ),
-        webCardViews: normalizeArray(
-          webCardStatsByDay.map(stats => stats?.webCardViews ?? 0),
-        ),
-        contactsImportFromScan: normalizeArray(
-          profileStatsByDays.map(stats => stats?.contactsImportFromScan ?? 0),
-        ),
-        shareBacks: normalizeArray(
-          profileStatsByDays.map(stats => stats?.shareBacks ?? 0),
-        ),
-      };
-    });
-  }, [profiles]);
+    return {
+      contactCardScans: normalizeArray(
+        profileStatsByDays.map(stats => stats?.contactCardScans ?? 0),
+      ),
+      webCardViews: normalizeArray(
+        webCardStatsByDay.map(stats => stats?.webCardViews ?? 0),
+      ),
+      contactsImportFromScan: normalizeArray(
+        profileStatsByDays.map(stats => stats?.contactsImportFromScan ?? 0),
+      ),
+      shareBacks: normalizeArray(
+        profileStatsByDays.map(stats => stats?.shareBacks ?? 0),
+      ),
+    };
+  }, [profile]);
 
   const animatedChartData = useDerivedValue(() => {
-    const profileIndex = Math.max((currentIndexSharedValue?.value ?? 1) - 1, 0);
-
-    const previousProfileIndex = Math.max(Math.floor(profileIndex), 0);
-    const nextProfileIndex = Math.min(
-      Math.ceil(profileIndex),
-      profiles.length - 1,
-    );
-    const profileIndexInterPolationValue = profileIndex - previousProfileIndex;
-
     const previousScrollIndex = Math.max(
       Math.floor(scrollIndexOffset.value),
       0,
@@ -138,88 +119,20 @@ const HomeStatistics = ({
       scrollIndexOffset.value - previousScrollIndex;
     const previousScrollIndexProp = STATISTICS_ORDER[previousScrollIndex];
     const nextScrollIndexProp = STATISTICS_ORDER[nextScrollIndex];
-
-    const previousProfileData = chartsData[previousProfileIndex];
-    const nextProfileData = chartsData[nextProfileIndex];
-
-    if (!previousProfileData || !nextProfileData) {
-      const data = previousProfileData ?? nextProfileData;
-      if (!data) {
-        return dayRange.map(() => 0);
-      }
-      return dayRange.map(index => {
-        return interpolate(
-          profileIndexInterPolationValue,
-          [0, 1],
-          [
-            data[previousScrollIndexProp][index],
-            data[nextScrollIndexProp][index],
-          ],
-        );
-      });
+    if (!chartsData) {
+      return dayRange.map(() => 0);
     }
-
     return dayRange.map(index => {
-      const previousProfileValue = interpolate(
-        scrollIndexInterPolationValue,
-        [0, 1],
-        [
-          previousProfileData[previousScrollIndexProp][index],
-          previousProfileData[nextScrollIndexProp][index],
-        ],
-      );
-      const nextProfileValue = interpolate(
-        scrollIndexInterPolationValue,
-        [0, 1],
-        [
-          nextProfileData[previousScrollIndexProp][index],
-          nextProfileData[nextScrollIndexProp][index],
-        ],
-      );
       return interpolate(
-        profileIndexInterPolationValue,
+        scrollIndexInterPolationValue,
         [0, 1],
-        [previousProfileValue, nextProfileValue],
+        [
+          chartsData[previousScrollIndexProp]?.[index] ?? 0,
+          chartsData[nextScrollIndexProp]?.[index] ?? 0,
+        ],
       );
     });
   });
-
-  const totalScans = useIndexInterpolation(
-    currentIndexProfileSharedValue,
-    concat(0, profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
-    0,
-  );
-  const totalScansLabel = useDerivedValue(() => format(totalScans.value));
-
-  const totalContactsImportFromScan = useIndexInterpolation(
-    currentIndexProfileSharedValue,
-    concat(
-      0,
-      profiles?.map(profile => profile.nbContactsImportFromScan ?? 0) ?? [],
-    ),
-    0,
-  );
-  const totalContactsImportFromScanLabel = useDerivedValue(() =>
-    format(totalContactsImportFromScan.value),
-  );
-
-  const totalViews = useIndexInterpolation(
-    currentIndexProfileSharedValue,
-    concat(
-      0,
-      profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? [],
-    ),
-    0,
-  );
-  const totalViewsLabel = useDerivedValue(() => format(totalViews.value));
-  const totalShareBacks = useIndexInterpolation(
-    currentIndexProfileSharedValue,
-    concat(0, profiles?.map(profile => profile.nbShareBacks ?? 0) ?? []),
-    0,
-  );
-  const totalShareBacksLabel = useDerivedValue(() =>
-    format(totalShareBacks.value),
-  );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
 
@@ -268,7 +181,7 @@ const HomeStatistics = ({
         overScrollMode="never"
       >
         <StatisticItems
-          value={totalScansLabel}
+          value={format(profile?.nbContactCardScans ?? 0)}
           title={intl.formatMessage({
             defaultMessage: 'Contact shares',
             description: 'Home statistics - Contact shares label',
@@ -278,7 +191,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalShareBacksLabel}
+          value={format(profile?.nbShareBacks ?? 0)}
           title={intl.formatMessage({
             defaultMessage: 'Contacts received',
             description: 'Home statistics - Contacts received label',
@@ -288,7 +201,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalViewsLabel}
+          value={format(profile?.webCard?.nbWebCardViews ?? 0)}
           title={intl.formatMessage({
             defaultMessage: 'Profile views',
             description: 'Home statistics - Profile views label',
@@ -298,7 +211,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalContactsImportFromScanLabel}
+          value={format(profile?.nbContactsImportFromScan ?? 0)}
           title={intl.formatMessage({
             defaultMessage: 'Scans',
             description:
@@ -322,19 +235,19 @@ export default HomeStatistics;
 const dayRange = Array.from({ length: 30 }, (_, i) => i);
 
 type StatisticItemsProps = {
-  value: DerivedValue<string>;
-  scrollIndex: DerivedValue<number>;
+  value: string;
   title: ReactNode;
   index: number;
   onSelect: (index: number) => void;
+  scrollIndex: SharedValue<number>;
 };
 
 export const StatisticItems = ({
   value,
-  scrollIndex,
   title,
   index,
   onSelect,
+  scrollIndex,
 }: StatisticItemsProps) => {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
@@ -371,15 +284,6 @@ export const StatisticItems = ({
     onSelect(index);
   };
 
-  const [text, setText] = useState(() => value.value);
-  useAnimatedReaction(
-    () => value.value,
-    newValue => {
-      runOnJS(setText)(newValue);
-    },
-    [value],
-  );
-
   const styles = useStyleSheet(stylesheet);
 
   return (
@@ -387,7 +291,7 @@ export const StatisticItems = ({
       <Pressable onPress={onPress} style={{ overflow: 'visible' }}>
         <Animated.View style={animatedTextStyle}>
           <Text style={styles.largeText} selectable={false}>
-            {text}
+            {value}
           </Text>
         </Animated.View>
         <Text variant="smallbold" style={styles.smallText} selectable={false}>
@@ -422,9 +326,6 @@ const stylesheet = createStyleSheet(() => ({
   },
   smallText: {
     textAlign: 'center',
-    color: colors.white,
-  },
-  icon: {
     color: colors.white,
   },
 }));

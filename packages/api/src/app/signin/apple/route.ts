@@ -148,6 +148,7 @@ const appleSignin = async (req: Request) => {
                 cookiePreferences: null,
                 nbEnrichments: 0,
                 freeEnrichments: false,
+                lastContactViewAt: new Date(),
               },
               null,
             ];

@@ -73,24 +73,18 @@ const ContactsScreen = ({
   const [commitContactsLastView] =
     useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
       graphql`
-        mutation ContactsScreenListsMutationUpdateContactsLastViewMutation(
-          $profileId: ID!
-        ) {
-          updateContactsLastView(profileId: $profileId)
+        mutation ContactsScreenListsMutationUpdateContactsLastViewMutation {
+          updateContactsLastView
         }
       `,
     );
 
   useEffect(() => {
-    const profileId = getAuthState().profileInfos?.profileId;
-    if (!profileId) {
+    const userId = getAuthState().profileInfos?.userId;
+    if (!userId) {
       return;
     }
-    commitContactsLastView({
-      variables: {
-        profileId,
-      },
-    });
+    commitContactsLastView({ variables: {} });
   }, [commitContactsLastView]);
 
   const onShowContact = useCallback(

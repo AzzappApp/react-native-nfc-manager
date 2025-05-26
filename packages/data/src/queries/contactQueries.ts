@@ -817,13 +817,13 @@ export const removeContacts = async (contactIds: string[]) => {
     .where(and(inArray(ContactTable.id, contactIds)));
 };
 
-export const refreshContactsLastView = async (ownerProfileId: string) => {
+export const refreshContactsLastView = async (userId: string) => {
   return db()
-    .update(ProfileTable)
+    .update(UserTable)
     .set({
       lastContactViewAt: new Date(),
     })
-    .where(eq(ProfileTable.id, ownerProfileId));
+    .where(eq(UserTable.id, userId));
 };
 
 export const removeContactsbyIds = async (contactIds: string[]) => {

@@ -3439,7 +3439,7 @@ SPEC CHECKSUMS:
   react-native-quick-crypto: c168bd6ca1835f7ff17434f329d073290be091a8
   react-native-safe-area-context: 5594ec631ede9c311c5c0efa244228eff845ce88
   react-native-skia: 2f725d0747756d57f0a51417c91e33bc42272c56
-  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
+  react-native-skottie-template-player: 3120030f38fc46dacafd2220539c31f4df1b7d0d
   react-native-webview: 520bcb79c3f2af91e157cdd695732a34ab5f25c8
   React-NativeModulesApple: 2c4377e139522c3d73f5df582e4f051a838ff25e
   React-oscompat: ef5df1c734f19b8003e149317d041b8ce1f7d29c
@@ -3501,8 +3501,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 7aaae584148bbc250e81b5662e45a7f25c18be2e
-  Yoga: c758bfb934100bb4bf9cbaccb52557cee35e8bdf
+  Yoga: 9f110fc4b7aa538663cba3c14cbb1c335f43c13f
 
 PODFILE CHECKSUM: 523d5e289b0d05bc39a1fb765a75df2a09fa62fd
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.16.1

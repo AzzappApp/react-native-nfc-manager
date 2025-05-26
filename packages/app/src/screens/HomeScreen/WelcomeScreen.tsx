@@ -5,7 +5,6 @@ import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
 import relayScreen from '#helpers/relayScreen';
@@ -32,15 +31,6 @@ export const WelcomeScreen = ({
   useSetRevenueCatUserInfo(currentUser);
 
   const intl = useIntl();
-
-  useEffect(() => {
-    if (hasFocus) {
-      setMainTabBarOpacity(0);
-    }
-    return () => {
-      setMainTabBarOpacity(1);
-    };
-  }, [hasFocus]);
 
   const [showMenu, open, close] = useBoolean(false);
 

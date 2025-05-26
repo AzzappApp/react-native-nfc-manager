@@ -173,6 +173,11 @@ export type FollowingsRoute = {
   params?: never;
 };
 
+export type AnalyticsRoute = {
+  route: 'ANALYTICS';
+  params?: never;
+};
+
 export type FollowingsMosaicRoute = {
   route: 'FOLLOWINGS_MOSAIC';
   params?: never;
@@ -347,6 +352,7 @@ export type Route =
   | AcceptTermsRoute
   | AccountDetailsRoute
   | AddModuleSectionRoute
+  | AnalyticsRoute
   | CardModuleEditionRoute
   | CommonInformationRoute
   | ConfirmChangeContactRoute

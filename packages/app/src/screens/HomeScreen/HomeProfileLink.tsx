@@ -16,7 +16,6 @@ import { useTooltipContext } from '#helpers/TooltipContext';
 import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
 import type { TextProps } from '#ui/Text';
@@ -40,8 +39,11 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     userKey,
   );
 
-  const { currentIndexProfileSharedValue, currentIndexSharedValue } =
-    useHomeScreenContext();
+  const {
+    currentIndexProfileSharedValue,
+    currentIndexSharedValue,
+    readableTextColor,
+  } = useHomeScreenContext();
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const userNames = useDerivedValue(
@@ -106,6 +108,10 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     };
   }, [onPressLatest, registerTooltip, unregisterTooltip]);
 
+  const iconStyles = useAnimatedStyle(() => ({
+    tintColor: readableTextColor.value,
+  }));
+
   return (
     <Animated.View ref={ref} style={[styles.container, opacityStyle]}>
       <PressableNative
@@ -113,7 +119,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="link" style={styles.iconLink} />
+        <Icon icon="link" style={[styles.iconLink, iconStyles]} />
         <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
       </PressableNative>
     </Animated.View>
@@ -122,12 +128,17 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
 const HomeProfileLinkText = ({
   text,
+  style,
   ...props
 }: TextProps & { text: DerivedValue<string> }) => {
   // Cause a reading of shared value during render
   // eslint-disable-next-line react-compiler/react-compiler
   'use no memo';
   const [textInner, setTextInner] = useState(() => text.value);
+  const { readableTextColor } = useHomeScreenContext();
+  const animatedStyle = useAnimatedStyle(() => {
+    return { color: readableTextColor.value };
+  });
 
   useAnimatedReaction(
     () => text.value,
@@ -136,9 +147,14 @@ const HomeProfileLinkText = ({
     },
   );
   return (
-    <Text variant="button" numberOfLines={1} {...props}>
+    <Animated.Text
+      variant="button"
+      numberOfLines={1}
+      {...props}
+      style={[style, animatedStyle]}
+    >
       {textInner}
-    </Text>
+    </Animated.Text>
   );
 };
 
@@ -146,7 +162,7 @@ export default memo(HomeProfileLink);
 
 export const PROFILE_LINK_HEIGHT = 29;
 
-export const PROFILE_LINK_MARGIN_TOP = 21;
+export const PROFILE_LINK_MARGIN_TOP = 10;
 
 const styles = StyleSheet.create({
   container: {

@@ -11,23 +11,8 @@ const createRouterInit = (
  * Main stack of the app
  */
 export const mainRoutes: RouterInit = createRouterInit('MAIN', {
-  id: 'MAIN_TAB',
-  currentIndex: 0,
-  lazy: true,
-  tabs: [
-    {
-      id: 'HOME',
-      route: 'HOME',
-    },
-    {
-      id: 'MEDIA',
-      route: 'MEDIA',
-    },
-  ],
-  screenOptions: {
-    stackAnimation: 'fade',
-    replaceAnimation: 'push',
-  },
+  id: 'HOME',
+  route: 'HOME',
 });
 
 export const onboardIngRoutes = createRouterInit('ONBOARDING', {

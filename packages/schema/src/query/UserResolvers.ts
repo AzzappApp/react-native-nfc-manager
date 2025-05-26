@@ -20,6 +20,7 @@ import {
   profileLoader,
   webCardLoader,
   webCardOwnerLoader,
+  newContactsCountForUserLoader,
 } from '#loaders';
 import {
   cursorToDate,
@@ -102,6 +103,9 @@ export const User: ProtectedResolver<UserResolvers> = {
     const subscriptions = await subscriptionsForUserLoader.load(user.id);
 
     return subscriptions[0] ?? null;
+  },
+  nbNewContacts: async user => {
+    return newContactsCountForUserLoader.load(user.id);
   },
   isPremium: async user => {
     if (!isSameUser(user)) {

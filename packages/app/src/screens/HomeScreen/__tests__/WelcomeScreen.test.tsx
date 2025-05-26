@@ -11,10 +11,6 @@ import { WelcomeScreen } from '../WelcomeScreen';
 import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-jest.mock('#components/MainTabBar', () => ({
-  setMainTabBarOpacity: jest.fn(),
-}));
-
 jest.mock('../HomeBottomSheetPanel', () => 'HomeBottomSheetPanel');
 
 jest.mock('#helpers/authStore', () => ({

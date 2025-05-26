@@ -74,7 +74,11 @@ type User {
   nbEnrichments: EnrichmentData!
 
   nbContacts: Int!
-
+  
+  """
+  the number of new contact unread since last contact view open
+  """
+  nbNewContacts: Int!
 
   """
   Returns the list of contacts of the user profiles
@@ -111,7 +115,7 @@ type User {
   Returns the list of contacts for the user grouped by meeting date
   """
   contactsByDates(
-     """
+    """
     An optional search filter to apply to the list of contacts
     """
     search: String
@@ -130,7 +134,6 @@ type User {
     first: Int @max(value: 20)
   ): ContactsByDateConnection!
 
-
   """
   Returns the list of contacts for the user grouped by location
   """
@@ -143,7 +146,7 @@ type User {
     The number of contacts to load by location
     @default(5)
     """
-    nbContactsByLocations: Int 
+    nbContactsByLocations: Int
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -153,7 +156,6 @@ type User {
     """
     first: Int @max(value: 20)
   ): ContactsByLocationConnection!
-
 }
 
 enum ContactOrderBy {
@@ -186,7 +188,7 @@ type UserContactData {
   Returns the title of the user if retrieved during signup
   """
   email: String
-  
+
   """
   Returns the phone number of the user if retrieved during signup
   """
@@ -197,7 +199,6 @@ type UserContactData {
   """
   avatarUrl: String
 }
-
 
 """
 A Type representing a User Cookie Preferences
@@ -318,4 +319,3 @@ type EnrichmentData {
   """
   max: Int!
 }
-

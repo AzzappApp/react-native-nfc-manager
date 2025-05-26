@@ -277,7 +277,7 @@ const HomeProfilesCarousel = (
 
 const SCALE_RATIO = 108 / 291;
 
-const MARGIN_VERTICAL = 15;
+const MARGIN_VERTICAL = 10;
 
 const keyExtractor = (item: { profile: ProfileType | null }, index: number) =>
   item.profile?.webCard?.id ?? `new_${index}`;
@@ -614,7 +614,7 @@ const CreateItemMemo = memo(CreateItem);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: MARGIN_VERTICAL,
+    paddingTop: MARGIN_VERTICAL,
   },
   carousel: {
     flex: 1,

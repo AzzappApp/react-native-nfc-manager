@@ -26,6 +26,7 @@ import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -38,6 +39,7 @@ import SearchBar from '#ui/SearchBar';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
+import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
 import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
@@ -67,7 +69,7 @@ const multiUserScreenQuery = graphql`
         webCard {
           id
           isMultiUser
-          ...CoverRenderer_webCard
+          ...AccountHeader_webCard
           nbProfiles
           ...MultiUserScreenUserList_webCard
           subscription {
@@ -351,12 +353,19 @@ const MultiUserScreen = ({
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const [searching, setSearchMode, removeSearchMode] = useBoolean(false);
 
+  const { top } = useScreenInsets();
+
+  const contentContainerStyle = useMemo(
+    () => ({ flex: 1, paddingTop: transferOwnerMode ? top : 0 }),
+    [top, transferOwnerMode],
+  );
+
   if (!profile) {
     return null;
   }
 
   return (
-    <Container style={styles.contentContainerStyle}>
+    <Container style={contentContainerStyle}>
       {transferOwnerMode ? (
         <Header
           middleElement={intl.formatMessage({
@@ -385,11 +394,12 @@ const MultiUserScreen = ({
         />
       ) : (
         <AccountHeader
+          webCard={profile?.webCard}
           title={intl.formatMessage({
             defaultMessage: 'Multi user',
             description: 'MultiUserScreen - Multi user title',
           })}
-          webCard={profile.webCard}
+          leftIcon="close"
         />
       )}
       <View style={styles.content}>
@@ -482,9 +492,6 @@ const MultiUserScreen = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
-  contentContainerStyle: {
-    flex: 1,
-  },
   sharedIcon: {
     margin: 'auto',
     marginTop: 15,
@@ -552,7 +559,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(MultiUserScreen, {
+const MultiUserRelayScreen = relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
@@ -561,6 +568,12 @@ export default relayScreen(MultiUserScreen, {
   pollInterval: 30000,
   refreshOnFocus: true,
 });
+
+MultiUserRelayScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default MultiUserRelayScreen;
 
 type MultiUserTransferOwnerContextProps = {
   selectedProfileId: string | undefined;

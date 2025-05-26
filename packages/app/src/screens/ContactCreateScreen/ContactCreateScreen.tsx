@@ -583,7 +583,7 @@ const ContactCreateScreen = ({
         })}
         leftElement={
           <IconButton
-            icon="arrow_left"
+            icon="close"
             onPress={router.back}
             style={styles.leftArrowIcon}
           />

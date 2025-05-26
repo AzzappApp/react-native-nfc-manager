@@ -15,8 +15,8 @@ import Animated, {
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors, shadow } from '#theme';
+import AccountHeader from '#components/AccountHeader';
 import Link from '#components/Link';
-import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useCurrentRoute, useRouter } from '#components/NativeRouter';
 import WebCardStatHeader, {
   WebCardStatHeaderFallback,
@@ -29,8 +29,8 @@ import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BlurredFloatingButton from '#ui/BlurredFloatingButton';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
+import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
@@ -41,6 +41,7 @@ import MediaFollowingsWebCards from './MediaFollowingsWebCards';
 import MediaSuggestionsScreen, {
   MediaSuggestionsScreenFallback,
 } from './MediaSuggestionsScreen';
+import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ScrollableToOffset } from '#helpers/types';
 import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
@@ -70,6 +71,7 @@ const mediaScreenQuery = graphql`
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
           ...WebCardStatHeader_webCard
+          ...AccountHeader_webCard
         }
       }
     }
@@ -100,12 +102,6 @@ const MediaScreen = ({
   const intl = useIntl();
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (hasFocus) {
-      setMainTabBarOpacity(1);
-    }
-  }, [hasFocus]);
 
   const canBrowseCommunity =
     profile?.webCard?.cardIsPublished &&
@@ -273,7 +269,15 @@ const MediaScreen = ({
   ];
 
   return (
-    <Container style={[styles.flex, { paddingTop: top }]}>
+    <Container style={styles.flex}>
+      <AccountHeader
+        webCard={profile?.webCard}
+        title={intl.formatMessage({
+          defaultMessage: 'About',
+          description: 'Title of the about screen',
+        })}
+        leftIcon="close"
+      />
       <Animated.View style={[fixedHeaderStyle, styles.fixedHeaderStyle]}>
         <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
       </Animated.View>
@@ -282,7 +286,7 @@ const MediaScreen = ({
         style={{
           position: 'absolute',
           alignItems: 'center',
-          bottom: bottom + BOTTOM_MENU_HEIGHT + 10,
+          bottom: bottom + 10,
           width: '100%',
         }}
       >
@@ -438,6 +442,7 @@ const styleSheet = createStyleSheet(appearance => ({
   fixedHeaderStyle: {
     zIndex: 3,
     position: 'absolute',
+    top: HEADER_HEIGHT,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
     ...shadow({
       appearance,
@@ -451,7 +456,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(MediaScreen, {
+const MediaScreenRelayScreen = relayScreen(MediaScreen, {
   query: mediaScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
@@ -459,3 +464,9 @@ export default relayScreen(MediaScreen, {
   }),
   fallback: MediaScreenFallback,
 });
+
+MediaScreenRelayScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default MediaScreenRelayScreen;

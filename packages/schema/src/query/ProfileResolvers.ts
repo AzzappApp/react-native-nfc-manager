@@ -22,7 +22,6 @@ import { simpleHash } from '@azzapp/shared/stringHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
   contactCountForProfileLoader,
-  newContactsCountForProfileLoader,
   profileInUserContactLoader,
   profileLoader,
   profileStatisticsLoader,
@@ -140,16 +139,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return null;
     }
     return profile.nbShareBacks;
-  },
-  nbNewContacts: async profile => {
-    if (
-      !profileIsAssociatedToCurrentUser(profile) &&
-      !(await hasWebCardProfileRight(profile.webCardId))
-    ) {
-      return 0;
-    }
-
-    return newContactsCountForProfileLoader.load(profile.id);
   },
   promotedAsOwner: async profile => {
     if (

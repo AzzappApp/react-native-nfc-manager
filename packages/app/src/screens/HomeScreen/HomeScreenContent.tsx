@@ -19,13 +19,14 @@ import useNotificationsEvent, {
 } from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useWidget from '#hooks/useWidget';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
+import { HomeBottomBar } from './HomeBottomBar';
 import HomeBottomPanel from './HomeBottomPanel';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
+import HomeProfileMenu from './HomeProfileMenu';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
@@ -58,6 +59,9 @@ const HomeScreenContent = ({
             cardIsPublished
             userName
             coverIsPredefined
+            cardColors {
+              primary
+            }
           }
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
@@ -69,6 +73,8 @@ const HomeScreenContent = ({
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
         ...HomeHeader_user
+        ...HomeBottomBar_user
+        ...HomeBottomBar_shareButton_user
       }
     `,
     userKey,
@@ -84,8 +90,6 @@ const HomeScreenContent = ({
   );
 
   const router = useRouter();
-
-  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const redirectDeepLink = useCallback(
     (notification: PushNotificationData) => {
@@ -142,8 +146,6 @@ const HomeScreenContent = ({
     [redirectDeepLink, user.profiles],
   );
 
-  useEffect(() => clearTimeout(changeWebCardTimeout.current), []);
-
   const { notificationAuthorized, requestNotificationPermission } =
     useNotificationsManager();
 
@@ -198,16 +200,15 @@ const HomeScreenContent = ({
 
   // #endregion
   const insets = useScreenInsets();
+
   const homeContentContainerStyle = useMemo(
     () => [
       styles.container,
       {
         marginTop: insets.top + HOME_SCREEN_CONTENT_PADDING,
-        marginBottom:
-          insets.bottom + BOTTOM_MENU_HEIGHT + HOME_SCREEN_CONTENT_PADDING,
       },
     ],
-    [insets.bottom, insets.top],
+    [insets.top],
   );
 
   //#region widget
@@ -220,10 +221,12 @@ const HomeScreenContent = ({
       <View style={homeContentContainerStyle}>
         <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
-        <HomeProfilesCarousel ref={selectListRef} user={user} />
-        <Suspense>
-          <HomeBottomPanel user={user} />
-        </Suspense>
+        <View style={styles.viewCarrousel}>
+          <HomeProfilesCarousel ref={selectListRef} user={user} />
+        </View>
+        <HomeProfileMenu />
+        <HomeBottomPanel user={user} />
+        <HomeBottomBar user={user} />
       </View>
       <Suspense>
         <HomeBottomSheetPanel
@@ -243,9 +246,10 @@ const HomeScreenContent = ({
 //usage of memo tested with whyDidYouRender, reducing render due to context change
 export default memo(HomeScreenContent);
 
-export const HOME_SCREEN_CONTENT_PADDING = 15;
+export const HOME_SCREEN_CONTENT_PADDING = 5;
 
 const styles = StyleSheet.create({
+  viewCarrousel: { flex: 1, zIndex: 10 },
   container: {
     flex: 1,
     justifyContent: 'space-around',

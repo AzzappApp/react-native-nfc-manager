@@ -8,6 +8,9 @@ const icons = {
   get missing() {
     return require('./assets/missing.png');
   },
+  get analytics() {
+    return require('./assets/analytics.png');
+  },
   get about() {
     return require('./assets/about.png');
   },
@@ -181,6 +184,9 @@ const icons = {
   },
   get earth() {
     return require('./assets/earth.png');
+  },
+  get earth_thin() {
+    return require('./assets/earth_thin.png');
   },
   get edit() {
     return require('./assets/edit.png');
@@ -467,8 +473,14 @@ const icons = {
   get share() {
     return require('./assets/share.png');
   },
+  get share_home() {
+    return require('./assets/share_home.png');
+  },
   get shared_webcard() {
     return require('./assets/shared_webcard.png');
+  },
+  get shared_webcard_thin() {
+    return require('./assets/shared_webcard_thin.png');
   },
   get share_main() {
     return require('./assets/share_main.png');

@@ -20,10 +20,7 @@ type Profile implements Node {
   the number of total Share Back
   """
   nbShareBacks: Int
-  """
-  the number of new contact unread since last contact view open
-  """
-  nbNewContacts: Int!
+
   """
   the number of new contact imported from photo scan
   """

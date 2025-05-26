@@ -143,11 +143,6 @@ const UserPayWallScreen = ({
           Platform.OS === 'ios')));
 
   useEffect(() => {
-    console.log(
-      'wiating',
-      shouldWaitDatabase,
-      currentSubscription?.subscriptionId === waitedSubscriptionId,
-    );
     if (
       shouldWaitDatabase &&
       currentSubscription?.subscriptionId === waitedSubscriptionId

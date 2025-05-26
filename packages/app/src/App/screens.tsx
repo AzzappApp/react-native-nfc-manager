@@ -1,6 +1,7 @@
 import AboutScreen from '#screens/AboutScreen';
 import AcceptTermsScreen from '#screens/AcceptTermsScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
+import AnalyticsScreen from '#screens/AnalyticsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import CommonInformationScreen from '#screens/CommonInformationScreen';
 import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
@@ -58,6 +59,7 @@ const screens = {
   ABOUT: AboutScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   ACCEPT_TERMS: AcceptTermsScreen,
+  ANALYTICS: AnalyticsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CARD_MODULE_MEDIA_EDITION: MediaModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,

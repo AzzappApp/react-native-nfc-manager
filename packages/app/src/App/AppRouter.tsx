@@ -9,7 +9,6 @@ import {
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import MainTabBar from '#components/MainTabBar';
 import {
   RouterProvider,
   ScreensRenderer,
@@ -99,10 +98,6 @@ const LoginRouter = () => {
       <ScreensRenderer routerState={routerState} screens={screens} />
     </RouterProvider>
   );
-};
-
-const tabs = {
-  MAIN_TAB: MainTabBar,
 };
 
 /**
@@ -202,7 +197,6 @@ const MainRouter = () => {
         router={router}
         routerState={routerState}
         screens={screens}
-        tabs={tabs}
       />
     </RouterProvider>
   );
