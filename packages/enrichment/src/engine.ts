@@ -13,6 +13,7 @@ import {
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { cleanObject } from '@azzapp/shared/objectHelpers';
+import { isSocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import env from './env';
 import { evaluateExpr, describeDependsOn, extractFieldPaths } from './helpers';
 import { countryCode } from './provider/countryCode';
@@ -52,7 +53,7 @@ function diffValues<T extends Record<string, any>>(
   return result;
 }
 
-const removeDuplicatedLinks = (
+const removeDuplicatedAndUnknownLinks = (
   contact: EnrichedContactFields,
   updatedContact: EnrichedContactFields,
 ): EnrichedContactFields => {
@@ -78,8 +79,14 @@ const removeDuplicatedLinks = (
 
   return {
     ...contact,
-    socials: updatedSocials,
-    urls: updatedUrls,
+    socials: updatedSocials.filter(val => isSocialLinkId(val.label)), // we exclude unknown social links
+    urls: updatedUrls.concat(
+      (updatedSocials ?? [])
+        .filter(s => !isSocialLinkId(s.label))
+        .map(s => ({
+          url: s.url,
+        })),
+    ),
   };
 };
 
@@ -226,7 +233,7 @@ export const enrichContact = async (
           deduplicateContactFields(
             diffValues(
               initialContact,
-              removeDuplicatedLinks(initialContact, contact),
+              removeDuplicatedAndUnknownLinks(initialContact, contact),
             ),
           ),
         );
