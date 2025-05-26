@@ -461,8 +461,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   button: {
     marginTop: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   footer: {
     marginTop: 10,
