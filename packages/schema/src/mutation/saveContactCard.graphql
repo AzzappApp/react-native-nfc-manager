@@ -15,6 +15,7 @@ extend type Mutation {
     publishWebCard: Boolean
     contactCard: ContactCardInput!
     primaryColor: String
+    backgroundColor: String
     webCardUserName: String
     coverMediaId: String
   ): SaveContactCardPayload!

@@ -103,6 +103,7 @@ const ContactCardCreateScreen = ({
         $webCardKind: String!
         $contactCard: ContactCardInput!
         $primaryColor: String
+        $backgroundColor: String
         $coverMediaId: String
         $publishWebCard: Boolean!
       ) {
@@ -110,6 +111,7 @@ const ContactCardCreateScreen = ({
           webCardKind: $webCardKind
           contactCard: $contactCard
           primaryColor: $primaryColor
+          backgroundColor: $backgroundColor
           coverMediaId: $coverMediaId
           publishWebCard: $publishWebCard
         ) {
@@ -421,6 +423,7 @@ const ContactCardCreateScreen = ({
       commit({
         variables: {
           primaryColor: data.primaryColor ?? colors.grey400,
+          backgroundColor: data.expendableColor ?? colors.white,
           webCardKind: webCardKind as string,
           coverMediaId: uploadedCoverId,
           publishWebCard: true,

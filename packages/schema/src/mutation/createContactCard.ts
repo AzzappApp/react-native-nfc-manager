@@ -26,6 +26,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     contactCard,
     webCardUserName,
     primaryColor,
+    backgroundColor,
     coverMediaId,
     publishWebCard,
   },
@@ -90,6 +91,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     companyActivityLabel: contactCard.companyActivityLabel,
     alreadyPublished: publishWebCard ?? true,
     userName: webCardUserName,
+    coverBackgroundColor: backgroundColor ?? 'light',
   };
 
   try {
