@@ -379,7 +379,7 @@ const styleSheet = createStyleSheet(appearance => ({
   tooltipText: {
     alignSelf: 'center',
     textAlign: 'center',
-    color: colors.black,
+    color: colors.grey400,
   },
   tooltipButton: { alignSelf: 'center' },
   tooltipButtonText: { color: colors.black },
