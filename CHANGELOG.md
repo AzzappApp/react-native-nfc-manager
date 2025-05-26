@@ -1,3 +1,7 @@
+## 2.0.0-canary.27
+
+* **fix:**  - **contact:** [#8948](https://github.com/AzzappApp/azzapp/pull/8948) item appearance on ios ([#8962](https://github.com/AzzappApp/azzapp/pull/8962))
+
 ## 2.0.0-canary.26
 
 * **fix:**  - add missing shadow on enrich button ([#8949](https://github.com/AzzappApp/azzapp/pull/8949))
