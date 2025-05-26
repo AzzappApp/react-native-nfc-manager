@@ -1,3 +1,7 @@
+## 2.0.0-canary.33
+
+* **fix:**  - **enrichment:** [#8985](https://github.com/AzzappApp/azzapp/pull/8985) wrong avatar upload ([#8992](https://github.com/AzzappApp/azzapp/pull/8992))
+
 ## 2.0.0-canary.32
 
 * **fix:**  - enrichment button shadow display on android ([#8976](https://github.com/AzzappApp/azzapp/pull/8976))
