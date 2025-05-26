@@ -78,6 +78,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 16,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey900,
     borderWidth: 1,
+    height: 32,
   },
   menuPressable: {
     borderStyle: 'solid',
@@ -86,7 +87,6 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     paddingHorizontal: 16,
     borderRadius: 16,
-    height: 32,
   },
   menuSelected: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey900,
