@@ -1832,7 +1832,7 @@ PODS:
     - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-pager-view (6.7.1):
+  - react-native-pager-view (6.8.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1913,7 +1913,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context (5.4.0):
+  - react-native-safe-area-context (5.4.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1928,8 +1928,8 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.4.0)
-    - react-native-safe-area-context/fabric (= 5.4.0)
+    - react-native-safe-area-context/common (= 5.4.1)
+    - react-native-safe-area-context/fabric (= 5.4.1)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1939,7 +1939,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/common (5.4.0):
+  - react-native-safe-area-context/common (5.4.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1963,7 +1963,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/fabric (5.4.0):
+  - react-native-safe-area-context/fabric (5.4.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3433,11 +3433,11 @@ SPEC CHECKSUMS:
   react-native-keyboard-controller: 56db363cb5313c7a8c29e4144c02f9b8a2fc96da
   react-native-mmkv: d3cc73d2554fafa20dc5b86386359034d1faf8ff
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
-  react-native-pager-view: f238ed7fb53458bd03366944a33686f067c83e9a
+  react-native-pager-view: e6194678c3565ded669f30b1a8e1973c9935d8dc
   react-native-passkit: 3979317a86e60cc9288eeffab27da37d62d15160
   react-native-quick-base64: 651d972291fd5d9902869636a1b3c46820324490
   react-native-quick-crypto: c168bd6ca1835f7ff17434f329d073290be091a8
-  react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
+  react-native-safe-area-context: 5594ec631ede9c311c5c0efa244228eff845ce88
   react-native-skia: 2f725d0747756d57f0a51417c91e33bc42272c56
   react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
   react-native-webview: 520bcb79c3f2af91e157cdd695732a34ab5f25c8

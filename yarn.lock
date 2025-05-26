@@ -609,9 +609,9 @@ __metadata:
     "@react-native/metro-config": "npm:^0.79.2"
     "@react-native/typescript-config": "npm:^0.79.2"
     "@reeq/react-native-passkit": "patch:@reeq/react-native-passkit@npm%3A0.1.3#~/.yarn/patches/@reeq-react-native-passkit-npm-0.1.3-587260733c.patch"
-    "@sentry/core": "npm:^9.20.0"
+    "@sentry/core": "npm:^9.22.0"
     "@sentry/react-native": "npm:^6.14.0"
-    "@sentry/types": "npm:^9.20.0"
+    "@sentry/types": "npm:^9.22.0"
     "@sentry/utils": "npm:^8.55.0"
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.6#~/.yarn/patches/@shopify-flash-list-npm-1.7.6-dd7668e04d.patch"
     "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A2.0.0-next.3#~/.yarn/patches/@shopify-react-native-skia-npm-2.0.0-next.3-b2666be50d.patch"
@@ -721,7 +721,7 @@ __metadata:
     react-native-localize: "npm:^3.4.1"
     react-native-mime-types: "npm:^2.5.0"
     react-native-mmkv: "npm:^3.2.0"
-    react-native-pager-view: "npm:^6.7.1"
+    react-native-pager-view: "npm:^6.8.0"
     react-native-permissions: "npm:^5.4.0"
     react-native-popover-view: "npm:^6.1.0"
     react-native-purchases: "npm:^8.10.1"
@@ -729,7 +729,7 @@ __metadata:
     react-native-quick-crypto: "npm:^0.7.13"
     react-native-reanimated: "npm:^3.17.5"
     react-native-remix-icon: "patch:react-native-remix-icon@npm%3A4.6.0#~/.yarn/patches/react-native-remix-icon-npm-4.6.0-79527dbd88.patch"
-    react-native-safe-area-context: "npm:^5.4.0"
+    react-native-safe-area-context: "npm:^5.4.1"
     react-native-screens: "patch:react-native-screens@npm%3A4.10.0#~/.yarn/patches/react-native-screens-npm-4.10.0-a9c3a4e55e.patch"
     react-native-share: "npm:^12.0.11"
     react-native-shared-group-preferences: "npm:^1.1.24"
@@ -12218,10 +12218,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:9.20.0, @sentry/core@npm:^9.20.0":
-  version: 9.20.0
-  resolution: "@sentry/core@npm:9.20.0"
-  checksum: 10/00433d24dbe9b1fc429615cc105dcf85f3ac3ecefed8c5b5616dbfe066b06bbc3c2e45b4b90843f07a5fb6858f39eebd9c0e1efdfa3ba1baa42dae255e4d34d4
+"@sentry/core@npm:9.22.0, @sentry/core@npm:^9.22.0":
+  version: 9.22.0
+  resolution: "@sentry/core@npm:9.22.0"
+  checksum: 10/5bf5d6b5402dca90c6ed1d6e8834c00067806f9710f1cbcd0dff3004c3f3b6ffae8e43d56592d5378fdbddb3d196eb60d8850ea50ca6eca8e31870608109df3d
   languageName: node
   linkType: hard
 
@@ -12485,12 +12485,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:^9.20.0":
-  version: 9.20.0
-  resolution: "@sentry/types@npm:9.20.0"
+"@sentry/types@npm:^9.22.0":
+  version: 9.22.0
+  resolution: "@sentry/types@npm:9.22.0"
   dependencies:
-    "@sentry/core": "npm:9.20.0"
-  checksum: 10/682e095ab8104e843ece43efac9a6d643bffff890c53e3957d06fc0a57bbdd88e45c7908a6f494943d3151dd570c07635a4fb3a6a5103ac555244d7755bc346e
+    "@sentry/core": "npm:9.22.0"
+  checksum: 10/edf1fcecf414d42f65b71068970c2ea75c5c7498e541712da27761c3103ecf340d9a0b271f1bc99dee77b56dcd6d57aca7b1c906dfc4c5d90e52b5683beccd4f
   languageName: node
   linkType: hard
 
@@ -27857,13 +27857,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-pager-view@npm:^6.7.1":
-  version: 6.7.1
-  resolution: "react-native-pager-view@npm:6.7.1"
+"react-native-pager-view@npm:^6.8.0":
+  version: 6.8.0
+  resolution: "react-native-pager-view@npm:6.8.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/22cc95dcf5085cab2b88272610b836375044cc9ab22f8e81f586e9ecb5c75880dc2c649321cbd173b48c6c7025c9914ab4b67ed0207f623a84ea26025257a4e0
+  checksum: 10/528091d15b443b394a8fafcb823a2a08a8e0cd28f512ccf674e581690967828750131457d819736f0f3ed16d2c1d3de360ac83b0032b5474fedc68fd8f45c03d
   languageName: node
   linkType: hard
 
@@ -27970,13 +27970,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:^5.4.0":
-  version: 5.4.0
-  resolution: "react-native-safe-area-context@npm:5.4.0"
+"react-native-safe-area-context@npm:^5.4.1":
+  version: 5.4.1
+  resolution: "react-native-safe-area-context@npm:5.4.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/3b94e0a39398f23f4cbec2e49ebfd58c4e56f1d4157fda613c3bab66924a4e71ed6665a346dd71fd04ebd40e00f606f10d5a973b2616be4bfa0a422b361a425f
+  checksum: 10/1d8de402c4af8ee1bd00dec0c2fdb35b34ba64a62d7e235884c98216a2068f8d89e5bb89f27d2e9cd711ee9b173d9aafde53ebd2b39e64d0a1e83567de95305b
   languageName: node
   linkType: hard
 
