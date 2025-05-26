@@ -1,3 +1,11 @@
+## 2.0.0-canary.25
+
+* **fix:**  - add borderRadius to image associated to education & professional experience ([#8945](https://github.com/AzzappApp/azzapp/pull/8945))
+* **fix:**  - **contacts:** [#8939](https://github.com/AzzappApp/azzapp/pull/8939) menu height ([#8946](https://github.com/AzzappApp/azzapp/pull/8946))
+* **fix:**  - **enrichment:** retrieve missing icon and fallback on null to avoid default icon ([#8944](https://github.com/AzzappApp/azzapp/pull/8944))
+* **fix:**  - center text in enrichment header ([#8941](https://github.com/AzzappApp/azzapp/pull/8941))
+* **fix:**  - enrichment tooltip style ([#8943](https://github.com/AzzappApp/azzapp/pull/8943))
+
 ## 2.0.0-canary.24
 
 * **fix:**  - **android:** [#8855](https://github.com/AzzappApp/azzapp/pull/8855) review most of android ripples ([#8935](https://github.com/AzzappApp/azzapp/pull/8935))
