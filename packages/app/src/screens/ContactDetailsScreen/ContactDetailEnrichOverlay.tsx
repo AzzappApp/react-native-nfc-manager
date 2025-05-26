@@ -299,6 +299,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     pointerEvents: 'box-none',
     zIndex: 1,
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   closeTooltip: {
     padding: 15,
