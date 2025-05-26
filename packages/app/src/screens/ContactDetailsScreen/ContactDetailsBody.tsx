@@ -795,6 +795,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   company: {
     marginTop: 5,
+    textAlign: 'center',
   },
   job: {
     marginTop: 5,
