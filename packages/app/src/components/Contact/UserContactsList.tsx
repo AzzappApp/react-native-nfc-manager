@@ -22,9 +22,10 @@ import type { FetchPolicy } from 'react-relay';
 
 type UserContactsListProps = {
   /**
-   * Search string to filter contacts by name or company
+   * Search string to filter contacts by name or company.
+   * This is always a non-optional string and defaults to an empty string.
    */
-  search: string | undefined;
+  search: string;
   /**
    * Location to filter contacts by location
    * :warning: `undefined` and `null` are different in this case
@@ -116,6 +117,7 @@ const UserContactsList = ({
       `,
       queryResult as UserContactsList_root$key,
     );
+
 
   const currentSearch = useRef<string | undefined>(undefined);
   useEffect(() => {

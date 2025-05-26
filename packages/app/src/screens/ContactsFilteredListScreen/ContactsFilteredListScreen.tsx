@@ -22,11 +22,11 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 const ContactsFilteredListScreen = ({
   route: { params, route },
 }: NativeScreenProps<ContactsByDateRoute | ContactsByLocationRoute>) => {
-  const [search, setSearch] = useState<string | undefined>(undefined);
+  const [search, setSearch] = useState<string>('');
   const [debounceSearch] = useDebounce(search, 500);
 
   const onChangeText = useCallback((text: string | undefined) => {
-    setSearch(text || undefined);
+    setSearch(text || '');
   }, []);
 
   const router = useRouter();

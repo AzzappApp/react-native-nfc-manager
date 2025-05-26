@@ -16,7 +16,7 @@ import type {
 } from 'react-native';
 
 type ContactsByLocationListProps = {
-  search: string | undefined;
+  search: string;
   onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;

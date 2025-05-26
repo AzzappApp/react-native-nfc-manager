@@ -61,10 +61,10 @@ const ContactsScreen = ({
   const [currentTab, setCurrentTab] = useState<'date' | 'location' | 'name'>(
     'date',
   );
-  const [search, setSearch] = useState<string | undefined>(undefined);
+  const [search, setSearch] = useState<string>('');
   const [debounceSearch] = useDebounce(search, 500);
   const onChangeText = useCallback((text: string | undefined) => {
-    setSearch(text || undefined);
+    setSearch(text ?? '');
   }, []);
 
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =

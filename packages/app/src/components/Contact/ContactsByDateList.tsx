@@ -18,7 +18,7 @@ type ContactsByDateListProps = {
   // Unlike the other lists, we use the reference from the ContactScreenQuery
   // to avoid double fetching the data
   queryRef: ContactsByDateList_root$key;
-  search: string | undefined;
+  search: string;
   onShowContact: (contact: string) => void;
   contentContainerStyle?: ViewStyle;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
