@@ -116,6 +116,7 @@ const buildDataFromResponse = async (
       lastName: profile.last_name,
       company: profile.occupation,
       title: profile.headline,
+      birthday: profile.birth_date,
       emails: profile.personal_emails?.map(email => ({
         address: email,
         label: 'Home',

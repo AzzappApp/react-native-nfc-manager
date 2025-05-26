@@ -124,6 +124,8 @@ const buildContact = async (
       ),
       firstName: data.first_name,
       lastName: data.last_name,
+      birthday:
+        typeof data.birth_date === 'string' ? data.birth_date : undefined,
       phoneNumbers: (Array.isArray(data.phone_numbers)
         ? data.phone_numbers.map(phone => ({
             number: phone,

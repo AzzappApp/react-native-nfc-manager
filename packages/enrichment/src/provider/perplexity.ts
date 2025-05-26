@@ -38,7 +38,7 @@ export const perplexity: ApiResolver = {
       !data.contact?.lastName ? 'lastName?: string|null; ' : ''
     }${!data.contact?.company ? 'company?: string|null; ' : ''}${
       !data.contact?.title ? 'title?: string|null; ' : ''
-    }${!data.contact?.birthday ? 'birthday?: string|null; ' : ''}${
+    }${!data.contact?.birthday ? 'birthday?: string|null (format yyyy/MM/dd); ' : ''}${
       !data.contact?.addresses ? 'addresses?: string[]|null; ' : ''
     }socials: {label, url}[]; urls: {url: string}[]; }`;
 
