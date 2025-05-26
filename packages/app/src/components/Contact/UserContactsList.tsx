@@ -118,7 +118,6 @@ const UserContactsList = ({
       queryResult as UserContactsList_root$key,
     );
 
-
   const currentSearch = useRef<string | undefined>(undefined);
   useEffect(() => {
     if (currentSearch.current === search) {
