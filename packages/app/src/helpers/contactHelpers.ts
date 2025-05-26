@@ -1193,7 +1193,7 @@ export const buildExpoContact = async (
     ...(contact.addresses ?? []),
     ...(contact?.enrichment?.fields?.addresses ?? []),
   ].map(({ address, label }) => ({
-    address,
+    street: address,
     label,
   }));
 
