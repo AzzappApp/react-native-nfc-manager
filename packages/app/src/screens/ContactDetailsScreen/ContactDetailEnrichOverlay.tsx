@@ -301,6 +301,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 50,
   },
   iconContainerStyle: {
+    borderRadius: 50,
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   confirmationContainer: {
