@@ -100,19 +100,23 @@ export const ContactDetailItem = ({
   );
 };
 
+const ITEM_RADIUS = 12;
+
 const stylesheet = createStyleSheet(appearance => ({
   item: {
     width: '100%',
     height: 52,
-
-    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
   },
-  itemContainer: { flex: 1 },
+  itemContainer: {
+    flex: 1,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
+    borderRadius: ITEM_RADIUS,
+    ...shadow({ appearance, direction: 'center' }),
+  },
   pressableContainer: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: ITEM_RADIUS,
     overflow: 'hidden',
-    ...shadow({ appearance, direction: 'center' }),
   },
   pressable: {
     padding: 14,
