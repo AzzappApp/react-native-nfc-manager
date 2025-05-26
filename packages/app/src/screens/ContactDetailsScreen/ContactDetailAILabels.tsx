@@ -13,9 +13,11 @@ export const ContactDetailAILabels = ({
         publicProfile {
           interests {
             name
+            icon
           }
           skills {
             name
+            icon
           }
         }
       }

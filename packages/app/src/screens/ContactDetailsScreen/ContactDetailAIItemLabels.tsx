@@ -19,12 +19,13 @@ export const ContactDetailAIItemLabels = ({
   const appearance = useColorScheme();
 
   const displayedItems = limit > 0 ? items.splice(0, limit) : items;
+
   return (
     <View style={styles.container}>
       {displayedItems.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
           <RemixIcon
-            name={item.icon as IconName}
+            name={(item.icon as IconName) || null}
             size="15"
             color={appearance === 'dark' ? 'white' : 'black'}
             fallback={null}
