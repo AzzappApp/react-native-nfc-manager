@@ -1,3 +1,13 @@
+## 2.0.0-canary.26
+
+* **fix:**  - add missing shadow on enrich button ([#8949](https://github.com/AzzappApp/azzapp/pull/8949))
+* **fix:**  - improve image quality in enrichment tooltip ([#8951](https://github.com/AzzappApp/azzapp/pull/8951))
+* **fix:**  - wording in enrichment details ([#8956](https://github.com/AzzappApp/azzapp/pull/8956))
+* **fix:**  - **enrichment:** [#8919](https://github.com/AzzappApp/azzapp/pull/8919) remove similar links ([#8921](https://github.com/AzzappApp/azzapp/pull/8921))
+* **fix:**  - **shakeAndShare:** [#8784](https://github.com/AzzappApp/azzapp/pull/8784) don’t build qrcode twice ([#8925](https://github.com/AzzappApp/azzapp/pull/8925))
+* **fix:**  - signup button size ([#8954](https://github.com/AzzappApp/azzapp/pull/8954))
+* **fix:**  - remove contactType from contact export to phonebook and export enriched details ([#8895](https://github.com/AzzappApp/azzapp/pull/8895))
+
 ## 2.0.0-canary.25
 
 * **fix:**  - add borderRadius to image associated to education & professional experience ([#8945](https://github.com/AzzappApp/azzapp/pull/8945))
