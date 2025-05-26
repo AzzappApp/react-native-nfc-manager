@@ -1,4 +1,5 @@
 import { Canvas, RadialGradient, Rect, vec } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import { useCallback, useEffect, useRef } from 'react';
@@ -215,7 +216,10 @@ export const ContactDetailEnrichOverlay = ({
               style={styles.closeTooltip}
               onPress={onCloseToolTipEnrich}
             >
-              <Icon icon="filters_ai_light" size={60} style={styles.aiIcon} />
+              <Image
+                style={styles.aiIcon}
+                source={require('#assets/filters_ai_light_big.png')}
+              />
               <Text variant="medium" style={styles.headerStyle}>
                 <FormattedMessage
                   defaultMessage="Enrich your contact"
@@ -358,7 +362,7 @@ const styleSheet = createStyleSheet(appearance => ({
   confirmationValidateTextStyle: {
     color: appearance === 'dark' ? colors.black : colors.white,
   },
-  aiIcon: { alignSelf: 'center', tintColor: undefined },
+  aiIcon: { alignSelf: 'center', width: 60, height: 60 },
   headerStyle: { alignSelf: 'center', color: colors.black },
   gradient: {
     width: 72,
