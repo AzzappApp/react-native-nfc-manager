@@ -5,7 +5,7 @@ import { File } from 'expo-file-system/next';
 import capitalize from 'lodash/capitalize';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Keyboard, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, usePreloadedQuery } from 'react-relay';
@@ -18,6 +18,7 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
+import ProfilesSelector from '#components/ProfilesSelector';
 import {
   addContactUpdater,
   contactSchema,
@@ -51,14 +52,17 @@ import {
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useCurrentLocation } from '#hooks/useLocation';
-import useQRCodeKey from '#hooks/useQRCodeKey';
+import { getOrCreateQrCodeKey } from '#hooks/useQRCodeKey';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCreateForm from './ContactCreateForm';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -73,7 +77,10 @@ const ContactCreateScreen = ({
   preloadedQuery,
   route: { params },
 }: RelayScreenProps<ContactCreateRoute, ContactCreateScreenQuery>) => {
-  const { node } = usePreloadedQuery(contactCreateScreenQuery, preloadedQuery);
+  const { currentUser } = usePreloadedQuery(
+    contactCreateScreenQuery,
+    preloadedQuery,
+  );
   const styles = useStyleSheet(stylesheet);
 
   const [notifyError, setNotifyError] = useState(false);
@@ -82,8 +89,6 @@ const ContactCreateScreen = ({
 
   const currentLocation = useCurrentLocation();
   const { location, address } = currentLocation?.value || {};
-
-  const qrCodeKey = useQRCodeKey(node?.profile);
 
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(
@@ -117,11 +122,14 @@ const ContactCreateScreen = ({
 
   const [notify, toggleNotify] = useToggle(true);
   const [scanUsed, setScan] = useBoolean(false);
+  const [showProfilesSelector, openProfilesSelector, closeProfilesSelector] =
+    useBoolean(false);
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting, isValid, isDirty },
+    getValues,
     setValue,
   } = useForm<contactFormValues>({
     mode: 'onBlur',
@@ -132,30 +140,10 @@ const ContactCreateScreen = ({
     },
   });
 
-  const submit = useCallback(() => {
-    setNotifyError(false);
-    Keyboard.dismiss();
-    handleSubmit(async ({ avatar, logo, ...data }) => {
-      if (!node?.profile?.id) {
-        return;
-      }
-      if (notify && data.emails.length <= 0) {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not save your contact. Please add email or uncheck the box.',
-            description:
-              'Error toast message when saving contact card without email and box checked',
-          }),
-          onHide: () => {
-            setNotifyError(true);
-          },
-        });
-
-        return;
-      }
-
+  const [isSaving, setIsSaving] = useState(false);
+  const saveContact = useCallback(
+    async ({ avatar, logo, ...data }: contactFormValues, profileId: string) => {
+      setIsSaving(true);
       const uploads = [];
 
       if (avatar?.local && avatar.uri) {
@@ -215,9 +203,18 @@ const ContactCreateScreen = ({
         addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
 
+      const profile = currentUser?.profiles?.find(
+        profile => profile.id === profileId,
+      );
+      if (!profile) {
+        // Should never happen, but just in case
+        return;
+      }
+
+      const qrCodeKey = await getOrCreateQrCodeKey(profile);
       commit({
         variables: {
-          profileId: node.profile.id,
+          profileId,
           scanUsed,
           notify,
           qrCodeKey,
@@ -277,6 +274,7 @@ const ContactCreateScreen = ({
               },
             });
           }
+          setIsSaving(false);
         },
         updater: (store, response) => {
           if (response && response.createContact) {
@@ -301,25 +299,76 @@ const ContactCreateScreen = ({
                 'Error toast message when saving contact card failed',
             }) as unknown as string,
           });
+          setIsSaving(false);
           router.back();
         },
       });
+    },
+    [
+      address,
+      commit,
+      currentUser?.profiles,
+      intl,
+      location,
+      notify,
+      router,
+      scanUsed,
+    ],
+  );
+
+  const submit = useCallback(() => {
+    setNotifyError(false);
+    Keyboard.dismiss();
+    handleSubmit(async data => {
+      if (notify && data.emails.length <= 0) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not save your contact. Please add email or uncheck the box.',
+            description:
+              'Error toast message when saving contact card without email and box checked',
+          }),
+          onHide: () => {
+            setNotifyError(true);
+          },
+        });
+      }
+      if (!currentUser?.profiles?.length) {
+        // Should never happen, but just in case
+        return;
+      } else if (currentUser?.profiles?.length === 1) {
+        await saveContact(data, currentUser.profiles[0].id!);
+      } else {
+        openProfilesSelector();
+      }
     })();
   }, [
-    address,
-    commit,
+    currentUser?.profiles,
     handleSubmit,
     intl,
-    location,
-    node?.profile?.id,
     notify,
-    qrCodeKey,
-    router,
-    scanUsed,
+    openProfilesSelector,
+    saveContact,
   ]);
 
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    null,
+  );
+  const onSelectProfile = useCallback((profileId: string) => {
+    setSelectedProfileId(profileId);
+  }, []);
+
+  const onProfileSelected = useCallback(() => {
+    if (!selectedProfileId) {
+      return;
+    }
+    saveContact(getValues(), selectedProfileId);
+    closeProfilesSelector();
+  }, [closeProfilesSelector, getValues, saveContact, selectedProfileId]);
+
   useEffect(() => {
-    return Toast.hide;
+    return () => Toast.hide();
   }, []);
 
   const [scanImage, setScanImage] = useState<{
@@ -546,7 +595,7 @@ const ContactCreateScreen = ({
               description: 'Create contact modal save button label',
             })}
             testID="save-contact-card"
-            loading={isSubmitting || loading}
+            loading={isSubmitting || loading || isSaving}
             onPress={submit}
             variant="primary"
             style={styles.headerButton}
@@ -590,6 +639,48 @@ const ContactCreateScreen = ({
           />
         </View>
       )}
+      <BottomSheetModal
+        visible={showProfilesSelector}
+        onDismiss={closeProfilesSelector}
+        lazy
+        enableContentPanningGesture={false}
+      >
+        <Container style={styles.profilesSelectorContainer}>
+          <Text variant="large" style={styles.profilesSelectorTitle}>
+            <FormattedMessage
+              defaultMessage="Select a destination for this new Contact"
+              description="ContactCreateScreen - profile selector title"
+            />
+          </Text>
+          <ProfilesSelector
+            profiles={currentUser?.profiles ?? null}
+            onSelectProfile={onSelectProfile}
+          />
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Add to my contacts',
+              description: 'ContactCreateScreen - profile selector save button',
+            })}
+            variant="primary"
+            onPress={onProfileSelected}
+          />
+
+          <PressableNative
+            onPress={closeProfilesSelector}
+            style={styles.profilesSelectorCancelButton}
+          >
+            <Text
+              variant="medium"
+              style={styles.profilesSelectorCancelButtonLabel}
+            >
+              <FormattedMessage
+                defaultMessage="Cancel"
+                description="ContactCreateScreen - profile selector cancel button"
+              />
+            </Text>
+          </PressableNative>
+        </Container>
+      </BottomSheetModal>
     </Container>
   );
 };
@@ -624,13 +715,28 @@ const stylesheet = createStyleSheet(appearance => ({
     borderWidth: 0,
   },
   scanButton: { marginHorizontal: 20, marginVertical: 10 },
+  profilesSelectorContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+    gap: 20,
+  },
+  profilesSelectorTitle: {
+    textAlign: 'center',
+  },
+  profilesSelectorCancelButton: {
+    alignSelf: 'center',
+  },
+  profilesSelectorCancelButtonLabel: {
+    color: appearance === 'dark' ? colors.grey700 : colors.grey200,
+  },
 }));
 
 const contactCreateScreenQuery = graphql`
-  query ContactCreateScreenQuery($profileId: ID!) {
-    node(id: $profileId) {
-      ... on Profile @alias(as: "profile") {
+  query ContactCreateScreenQuery {
+    currentUser {
+      profiles {
         id
+        ...ProfilesSelector_profiles
         ...useQRCodeKey_profile
       }
     }
@@ -639,10 +745,8 @@ const contactCreateScreenQuery = graphql`
 
 export default relayScreen(ContactCreateScreen, {
   query: contactCreateScreenQuery,
-  getVariables: (_, profileInfos) => ({
-    profileId: profileInfos?.profileId,
-  }),
   getScreenOptions: () => ({
     stackAnimation: 'slide_from_bottom',
   }),
+  profileBound: false,
 });

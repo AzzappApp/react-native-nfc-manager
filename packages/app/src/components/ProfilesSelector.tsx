@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import Skeleton from '#components/Skeleton';
@@ -10,47 +10,44 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import useEffectOnce from '#hooks/useEffectOnce';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import type {
-  AddContactModalProfilesQuery,
-  AddContactModalProfilesQuery$data,
-} from '#relayArtifacts/AddContactModalProfilesQuery.graphql';
+  ProfilesSelector_profiles$data,
+  ProfilesSelector_profiles$key,
+} from '#relayArtifacts/ProfilesSelector_profiles.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 
 type Props = {
   onSelectProfile: (profileId: string) => void;
+  profiles: ProfilesSelector_profiles$key | null;
 };
 
 const COVER_HEIGHT = 192;
 const COVER_WIDTH = COVER_HEIGHT * COVER_RATIO;
 
-const AddContactModalProfiles = ({ onSelectProfile }: Props) => {
+const ProfilesSelector = ({
+  onSelectProfile,
+  profiles: profilesKey,
+}: Props) => {
   const profileInfos = useProfileInfos();
 
-  const { currentUser } = useLazyLoadQuery<AddContactModalProfilesQuery>(
+  const profiles = useFragment(
     graphql`
-      query AddContactModalProfilesQuery {
-        currentUser {
-          profiles {
-            invited
-            id
-            webCard {
-              id
-              ...CoverRenderer_webCard
-            }
-          }
+      fragment ProfilesSelector_profiles on Profile @relay(plural: true) {
+        id
+        invited
+        webCard {
+          id
+          ...CoverRenderer_webCard
         }
       }
     `,
-    {},
+    profilesKey,
   );
 
   const data = useMemo(
-    () =>
-      currentUser?.profiles
-        ? currentUser.profiles.filter(profile => !profile.invited)
-        : [],
-    [currentUser?.profiles],
+    () => (profiles ? profiles.filter(profile => !profile.invited) : []),
+    [profiles],
   );
 
   const initialProfileIndex = useMemo(() => {
@@ -89,7 +86,7 @@ const AddContactModalProfiles = ({ onSelectProfile }: Props) => {
   });
 
   return (
-    <CarouselSelectList<(typeof data)[number]>
+    <CarouselSelectList
       ref={carouselRef}
       data={data}
       keyExtractor={keyExtractor}
@@ -104,12 +101,9 @@ const AddContactModalProfiles = ({ onSelectProfile }: Props) => {
     />
   );
 };
+export default ProfilesSelector;
 
-type ProfileType = ArrayItemType<
-  NonNullable<AddContactModalProfilesQuery$data['currentUser']>['profiles']
->;
-
-export const AddContactModalProfilesFallback = () => {
+export const ProfilesSelectorFallback = () => {
   const renderItem = () => {
     return <Skeleton style={styles.coverSkeleton} />;
   };
@@ -127,6 +121,8 @@ export const AddContactModalProfilesFallback = () => {
     />
   );
 };
+
+type ProfileType = ArrayItemType<NonNullable<ProfilesSelector_profiles$data>>;
 
 const SCALE_RATIO = 108 / 291;
 
@@ -149,5 +145,3 @@ const styles = StyleSheet.create({
     borderRadius: COVER_CARD_RADIUS * 120,
   },
 });
-
-export default AddContactModalProfiles;

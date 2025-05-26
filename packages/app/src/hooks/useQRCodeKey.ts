@@ -1,13 +1,14 @@
 import * as ed from '@noble/ed25519';
 import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { MMKV, useMMKVString } from 'react-native-mmkv';
 import { fromByteArray } from 'react-native-quick-base64';
 import Crypto from 'react-native-quick-crypto';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import { commitMutation, graphql, readInlineData } from 'react-relay';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import type { useQRCodeKey_profile$key } from '#relayArtifacts/useQRCodeKey_profile.graphql';
 
 const encryptedQrCodeStorage = new MMKV({
@@ -29,10 +30,13 @@ const deviceId = getQRCodeDeviceId();
 
 const PUBLIC_KEY_STORAGE_KEY = 'publicKeyForProfile';
 
-const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
-  const data = useFragment(
+const readProfileData = (
+  profileKey: useQRCodeKey_profile$key | null | undefined,
+) =>
+  readInlineData(
     graphql`
       fragment useQRCodeKey_profile on Profile
+      @inline
       @argumentDefinitions(
         deviceId: { type: "String!", provider: "qrCodeDeviceId.relayprovider" }
       ) {
@@ -43,21 +47,49 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
     profileKey,
   );
 
-  const { contactCardAccessId, id } = data || {};
+const generateQRCodeKey = async (profileId: string): Promise<string> => {
+  const message = new TextEncoder().encode(fromGlobalId(profileId).id);
+  const privateKey = ed.utils.randomPrivateKey();
 
-  const [commit] = useMutation(graphql`
-    mutation useQRCodeKeyStoreMutation(
-      $input: SaveContactCardAccessInput!
-      $deviceId: String!
-    ) {
-      saveContactCardAccess(input: $input) {
-        profile {
-          id
-          contactCardAccessId(deviceId: $deviceId)
+  const publicKey = await ed.getPublicKeyAsync(privateKey);
+  const signature = await ed.signAsync(message, privateKey);
+
+  return new Promise((resolve, reject) => {
+    commitMutation(getRelayEnvironment(), {
+      mutation: graphql`
+        mutation useQRCodeKeyStoreMutation(
+          $input: SaveContactCardAccessInput!
+          $deviceId: String!
+        ) {
+          saveContactCardAccess(input: $input) {
+            profile {
+              id
+              contactCardAccessId(deviceId: $deviceId)
+            }
+          }
         }
-      }
-    }
-  `);
+      `,
+      variables: {
+        input: {
+          deviceId,
+          profileId,
+          signature: fromByteArray(signature),
+        },
+        deviceId,
+      },
+      onError: error => {
+        reject(error);
+      },
+      onCompleted: () => {
+        resolve(fromByteArray(publicKey));
+      },
+    });
+  });
+};
+
+const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
+  const data = useMemo(() => readProfileData(profileKey), [profileKey]);
+  const { contactCardAccessId, id } = data || {};
 
   const [publicKey, setPublicKey] = useMMKVString(
     `${PUBLIC_KEY_STORAGE_KEY}:${id}`,
@@ -76,22 +108,13 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
     ) {
       buildingKeyPair.current = true;
 
-      const message = new TextEncoder().encode(fromGlobalId(id).id);
-      const privateKey = ed.utils.randomPrivateKey();
-
       (async () => {
-        const publicKey = await ed.getPublicKeyAsync(privateKey);
-        const signature = await ed.signAsync(message, privateKey);
-        commit({
-          variables: {
-            input: {
-              deviceId,
-              profileId: id,
-              signature: fromByteArray(signature),
-            },
-            deviceId,
+        generateQRCodeKey(id).then(
+          key => {
+            setPublicKey(key);
+            buildingKeyPair.current = false;
           },
-          onError: error => {
+          error => {
             Sentry.captureException(error);
             buildingKeyPair.current = false;
             Toast.show({
@@ -104,17 +127,15 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
               }),
             });
           },
-          onCompleted: () => {
-            setPublicKey(fromByteArray(publicKey));
-            buildingKeyPair.current = false;
-          },
-        });
+        );
       })();
     }
-  }, [commit, contactCardAccessId, id, setPublicKey, publicKey, intl]);
+  }, [contactCardAccessId, id, setPublicKey, publicKey, intl]);
 
   return publicKey;
 };
+
+export default useQRCodeKey;
 
 export const getPublicKeyForProfileId = (profileId: string) => {
   return encryptedQrCodeStorage.getString(
@@ -126,4 +147,19 @@ export const addOnPublicKeysChangeListener = (listener: () => void) => {
   return encryptedQrCodeStorage.addOnValueChangedListener(listener);
 };
 
-export default useQRCodeKey;
+export const getOrCreateQrCodeKey = async (
+  profileKey?: useQRCodeKey_profile$key | null,
+): Promise<string | null> => {
+  const data = readProfileData(profileKey);
+  const { contactCardAccessId, id } = data || {};
+  if (!id) {
+    return null;
+  }
+  const publicKey = getPublicKeyForProfileId(id);
+  if (!publicKey || !contactCardAccessId) {
+    const key = await generateQRCodeKey(id);
+    encryptedQrCodeStorage.set(`${PUBLIC_KEY_STORAGE_KEY}:${id}`, key);
+    return key;
+  }
+  return publicKey;
+};

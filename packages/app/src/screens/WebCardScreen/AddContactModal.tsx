@@ -11,7 +11,12 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  graphql,
+  useFragment,
+  useLazyLoadQuery,
+  useMutation,
+} from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
@@ -19,6 +24,9 @@ import { colors } from '#theme';
 import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import ProfilesSelector, {
+  ProfilesSelectorFallback,
+} from '#components/ProfilesSelector';
 import {
   stringToContactAddressLabelType,
   stringToContactEmailLabelType,
@@ -39,9 +47,6 @@ import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import AddContactModalProfiles, {
-  AddContactModalProfilesFallback,
-} from './AddContactModalProfiles';
 import type { ContactType } from '#helpers/contactHelpers';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
@@ -49,6 +54,7 @@ import type {
   AddContactModalMutation,
   ContactInput,
 } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type { AddContactModalProfilesSelectorQuery } from '#relayArtifacts/AddContactModalProfilesSelectorQuery.graphql';
 import type { useOnInviteContactDataQuery_contact$key } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
@@ -397,8 +403,8 @@ const AddContactModal = ({
         <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
       </View>
 
-      <Suspense fallback={<AddContactModalProfilesFallback />}>
-        <AddContactModalProfiles onSelectProfile={setViewer} />
+      <Suspense fallback={<ProfilesSelectorFallback />}>
+        <AddContactModalProfilesSelector onSelectProfile={setViewer} />
       </Suspense>
 
       <View style={{ paddingHorizontal: 20 }}>
@@ -433,6 +439,8 @@ const AddContactModal = ({
     </BottomSheetModal>
   );
 };
+
+export default AddContactModal;
 
 const downloadAvatar = async (avatarUrl?: string) => {
   let image: Image | undefined = undefined;
@@ -518,6 +526,35 @@ const buildContactFromContactCard = async (
   };
 
   return { contact };
+};
+
+type AddContactModalProfilesSelectorProps = {
+  onSelectProfile: (profileId: string) => void;
+};
+
+const AddContactModalProfilesSelector = ({
+  onSelectProfile,
+}: AddContactModalProfilesSelectorProps) => {
+  const { currentUser } =
+    useLazyLoadQuery<AddContactModalProfilesSelectorQuery>(
+      graphql`
+        query AddContactModalProfilesSelectorQuery {
+          currentUser {
+            profiles {
+              ...ProfilesSelector_profiles
+            }
+          }
+        }
+      `,
+      {},
+    );
+
+  return (
+    <ProfilesSelector
+      profiles={currentUser?.profiles ?? null}
+      onSelectProfile={onSelectProfile}
+    />
+  );
 };
 
 const buildContact = async (
@@ -637,5 +674,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default AddContactModal;
