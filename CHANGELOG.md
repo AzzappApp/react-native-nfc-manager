@@ -1,3 +1,8 @@
+## 2.0.0-canary.31
+
+* **fix:**  - **enrichment:** [#8947](https://github.com/AzzappApp/azzapp/pull/8947) menu used instead of button ([#8961](https://github.com/AzzappApp/azzapp/pull/8961))
+* **fix:**  - **android:** [#8689](https://github.com/AzzappApp/azzapp/pull/8689) issue with keyboard controller and pressables ([#8960](https://github.com/AzzappApp/azzapp/pull/8960))
+
 ## 2.0.0-canary.30
 
 * **fix:**  - missing address when exporting contact to phone ([#8974](https://github.com/AzzappApp/azzapp/pull/8974))
