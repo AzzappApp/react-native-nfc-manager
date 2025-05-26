@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { isDefined } from '@azzapp/shared/isDefined';
 import env from '../env';
 import { uploadMediaFromUrl } from '../media';
@@ -100,13 +101,16 @@ const buildDataFromResponse = async (
     : null;
   let avatarId;
   if (avatar) {
-    await avatar.promise
-      .then(res => {
-        avatarId = res;
-      })
-      .catch(() => {
-        avatarId = undefined;
+    try {
+      avatarId = await avatar.promise;
+    } catch (e) {
+      Sentry.captureException(e, {
+        extra: {
+          profilePicUrl: profile.profile_pic_url,
+        },
       });
+      avatarId = undefined;
+    }
   }
 
   return {
@@ -327,16 +331,18 @@ export const proxyCurlPicture: ApiResolver = {
       const avatar = json?.tmp_profile_pic_url
         ? uploadMediaFromUrl(json.tmp_profile_pic_url)
         : null;
-
       let avatarId;
       if (avatar) {
-        await avatar.promise
-          .then(res => {
-            avatarId = res;
-          })
-          .catch(() => {
-            avatarId = undefined;
+        try {
+          avatarId = await avatar.promise;
+        } catch (e) {
+          Sentry.captureException(e, {
+            extra: {
+              profilePicUrl: json.tmp_profile_pic_url,
+            },
           });
+          avatarId = undefined;
+        }
       }
 
       return {

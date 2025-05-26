@@ -78,7 +78,7 @@ const removeDuplicatedAndUnknownLinks = (
   );
 
   return {
-    ...contact,
+    ...updatedContact,
     socials: updatedSocials.filter(val => isSocialLinkId(val.label)), // we exclude unknown social links
     urls: updatedUrls.concat(
       (updatedSocials ?? [])
