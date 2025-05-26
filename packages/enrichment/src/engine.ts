@@ -52,6 +52,37 @@ function diffValues<T extends Record<string, any>>(
   return result;
 }
 
+const removeDuplicatedLinks = (
+  contact: EnrichedContactFields,
+  updatedContact: EnrichedContactFields,
+): EnrichedContactFields => {
+  const updatedSocials = (updatedContact.socials ?? []).filter(
+    s =>
+      !contact.socials?.some(
+        s2 =>
+          s.url === s2.url ||
+          `https://${s2.url}` === s.url ||
+          `https://${s.url}` === s2.url, //we exclude cases where http:// and https:// are added
+      ),
+  );
+
+  const updatedUrls = (updatedContact.urls ?? []).filter(
+    u =>
+      !contact.urls?.some(
+        u2 =>
+          u.url === u2.url ||
+          `https://${u2.url}` === u.url ||
+          `https://${u.url}` === u2.url, //we exclude cases where http:// and https:// are added
+      ),
+  );
+
+  return {
+    ...contact,
+    socials: updatedSocials,
+    urls: updatedUrls,
+  };
+};
+
 export type EnrichResult = {
   enriched: EnrichedData;
   trace: Record<string, string>; // field -> resolver name
@@ -192,7 +223,12 @@ export const enrichContact = async (
         }
 
         const newContact = cleanObject(
-          deduplicateContactFields(diffValues(initialContact, contact)),
+          deduplicateContactFields(
+            diffValues(
+              initialContact,
+              removeDuplicatedLinks(initialContact, contact),
+            ),
+          ),
         );
         const newProfile = cleanObject(diffValues(initialProfile, profile));
 
