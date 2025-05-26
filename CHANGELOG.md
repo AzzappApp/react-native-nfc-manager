@@ -1,3 +1,9 @@
+## 2.0.0-canary.32
+
+* **fix:**  - enrichment button shadow display on android ([#8976](https://github.com/AzzappApp/azzapp/pull/8976))
+* **feat:**  - **enrichment:** add enrichment cancelation method ([#8969](https://github.com/AzzappApp/azzapp/pull/8969))
+* **fix:**  - **contacts:** [#8843](https://github.com/AzzappApp/azzapp/pull/8843) wrong update when search is cleared ([#8926](https://github.com/AzzappApp/azzapp/pull/8926))
+
 ## 2.0.0-canary.31
 
 * **fix:**  - **enrichment:** [#8947](https://github.com/AzzappApp/azzapp/pull/8947) menu used instead of button ([#8961](https://github.com/AzzappApp/azzapp/pull/8961))
