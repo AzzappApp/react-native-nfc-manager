@@ -25,7 +25,6 @@ import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
-import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
 import type { ContactDetailEnrichState } from './ContactDetailsBody';
@@ -240,8 +239,7 @@ export const ContactDetailEnrichOverlay = ({
                   description="ContactDetail enrich overlay Tooltip - Tooltip description azzapp AI"
                 />
               </Text>
-              <RoundedMenuComponent
-                id={null}
+              <Button
                 label={intl.formatMessage({
                   defaultMessage: 'Got it',
                   description:
@@ -249,8 +247,8 @@ export const ContactDetailEnrichOverlay = ({
                 })}
                 style={styles.tooltipButton}
                 textStyle={styles.tooltipButtonText}
-                textVariant="button"
-                onSelect={onCloseToolTipEnrich}
+                variant="secondary"
+                onPress={onCloseToolTipEnrich}
               />
             </Pressable>
           </Tooltip>
