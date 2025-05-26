@@ -7,22 +7,23 @@ import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import { useRouter } from '#components/NativeRouter';
-import { readContactData, useShareContact } from '#helpers/contactHelpers';
+import { useShareContact } from '#helpers/contactHelpers';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useRemoveContact from '#hooks/useRemoveContact';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactActionModalOption from './ContactActionModalOption';
-import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { Icons } from '#ui/Icon';
 import type { ContactActionModalOptionProps } from './ContactActionModalOption';
 
 type ContactActionModalProps = {
   close: () => void;
   data?:
-    | contactHelpersReadContactData$key
-    | contactHelpersReadContactData$key[];
+    | ContactActionModal_contact$key
+    | ContactActionModal_contact$key[]
+    | null;
   onShow: (contactId: string) => void;
 };
 
@@ -33,34 +34,32 @@ const ContactActionModal = ({
 }: ContactActionModalProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const onInviteContact = useOnInviteContact();
 
-  const contactToShare = useFragment(
+  const isSingleContact = !Array.isArray(data);
+
+  const contact = useFragment(
     graphql`
       fragment ContactActionModal_contact on Contact {
-        ...contactHelpersShareContactDataQuery_contact
+        id
+        contactProfile {
+          webCard {
+            userName
+          }
+        }
+        ...contactHelpersShareContactData_contact
+        ...useOnInviteContactDataQuery_contact
       }
     `,
-    data && !Array.isArray(data) ? data : null,
+    isSingleContact ? data : null,
   );
+
+  const onInviteContact = useOnInviteContact();
 
   const removeContact = useRemoveContact();
 
-  const singleContact = useMemo(
-    () => (data && !Array.isArray(data) ? readContactData(data) : null),
-    [data],
-  );
+  const webCardUserName = contact?.contactProfile?.webCard?.userName;
 
-  const webCardUserName = singleContact?.webCardUserName;
-  const contacts = useMemo(
-    () =>
-      (data && Array.isArray(data)
-        ? data.map(readContactData)
-        : [singleContact]
-      ).filter(contact => !!contact),
-    [data, singleContact],
-  );
-  const onShare = useShareContact(contactToShare);
+  const onShare = useShareContact();
 
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
     return [
@@ -82,7 +81,7 @@ const ContactActionModal = ({
             },
           }
         : undefined,
-      singleContact
+      isSingleContact
         ? {
             icon: 'share' as Icons,
             text: intl.formatMessage({
@@ -90,12 +89,12 @@ const ContactActionModal = ({
               description: 'ContactsScreen - More option alert - share',
             }),
             onPress: async () => {
-              onShare();
+              onShare(contact);
               close();
             },
           }
         : undefined,
-      singleContact
+      isSingleContact
         ? {
             icon: 'contact' as Icons,
             text: intl.formatMessage({
@@ -103,8 +102,8 @@ const ContactActionModal = ({
               description: 'ContactsScreen - More option alert - view',
             }),
             onPress: () => {
-              if (singleContact.id) {
-                onShow(singleContact.id);
+              if (contact?.id) {
+                onShow(contact.id);
                 close();
               }
             },
@@ -117,8 +116,8 @@ const ContactActionModal = ({
           description: 'ContactsScreen - More option alert - save',
         }),
         onPress: () => {
-          if (data) {
-            onInviteContact(contacts);
+          if (contact) {
+            onInviteContact(contact);
             close();
           }
         },
@@ -126,18 +125,19 @@ const ContactActionModal = ({
     ].filter(isDefined);
   }, [
     close,
-    contacts,
-    data,
+    contact,
     intl,
+    isSingleContact,
     onInviteContact,
     onShare,
     onShow,
     router,
-    singleContact,
     webCardUserName,
   ]);
 
-  const contactsDefined = contacts.map(contact => contact.id).filter(isDefined);
+  const contactsDefined = Array.isArray(contact)
+    ? contact.map(data => data.id)
+    : [contact?.id];
 
   const onRemoveContactAction = data
     ? () => {

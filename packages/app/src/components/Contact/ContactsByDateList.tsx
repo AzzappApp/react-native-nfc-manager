@@ -5,13 +5,13 @@ import SectionContactsHorizontalList from '#components/Contact/SectionContactsHo
 import { useRouter } from '#components/NativeRouter';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import ContactActionModal from './ContactActionModal';
-import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { ContactsByDateList_root$key } from '#relayArtifacts/ContactsByDateList_root.graphql';
 import type { ContactsByDateListQuery } from '#relayArtifacts/ContactsByDateListQuery.graphql';
 import type {
+  ViewStyle,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  ViewStyle,
 } from 'react-native';
 
 type ContactsByDateListProps = {
@@ -57,9 +57,7 @@ const ContactsByDateList = ({
                   nbContacts
                   contacts {
                     id
-                    ...contactHelpersShareContactDataQuery_contact
                     ...ContactsHorizontalList_contacts
-                    ...contactHelpersReadContactData
                     ...ContactActionModal_contact
                   }
                 }
@@ -164,10 +162,11 @@ const ContactsByDateList = ({
     [data.currentUser?.contactsByDates.edges],
   );
   const [contactActionData, setContactActionData] = useState<
-    | contactHelpersReadContactData$key
-    | contactHelpersReadContactData$key[]
+    | ContactActionModal_contact$key
+    | ContactActionModal_contact$key[]
     | undefined
   >(undefined);
+
   const onShowContactAction = useCallback(
     (contactId: string[] | string) => {
       if (Array.isArray(contactId)) {

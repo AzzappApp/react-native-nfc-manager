@@ -1,6 +1,3 @@
-import ContactDetailScreen, {
-  ContactDetailsFromScannedContactScreen,
-} from './ContactsDetailScreen';
+import ContactDetailScreen from './ContactsDetailScreen';
 
-export { ContactDetailsFromScannedContactScreen };
 export default ContactDetailScreen;

@@ -6,10 +6,112 @@ import {
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
+import { graphql, readInlineData } from 'relay-runtime';
 import { buildExpoContact } from '#helpers/contactHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import { usePhoneContactBookPermission } from '#hooks/usePhoneContactBookPermission';
-import type { ContactType } from '#helpers/contactHelpers';
+import type { useOnInviteContactDataQuery_contact$key } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
+
+export const inviteContactFragment_contact = graphql`
+  fragment useOnInviteContactDataQuery_contact on Contact
+  @argumentDefinitions(
+    pixelRatio: { type: "Float!", provider: "CappedPixelRatio.relayprovider" }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+  )
+  @inline {
+    id
+    firstName
+    lastName
+    title
+    company
+    note
+    phoneNumbers {
+      number
+      label
+    }
+    emails {
+      label
+      address
+    }
+    urls {
+      url
+    }
+    addresses {
+      label
+      address
+    }
+    birthday
+    meetingDate
+    socials {
+      url
+      label
+    }
+    avatar {
+      uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    logo {
+      uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    note
+    contactProfile {
+      id
+      webCard {
+        id
+        cardIsPublished
+        userName
+        hasCover
+        coverMedia {
+          id
+          ... on MediaVideo {
+            webCardPreview: thumbnail(
+              width: $screenWidth
+              pixelRatio: $pixelRatio
+            )
+          }
+          ... on MediaImage {
+            webCardPreview: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          }
+        }
+      }
+    }
+    enrichment {
+      fields {
+        title
+        company
+        phoneNumbers {
+          label
+          number
+        }
+        emails {
+          address
+          label
+        }
+        urls {
+          url
+        }
+        addresses {
+          address
+          label
+        }
+        birthday
+        socials {
+          label
+          url
+        }
+        avatar {
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+      }
+    }
+  }
+`;
 
 const useOnInviteContact = () => {
   const intl = useIntl();
@@ -22,7 +124,11 @@ const useOnInviteContact = () => {
   } = usePhoneContactBookPermission();
 
   const onInviteContact = useCallback(
-    async (contacts: ContactType | ContactType[]) => {
+    async (contactsData?: useOnInviteContactDataQuery_contact$key | null) => {
+      const contacts = readInlineData(
+        inviteContactFragment_contact,
+        contactsData,
+      );
       try {
         const { status } =
           contactPermission !== 'granted'

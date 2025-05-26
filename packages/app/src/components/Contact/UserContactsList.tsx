@@ -9,7 +9,7 @@ import ListLoadingFooter from '#ui/ListLoadingFooter';
 import Text from '#ui/Text';
 import ContactActionModal from './ContactActionModal';
 import type { ContactsListItemType } from '#components/Contact/ContactsList/ContactsList';
-import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { UserContactsList_root$key } from '#relayArtifacts/UserContactsList_root.graphql';
 import type { UserContactsListQuery } from '#relayArtifacts/UserContactsListQuery.graphql';
 import type {
@@ -106,10 +106,8 @@ const UserContactsList = ({
                       userName
                     }
                   }
-                  ...ContactsListItem_contact
-                  ...contactHelpersReadContactData
-                  ...contactHelpersShareContactDataQuery_contact
                   ...ContactActionModal_contact
+                  ...ContactsListItem_contact
                 }
               }
             }
@@ -157,7 +155,7 @@ const UserContactsList = ({
   );
 
   const [contactActionData, setContactActionData] = useState<
-    contactHelpersReadContactData$key | undefined
+    ContactActionModal_contact$key | undefined
   >(undefined);
   const onShowContactAction = useCallback(
     (contactId: string) => {

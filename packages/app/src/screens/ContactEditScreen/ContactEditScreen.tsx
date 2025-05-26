@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { Keyboard, Platform, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useMutation } from 'react-relay';
+import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
@@ -32,25 +32,70 @@ import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
+import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import UploadProgressModal from '#ui/UploadProgressModal';
-import type {
-  NativeScreenProps,
-  ScreenOptions,
-} from '#components/NativeRouter';
+import type { ScreenOptions } from '#components/NativeRouter';
 import type { contactFormValues } from '#helpers/contactHelpers';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactEditScreenMutation } from '#relayArtifacts/ContactEditScreenMutation.graphql';
+import type { ContactEditScreenQuery } from '#relayArtifacts/ContactEditScreenQuery.graphql';
 import type { ContactEditRoute } from '#routes';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ScrollView } from 'react-native';
 
+const contactEditScreenQuery = graphql`
+  query ContactEditScreenQuery($contactId: ID!, $pixelRatio: Float!) {
+    node(id: $contactId) {
+      ... on Contact @alias(as: "contact") {
+        id
+        firstName
+        lastName
+        birthday
+        company
+        title
+        note
+        meetingDate
+        avatar {
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+        addresses {
+          address
+          label
+        }
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+        phoneNumbers {
+          number
+          label
+        }
+        emails {
+          address
+          label
+        }
+        urls {
+          url
+        }
+        socials {
+          url
+          label
+        }
+      }
+    }
+  }
+`;
+
 const ContactEditScreen = ({
-  route: { params },
-}: NativeScreenProps<ContactEditRoute>) => {
+  preloadedQuery,
+}: RelayScreenProps<ContactEditRoute, ContactEditScreenQuery>) => {
   const scrollRef = useRef<ScrollView>(null);
   const styles = useStyleSheet(stylesheet);
 
@@ -59,6 +104,7 @@ const ContactEditScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
+  const { node } = usePreloadedQuery(contactEditScreenQuery, preloadedQuery);
 
   const [commit, loading] = useMutation<ContactEditScreenMutation>(graphql`
     mutation ContactEditScreenMutation(
@@ -66,11 +112,12 @@ const ContactEditScreen = ({
       $contact: ContactInput!
     ) {
       saveContact(contactId: $contactId, input: $contact) {
-        ...contactHelpersReadContactData
+        id
       }
     }
   `);
 
+  const contact = node?.contact;
   const {
     control,
     handleSubmit,
@@ -81,16 +128,16 @@ const ContactEditScreen = ({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       avatar: {
-        uri: params.contact.avatar?.uri || '',
+        uri: contact?.avatar?.uri || '',
       },
-      firstName: params.contact.firstName,
-      lastName: params.contact.lastName,
-      title: params.contact.title,
-      company: params.contact.company,
+      firstName: contact?.firstName,
+      lastName: contact?.lastName,
+      title: contact?.title,
+      company: contact?.company,
       logo: {
-        uri: params.contact.logo?.uri || '',
+        uri: contact?.logo?.uri || '',
       },
-      phoneNumbers: params.contact.phoneNumbers?.map(({ label, number }) => {
+      phoneNumbers: contact?.phoneNumbers.map(({ label, number }) => {
         const { countryCode, number: parsedPhoneNumber } =
           extractPhoneNumberDetails(number);
         return {
@@ -100,22 +147,23 @@ const ContactEditScreen = ({
           countryCode,
         };
       }),
-      emails: params.contact.emails?.map(({ address, label }) => ({
+      emails: contact?.emails?.map(({ address, label }) => ({
         address,
         label,
       })),
-      urls: params.contact.urls ?? [],
-      addresses: params.contact.addresses?.map(({ address, label }) => ({
+      urls: contact?.urls?.map(({ url }) => ({ url })) ?? [],
+      addresses: contact?.addresses?.map(({ address, label }) => ({
         address,
         label,
       })),
       birthday: {
-        birthday: params.contact.birthday,
+        birthday: contact?.birthday,
       },
-      socials: params.contact.socials ?? [],
-      note: params.contact.note,
-      meetingDate: params.contact.meetingDate
-        ? new Date(params.contact.meetingDate)
+      socials:
+        contact?.socials?.map(({ label, url }) => ({ label, url })) ?? [],
+      note: contact?.note,
+      meetingDate: contact?.meetingDate
+        ? new Date(contact?.meetingDate)
         : new Date(),
     },
   });
@@ -123,7 +171,7 @@ const ContactEditScreen = ({
   const submit = () => {
     Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
-      if (!params.contact.id) {
+      if (!contact?.id) {
         return;
       }
 
@@ -188,7 +236,7 @@ const ContactEditScreen = ({
 
       commit({
         variables: {
-          contactId: params.contact.id,
+          contactId: contact.id,
           contact: {
             avatarId,
             logoId,
@@ -341,4 +389,10 @@ ContactEditScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-export default ContactEditScreen;
+export default relayScreen(ContactEditScreen, {
+  query: contactEditScreenQuery,
+  getVariables: ({ contactId }) => ({
+    contactId,
+    pixelRatio: PixelRatio(),
+  }),
+});

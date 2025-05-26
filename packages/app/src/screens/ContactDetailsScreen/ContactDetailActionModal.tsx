@@ -6,6 +6,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { ENABLE_DATA_ENRICHMENT } from '#Config';
 import { colors } from '#theme';
 import { ContactActionModalOption } from '#components/Contact/ContactActionModal';
+import { useShareContact } from '#helpers/contactHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -18,7 +19,6 @@ type ContactDetailActionModalProps = {
   onRemoveContacts: () => void;
   visible?: boolean;
   onSaveContact: () => void;
-  onShare: () => void;
   onEdit: () => void;
   onEnrich?: () => void;
   contact?: ContactDetailActionModal_contact$key | null;
@@ -30,20 +30,23 @@ const ContactDetailActionModal = ({
   close,
   onRemoveContacts,
   onSaveContact,
-  onShare,
   onEdit,
   onEnrich,
 }: ContactDetailActionModalProps) => {
+  const onShare = useShareContact();
+
   const intl = useIntl();
   const contact = useFragment(
     graphql`
       fragment ContactDetailActionModal_contact on Contact {
         firstName
         lastName
+        ...contactHelpersShareContactData_contact
       }
     `,
     contactKey,
   );
+
   const elements = useMemo<ContactActionModalOptionProps[]>(() => {
     return [
       {
@@ -70,7 +73,7 @@ const ContactDetailActionModal = ({
           defaultMessage: 'Share Contact',
           description: 'ContactsScreen - More option alert - share',
         }),
-        onPress: onShare,
+        onPress: () => onShare(contact),
       },
       {
         icon: 'invite' as Icons,
@@ -81,7 +84,7 @@ const ContactDetailActionModal = ({
         onPress: onSaveContact,
       },
     ].filter(isDefined);
-  }, [intl, onEdit, onEnrich, onShare, onSaveContact]);
+  }, [intl, onEdit, onEnrich, onSaveContact, onShare, contact]);
 
   const confirmDelete = () => {
     Alert.alert(

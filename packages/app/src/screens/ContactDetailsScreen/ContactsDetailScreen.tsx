@@ -1,21 +1,16 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import { useRouter } from '#components/NativeRouter';
-import { readContactData } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import { TooltipProvider } from '#helpers/TooltipContext';
 import ContactDetailsBody from './ContactDetailsBody';
-import type { NativeScreenProps } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsDetailScreenQuery } from '#relayArtifacts/ContactsDetailScreenQuery.graphql';
-import type {
-  ContactDetailsRoute,
-  ContactDetailsFromScannerRoute,
-} from '#routes';
+import type { ContactDetailsRoute } from '#routes';
 
 const query = graphql`
   query ContactsDetailScreenQuery($contactId: ID!) {
@@ -23,8 +18,8 @@ const query = graphql`
       ... on Contact @alias(as: "contact") {
         id
         ...ContactDetailsBody_contact
-        ...contactHelpersReadContactData
-        ...contactHelpersShareContactDataQuery_contact
+        ...contactHelpersShareContactData_contact
+        ...useOnInviteContactDataQuery_contact
         enrichment {
           ...ContactDetailAIItemLocations_enrichment
           ...ContactDetailAISummary_enrichment
@@ -52,21 +47,16 @@ const ContactDetailsScreen = ({
     query,
     preloadedQuery,
   );
-  const contact = useMemo(() => {
-    if (node?.contact) {
-      return readContactData(node.contact);
-    }
-    return null;
-  }, [node]);
+
   const webCard = node?.contact?.contactProfile?.webCard ?? null;
 
   const onInviteContact = useOnInviteContact();
   const onInviteContactInner = useCallback(async () => {
-    if (!contact) {
+    if (!node?.contact) {
       return;
     }
-    await onInviteContact(contact);
-  }, [contact, onInviteContact]);
+    await onInviteContact(node?.contact);
+  }, [node?.contact, onInviteContact]);
 
   const styles = useStyleSheet(stylesheet);
   /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
@@ -74,11 +64,10 @@ const ContactDetailsScreen = ({
   return (
     <TooltipProvider>
       <View collapsable={false} style={styles.container}>
-        {contact ? (
+        {node?.contact ? (
           <ContactDetailsBody
             refreshQuery={refreshQuery}
-            contact={contact}
-            contactKey={node?.contact || null}
+            contactKey={node?.contact}
             onClose={router.back}
             webCard={webCard}
             onSave={onInviteContactInner}
@@ -104,43 +93,6 @@ export default relayScreen(ContactDetailsScreen, {
   },
   fetchPolicy: 'store-and-network',
 });
-
-export const ContactDetailsFromScannedContactScreen = ({
-  route: {
-    params: { scannedContact: contact },
-  },
-}: NativeScreenProps<ContactDetailsFromScannerRoute>) => {
-  const router = useRouter();
-
-  const onInviteContact = useOnInviteContact();
-  const onInviteContactInner = useCallback(async () => {
-    if (!contact) {
-      return;
-    }
-    await onInviteContact(contact);
-  }, [contact, onInviteContact]);
-
-  const styles = useStyleSheet(stylesheet);
-  /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
-        Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */
-  return (
-    <View collapsable={false} style={styles.container}>
-      {contact ? (
-        <ContactDetailsBody
-          contact={contact}
-          webCard={null}
-          contactKey={null}
-          onClose={router.back}
-          onSave={onInviteContactInner}
-        />
-      ) : undefined}
-    </View>
-  );
-};
-
-ContactDetailsFromScannedContactScreen.options = {
-  stackAnimation: 'slide_from_bottom',
-};
 
 const stylesheet = createStyleSheet(appearance => ({
   container: {

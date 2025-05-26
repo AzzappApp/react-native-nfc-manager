@@ -103,7 +103,10 @@ const ContactCreateScreen = ({
       ) {
         contact {
           id
-          ...contactHelpersReadContactData
+          ...ContactActionModal_contact
+          ...ContactsHorizontalList_contacts
+          ...ContactDetailsBody_contact
+          ...ContactsListItem_contact
         }
       }
     }

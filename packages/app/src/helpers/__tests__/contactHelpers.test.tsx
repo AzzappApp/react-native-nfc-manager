@@ -1,5 +1,6 @@
 import { buildExpoContact, buildVCard } from '#helpers/contactHelpers';
-import type { contactHelpersShareContactDataQuery_contact$data } from '#relayArtifacts/contactHelpersShareContactDataQuery_contact.graphql';
+import type { contactHelpersShareContactData_contact$data } from '#relayArtifacts/contactHelpersShareContactData_contact.graphql';
+import type { useOnInviteContactDataQuery_contact$data } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
 
 jest.mock('expo-file-system/next', () => {
   return {
@@ -24,7 +25,7 @@ jest.mock('expo-file-system/next', () => {
   };
 });
 
-const contactMock: contactHelpersShareContactDataQuery_contact$data = {
+const contactMock: contactHelpersShareContactData_contact$data = {
   addresses: [],
   avatar: null,
   logo: null,
@@ -41,7 +42,7 @@ const contactMock: contactHelpersShareContactDataQuery_contact$data = {
   urls: null,
   enrichment: null,
   note: null,
-  ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
+  ' $fragmentType': 'contactHelpersShareContactData_contact',
 };
 
 describe('contactHelpers', () => {
@@ -50,7 +51,7 @@ describe('contactHelpers', () => {
     expect(vCard).toMatchSnapshot();
   });
   test('buildVCard contact with social', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
+    const contact: contactHelpersShareContactData_contact$data = {
       ...contactMock,
       socials: [
         {
@@ -68,31 +69,14 @@ describe('contactHelpers', () => {
   });
 
   test('buildVCard empty contact', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
-      addresses: [],
-      avatar: null,
-      logo: null,
-      birthday: null,
-      company: '',
-      emails: [],
-      firstName: '',
-      id: '',
-      lastName: '',
-      phoneNumbers: [],
-      socials: null,
-      title: '',
-      urls: null,
-      enrichment: null,
-      meetingDate: null,
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
-    };
+    const contact: contactHelpersShareContactData_contact$data = contactMock;
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
   test('buildVCard full featured contact', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
+    const contact: contactHelpersShareContactData_contact$data = {
+      ...contactMock,
       addresses: [
         { address: 'monaco', label: 'Default' },
         { address: 'paris', label: 'Work' },
@@ -120,16 +104,14 @@ describe('contactHelpers', () => {
       ],
       title: 'dev',
       urls: [{ url: 'https://url.com' }, { url: 'https://url2.com' }],
-      enrichment: null,
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
     };
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
   test('buildVCard full featured contact AND enriched data', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
+    const contact: contactHelpersShareContactData_contact$data = {
+      ...contactMock,
       addresses: [
         { address: 'monaco', label: 'Default' },
         { address: 'paris', label: 'Work' },
@@ -186,101 +168,69 @@ describe('contactHelpers', () => {
           urls: [{ url: 'https://overloadedurl.com' }],
         },
       },
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
     };
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
   test('buildVCard with avatar', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
-      addresses: [],
+    const contact: contactHelpersShareContactData_contact$data = {
+      ...contactMock,
       avatar: { id: 'avatarId', uri: 'http://avatar.com' },
-      logo: null,
-      birthday: null,
-      company: '',
-      meetingDate: '2012-12-21',
-      emails: [],
-      firstName: '',
-      id: '',
-      lastName: '',
-      phoneNumbers: [],
-      socials: null,
-      title: '',
-      urls: null,
-      enrichment: null,
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
     };
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
   test('buildVCard with logo', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
-      addresses: [],
-      avatar: null,
+    const contact: contactHelpersShareContactData_contact$data = {
+      ...contactMock,
       logo: { id: 'logoId', uri: 'http://logo.com' },
-      birthday: null,
-      company: '',
-      meetingDate: '2012-12-21',
-      emails: [],
-      firstName: '',
-      id: '',
-      lastName: '',
-      phoneNumbers: [],
-      socials: null,
-      title: '',
-      urls: null,
-      enrichment: null,
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
     };
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
   test('buildVCard with logo and avatar', async () => {
-    const contact: contactHelpersShareContactDataQuery_contact$data = {
-      addresses: [],
+    const contact: contactHelpersShareContactData_contact$data = {
+      ...contactMock,
       avatar: { id: 'avatarId', uri: 'http://avatar.com' },
       logo: { id: 'logoId', uri: 'http://logo.com' },
-      birthday: null,
-      company: '',
-      meetingDate: '2012-12-21',
-      emails: [],
-      firstName: '',
-      id: '',
-      lastName: '',
-      phoneNumbers: [],
-      socials: null,
-      title: '',
-      urls: null,
-      enrichment: null,
-      note: null,
-      ' $fragmentType': 'contactHelpersShareContactDataQuery_contact',
     };
     const vCard = await buildVCard(contact);
     expect(vCard).toMatchSnapshot();
   });
 
+  const defaultExpoContact: useOnInviteContactDataQuery_contact$data = {
+    emails: [],
+    firstName: 'John',
+    lastName: 'Doe',
+    addresses: [],
+    avatar: null,
+    birthday: null,
+    company: '',
+    contactProfile: null,
+    enrichment: null,
+    id: '',
+    logo: null,
+    meetingDate: null,
+    note: null,
+    phoneNumbers: [],
+    socials: null,
+    title: '',
+    urls: null,
+    ' $fragmentType': 'useOnInviteContactDataQuery_contact',
+  };
+
   test('buildExpoContact generate correctly empty emails', async () => {
-    const result = await buildExpoContact({
-      emails: [],
-      firstName: 'John',
-      lastName: 'Doe',
-      meetingDate: new Date('2012-12-21'),
-    });
+    const result = await buildExpoContact(defaultExpoContact);
     expect(result.emails?.length).toBe(0);
   });
 
   test('buildExpoContact generate correctly emails', async () => {
     const result = await buildExpoContact({
+      ...defaultExpoContact,
       emails: [{ address: 'a@a.com', label: 'Work' }],
-      firstName: 'John',
-      lastName: 'Doe',
-      meetingDate: new Date('2012-12-21'),
     });
     expect(result.emails?.length).toBe(1);
     expect(result.emails?.[0].email).toBe('a@a.com');
@@ -289,15 +239,45 @@ describe('contactHelpers', () => {
 
   test('buildExpoContact generate correct avatar uri', async () => {
     const result = await buildExpoContact({
-      firstName: 'John',
-      lastName: 'Doe',
-      meetingDate: new Date('2012-12-21'),
+      ...defaultExpoContact,
       avatar: {
         uri: 'https://example.com/avatar.jpg',
+        id: '',
       },
     });
-    console.log('result', result);
     expect(result.imageAvailable).toBe(true);
     expect(result.image?.uri).toBe('https://example.com/avatar.jpg');
+  });
+  test('buildExpoContact generate correct contact with enrichment', async () => {
+    const result = await buildExpoContact({
+      ...defaultExpoContact,
+      firstName: 'John',
+      lastName: 'Doe',
+      avatar: {
+        uri: 'https://example.com/avatar.jpg',
+        id: '',
+      },
+      company: 'Company',
+      enrichment: {
+        fields: {
+          avatar: {
+            uri: 'https://example.com/enriched.jpg',
+            id: '',
+          },
+          company: 'Enriched Company',
+          addresses: null,
+          birthday: null,
+          emails: null,
+          logo: null,
+          phoneNumbers: null,
+          socials: null,
+          title: null,
+          urls: null,
+        },
+      },
+    });
+    expect(result.imageAvailable).toBe(true);
+    expect(result.image?.uri).toBe('https://example.com/enriched.jpg');
+    expect(result.company).toBe('Enriched Company');
   });
 });

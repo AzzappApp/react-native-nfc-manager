@@ -1,6 +1,13 @@
 import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -42,6 +49,7 @@ import type {
   AddContactModalMutation,
   ContactInput,
 } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type { useOnInviteContactDataQuery_contact$key } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -64,6 +72,16 @@ const AddContactModal = ({
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
+  const [contactKey, setContactKey] = useState<
+    | (useOnInviteContactDataQuery_contact$key & {
+        firstName: string;
+        lastName: string;
+        company: string;
+        id: string;
+      })
+    | null
+    | undefined
+  >(null);
 
   const webCard = useFragment(
     graphql`
@@ -91,7 +109,10 @@ const AddContactModal = ({
       ) {
         contact {
           id
-          ...contactHelpersReadContactData
+          lastName
+          firstName
+          company
+          ...useOnInviteContactDataQuery_contact
         }
       }
     }
@@ -133,7 +154,10 @@ const AddContactModal = ({
     const urls = scanned.urls?.filter(isDefined) || [];
 
     return {
-      addresses,
+      addresses: addresses?.map(address => ({
+        label: address.label,
+        address: address.address,
+      })),
       company: scanned.company,
       emails:
         emails?.map(email => ({
@@ -164,10 +188,10 @@ const AddContactModal = ({
   const onInviteContact = useOnInviteContact();
 
   const onRequestAddContactToPhonebook = useCallback(async () => {
-    if (!scanned) return;
+    if (!contactKey) return;
     const name = `${
-      `${scanned.firstName ?? ''}  ${scanned.lastName ?? ''}`.trim() ||
-      scanned.company ||
+      `${contactKey.firstName ?? ''}  ${contactKey.lastName ?? ''}`.trim() ||
+      contactKey.company ||
       webCard.userName
     }`;
 
@@ -196,7 +220,7 @@ const AddContactModal = ({
           text: addText,
           onPress: async () => {
             try {
-              await onInviteContact(scanned);
+              await onInviteContact(contactKey);
             } catch (e) {
               console.error(e);
             }
@@ -208,11 +232,11 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            if (scanned) {
+            if (contactKey?.id) {
               router.push({
-                route: 'CONTACT_DETAILS_FROM_SCANNER',
+                route: 'CONTACT_DETAILS',
                 params: {
-                  scannedContact: scanned,
+                  contactId: contactKey.id,
                   overlay: 'tooltipVisible',
                 },
               });
@@ -225,7 +249,15 @@ const AddContactModal = ({
         cancelable: true,
       },
     );
-  }, [scanned, webCard.userName, intl, onInviteContact, router]);
+  }, [contactKey, webCard.userName, intl, onInviteContact, router]);
+
+  const hasPhoneInsertRequested = useRef(false);
+  useEffect(() => {
+    if (contactKey && !hasPhoneInsertRequested.current) {
+      hasPhoneInsertRequested.current = true;
+      onRequestAddContactToPhonebook();
+    }
+  }, [contactKey, onRequestAddContactToPhonebook]);
 
   const onAddContactToProfile = useCallback(async () => {
     if (!scanned || !viewer) return;
@@ -251,7 +283,7 @@ const AddContactModal = ({
           console.warn('fail to add contact ?');
         }
       },
-      onCompleted: () => {
+      onCompleted: data => {
         close();
         Toast.show({
           type: 'success',
@@ -260,6 +292,7 @@ const AddContactModal = ({
             description: 'Toast message when a contact is created successfully',
           }),
         });
+        setContactKey(data.createContact?.contact);
       },
       onError: e => {
         console.warn('error adding contact', e);
@@ -339,12 +372,7 @@ const AddContactModal = ({
   const coverWidth = dim.height < 700 + bottom ? dim.width / 4 : 120;
 
   return (
-    <BottomSheetModal
-      visible={show}
-      onDismiss={onRequestAddContactToPhonebook}
-      lazy
-      enableContentPanningGesture={false}
-    >
+    <BottomSheetModal visible={show} lazy enableContentPanningGesture={false}>
       <Header
         middleElement={
           <View style={styles.headerMiddleContent}>

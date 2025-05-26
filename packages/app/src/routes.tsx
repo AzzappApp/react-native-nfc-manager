@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual';
-import type { ContactType } from '#helpers/contactHelpers';
 import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { ContactDetailEnrichState } from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import type { SectionsRoute } from './sectionsRoutes';
@@ -277,7 +276,7 @@ export type ContactCreateRoute = {
 export type ContactEditRoute = {
   route: 'CONTACT_EDIT';
   params: {
-    contact: ContactType;
+    contactId: string;
   };
 };
 
@@ -306,14 +305,6 @@ export type ContactDetailsRoute = {
   route: 'CONTACT_DETAILS';
   params: {
     contactId: string;
-    overlay?: ContactDetailEnrichState;
-  };
-};
-
-export type ContactDetailsFromScannerRoute = {
-  route: 'CONTACT_DETAILS_FROM_SCANNER';
-  params: {
-    scannedContact: ContactType;
     overlay?: ContactDetailEnrichState;
   };
 };
@@ -363,7 +354,6 @@ export type Route =
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCreateRoute
-  | ContactDetailsFromScannerRoute
   | ContactDetailsRoute
   | ContactEditRoute
   | ContactsByDateRoute

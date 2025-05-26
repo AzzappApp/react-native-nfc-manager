@@ -30,7 +30,6 @@ import { ContactDetailAvatar } from './ContactDetailAvatar';
 import { ContactDetailEnrichOverlay } from './ContactDetailEnrichOverlay';
 import { ContactDetailFragmentAI } from './ContactDetailFragmentAI';
 import { ContactDetailFragmentContact } from './ContactDetailFragmentContact';
-import type { ContactType } from '#helpers/contactHelpers';
 import type { ContactDetailAvatar_webCard$key } from '#relayArtifacts/ContactDetailAvatar_webCard.graphql';
 import type {
   ContactDetailsBody_contact$data,
@@ -48,7 +47,6 @@ export type ContactDetailEnrichState =
 const BLUR_GAP = 20;
 
 type ContactDetailsBodyProps = {
-  contact: ContactType;
   webCard: ContactDetailAvatar_webCard$key | null;
   contactKey: ContactDetailsBody_contact$key | null;
   onClose: () => void;
@@ -73,7 +71,6 @@ export type HiddenFields = {
 };
 
 const ContactDetailsBody = ({
-  contact,
   contactKey,
   webCard: webCardKey,
   onSave,
@@ -84,6 +81,7 @@ const ContactDetailsBody = ({
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
+  const onShare = useShareContact();
 
   const data = useFragment(
     graphql`
@@ -100,7 +98,7 @@ const ContactDetailsBody = ({
         ...ContactDetailFragmentAI_contact
         ...ContactDetailAvatar_contact
         ...ContactDetailActionModal_contact
-        ...contactHelpersShareContactDataQuery_contact
+        ...contactHelpersShareContactData_contact
         enrichmentStatus
         firstName
         lastName
@@ -288,8 +286,6 @@ const ContactDetailsBody = ({
     });
   };
 
-  const onShare = useShareContact(data);
-
   const appearance = useColorScheme();
 
   const { width: screenWidth } = useScreenDimensions();
@@ -378,13 +374,15 @@ const ContactDetailsBody = ({
 
   const onEditContact = useCallback(() => {
     hideMore();
-    router.push({
-      route: 'CONTACT_EDIT',
-      params: {
-        contact,
-      },
-    });
-  }, [contact, hideMore, router]);
+    if (data?.id) {
+      router.push({
+        route: 'CONTACT_EDIT',
+        params: {
+          contactId: data.id,
+        },
+      });
+    }
+  }, [data?.id, hideMore, router]);
 
   const [subView, setSubView] = useState<'AI' | 'contact'>('contact');
 
@@ -591,9 +589,8 @@ const ContactDetailsBody = ({
             }
             variant="icon"
             style={styles.share}
-            onPress={onShare}
+            onPress={() => onShare(data)}
           />
-
           <ContactDetailAvatar
             state={overlayState}
             isHiddenField={hiddenFields.avatarId}
@@ -646,7 +643,6 @@ const ContactDetailsBody = ({
               />
             </View>
           )}
-
           {subView === 'contact' && (
             <ContactDetailFragmentContact
               showMore={showMore}
@@ -666,7 +662,6 @@ const ContactDetailsBody = ({
           close={hideMore}
           onRemoveContacts={onRemoveContacts}
           onSaveContact={onSave}
-          onShare={onShare}
           contact={data}
           onEdit={onEditContact}
           onEnrich={onEnrich}

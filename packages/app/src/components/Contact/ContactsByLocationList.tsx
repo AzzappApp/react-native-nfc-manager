@@ -6,13 +6,13 @@ import { useRouter } from '#components/NativeRouter';
 import ContactsByLocationListQueryNode from '#relayArtifacts/ContactsByLocationListQuery.graphql';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import ContactActionModal from './ContactActionModal';
-import type { contactHelpersReadContactData$key } from '#relayArtifacts/contactHelpersReadContactData.graphql';
+import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { ContactsByLocationList_root$key } from '#relayArtifacts/ContactsByLocationList_root.graphql';
 import type { ContactsByLocationListQuery } from '#relayArtifacts/ContactsByLocationListQuery.graphql';
 import type {
+  ViewStyle,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  ViewStyle,
 } from 'react-native';
 
 type ContactsByLocationListProps = {
@@ -58,10 +58,8 @@ const ContactsByLocationList = ({
                   nbContacts
                   contacts {
                     id
-                    ...contactHelpersShareContactDataQuery_contact
-                    ...ContactsHorizontalList_contacts
-                    ...contactHelpersReadContactData
                     ...ContactActionModal_contact
+                    ...ContactsHorizontalList_contacts
                   }
                 }
               }
@@ -154,8 +152,8 @@ const ContactsByLocationList = ({
     [data.currentUser?.contactsByLocation.edges],
   );
   const [contactActionData, setContactActionData] = useState<
-    | contactHelpersReadContactData$key
-    | contactHelpersReadContactData$key[]
+    | ContactActionModal_contact$key
+    | ContactActionModal_contact$key[]
     | undefined
   >(undefined);
   const onShowContactAction = useCallback(
