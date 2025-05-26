@@ -1,3 +1,9 @@
+## 2.0.0-canary.29
+
+* **fix:**  - align enrich icon button to expected design ([#8963](https://github.com/AzzappApp/azzapp/pull/8963))
+* **fix:**  - **Contact:** add profile selector on save ([#8964](https://github.com/AzzappApp/azzapp/pull/8964))
+* **fix:**  - sometime overlay not displayed on android ([#8942](https://github.com/AzzappApp/azzapp/pull/8942))
+
 ## 2.0.0-canary.28
 
 * **fix:**  - **enrichment:** [#8955](https://github.com/AzzappApp/azzapp/pull/8955) hack brandfetch ([#8966](https://github.com/AzzappApp/azzapp/pull/8966))
