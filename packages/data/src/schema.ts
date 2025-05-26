@@ -997,6 +997,7 @@ export const ContactTable = cols.table(
       'running',
       'completed',
       'failed',
+      'canceled',
     ]),
   },
   table => {

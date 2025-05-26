@@ -12,6 +12,10 @@ export const enrichContact = inngest.createFunction(
         event: 'send/enrichContact',
         match: 'data.contact.id',
       },
+      {
+        event: 'cancel/enrichContact',
+        if: 'event.data.contactId == event.data.contactId',
+      },
     ],
     onFailure: ({ event }) => {
       const contact = event.data.event.data?.contact;
@@ -43,5 +47,13 @@ export const enrichContact = inngest.createFunction(
     }
 
     return result;
+  },
+);
+
+export const cancelEnrichContact = inngest.createFunction(
+  { id: 'cancelEnrichContact' },
+  { event: 'cancel/enrichContact' },
+  async () => {
+    //nothing to do here, just a placeholder for cancellation
   },
 );

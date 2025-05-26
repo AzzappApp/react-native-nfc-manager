@@ -424,6 +424,36 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
   };
 };
 
+export const cancelEnrichContact: MutationResolvers['cancelEnrichContact'] =
+  async (_, { contactId: gqlContactId }, { cancelEnrichContact }) => {
+    const user = await getSessionUser();
+    if (!user) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+
+    const contactId = fromGlobalId(gqlContactId).id;
+    const existingContact = await contactLoader.load(contactId);
+
+    if (existingContact === null) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    const profile = await profileLoader.load(existingContact.ownerProfileId);
+
+    if (!profile || profile.userId !== user.id) {
+      throw new GraphQLError(ERRORS.FORBIDDEN);
+    }
+    cancelEnrichContact(user.id, existingContact.id);
+
+    await updateContact(contactId, {
+      enrichmentStatus: 'canceled',
+    });
+
+    return {
+      contact: existingContact,
+    };
+  };
+
 export const updateContactEnrichmentHiddenFields: MutationResolvers['updateContactEnrichmentHiddenFields'] =
   async (_, { contactEnrichmentId: gqlContactEnrichmentId, input }) => {
     const user = await getSessionUser();

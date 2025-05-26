@@ -57,3 +57,7 @@ export const notifyWebCardUsers =
 
 export const enrichContact =
   externalFunction<(userId: string, contact: Contact) => void>('enrichContact');
+
+export const cancelEnrichContact = externalFunction<
+  (userId: string, contactId: string) => void
+>('cancelEnrichContact');

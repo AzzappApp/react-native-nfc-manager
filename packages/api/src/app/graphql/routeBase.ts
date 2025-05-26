@@ -234,6 +234,21 @@ const { handleRequest } = createYoga({
             }),
         );
       },
+      cancelEnrichContact: async (userId, contactId) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'cancel/enrichContact',
+              data: {
+                userId,
+                contactId,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
+      },
     };
   },
   plugins: [

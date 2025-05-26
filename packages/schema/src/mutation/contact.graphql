@@ -17,6 +17,8 @@ extend type Mutation {
 
   enrichContact(contactId: ID!): ContactPayload
 
+  cancelEnrichContact(contactId: ID!): ContactPayload
+
   updateContactEnrichmentHiddenFields(
     contactEnrichmentId: ID!
     input: HiddenFieldInput!

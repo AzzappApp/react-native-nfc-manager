@@ -33,6 +33,7 @@ enum EnrichmentStatus {
   running
   completed
   failed
+  canceled
 }
 
 type EnrichedContactFields {
