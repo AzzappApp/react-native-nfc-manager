@@ -14,6 +14,7 @@ export const useCurrentLocation = () => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        setCurrentValue({ value: null, locationSearched: true });
         return;
       }
 

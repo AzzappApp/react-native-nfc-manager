@@ -449,7 +449,12 @@ const QRCode = ({
   const [contactCardSvg, setContactCardSvg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data?.webCard?.userName && data.contactCardAccessId && publicKey) {
+    if (
+      data?.webCard?.userName &&
+      data.contactCardAccessId &&
+      publicKey &&
+      currentLocation.locationSearched
+    ) {
       toString(
         buildUserUrlWithKey({
           userName: data.webCard?.userName,
@@ -486,7 +491,7 @@ const QRCode = ({
         setContactCardSvg(svg);
       });
     }
-  }, [publicKey, data, location, address]);
+  }, [publicKey, data, location, address, currentLocation.locationSearched]);
 
   const svg = contactCardSvg ? Skia.SVG.MakeFromString(contactCardSvg) : null;
 

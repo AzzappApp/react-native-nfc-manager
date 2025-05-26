@@ -2,9 +2,11 @@ import * as ed from '@noble/ed25519';
 import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
 import { useEffect, useRef } from 'react';
+import { useIntl } from 'react-intl';
 import { MMKV, useMMKVString } from 'react-native-mmkv';
 import { fromByteArray } from 'react-native-quick-base64';
 import Crypto from 'react-native-quick-crypto';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import type { useQRCodeKey_profile$key } from '#relayArtifacts/useQRCodeKey_profile.graphql';
 
@@ -64,6 +66,8 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
 
   const buildingKeyPair = useRef(false);
 
+  const intl = useIntl();
+
   useEffect(() => {
     if (
       id &&
@@ -90,6 +94,15 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
           onError: error => {
             Sentry.captureException(error);
             buildingKeyPair.current = false;
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'The QR code can not be generated, please try again',
+                description:
+                  'Error message when the QR code can not be generated',
+              }),
+            });
           },
           onCompleted: () => {
             setPublicKey(fromByteArray(publicKey));
@@ -98,7 +111,7 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
         });
       })();
     }
-  }, [commit, contactCardAccessId, id, setPublicKey, publicKey]);
+  }, [commit, contactCardAccessId, id, setPublicKey, publicKey, intl]);
 
   return publicKey;
 };
