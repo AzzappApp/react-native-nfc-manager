@@ -1,3 +1,8 @@
+## 2.0.0-canary.28
+
+* **fix:**  - **enrichment:** [#8955](https://github.com/AzzappApp/azzapp/pull/8955) hack brandfetch ([#8966](https://github.com/AzzappApp/azzapp/pull/8966))
+* **fix:**  - **enrichment:** add birth date ([#8967](https://github.com/AzzappApp/azzapp/pull/8967))
+
 ## 2.0.0-canary.27
 
 * **fix:**  - **contact:** [#8948](https://github.com/AzzappApp/azzapp/pull/8948) item appearance on ios ([#8962](https://github.com/AzzappApp/azzapp/pull/8962))
