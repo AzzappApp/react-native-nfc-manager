@@ -1,3 +1,9 @@
+## 2.0.0-canary.30
+
+* **fix:**  - missing address when exporting contact to phone ([#8974](https://github.com/AzzappApp/azzapp/pull/8974))
+* **fix:**  - **enrichment:** remove unknown social links ([#8968](https://github.com/AzzappApp/azzapp/pull/8968))
+* **fix:**  - **Cover:** set background color on logo cover ([#8978](https://github.com/AzzappApp/azzapp/pull/8978))
+
 ## 2.0.0-canary.29
 
 * **fix:**  - align enrich icon button to expected design ([#8963](https://github.com/AzzappApp/azzapp/pull/8963))
