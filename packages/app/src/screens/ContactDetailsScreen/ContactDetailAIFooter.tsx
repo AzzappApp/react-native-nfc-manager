@@ -13,7 +13,7 @@ export const ContactDetailAIFooter = ({
       <Icon icon="filters_ai_light" size={24} />
       <Text variant="medium">
         <FormattedMessage
-          defaultMessage="Profile built with azzapp AI - {version}"
+          defaultMessage="Contact enriched with azzapp AI - {version}"
           description="ContactDetailsModal - Description footer for AI profile view"
           values={{
             version,
