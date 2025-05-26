@@ -107,7 +107,7 @@ export const ContactDetailAIItemEducation = ({
 const stylesheet = createStyleSheet(appearance => ({
   container: { marginBottom: 10 },
   imageContainer: { flexDirection: 'row', gap: CONTAINER_GAP },
-  image: { width: LOGO_SIZE, height: LOGO_SIZE },
+  image: { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: 8 },
   textContainer: {
     marginLeft: CONTAINER_GAP,
     gap: CONTAINER_GAP,

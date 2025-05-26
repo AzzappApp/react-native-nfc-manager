@@ -115,7 +115,7 @@ export const ContactDetailAIItemProfessionalExperiences = ({
 const stylesheet = createStyleSheet(appearance => ({
   container: { marginBottom: 10 },
   imageContainer: { flexDirection: 'row', gap: CONTAINER_GAP },
-  image: { width: LOGO_SIZE, height: LOGO_SIZE },
+  image: { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: 8 },
   textContainer: { marginLeft: CONTAINER_GAP, gap: 7, paddingBottom: 20 },
   text: { color: appearance === 'dark' ? colors.grey600 : colors.grey400 },
 }));
