@@ -58,7 +58,7 @@ export const peopleDataLabsEnrichment: ApiResolver = {
 
 const buildContact = async (
   data: PersonResponse,
-  mediaPromises: Array<Promise<string>>,
+  mediaPromises: Array<Promise<string | null>>,
 ) => {
   const uniqueBrands = (
     data.experience?.map(position => ({

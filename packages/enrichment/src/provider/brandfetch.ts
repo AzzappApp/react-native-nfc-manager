@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { createId } from '@azzapp/data';
 import { encodeMediaId } from '@azzapp/service/mediaServices/imageHelpers';
 import env from '../env';
@@ -81,19 +82,35 @@ export const downloadMediaFromBrand = (website: string) => {
 
 export const uploadLogo = async (mediaId: string, hostname: string) => {
   const logo = await fetch(
-    `https://cdn.brandfetch.io/${hostname}/icon?c=${env.BRANDFETCH_CLIENT_ID}`,
+    `https://cdn.brandfetch.io/${hostname}/fallback/404/icon?c=${env.BRANDFETCH_CLIENT_ID}`,
+    {
+      method: 'GET',
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36', // Set a user agent to avoid potential blocking by the server, it's unfair but they should protect it better
+      },
+    },
   );
+
   if (logo.ok) {
     const type = logo.headers.get('content-type') || '';
     if (type.includes('image')) {
       const buffer = await logo.blob();
       return uploadMedia(buffer, mediaId);
     }
-    throw new Error(
+    Sentry.captureMessage(
       `Error fetching logo of ${hostname}: invalid content type ${type}, response ${logo.status}:  ${logo.statusText}`,
     );
+
+    return null;
   }
-  throw new Error(
-    `Error fetching logo of ${hostname}: response ${logo.status}:  ${logo.statusText}`,
-  );
+
+  if (logo.status !== 404) {
+    Sentry.captureMessage(
+      `Error fetching logo of
+     ${hostname}: response ${logo.status}:  ${logo.statusText}`,
+    );
+  }
+
+  return null;
 };
