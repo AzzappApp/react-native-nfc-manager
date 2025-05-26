@@ -716,7 +716,7 @@ __metadata:
     react-native-haptic-feedback: "npm:^2.3.3"
     react-native-image-colors: "npm:^2.4.0"
     react-native-image-size: "npm:^1.1.6"
-    react-native-keyboard-controller: "npm:^1.17.2"
+    react-native-keyboard-controller: "patch:react-native-keyboard-controller@npm%3A1.17.2#~/.yarn/patches/react-native-keyboard-controller-npm-1.17.2-f490af669a.patch"
     react-native-keychain: "npm:^10.0.0"
     react-native-localize: "npm:^3.4.1"
     react-native-mime-types: "npm:^2.5.0"
@@ -27804,7 +27804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keyboard-controller@npm:^1.17.2":
+"react-native-keyboard-controller@npm:1.17.2":
   version: 1.17.2
   resolution: "react-native-keyboard-controller@npm:1.17.2"
   dependencies:
@@ -27814,6 +27814,19 @@ __metadata:
     react-native: "*"
     react-native-reanimated: ">=3.0.0"
   checksum: 10/3d8069d103ff5f67a8aba12fc04e7b78e91bea6dbf2286ee5154c11debea07e04750258f2f7fa7532578341bc3239d8934a7ee03a20f54f2ffeadc8708d450ee
+  languageName: node
+  linkType: hard
+
+"react-native-keyboard-controller@patch:react-native-keyboard-controller@npm%3A1.17.2#~/.yarn/patches/react-native-keyboard-controller-npm-1.17.2-f490af669a.patch":
+  version: 1.17.2
+  resolution: "react-native-keyboard-controller@patch:react-native-keyboard-controller@npm%3A1.17.2#~/.yarn/patches/react-native-keyboard-controller-npm-1.17.2-f490af669a.patch::version=1.17.2&hash=0eac0b"
+  dependencies:
+    react-native-is-edge-to-edge: "npm:^1.1.6"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: ">=3.0.0"
+  checksum: 10/17bbfd39b780745b6e708f1bcdb64d029b21450bab22b78750b0048bf10d1d6dec734db09b2484fa439e7e8c362b4b11c9e497985733d5453811a3acb7269436
   languageName: node
   linkType: hard
 
