@@ -4,7 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import { useCallback, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, Pressable, useWindowDimensions, View } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  useColorScheme,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Placement } from 'react-native-popover-view/dist/Types';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
@@ -18,6 +24,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import PressableOpacity from '#ui/PressableOpacity';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
@@ -44,6 +51,7 @@ export const ContactDetailEnrichOverlay = ({
   const { bottom } = useScreenInsets();
 
   const { tooltips } = useTooltipDataContext();
+  const colorScheme = useColorScheme();
 
   const {
     openTooltips,
@@ -246,32 +254,25 @@ export const ContactDetailEnrichOverlay = ({
               />
             </Pressable>
           </Tooltip>
-          <View
+          <PressableOpacity
+            onPress={onEnrich}
             style={[styles.enrichButtonContainer, { bottom: bottom + 20 }]}
-            ref={enrichButtonRef}
           >
-            <View style={styles.enrichBackground}>
-              <LinearGradient
-                colors={['#B02EFB', '#1E6BCF', '#1962C1', '#23CFCC']}
-                start={{ x: 0.15, y: 0.15 }}
-                end={{ x: 0.8, y: 0.8 }}
-                style={styles.gradient}
-              />
-              <IconButton
-                icon="filters_ai_light"
-                onPress={onEnrich}
-                size={40}
-                iconSize={24}
-                iconStyle={styles.iconStyle}
-                style={styles.iconContainerStyle}
+            <View style={styles.iconContainerStyle} ref={enrichButtonRef}>
+              <Icon
+                icon={colorScheme === 'light' ? 'enrich_light' : 'enrich_dark'}
+                size={ENRICH_ICON_SIZE}
+                style={styles.iconStyle}
               />
             </View>
-          </View>
+          </PressableOpacity>
         </Animated.View>
       )}
     </View>
   );
 };
+
+const ENRICH_ICON_SIZE = 72;
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
@@ -282,24 +283,15 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     pointerEvents: 'box-none',
   },
-  enrichBackground: {
-    borderWidth: 8,
-    color: appearance === 'dark' ? colors.grey1000 : colors.grey50,
-    borderColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-  },
+  flex: { flex: 1 },
   enrichContainer: { flex: 1, pointerEvents: 'box-none' },
   enrichButtonContainer: {
     position: 'absolute',
     paddingBottom: 50,
     width: '100%',
-    height: 72,
+    height: ENRICH_ICON_SIZE,
     alignItems: 'center',
     pointerEvents: 'box-none',
-    zIndex: 1,
-    ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   closeTooltip: {
     padding: 15,
@@ -308,13 +300,9 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   iconStyle: {
     tintColor: undefined,
+    borderRadius: 50,
   },
   iconContainerStyle: {
-    position: 'absolute',
-    borderColor: 'transparent',
-    top: 8,
-    left: 8,
-    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   confirmationContainer: {
@@ -365,16 +353,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   aiIcon: { alignSelf: 'center', width: 60, height: 60 },
   headerStyle: { alignSelf: 'center', color: colors.black },
-  gradient: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    position: 'absolute',
-    top: -8,
-    left: -8,
-    zIndex: -1,
-    borderWidth: 8,
-  },
   fullscreen: {
     position: 'absolute',
     width: '100%',

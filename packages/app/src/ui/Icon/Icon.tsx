@@ -206,6 +206,12 @@ const icons = {
   get filters_ai_dark() {
     return require('./assets/filters_ai_light.png');
   },
+  get enrich_dark() {
+    return require('./assets/enrich_dark.png');
+  },
+  get enrich_light() {
+    return require('./assets/enrich_light.png');
+  },
   get fixed_ratio() {
     return require('./assets/fixed_ratio.png');
   },
