@@ -139,7 +139,7 @@ export const ContactDetailEnrichOverlay = ({
         <Animated.View
           style={styles.confirmationContainer}
           exiting={FadeOut}
-          entering={FadeIn}
+          entering={Platform.OS === 'ios' ? FadeIn : undefined}
         >
           <LinearGradient
             colors={['transparent', 'rgba(0, 0, 0, 0.7))']}
@@ -201,7 +201,7 @@ export const ContactDetailEnrichOverlay = ({
         <Animated.View
           style={styles.enrichContainer}
           exiting={FadeOut}
-          entering={FadeIn}
+          entering={Platform.OS === 'ios' ? FadeIn : undefined}
         >
           <Tooltip
             offset={Platform.OS === 'ios' ? 0 : 25}
