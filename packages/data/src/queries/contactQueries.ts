@@ -11,6 +11,7 @@ import {
   lte,
   gt,
 } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import {
   ContactEnrichmentTable,
@@ -284,21 +285,20 @@ export const getUserContacts = async (
       afterUserName,
       afterId,
     ] = after.split(SEPARATOR);
+    const afterCompare =
+      [afterLastName, afterFirstName, afterCompany, afterUserName, afterId]
+        .filter(val => !!val)
+        .at(0) ?? '';
     if (afterId) {
       afterClause = sql`
-        (
-          COALESCE(${ContactTable.lastName}, ''), 
-          COALESCE(${ContactTable.firstName}, ''), 
-          COALESCE(${ContactTable.company}, ''), 
-          COALESCE(${WebCardTable.userName}, ''), 
-          ${ContactTable.id}
-        ) > (
-          ${afterLastName}, 
-          ${afterFirstName}, 
-          ${afterCompany}, 
-          ${afterUserName}, 
-          ${afterId}
-        )
+        COALESCE(       
+          NULLIF(${ContactTable.lastName}, ''),
+          NULLIF(${ContactTable.firstName}, ''),    
+          NULLIF(${ContactTable.company}, ''),
+          NULLIF(${WebCardTable.userName}, ''),
+          NULLIF(${ContactTable.id}, ''),
+          ''
+        ) > ${afterCompare}
       `;
     }
   }
@@ -306,21 +306,20 @@ export const getUserContacts = async (
   // Build WHERE clause dynamically
 
   // Query the DB
+  const ContactProfile = alias(ProfileTable, 'ContactProfile');
+
   const data = await db()
     .select({
       Contact: ContactTable,
       WebCard: WebCardTable,
-      cursorOrder: sql`COALESCE(       
-        NULLIF(${ContactTable.lastName}, ''),
-        NULLIF(${ContactTable.firstName}, ''),    
-        NULLIF(${ContactTable.company}, ''),
-        NULLIF(${WebCardTable.userName}, ''),
-        ''
-      )`.as('cursorOrder'),
     })
     .from(ContactTable)
     .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
-    .leftJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .leftJoin(
+      ContactProfile,
+      eq(ContactTable.contactProfileId, ContactProfile.id),
+    )
+    .leftJoin(WebCardTable, eq(ContactProfile.webCardId, WebCardTable.id))
     .where(
       and(
         eq(ProfileTable.userId, userId),
@@ -358,23 +357,23 @@ export const getUserContacts = async (
       ...[
         orderBy === 'date' ? desc(ContactTable.meetingDate) : undefined,
         sql`COALESCE(       
-        NULLIF(${ContactTable.lastName}, ''),
-        NULLIF(${ContactTable.firstName}, ''),    
-        NULLIF(${ContactTable.company}, ''),
-        NULLIF(${WebCardTable.userName}, ''),
-        ''
-      )`,
+          NULLIF(${ContactTable.lastName}, ''),
+          NULLIF(${ContactTable.firstName}, ''),    
+          NULLIF(${ContactTable.company}, ''),
+          NULLIF(${WebCardTable.userName}, ''),
+          ''
+        )`,
         sql`COALESCE(       
-        NULLIF(${ContactTable.firstName}, ''),    
-        NULLIF(${ContactTable.company}, ''),
-        NULLIF(${WebCardTable.userName}, ''),
-        ''
-      )`,
+          NULLIF(${ContactTable.firstName}, ''),    
+          NULLIF(${ContactTable.company}, ''),
+          NULLIF(${WebCardTable.userName}, ''),
+          ''
+        )`,
         sql`COALESCE(       
-        NULLIF(${ContactTable.company}, ''),
-        NULLIF(${WebCardTable.userName}, ''),
-        ''
-      )`,
+          NULLIF(${ContactTable.company}, ''),
+          NULLIF(${WebCardTable.userName}, ''),
+          ''
+        )`,
         sql`COALESCE(${WebCardTable.userName}, '')`,
         ContactTable.id,
       ].filter(val => val !== undefined),

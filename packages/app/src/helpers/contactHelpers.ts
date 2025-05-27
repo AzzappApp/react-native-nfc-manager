@@ -906,10 +906,13 @@ export const addContactUpdater = (
         contact.getValue('lastName'),
         contact.getValue('firstName'),
         contact.getValue('company'),
-        contact.getLinkedRecord('webCard')?.getValue('userName'),
-        contact.getValue('id'),
+        contact
+          .getLinkedRecord('profile')
+          ?.getLinkedRecord('webCard')
+          ?.getValue('userName'),
       ]
-        .filter(Boolean)
+        .filter(val => !!val)
+        .map(val => val!.toString().toLowerCase())
         .join('\u0001');
 
     const cursorCompare = getCursorForContact(newContact);
@@ -924,11 +927,19 @@ export const addContactUpdater = (
         return cursor > cursorCompare;
       });
 
-    ConnectionHandler.insertEdgeBefore(
-      userContactsConnection,
-      edge,
-      prevRecordEdge?.getValue('cursor') as string | undefined,
-    );
+    if (prevRecordEdge) {
+      ConnectionHandler.insertEdgeBefore(
+        userContactsConnection,
+        edge,
+        prevRecordEdge?.getValue('cursor') as string | undefined,
+      );
+    } else if (
+      !userContactsConnection
+        .getLinkedRecord('pageInfo')
+        ?.getValue('hasNextPage')
+    ) {
+      ConnectionHandler.insertEdgeAfter(userContactsConnection, edge);
+    }
   });
 
   // Update user by location connection
