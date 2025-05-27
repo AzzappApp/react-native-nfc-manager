@@ -99,13 +99,15 @@ export default TermsCheckBoxes;
 const styles = StyleSheet.create({
   checkboxesContainer: {
     marginBottom: 20,
+    gap: 5,
   },
   checkLabelContainer: {
     flex: 1,
     paddingHorizontal: 10,
   },
   checkLabel: {
-    flex: 1,
+    flexGrow: 1,
+    maxWidth: '100%',
   },
   error: {
     paddingLeft: 10,
