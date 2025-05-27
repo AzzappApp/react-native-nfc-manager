@@ -56,6 +56,7 @@ const ContactCardEditModalSocials = ({
               });
             }}
             returnKeyType="done"
+            ellipsize
           />
           <Separation small />
         </Fragment>

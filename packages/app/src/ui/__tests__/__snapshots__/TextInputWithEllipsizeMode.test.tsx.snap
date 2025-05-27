@@ -24,19 +24,24 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
           "alignItems": "center",
           "flexDirection": "row",
         },
-        {
-          "backgroundColor": "#F5F5F6",
-          "borderColor": "#F5F5F6",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-          "fontSize": 16,
-          "height": 47,
-          "lineHeight": 20,
-          "paddingHorizontal": 15,
-          "paddingVertical": 3,
-        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          false,
+          undefined,
+        ],
       ]
     }
   >
@@ -53,8 +58,11 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
             "flex": 1,
           },
           [
-            undefined,
-            false,
+            {
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "lineHeight": 20,
+            },
             undefined,
             {
               "color": "transparent",
@@ -66,52 +74,65 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
       value="test"
     />
   </View>
-  <Text
-    accessible={true}
-    allowFontScaling={false}
-    ellipsizeMode="tail"
-    maxFontSizeMultiplier={1}
-    numberOfLines={1}
-    onPress={[Function]}
+  <View
     style={
-      [
-        {
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-        },
+      {
+        "backgroundColor": "transparent",
+        "bottom": 0,
+        "flex": 1,
+        "justifyContent": "center",
+        "position": "absolute",
+        "top": 0,
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      allowFontScaling={false}
+      ellipsizeMode="tail"
+      maxFontSizeMultiplier={1}
+      numberOfLines={1}
+      onPress={[Function]}
+      style={
         [
           {
-            "backgroundColor": "#F5F5F6",
-            "borderColor": "#F5F5F6",
-            "borderRadius": 12,
-            "borderWidth": 1,
             "color": "#0E1216",
             "fontFamily": "PlusJakartaSans-Regular",
-            "fontSize": 16,
-            "height": 47,
-            "lineHeight": 20,
-            "paddingHorizontal": 15,
-            "paddingVertical": 3,
           },
-          undefined,
-          undefined,
-          {
-            "backgroundColor": "transparent",
-            "justifyContent": "center",
-            "position": "absolute",
-            "top": 9,
-          },
-          {
-            "borderWidth": 0,
-            "opacity": 1,
-          },
-        ],
-      ]
-    }
-    value="test"
-  >
-    test
-  </Text>
+          [
+            {
+              "backgroundColor": "#F5F5F6",
+              "borderColor": "#F5F5F6",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "color": "#0E1216",
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "height": 47,
+              "lineHeight": 20,
+              "paddingHorizontal": 15,
+              "paddingVertical": 3,
+            },
+            undefined,
+            undefined,
+            {
+              "borderColor": "transparent",
+              "borderWidth": 1,
+              "color": undefined,
+              "flex": 0,
+              "height": "auto",
+              "opacity": 1,
+              "padding": 0,
+            },
+          ],
+        ]
+      }
+      value="test"
+    >
+      test
+    </Text>
+  </View>
 </View>
 `;
 
@@ -139,19 +160,24 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
           "alignItems": "center",
           "flexDirection": "row",
         },
-        {
-          "backgroundColor": "#F5F5F6",
-          "borderColor": "#F5F5F6",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-          "fontSize": 16,
-          "height": 47,
-          "lineHeight": 20,
-          "paddingHorizontal": 15,
-          "paddingVertical": 3,
-        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          false,
+          undefined,
+        ],
       ]
     }
   >
@@ -168,8 +194,11 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
             "flex": 1,
           },
           [
-            undefined,
-            false,
+            {
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "lineHeight": 20,
+            },
             undefined,
             {
               "color": "transparent",
@@ -181,52 +210,65 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
       value="test"
     />
   </View>
-  <Text
-    accessible={true}
-    allowFontScaling={false}
-    ellipsizeMode="tail"
-    maxFontSizeMultiplier={1}
-    numberOfLines={1}
-    onPress={[Function]}
+  <View
     style={
-      [
-        {
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-        },
+      {
+        "backgroundColor": "transparent",
+        "bottom": 0,
+        "flex": 1,
+        "justifyContent": "center",
+        "position": "absolute",
+        "top": 0,
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      allowFontScaling={false}
+      ellipsizeMode="tail"
+      maxFontSizeMultiplier={1}
+      numberOfLines={1}
+      onPress={[Function]}
+      style={
         [
           {
-            "backgroundColor": "#F5F5F6",
-            "borderColor": "#F5F5F6",
-            "borderRadius": 12,
-            "borderWidth": 1,
             "color": "#0E1216",
             "fontFamily": "PlusJakartaSans-Regular",
-            "fontSize": 16,
-            "height": 47,
-            "lineHeight": 20,
-            "paddingHorizontal": 15,
-            "paddingVertical": 3,
           },
-          undefined,
-          undefined,
-          {
-            "backgroundColor": "transparent",
-            "justifyContent": "center",
-            "position": "absolute",
-            "top": 9,
-          },
-          {
-            "borderWidth": 0,
-            "opacity": 1,
-          },
-        ],
-      ]
-    }
-    value="test"
-  >
-    test
-  </Text>
+          [
+            {
+              "backgroundColor": "#F5F5F6",
+              "borderColor": "#F5F5F6",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "color": "#0E1216",
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "height": 47,
+              "lineHeight": 20,
+              "paddingHorizontal": 15,
+              "paddingVertical": 3,
+            },
+            undefined,
+            undefined,
+            {
+              "borderColor": "transparent",
+              "borderWidth": 1,
+              "color": undefined,
+              "flex": 0,
+              "height": "auto",
+              "opacity": 1,
+              "padding": 0,
+            },
+          ],
+        ]
+      }
+      value="test"
+    >
+      test
+    </Text>
+  </View>
 </View>
 `;
 
@@ -254,19 +296,24 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
           "alignItems": "center",
           "flexDirection": "row",
         },
-        {
-          "backgroundColor": "#F5F5F6",
-          "borderColor": "#F5F5F6",
-          "borderRadius": 12,
-          "borderWidth": 1,
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-          "fontSize": 16,
-          "height": 47,
-          "lineHeight": 20,
-          "paddingHorizontal": 15,
-          "paddingVertical": 3,
-        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          false,
+          undefined,
+        ],
       ]
     }
   >
@@ -283,8 +330,11 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
             "flex": 1,
           },
           [
-            undefined,
-            false,
+            {
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "lineHeight": 20,
+            },
             undefined,
             {
               "color": "transparent",
@@ -295,48 +345,61 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
       testID="nativeInputText"
     />
   </View>
-  <Text
-    accessible={true}
-    allowFontScaling={false}
-    ellipsizeMode="tail"
-    maxFontSizeMultiplier={1}
-    numberOfLines={1}
-    onPress={[Function]}
+  <View
     style={
-      [
-        {
-          "color": "#0E1216",
-          "fontFamily": "PlusJakartaSans-Regular",
-        },
+      {
+        "backgroundColor": "transparent",
+        "bottom": 0,
+        "flex": 1,
+        "justifyContent": "center",
+        "position": "absolute",
+        "top": 0,
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      allowFontScaling={false}
+      ellipsizeMode="tail"
+      maxFontSizeMultiplier={1}
+      numberOfLines={1}
+      onPress={[Function]}
+      style={
         [
           {
-            "backgroundColor": "#F5F5F6",
-            "borderColor": "#F5F5F6",
-            "borderRadius": 12,
-            "borderWidth": 1,
             "color": "#0E1216",
             "fontFamily": "PlusJakartaSans-Regular",
-            "fontSize": 16,
-            "height": 47,
-            "lineHeight": 20,
-            "paddingHorizontal": 15,
-            "paddingVertical": 3,
           },
-          undefined,
-          undefined,
-          {
-            "backgroundColor": "transparent",
-            "justifyContent": "center",
-            "position": "absolute",
-            "top": 9,
-          },
-          {
-            "borderWidth": 0,
-            "opacity": 1,
-          },
-        ],
-      ]
-    }
-  />
+          [
+            {
+              "backgroundColor": "#F5F5F6",
+              "borderColor": "#F5F5F6",
+              "borderRadius": 12,
+              "borderWidth": 1,
+              "color": "#0E1216",
+              "fontFamily": "PlusJakartaSans-Regular",
+              "fontSize": 16,
+              "height": 47,
+              "lineHeight": 20,
+              "paddingHorizontal": 15,
+              "paddingVertical": 3,
+            },
+            undefined,
+            undefined,
+            {
+              "borderColor": "transparent",
+              "borderWidth": 1,
+              "color": "#A1A1A5",
+              "flex": 0,
+              "height": "auto",
+              "opacity": 1,
+              "padding": 0,
+            },
+          ],
+        ]
+      }
+    />
+  </View>
 </View>
 `;
