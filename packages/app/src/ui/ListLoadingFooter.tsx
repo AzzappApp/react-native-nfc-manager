@@ -13,6 +13,7 @@ const ListLoadingFooter = ({
 
   return (
     <View
+      collapsable={false}
       style={[
         {
           height: 48 + (addBottomInset ? bottom : 0),
