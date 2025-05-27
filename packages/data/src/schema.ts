@@ -1151,13 +1151,16 @@ export type EnrichedContactFields = Partial<
 >;
 
 export type EnrichedContactHiddenFields = {
-  contact?: {
-    [K in keyof EnrichedContactFields]?: NonNullable<
-      EnrichedContactFields[K]
-    > extends any[]
-      ? boolean[] | null
-      : boolean | null;
-  };
+  contact?:
+    | {
+        [K in keyof EnrichedContactFields]?: NonNullable<
+          EnrichedContactFields[K]
+        > extends any[]
+          ? boolean[] | null
+          : boolean | null;
+      }
+    | null;
+  profile?: boolean | null;
 };
 
 export const ContactEnrichmentTable = cols.table(

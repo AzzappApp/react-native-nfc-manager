@@ -123,7 +123,7 @@ export const ContactDetailFragmentContact = ({
     ? getFriendlyNameFromLocation(data.meetingPlace)
     : undefined;
 
-  const displayedBirthday = hiddenFields?.birthday
+  const displayedBirthday = hiddenFields?.contact.birthday
     ? data?.birthday
     : data?.enrichment?.fields?.birthday || data?.birthday;
   /// SOCIALS
@@ -250,23 +250,21 @@ export const ContactDetailFragmentContact = ({
           content={phoneNumber.number}
         />
       ))}
-      {data?.enrichment?.fields?.phoneNumbers?.map((phoneNumber, index) => {
-        if (!hiddenFields?.phoneNumbers?.[index]) {
-          return (
-            <ContactDetailItem
-              key={'phone' + index + '' + phoneNumber.number}
-              onPress={onPressPhoneLink(phoneNumber)}
-              icon="mobile"
-              label={phoneNumber.label}
-              content={phoneNumber.number}
-              isEnrichedItem
-              state={state}
-              onRemoveField={() => onRemoveField('phoneNumber', index)}
-            />
-          );
-        }
-        return null;
-      })}
+      {data?.enrichment?.fields?.phoneNumbers?.map((phoneNumber, index) =>
+        hiddenFields?.contact.phoneNumbers?.[index] ? null : (
+          <ContactDetailItem
+            key={'phone' + index + '' + phoneNumber.number}
+            onPress={onPressPhoneLink(phoneNumber)}
+            icon="mobile"
+            label={phoneNumber.label}
+            content={phoneNumber.number}
+            isEnrichedItem
+            state={state}
+            onRemoveField={() => onRemoveField('phoneNumber', index)}
+          />
+        ),
+      )}
+
       {data?.emails?.map((email, index) => (
         <ContactDetailItem
           key={'email' + index + '' + email.address}
@@ -276,23 +274,20 @@ export const ContactDetailFragmentContact = ({
           content={email.address}
         />
       ))}
-      {data?.enrichment?.fields?.emails?.map((email, index) => {
-        if (!hiddenFields?.emails?.[index]) {
-          return (
-            <ContactDetailItem
-              key={'email' + index + '' + email.address}
-              onPress={onPressEmailLink(email)}
-              icon="mail_line"
-              label={email.label}
-              content={email.address}
-              isEnrichedItem
-              state={state}
-              onRemoveField={() => onRemoveField('emails', index)}
-            />
-          );
-        }
-        return null;
-      })}
+      {data?.enrichment?.fields?.emails?.map((email, index) =>
+        hiddenFields?.contact.emails?.[index] ? null : (
+          <ContactDetailItem
+            key={'email' + index + '' + email.address}
+            onPress={onPressEmailLink(email)}
+            icon="mail_line"
+            label={email.label}
+            content={email.address}
+            isEnrichedItem
+            state={state}
+            onRemoveField={() => onRemoveField('emails', index)}
+          />
+        ),
+      )}
       {displayedBirthday && (
         <ContactDetailItem
           key="birthday"
@@ -309,7 +304,7 @@ export const ContactDetailFragmentContact = ({
             month: 'long',
             day: 'numeric',
           })}
-          isEnrichedItem={!hiddenFields?.birthday}
+          isEnrichedItem={!hiddenFields?.contact.birthday}
           state={state}
           onRemoveField={() => onRemoveField('birthday')}
         />
@@ -327,27 +322,24 @@ export const ContactDetailFragmentContact = ({
           content={urlAddress.url}
         />
       ))}
-      {data?.enrichment?.fields?.urls?.map((urlAddress, index) => {
-        if (!hiddenFields?.urls?.[index]) {
-          return (
-            <ContactDetailItem
-              key={'url' + index + '' + urlAddress.url}
-              onPress={onPressURLLink(urlAddress)}
-              icon="link"
-              label={intl.formatMessage({
-                defaultMessage: 'Url',
-                description:
-                  'ContactDetailsBody - Title for item URL with empty label',
-              })}
-              content={urlAddress.url}
-              isEnrichedItem
-              state={state}
-              onRemoveField={() => onRemoveField('urls', index)}
-            />
-          );
-        }
-        return null;
-      })}
+      {data?.enrichment?.fields?.urls?.map((urlAddress, index) =>
+        hiddenFields?.contact.urls?.[index] ? null : (
+          <ContactDetailItem
+            key={'url' + index + '' + urlAddress.url}
+            onPress={onPressURLLink(urlAddress)}
+            icon="link"
+            label={intl.formatMessage({
+              defaultMessage: 'Url',
+              description:
+                'ContactDetailsBody - Title for item URL with empty label',
+            })}
+            content={urlAddress.url}
+            isEnrichedItem
+            state={state}
+            onRemoveField={() => onRemoveField('urls', index)}
+          />
+        ),
+      )}
       {data?.addresses?.map((address, index) => (
         <ContactDetailItem
           key={'street' + index + '' + address.address}
@@ -357,23 +349,20 @@ export const ContactDetailFragmentContact = ({
           content={address.address}
         />
       ))}
-      {data?.enrichment?.fields?.addresses?.map((address, index) => {
-        if (!hiddenFields?.addresses?.[index]) {
-          return (
-            <ContactDetailItem
-              key={'street' + index + '' + address.address}
-              onPress={onPressAddressLink(address)}
-              icon="location"
-              label={address.label}
-              content={address.address}
-              isEnrichedItem
-              state={state}
-              onRemoveField={() => onRemoveField('addresses', index)}
-            />
-          );
-        }
-        return null;
-      })}
+      {data?.enrichment?.fields?.addresses?.map((address, index) =>
+        hiddenFields?.contact.addresses?.[index] ? null : (
+          <ContactDetailItem
+            key={'street' + index + '' + address.address}
+            onPress={onPressAddressLink(address)}
+            icon="location"
+            label={address.label}
+            content={address.address}
+            isEnrichedItem
+            state={state}
+            onRemoveField={() => onRemoveField('addresses', index)}
+          />
+        ),
+      )}
       {data?.socials?.map((social, index) => (
         <ContactDetailItem
           key={'social' + index + '' + social.url}
@@ -383,23 +372,20 @@ export const ContactDetailFragmentContact = ({
           content={social.url}
         />
       ))}
-      {data?.enrichment?.fields?.socials?.map((social, index) => {
-        if (!hiddenFields?.socials?.[index]) {
-          return (
-            <ContactDetailItem
-              key={'social' + index + '' + social.url}
-              onPress={onPressSocialLink(social)}
-              iconComponent={renderIconSocialComponent(social)}
-              label={social.label}
-              content={social.url}
-              isEnrichedItem
-              state={state}
-              onRemoveField={() => onRemoveField('socials', index)}
-            />
-          );
-        }
-        return null;
-      })}
+      {data?.enrichment?.fields?.socials?.map((social, index) =>
+        hiddenFields?.contact.socials?.[index] ? null : (
+          <ContactDetailItem
+            key={'social' + index + '' + social.url}
+            onPress={onPressSocialLink(social)}
+            iconComponent={renderIconSocialComponent(social)}
+            label={social.label}
+            content={social.url}
+            isEnrichedItem
+            state={state}
+            onRemoveField={() => onRemoveField('socials', index)}
+          />
+        ),
+      )}
       {data?.enrichment && <ContactDetailAIFooter />}
     </View>
   );

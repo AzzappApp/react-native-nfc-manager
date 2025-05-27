@@ -56,18 +56,21 @@ type ContactDetailsBodyProps = {
 };
 
 export type HiddenFields = {
-  firstName: boolean;
-  lastName: boolean;
-  company: boolean;
-  title: boolean;
-  birthday: boolean;
-  avatarId: boolean;
-  logoId: boolean;
-  phoneNumbers: boolean[];
-  emails: boolean[];
-  addresses: boolean[];
-  socials: boolean[];
-  urls: boolean[];
+  contact: {
+    firstName: boolean;
+    lastName: boolean;
+    company: boolean;
+    title: boolean;
+    birthday: boolean;
+    avatarId: boolean;
+    logoId: boolean;
+    phoneNumbers: boolean[];
+    emails: boolean[];
+    addresses: boolean[];
+    socials: boolean[];
+    urls: boolean[];
+  };
+  profile: boolean;
 };
 
 const ContactDetailsBody = ({
@@ -95,7 +98,6 @@ const ContactDetailsBody = ({
       ) {
         id
         ...ContactDetailFragmentContact_contact
-        ...ContactDetailFragmentAI_contact
         ...ContactDetailAvatar_contact
         ...ContactDetailActionModal_contact
         ...contactHelpersShareContactData_contact
@@ -142,6 +144,9 @@ const ContactDetailsBody = ({
               url
             }
           }
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
         }
         contactProfile {
           id
@@ -176,19 +181,22 @@ const ContactDetailsBody = ({
 
   const getDefaultContactEnrichmentHiddenFields = useCallback(() => {
     return {
-      firstName: false,
-      lastName: false,
-      company: false,
-      title: false,
-      birthday: false,
-      avatarId: false,
-      phoneNumbers:
-        data?.enrichment?.fields?.phoneNumbers?.map(() => false) || [],
-      emails: data?.enrichment?.fields?.emails?.map(() => false) || [],
-      addresses: data?.enrichment?.fields?.addresses?.map(() => false) || [],
-      socials: data?.enrichment?.fields?.socials?.map(() => false) || [],
-      urls: data?.enrichment?.fields?.urls?.map(() => false) || [],
-      logoId: false,
+      contact: {
+        firstName: false,
+        lastName: false,
+        company: false,
+        title: false,
+        birthday: false,
+        avatarId: false,
+        phoneNumbers:
+          data?.enrichment?.fields?.phoneNumbers?.map(() => false) || [],
+        emails: data?.enrichment?.fields?.emails?.map(() => false) || [],
+        addresses: data?.enrichment?.fields?.addresses?.map(() => false) || [],
+        socials: data?.enrichment?.fields?.socials?.map(() => false) || [],
+        urls: data?.enrichment?.fields?.urls?.map(() => false) || [],
+        logoId: false,
+      },
+      profile: false,
     };
   }, [
     data?.enrichment?.fields?.addresses,
@@ -199,7 +207,7 @@ const ContactDetailsBody = ({
   ]);
 
   const [hiddenFields, setHiddenFields] = useState<HiddenFields>(
-    getDefaultContactEnrichmentHiddenFields(),
+    getDefaultContactEnrichmentHiddenFields,
   );
 
   useEffect(() => {
@@ -260,10 +268,33 @@ const ContactDetailsBody = ({
               url
             }
           }
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
         }
       }
     }
   `);
+
+  const [commitHiddenFields] = useMutation(graphql`
+    mutation ContactDetailsBodyHiddenFieldsMutation(
+      $contactEnrichmentId: ID!
+      $hiddenFields: HiddenFieldInput!
+    ) {
+      updateContactEnrichmentHiddenFields(
+        contactEnrichmentId: $contactEnrichmentId
+        input: $hiddenFields
+      ) {
+        contactEnrichment {
+          id
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
+        }
+      }
+    }
+  `);
+
   const onEnrich = async () => {
     commit({
       variables: {
@@ -293,7 +324,7 @@ const ContactDetailsBody = ({
 
   const backgroundWidth = screenWidth + BLUR_GAP * 2;
   const backgroundImageUrl = useMemo(() => {
-    if (!hiddenFields.avatarId && data?.enrichment?.fields?.avatar) {
+    if (!hiddenFields.contact.avatarId && data?.enrichment?.fields?.avatar) {
       if (data?.enrichment?.fields?.avatar.id) {
         const localFile = getLocalCachedMediaFile(
           data?.enrichment?.fields?.avatar.id,
@@ -341,7 +372,7 @@ const ContactDetailsBody = ({
     }
     return webCardPreview?.uri ?? undefined;
   }, [
-    hiddenFields.avatarId,
+    hiddenFields.contact.avatarId,
     data?.enrichment?.fields?.avatar,
     data?.logo,
     data?.avatar,
@@ -444,9 +475,7 @@ const ContactDetailsBody = ({
       variables: {
         contactEnrichmentId: data?.enrichment?.id,
         approved: true,
-        input: {
-          contact: hiddenFields,
-        },
+        input: hiddenFields,
         pixelRatio: CappedPixelRatio(),
       },
       onCompleted: () => {
@@ -491,7 +520,7 @@ const ContactDetailsBody = ({
         return prev;
       }
       const newField = cloneDeep(prev);
-      const fieldValue = field as keyof typeof newField;
+      const fieldValue = field as keyof (typeof newField)['contact'];
 
       if (index === undefined) {
         if (
@@ -502,19 +531,19 @@ const ContactDetailsBody = ({
           fieldValue === 'lastName' ||
           fieldValue === 'title'
         ) {
-          newField[fieldValue] = true;
+          newField.contact[fieldValue] = true;
         }
-      } else if (Array.isArray(newField[fieldValue])) {
+      } else if (Array.isArray(newField.contact[fieldValue])) {
         if (
           (fieldValue === 'phoneNumbers' ||
             fieldValue === 'emails' ||
             fieldValue === 'addresses' ||
             fieldValue === 'socials' ||
             fieldValue === 'urls') &&
-          Array.isArray(prev[fieldValue]) &&
-          newField[fieldValue].length > index
+          Array.isArray(prev.contact[fieldValue]) &&
+          newField.contact[fieldValue].length > index
         ) {
-          newField[fieldValue][index] = true;
+          newField.contact[fieldValue][index] = true;
         }
       } else {
         console.error('setting incorrect field', fieldValue);
@@ -522,6 +551,49 @@ const ContactDetailsBody = ({
       return newField;
     });
   }, []);
+
+  const onRemoveProfile = useCallback(() => {
+    if (data?.enrichment?.approved) {
+      setSubView('contact');
+      commitHiddenFields({
+        variables: {
+          contactEnrichmentId: data?.enrichment?.id,
+          hiddenFields: {
+            profile: true,
+          },
+        },
+        optimisticUpdater: store => {
+          const contact = store.get(data?.id);
+          if (contact) {
+            const enrichment = contact.getLinkedRecord('enrichment');
+            if (enrichment) {
+              enrichment.setValue(null, 'publicProfile');
+            }
+          }
+        },
+        updater: store => {
+          const contact = store.get(data?.id);
+          if (contact) {
+            const enrichment = contact.getLinkedRecord('enrichment');
+            if (enrichment) {
+              enrichment.setValue(null, 'publicProfile');
+            }
+          }
+        },
+      });
+    } else {
+      setHiddenFields(prev => {
+        const newField = cloneDeep(prev);
+        newField.profile = true;
+        return newField;
+      });
+    }
+  }, [
+    commitHiddenFields,
+    data?.enrichment?.approved,
+    data?.enrichment?.id,
+    data?.id,
+  ]);
 
   return (
     <Container style={styles.container}>
@@ -593,7 +665,7 @@ const ContactDetailsBody = ({
           />
           <ContactDetailAvatar
             state={overlayState}
-            isHiddenField={hiddenFields.avatarId}
+            isHiddenField={hiddenFields.contact.avatarId}
             onRemoveField={() => onRemoveField('avatarId')}
             webCard={webCardKey}
             contactKey={data}
@@ -604,7 +676,7 @@ const ContactDetailsBody = ({
           <DisposableText
             text={data?.company}
             enrichedText={
-              hiddenFields.company
+              hiddenFields.contact.company
                 ? undefined
                 : data?.enrichment?.fields?.company
             }
@@ -614,35 +686,39 @@ const ContactDetailsBody = ({
           <DisposableText
             text={data?.title}
             enrichedText={
-              hiddenFields.title ? undefined : data?.enrichment?.fields?.title
+              hiddenFields.contact.title
+                ? undefined
+                : data?.enrichment?.fields?.title
             }
             onRemove={() => onRemoveField('title')}
             state={overlayState}
           />
-          {ENABLE_DATA_ENRICHMENT && (
-            <View style={styles.saveContainer}>
-              <MenuItem
-                onSelect={() => setSubView('contact')}
-                label={intl.formatMessage({
-                  defaultMessage: 'Contact',
-                  description:
-                    'ContactDetailsModal - Button to switch to contact view',
-                })}
-                selected={subView === 'contact'}
-                overlayState={overlayState}
-              />
-              <MenuItem
-                onSelect={() => setSubView('AI')}
-                label={intl.formatMessage({
-                  defaultMessage: 'Profile',
-                  description:
-                    'ContactDetailsModal - Button to switch to AI profile view',
-                })}
-                selected={subView === 'AI'}
-                overlayState={overlayState}
-              />
-            </View>
-          )}
+          {ENABLE_DATA_ENRICHMENT &&
+            (data?.enrichment?.publicProfile ||
+              data?.enrichmentStatus !== 'completed') && (
+              <View style={styles.saveContainer}>
+                <MenuItem
+                  onSelect={() => setSubView('contact')}
+                  label={intl.formatMessage({
+                    defaultMessage: 'Contact',
+                    description:
+                      'ContactDetailsModal - Button to switch to contact view',
+                  })}
+                  selected={subView === 'contact'}
+                  overlayState={overlayState}
+                />
+                <MenuItem
+                  onSelect={() => setSubView('AI')}
+                  label={intl.formatMessage({
+                    defaultMessage: 'Profile',
+                    description:
+                      'ContactDetailsModal - Button to switch to AI profile view',
+                  })}
+                  selected={subView === 'AI'}
+                  overlayState={overlayState}
+                />
+              </View>
+            )}
           {subView === 'contact' && (
             <ContactDetailFragmentContact
               showMore={showMore}
@@ -653,7 +729,15 @@ const ContactDetailsBody = ({
               contact={data}
             />
           )}
-          {subView === 'AI' && <ContactDetailFragmentAI contact={data} />}
+          {subView === 'AI' && (
+            <ContactDetailFragmentAI
+              contact={
+                hiddenFields.profile ? null : data?.enrichment?.publicProfile
+              }
+              onRemoveProfile={onRemoveProfile}
+              approved={data?.enrichment?.approved}
+            />
+          )}
         </View>
       </ScrollView>
       {data ? (

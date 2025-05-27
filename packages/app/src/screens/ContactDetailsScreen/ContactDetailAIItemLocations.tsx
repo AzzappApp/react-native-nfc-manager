@@ -11,23 +11,21 @@ export const ContactDetailAIItemLocations = ({
 }: {
   contact: ContactDetailAIItemLocations_enrichment$key | null;
 }) => {
-  const enrichment = useFragment(
+  const publicProfile = useFragment(
     graphql`
-      fragment ContactDetailAIItemLocations_enrichment on ContactEnrichment {
-        publicProfile {
-          location {
-            city
-            country {
-              code
-              name
-            }
+      fragment ContactDetailAIItemLocations_enrichment on PublicProfile {
+        location {
+          city
+          country {
+            code
+            name
           }
         }
       }
     `,
     contactKey,
   );
-  const location = enrichment?.publicProfile?.location;
+  const location = publicProfile?.location;
 
   if (!location) return undefined;
   const flagUri =

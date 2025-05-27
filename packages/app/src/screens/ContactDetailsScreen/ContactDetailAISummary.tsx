@@ -9,17 +9,15 @@ export const ContactDetailAISummary = ({
 }: {
   contact: ContactDetailAISummary_enrichment$key | null;
 }) => {
-  const enrichment = useFragment(
+  const publicProfile = useFragment(
     graphql`
-      fragment ContactDetailAISummary_enrichment on ContactEnrichment {
-        publicProfile {
-          summary
-        }
+      fragment ContactDetailAISummary_enrichment on PublicProfile {
+        summary
       }
     `,
     contactKey,
   );
-  const summary = enrichment?.publicProfile?.summary;
+  const summary = publicProfile?.summary;
   if (!summary) return null;
   return (
     <ContactDetailExpendableSection minHeight={210}>

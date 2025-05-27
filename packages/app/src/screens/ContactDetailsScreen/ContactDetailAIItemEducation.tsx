@@ -21,21 +21,19 @@ export const ContactDetailAIItemEducation = ({
 }: {
   contact: ContactDetailAIItemEducation_enrichment$key | null;
 }) => {
-  const enrichment = useFragment(
+  const publicProfile = useFragment(
     graphql`
-      fragment ContactDetailAIItemEducation_enrichment on ContactEnrichment
+      fragment ContactDetailAIItemEducation_enrichment on PublicProfile
       @argumentDefinitions(
         pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
       ) {
-        publicProfile {
-          education {
-            school
-            summary
-            endDate
-            startDate
-            logo {
-              uri: uri(width: 180, pixelRatio: $pixelRatio)
-            }
+        education {
+          school
+          summary
+          endDate
+          startDate
+          logo {
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
         }
       }
@@ -51,20 +49,19 @@ export const ContactDetailAIItemEducation = ({
 
   return (
     <>
-      {enrichment?.publicProfile?.education &&
-        enrichment?.publicProfile?.education?.length > 0 && (
-          <ContactDetailAISectionSeparator
-            icon="education"
-            label={intl.formatMessage({
-              defaultMessage: 'Education',
-              description:
-                'ContactDetailsModal - Title for AI profile education section',
-            })}
-          />
-        )}
+      {publicProfile?.education && publicProfile?.education?.length > 0 && (
+        <ContactDetailAISectionSeparator
+          icon="education"
+          label={intl.formatMessage({
+            defaultMessage: 'Education',
+            description:
+              'ContactDetailsModal - Title for AI profile education section',
+          })}
+        />
+      )}
       <ContactDetailExpendableSection minHeight={223}>
         <>
-          {enrichment?.publicProfile?.education?.map((educationItem, index) => {
+          {publicProfile?.education?.map((educationItem, index) => {
             const displayedYear = getDisplayedDuration(educationItem, intl);
 
             return (

@@ -480,7 +480,7 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
     }
 
     await updateContactEnrichment(contactEnrichmentId, {
-      hiddenFields: { contact: input.contact },
+      hiddenFields: input,
     });
 
     return {
@@ -507,7 +507,7 @@ export const approveContactEnrichment: MutationResolvers['approveContactEnrichme
     }
 
     await updateContactEnrichment(contactEnrichmentId, {
-      hiddenFields: { contact: input?.contact },
+      hiddenFields: input,
       approved,
     });
 

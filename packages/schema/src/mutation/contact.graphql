@@ -107,7 +107,8 @@ type RemoveContactPayload {
 }
 
 input HiddenFieldInput {
-  contact: HiddenContactFieldsInput!
+  contact: HiddenContactFieldsInput
+  profile: Boolean
 }
 
 input HiddenContactFieldsInput {

@@ -5,6 +5,7 @@ import { useFragment } from 'react-relay';
 import { graphql } from 'relay-runtime';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { ContactDetailAIFooter } from './ContactDetailAIFooter';
 import { ContactDetailAIItemEducation } from './ContactDetailAIItemEducation';
@@ -17,29 +18,29 @@ import type { ContactDetailFragmentAI_contact$key } from '#relayArtifacts/Contac
 
 export const ContactDetailFragmentAI = ({
   contact: contactKey,
+  onRemoveProfile,
+  approved,
 }: {
   contact?: ContactDetailFragmentAI_contact$key | null;
+  onRemoveProfile: () => void;
+  approved?: boolean | null;
 }) => {
   const colorScheme = useColorScheme();
   const styles = useStyleSheet(stylesheet);
   const data = useFragment(
     graphql`
-      fragment ContactDetailFragmentAI_contact on Contact {
-        enrichmentStatus
-        enrichment {
-          approved
-          ...ContactDetailAIItemLocations_enrichment
-          ...ContactDetailAISummary_enrichment
-          ...ContactDetailAILabels_enrichment
-          ...ContactDetailAIItemProfessionalExperiences_enrichment
-          ...ContactDetailAIItemEducation_enrichment
-        }
+      fragment ContactDetailFragmentAI_contact on PublicProfile {
+        ...ContactDetailAIItemLocations_enrichment
+        ...ContactDetailAISummary_enrichment
+        ...ContactDetailAILabels_enrichment
+        ...ContactDetailAIItemProfessionalExperiences_enrichment
+        ...ContactDetailAIItemEducation_enrichment
       }
     `,
     contactKey,
   );
 
-  if (!data?.enrichment) {
+  if (!data) {
     // placeholder image
     return (
       <View style={styles.placeHolderContainer}>
@@ -63,17 +64,32 @@ export const ContactDetailFragmentAI = ({
           description="ContactDetailsModal - Title for AI profile view"
         />
       </Text>
+      <PressableOpacity onPress={onRemoveProfile}>
+        <Text variant="medium" style={styles.removeProfile}>
+          {approved ? (
+            <FormattedMessage
+              defaultMessage="Clear this profile"
+              description="ContactDetailsModal - Clear this profile"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Remove this profile"
+              description="ContactDetailsModal - Remove this profile"
+            />
+          )}
+        </Text>
+      </PressableOpacity>
       <View style={styles.aiDetailsContainer}>
         {/* 
         to be reenabled when we have data from server
         {enrichDetails?.imageUrls && (
           <ContactDetailAIItemImages imageUrls={enrichDetails.imageUrls} />
         )} */}
-        <ContactDetailAIItemLocations contact={data.enrichment} />
-        <ContactDetailAISummary contact={data.enrichment} />
-        <ContactDetailAILabels contact={data.enrichment} />
-        <ContactDetailAIItemEducation contact={data.enrichment} />
-        <ContactDetailAIItemProfessionalExperiences contact={data.enrichment} />
+        <ContactDetailAIItemLocations contact={data} />
+        <ContactDetailAISummary contact={data} />
+        <ContactDetailAILabels contact={data} />
+        <ContactDetailAIItemEducation contact={data} />
+        <ContactDetailAIItemProfessionalExperiences contact={data} />
         <ContactDetailAIFooter />
       </View>
     </View>
@@ -86,12 +102,17 @@ const stylesheet = createStyleSheet(appearance => ({
     marginTop: 20,
   },
   aiDetailsContainer: {
+    paddingTop: 20,
     gap: 40,
   },
   aiHeader: {
     color: appearance === 'dark' ? colors.grey600 : colors.grey400,
-    paddingBottom: 10,
     textAlign: 'center',
+  },
+  removeProfile: {
+    color: appearance === 'dark' ? colors.grey600 : colors.grey400,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   placeHolderContainer: {
     width: '100%',

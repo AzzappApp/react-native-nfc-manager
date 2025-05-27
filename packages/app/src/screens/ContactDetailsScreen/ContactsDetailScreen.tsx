@@ -21,11 +21,13 @@ const query = graphql`
         ...contactHelpersShareContactData_contact
         ...useOnInviteContactDataQuery_contact
         enrichment {
-          ...ContactDetailAIItemLocations_enrichment
-          ...ContactDetailAISummary_enrichment
-          ...ContactDetailAILabels_enrichment
-          ...ContactDetailAIItemProfessionalExperiences_enrichment
-          ...ContactDetailAIItemEducation_enrichment
+          publicProfile {
+            ...ContactDetailAIItemLocations_enrichment
+            ...ContactDetailAISummary_enrichment
+            ...ContactDetailAILabels_enrichment
+            ...ContactDetailAIItemProfessionalExperiences_enrichment
+            ...ContactDetailAIItemEducation_enrichment
+          }
         }
         contactProfile {
           webCard {

@@ -90,7 +90,9 @@ export const ContactEnrichment: ContactEnrichmentResolvers = {
       : null;
   },
   publicProfile: enrichment => {
-    return enrichment.publicProfile && enrichment.approved !== false
+    return enrichment.publicProfile &&
+      enrichment.approved !== false &&
+      !enrichment.hiddenFields?.profile
       ? enrichment.publicProfile
       : null;
   },

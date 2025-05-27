@@ -7,26 +7,24 @@ export const ContactDetailAILabels = ({
 }: {
   contact: ContactDetailAILabels_enrichment$key | null;
 }) => {
-  const enrichment = useFragment(
+  const publicProfile = useFragment(
     graphql`
-      fragment ContactDetailAILabels_enrichment on ContactEnrichment {
-        publicProfile {
-          interests {
-            name
-            icon
-          }
-          skills {
-            name
-            icon
-          }
+      fragment ContactDetailAILabels_enrichment on PublicProfile {
+        interests {
+          name
+          icon
+        }
+        skills {
+          name
+          icon
         }
       }
     `,
     contactKey,
   );
 
-  const interests = enrichment?.publicProfile?.interests;
-  const skills = enrichment?.publicProfile?.skills;
+  const interests = publicProfile?.interests;
+  const skills = publicProfile?.skills;
 
   if (!interests?.length && !skills?.length) return null;
   return (

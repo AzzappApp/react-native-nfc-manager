@@ -21,24 +21,22 @@ export const ContactDetailAIItemProfessionalExperiences = ({
 }: {
   contact: ContactDetailAIItemProfessionalExperiences_enrichment$key | null;
 }) => {
-  const enrichment = useFragment(
+  const publicProfile = useFragment(
     graphql`
-      fragment ContactDetailAIItemProfessionalExperiences_enrichment on ContactEnrichment
+      fragment ContactDetailAIItemProfessionalExperiences_enrichment on PublicProfile
       @argumentDefinitions(
         pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
       ) {
-        publicProfile {
-          positions {
-            company
-            title
-            startDate
-            endDate
-            logo {
-              uri: uri(width: 180, pixelRatio: $pixelRatio)
-              id
-            }
-            summary
+        positions {
+          company
+          title
+          startDate
+          endDate
+          logo {
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
+            id
           }
+          summary
         }
       }
     `,
@@ -53,59 +51,54 @@ export const ContactDetailAIItemProfessionalExperiences = ({
 
   return (
     <>
-      {enrichment?.publicProfile?.positions &&
-        enrichment?.publicProfile?.positions?.length > 0 && (
-          <ContactDetailAISectionSeparator
-            icon="professional"
-            label={intl.formatMessage({
-              defaultMessage: 'Professional Experience',
-              description:
-                'ContactDetailsModal - Title for AI profile Professional Experience section',
-            })}
-          />
-        )}
+      {publicProfile?.positions && publicProfile?.positions?.length > 0 && (
+        <ContactDetailAISectionSeparator
+          icon="professional"
+          label={intl.formatMessage({
+            defaultMessage: 'Professional Experience',
+            description:
+              'ContactDetailsModal - Title for AI profile Professional Experience section',
+          })}
+        />
+      )}
       <ContactDetailExpendableSection minHeight={273}>
         <>
-          {enrichment?.publicProfile?.positions?.map(
-            (experienceItem, index) => {
-              const displayedYear = getDisplayedDuration(experienceItem, intl);
-              return (
-                <View key={`experience:${index}`} style={styles.container}>
-                  <View
-                    style={[styles.imageContainer, { maxWidth: maxTextWith }]}
-                  >
-                    {experienceItem.logo?.uri ? (
-                      <Image
-                        source={experienceItem.logo?.uri}
-                        style={styles.image}
-                        contentFit="scale-down"
-                      />
-                    ) : (
-                      <ContactDetailLogoFallback
-                        label={experienceItem.company}
-                      />
+          {publicProfile?.positions?.map((experienceItem, index) => {
+            const displayedYear = getDisplayedDuration(experienceItem, intl);
+            return (
+              <View key={`experience:${index}`} style={styles.container}>
+                <View
+                  style={[styles.imageContainer, { maxWidth: maxTextWith }]}
+                >
+                  {experienceItem.logo?.uri ? (
+                    <Image
+                      source={experienceItem.logo?.uri}
+                      style={styles.image}
+                      contentFit="scale-down"
+                    />
+                  ) : (
+                    <ContactDetailLogoFallback label={experienceItem.company} />
+                  )}
+                  <View style={styles.textContainer}>
+                    {experienceItem.company && (
+                      <Text variant="button">{experienceItem.company}</Text>
                     )}
-                    <View style={styles.textContainer}>
-                      {experienceItem.company && (
-                        <Text variant="button">{experienceItem.company}</Text>
-                      )}
-                      {(experienceItem.title || displayedYear) && (
-                        <Text variant="smallbold">
-                          {experienceItem.title}
-                          {displayedYear ? ' (' + displayedYear + ')' : ''}
-                        </Text>
-                      )}
-                      {experienceItem.summary && (
-                        <Text variant="small" style={styles.text}>
-                          {experienceItem.summary}
-                        </Text>
-                      )}
-                    </View>
+                    {(experienceItem.title || displayedYear) && (
+                      <Text variant="smallbold">
+                        {experienceItem.title}
+                        {displayedYear ? ' (' + displayedYear + ')' : ''}
+                      </Text>
+                    )}
+                    {experienceItem.summary && (
+                      <Text variant="small" style={styles.text}>
+                        {experienceItem.summary}
+                      </Text>
+                    )}
                   </View>
                 </View>
-              );
-            },
-          )}
+              </View>
+            );
+          })}
         </>
       </ContactDetailExpendableSection>
     </>
