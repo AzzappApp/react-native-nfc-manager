@@ -62,7 +62,12 @@ const ProfilePage = async (props: ProfilePageProps) => {
     isAzzappPlus = subscriptions.length > 0;
   }
 
-  if (!webCard?.cardIsPublished) {
+  if (
+    !webCard?.cardIsPublished ||
+    webCard.deleted ||
+    owners.length === 0 ||
+    owners[0]?.deleted
+  ) {
     return notFound();
   }
 
