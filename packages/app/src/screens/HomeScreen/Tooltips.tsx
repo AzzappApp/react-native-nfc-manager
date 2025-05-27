@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Platform } from 'react-native';
 import { PopoverMode } from 'react-native-popover-view';
-import { Placement, Point } from 'react-native-popover-view/dist/Types';
+import { Placement, Point, Size } from 'react-native-popover-view/dist/Types';
 import {
   useTooltipContext,
   useTooltipDataContext,
@@ -68,24 +68,23 @@ const Tooltips = () => {
         mode={
           Platform.OS === 'ios' ? PopoverMode.RN_MODAL : PopoverMode.JS_MODAL
         }
-        offset={Platform.OS === 'ios' ? -15 : 30}
+        offset={Platform.OS === 'ios' ? -10 : 30}
         from={tooltips['profileLink']?.ref as RefObject<Component>}
         placement={Placement.TOP}
-        header={
+        description={
           <FormattedMessage
-            defaultMessage="Link to your WebCard{azzappA}"
+            defaultMessage="Link to your WebCard{azzappA} - Tap to copy"
             description="WebCard tooltip link"
             values={{
               azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
         }
-        description={
-          <FormattedMessage
-            defaultMessage="Tap to copy"
-            description="WebCard tooltip link description"
-          />
-        }
+        popoverStyle={{
+          width: 260,
+          borderRadius: 8,
+        }}
+        arrowSize={new Size(8, 6)}
         isVisible={tooltips['profileLink']?.visible}
         onRequestClose={onCloseToolTip}
         onPress={() => {
