@@ -137,6 +137,10 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
   },
+  fallbackContainer: {
+    flex: 1,
+    backgroundColor: colors.black,
+  },
 });
 
 const AnalyticsRelayScreen = relayScreen(AnalyticsScreen, {
@@ -144,6 +148,8 @@ const AnalyticsRelayScreen = relayScreen(AnalyticsScreen, {
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
   }),
+  //force a fallback black to avoid the white flash from default container(based on color scheme)
+  fallback: () => <View style={styles.fallbackContainer} />,
 });
 
 AnalyticsRelayScreen.getScreenOptions = (): ScreenOptions => ({
