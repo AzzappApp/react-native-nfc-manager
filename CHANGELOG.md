@@ -1,3 +1,8 @@
+## 2.0.0-canary.41
+
+* **fix:**  - **multiUser:** [#9028](https://github.com/AzzappApp/azzapp/pull/9028) add padding on search bar ([#9033](https://github.com/AzzappApp/azzapp/pull/9033))
+* **fix:**  - **home:** [#9024](https://github.com/AzzappApp/azzapp/pull/9024) adapt link tooltip ([#9032](https://github.com/AzzappApp/azzapp/pull/9032))
+
 ## 2.0.0-canary.40
 
 * **fix:**  - **verify:** [#8993](https://github.com/AzzappApp/azzapp/pull/8993) check all back to login links ([#9029](https://github.com/AzzappApp/azzapp/pull/9029))
