@@ -121,7 +121,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#endregion
 
   return (
-    <View style={containerStyle}>
+    <View style={containerStyle} ref={ref}>
       <View style={styles.informationPanel}>
         <HomeBottomPanelMessage
           user={profiles!}
