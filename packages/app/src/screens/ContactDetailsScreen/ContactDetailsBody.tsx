@@ -295,7 +295,8 @@ const ContactDetailsBody = ({
     }
   `);
 
-  const onEnrich = async () => {
+  const onEnrich = useCallback(async () => {
+    hideMore();
     commit({
       variables: {
         contactId: data?.id,
@@ -315,7 +316,7 @@ const ContactDetailsBody = ({
         setOverlayState('idle');
       },
     });
-  };
+  }, [commit, data?.id, hideMore, intl]);
 
   const appearance = useColorScheme();
 
