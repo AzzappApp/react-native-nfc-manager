@@ -44,7 +44,15 @@ const AnalyticsScreen = ({
   const webCard = node?.profile?.webCard;
   const { width: windowsWidth, height: windowsHeight } = useScreenDimensions();
   const { top, bottom } = useScreenInsets();
-
+  const coverWidth =
+    (windowsHeight -
+      CONTAINER_STATS_HEIGHT -
+      CONTAINER_STATS_TOP_MARGIN -
+      ICON_VIEW_HEIGHT -
+      40 -
+      bottom -
+      top) *
+    COVER_RATIO;
   return (
     <View
       style={{
@@ -79,11 +87,7 @@ const AnalyticsScreen = ({
             description="Analytics Screen - title"
           />
         </Text>
-        <CoverRenderer
-          webCard={webCard}
-          width={(windowsHeight - 240 - 80 - 40 - bottom - top) * COVER_RATIO}
-          canPlay
-        />
+        <CoverRenderer webCard={webCard} width={coverWidth} canPlay />
       </View>
       <View style={styles.containerStats}>
         <HomeStatistics user={node?.profile} height={190} focused />
@@ -101,6 +105,9 @@ const AnalyticsScreen = ({
   );
 };
 const ZOOM_COVER = 1.1;
+const ICON_VIEW_HEIGHT = 120;
+const CONTAINER_STATS_HEIGHT = 200;
+const CONTAINER_STATS_TOP_MARGIN = 40;
 const styles = StyleSheet.create({
   viewHeader: {
     justifyContent: 'center',
@@ -108,14 +115,14 @@ const styles = StyleSheet.create({
   },
   viewIcon: {
     alignItems: 'center',
-    height: 80,
+    height: ICON_VIEW_HEIGHT,
     paddingBottom: 20,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   containerStats: {
-    marginTop: 40,
+    marginTop: CONTAINER_STATS_TOP_MARGIN,
     marginHorizontal: 20,
-    height: 200,
+    height: CONTAINER_STATS_HEIGHT,
   },
   iconContainerStyle: {
     borderColor: 'white',

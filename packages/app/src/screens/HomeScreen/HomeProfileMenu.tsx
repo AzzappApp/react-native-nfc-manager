@@ -97,7 +97,7 @@ const HomeProfileMenu = () => {
           </Pressable>
         </LinearGradient>
         <LinearGradient
-          colors={['transparent)', '#FFFFFF26']}
+          colors={['transparent', '#FFFFFF26']}
           style={styles.containerGradient}
         >
           <Pressable
@@ -114,7 +114,7 @@ const HomeProfileMenu = () => {
           </Pressable>
         </LinearGradient>
         <LinearGradient
-          colors={['rgba(255, 255, 255, 0.00)', 'rgba(255, 255, 255, 0.15)']}
+          colors={['transparent', '#FFFFFF26']}
           style={[styles.containerGradient, styles.containerGradientRight]}
         >
           <Pressable

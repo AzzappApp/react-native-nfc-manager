@@ -270,6 +270,7 @@ const HomeProfilesCarousel = (
         onSelectedIndexChange={onSelectedIndexChange}
         currentProfileIndexSharedValue={currentIndexSharedValue}
         initialScrollIndex={initialProfileIndex}
+        withAnimatedOpacity
       />
     </View>
   );

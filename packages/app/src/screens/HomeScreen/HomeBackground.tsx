@@ -1,4 +1,6 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import { interpolateColor } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
@@ -89,5 +91,15 @@ export const HomeBackgroundComponent = ({
     },
   );
 
-  return <WebCardBackground colors={skiaGradient} />;
+  return (
+    <>
+      <WebCardBackground colors={skiaGradient} />
+      <LinearGradient
+        colors={['#00000000', '#00000080']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0.2 }}
+        end={{ x: 0, y: 1 }}
+      />
+    </>
+  );
 };
