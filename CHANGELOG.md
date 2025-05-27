@@ -1,3 +1,7 @@
+## 2.0.0-canary.35
+
+
+
 ## 2.0.0-canary.34
 
 * **fix:**  - **signup:** [#8994](https://github.com/AzzappApp/azzapp/pull/8994) fix padding ([#9002](https://github.com/AzzappApp/azzapp/pull/9002))
