@@ -402,7 +402,12 @@ const MultiUserScreen = ({
           leftIcon="close"
         />
       )}
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          transferOwnerMode ? { paddingTop: 14 } : undefined,
+        ]}
+      >
         {profile.webCard?.isMultiUser ? (
           <>
             <SearchBar
