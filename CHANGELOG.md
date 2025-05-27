@@ -1,3 +1,11 @@
+## 2.0.0-canary.40
+
+* **fix:**  - **verify:** [#8993](https://github.com/AzzappApp/azzapp/pull/8993) check all back to login links ([#9029](https://github.com/AzzappApp/azzapp/pull/9029))
+* **fix:**  - **shakeAndShare:** [#9008](https://github.com/AzzappApp/azzapp/pull/9008) display qrcode as soon as possible ([#9025](https://github.com/AzzappApp/azzapp/pull/9025))
+* **fix:**  - **contactCard:** [#8913](https://github.com/AzzappApp/azzapp/pull/8913) add ellipsize mode ([#9020](https://github.com/AzzappApp/azzapp/pull/9020))
+* **fix:**  - **Contact:** contacts by name list incoherence ([#9027](https://github.com/AzzappApp/azzapp/pull/9027))
+* **fix:**  - **Contact:** prevents flash when footer collapse ([#9030](https://github.com/AzzappApp/azzapp/pull/9030))
+
 ## 2.0.0-canary.39
 
 * **fix:**  - **contactCard:** [#9021](https://github.com/AzzappApp/azzapp/pull/9021) put back tooltip on contact card ([#9022](https://github.com/AzzappApp/azzapp/pull/9022))
