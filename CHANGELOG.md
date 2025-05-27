@@ -1,3 +1,9 @@
+## 2.0.0-canary.37
+
+* **fix:**  - **android:** regression on signup checkboxes ([#9011](https://github.com/AzzappApp/azzapp/pull/9011))
+* **fix:**  - restore background gradient during enrichment validation step ([#9012](https://github.com/AzzappApp/azzapp/pull/9012))
+* **fix:**  - **contact:** [#8931](https://github.com/AzzappApp/azzapp/pull/8931) hide bottom panel on enrich ([#9013](https://github.com/AzzappApp/azzapp/pull/9013))
+
 ## 2.0.0-canary.36
 
 * **fix:**  - use transparent from white (nico request) ([#9010](https://github.com/AzzappApp/azzapp/pull/9010))
