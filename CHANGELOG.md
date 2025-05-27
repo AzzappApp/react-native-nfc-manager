@@ -1,3 +1,10 @@
+## 2.0.0-canary.36
+
+* **fix:**  - use transparent from white (nico request) ([#9010](https://github.com/AzzappApp/azzapp/pull/9010))
+* **fix:**  - **contact:** [#8843](https://github.com/AzzappApp/azzapp/pull/8843) wrong list behavior on search change ([#9009](https://github.com/AzzappApp/azzapp/pull/9009))
+* **fix:**  - **webcard:** [#8485](https://github.com/AzzappApp/azzapp/pull/8485) don’t display webcard of deleted owners ([#9005](https://github.com/AzzappApp/azzapp/pull/9005))
+* **feat:**  - home improvement ([#8996](https://github.com/AzzappApp/azzapp/pull/8996))
+
 ## 2.0.0-canary.35
 
 
