@@ -7,11 +7,10 @@ const buildChangeLog = require('./buildChangeLog');
 const changeLogPath = path.join(__dirname, '..', 'CHANGELOG.md');
 
 const main = async () => {
-  const { changeLog } = await buildChangeLog(
+  const changeLog = await buildChangeLog(
+    `${pkg.version}-${internal.kind}.${internal.version}`,
     true,
     false,
-    false,
-    `${pkg.version}-${internal.kind}.${internal.version}`,
     'chore(ci):',
   );
   const oldData = fs.readFileSync(changeLogPath).toString();

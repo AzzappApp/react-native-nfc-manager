@@ -2,14 +2,14 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { Octokit: GitHubAPI } = require('@octokit/rest');
+const internal = require('../internal-version.json');
+const pkg = require('../package.json');
 const buildChangeLog = require('./buildChangeLog');
 const setWorkspaceVersions = require('./setWorkspaceVersions');
 
 const main = async () => {
-  console.error('This script is not up to date with new versioning system');
-  process.exit(1);
   const args = process.argv.slice(2);
-  if (args.length > 2) {
+  if (args.length > 1) {
     console.error('Too many arguments');
     process.exit(1);
   }
@@ -24,27 +24,38 @@ const main = async () => {
   });
 
   let prerelease = false;
-  let majorInc = false;
+  if (args[0] === '--prerelease') {
+    prerelease = true;
+  } else if (args[0]) {
+    console.error(
+      `Invalid argument ${args[0]}. Use --prerelease to create a prerelease.`,
+    );
+    process.exit(1);
+  }
 
-  args.forEach(arg => {
-    if (arg === '--prerelease') {
-      prerelease = true;
-    } else if (arg === '--major') {
-      majorInc = true;
-    } else {
-      console.error(`Invalid argument ${arg}`);
-      process.exit(1);
-    }
-  });
+  if (prerelease && internal.kind !== 'canary') {
+    console.error(
+      `You can only create a prerelease from main to staging (canary to rc). Current internal version kind is '${internal.kind}'.`,
+    );
+    process.exit(1);
+  } else if (!prerelease && internal.kind !== 'rc') {
+    console.error(
+      `You can only create a release from staging to stable (rc to release). Current internal version kind is '${internal.kind}'.`,
+    );
+    process.exit(1);
+  }
 
-  const { nextVersion, changeLog } = await buildChangeLog(prerelease, majorInc);
-  const [major, minor, patch] = nextVersion.split('-')[0].split('.');
-  const paddedMinor = minor.padStart(2, '0');
-  const paddedPatch = patch.padStart(2, '0');
-  const androidVersionCode = `${major}${paddedMinor}${paddedPatch}000`;
+  const [major, minor, patch] = extractVersionNumber(pkg.version);
 
-  console.log('Updating worskpace version...');
-  setWorkspaceVersions(nextVersion, androidVersionCode);
+  let nextVersion = `${major}.${minor}.${patch}`;
+  if (prerelease) {
+    nextVersion += `-rc.1`;
+  }
+
+  const changeLog = await buildChangeLog(nextVersion, prerelease);
+
+  console.log('Updating workspace version...');
+  setWorkspaceVersions(prerelease ? 'rc' : 'release', major, minor, patch, 1);
 
   console.log('Erase changelog');
   fs.writeFileSync(path.join(__dirname, '..', 'CHANGELOG.md'), '');
@@ -104,4 +115,9 @@ const execSyncWithLog = (command, options) => {
     console.log('sdterr', err.stderr.toString());
     throw err;
   }
+};
+
+const extractVersionNumber = version => {
+  const [major, minor, patch] = version.split('-')[0].split('.');
+  return [Number(major), Number(minor), Number(patch)];
 };
