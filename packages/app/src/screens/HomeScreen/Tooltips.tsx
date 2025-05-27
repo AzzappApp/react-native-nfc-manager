@@ -68,7 +68,7 @@ const Tooltips = () => {
         mode={
           Platform.OS === 'ios' ? PopoverMode.RN_MODAL : PopoverMode.JS_MODAL
         }
-        offset={Platform.OS === 'ios' ? -10 : 30}
+        offset={Platform.OS === 'ios' ? -15 : 30}
         from={tooltips['profileLink']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         header={

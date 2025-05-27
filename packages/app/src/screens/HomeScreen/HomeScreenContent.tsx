@@ -239,7 +239,9 @@ const HomeScreenContent = ({
       {currentProfile?.webCard && !currentProfile.webCard.userName && (
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
-      <Tooltips />
+      <View style={styles.tooltipContainer}>
+        <Tooltips />
+      </View>
     </View>
   );
 };
@@ -248,10 +250,22 @@ export default memo(HomeScreenContent);
 
 export const HOME_SCREEN_CONTENT_PADDING = 5;
 
+const CAROUSEL_Z_INDEX = 5; // zIndex for the carousel to be above the background and below the bottom panel
+
 const styles = StyleSheet.create({
-  viewCarrousel: { flex: 1, zIndex: 10 },
+  viewCarrousel: { flex: 1, zIndex: CAROUSEL_Z_INDEX },
   container: {
     flex: 1,
     justifyContent: 'space-around',
+  },
+  tooltipContainer: {
+    flex: 1,
+    position: 'absolute',
+    zIndex: CAROUSEL_Z_INDEX + 1,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    pointerEvents: 'box-none',
   },
 });
