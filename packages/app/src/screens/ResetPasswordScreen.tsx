@@ -82,6 +82,7 @@ const ResetPasswordScreen = ({
         } catch {
           Toast.show({
             type: 'error',
+            position: 'top',
             text1: intl.formatMessage({
               defaultMessage: 'Error while changing your password.',
               description: 'Toast Error message when resetting password fails',

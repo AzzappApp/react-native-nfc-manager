@@ -80,6 +80,7 @@ const ConfirmRegistrationScreen = ({
       console.error(e);
       Toast.show({
         type: 'error',
+        position: 'top',
         text1: isEmail
           ? intl.formatMessage({
               defaultMessage: 'Error while confirming your email.',
