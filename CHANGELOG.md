@@ -1,3 +1,7 @@
+## 2.0.0-canary.38
+
+* **fix:**  - **ShakeShare:** white flash when opening ([#9019](https://github.com/AzzappApp/azzapp/pull/9019))
+
 ## 2.0.0-canary.37
 
 * **fix:**  - **android:** regression on signup checkboxes ([#9011](https://github.com/AzzappApp/azzapp/pull/9011))
