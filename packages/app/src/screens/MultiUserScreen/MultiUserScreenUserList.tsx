@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, SectionList, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
@@ -286,60 +287,59 @@ const MultiUserScreenUserList = ({
   const router = useRouter();
 
   return (
-    <View style={styles.content}>
-      <Suspense fallback={<LoadingView />}>
-        <SectionList
-          ListHeaderComponent={
-            searching || searchValue ? null : (
-              <View style={styles.headerContainer}>
-                {Header}
-                {!transferOwnerMode && (
-                  <>
+    <Suspense fallback={<LoadingView />}>
+      <SectionList
+        ListHeaderComponent={
+          searching || searchValue ? null : (
+            <View style={styles.headerContainer}>
+              {Header}
+              {!transferOwnerMode && (
+                <>
+                  <Button
+                    style={styles.button}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Add users',
+                      description:
+                        'Button to add new users from MultiUserScreen',
+                    })}
+                    onPress={() => {
+                      router.push({
+                        route: 'MULTI_USER_ADD',
+                      });
+                    }}
+                  />
+                  <Link route="COMMON_INFORMATION">
                     <Button
                       style={styles.button}
-                      label={intl.formatMessage({
-                        defaultMessage: 'Add users',
+                      variant="secondary"
+                      label={`${intl.formatMessage({
+                        defaultMessage: 'Set common information',
                         description:
-                          'Button to add new users from MultiUserScreen',
-                      })}
-                      onPress={() => {
-                        router.push({
-                          route: 'MULTI_USER_ADD',
-                        });
-                      }}
+                          'Button to add common information to the contact card in MultiUserScreen',
+                      })} (${nbCommonInformation})`}
                     />
-                    <Link route="COMMON_INFORMATION">
-                      <Button
-                        style={styles.button}
-                        variant="secondary"
-                        label={`${intl.formatMessage({
-                          defaultMessage: 'Set common information',
-                          description:
-                            'Button to add common information to the contact card in MultiUserScreen',
-                        })} (${nbCommonInformation})`}
-                      />
-                    </Link>
-                  </>
-                )}
-              </View>
-            )
-          }
-          accessibilityRole="list"
-          sections={filteredSections}
-          keyExtractor={keyExtractor}
-          renderItem={renderListItem}
-          renderSectionHeader={renderHeaderSection}
-          showsVerticalScrollIndicator={false}
-          onEndReached={onEndReached}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          contentContainerStyle={contentContainerStyle}
-          onEndReachedThreshold={0.5}
-          keyboardShouldPersistTaps="always"
-          automaticallyAdjustKeyboardInsets
-        />
-      </Suspense>
-    </View>
+                  </Link>
+                </>
+              )}
+            </View>
+          )
+        }
+        renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
+        accessibilityRole="list"
+        sections={filteredSections}
+        keyExtractor={keyExtractor}
+        renderItem={renderListItem}
+        renderSectionHeader={renderHeaderSection}
+        showsVerticalScrollIndicator={false}
+        onEndReached={onEndReached}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        style={styles.sectionList}
+        contentContainerStyle={contentContainerStyle}
+        onEndReachedThreshold={0.5}
+        keyboardShouldPersistTaps="always"
+      />
+    </Suspense>
   );
 };
 
@@ -455,6 +455,9 @@ const UserListItem = memo(ItemList);
 
 const styleSheet = createStyleSheet(appearance => ({
   headerContainer: { paddingBottom: 16, gap: 10 },
+  sectionList: {
+    width: '100%',
+  },
   content: {
     paddingTop: 10,
     width: '100%',
