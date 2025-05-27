@@ -232,8 +232,7 @@ const ShakeAndShareScreen = ({
     webCard?.id,
   ]);
 
-  const { bottom } = useScreenInsets();
-  const { height, width } = useScreenDimensions();
+  const { width } = useScreenDimensions();
 
   return (
     <BottomSheetModalProvider>
@@ -395,29 +394,7 @@ const ShakeAndShareScreen = ({
             </View>
           </View>
         </ScrollView>
-        <View style={[styles.closeButtonContainer, { bottom }]}>
-          <LinearGradient
-            colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            locations={[0, 0.7]}
-            style={{ width: '100%', height }}
-            pointerEvents="none"
-          />
-          <View
-            style={[
-              styles.iconContainerStyle,
-              { bottom: Platform.OS === 'ios' ? bottom + 20 : 0 },
-            ]}
-          >
-            <IconButton
-              icon="close"
-              onPress={router.back}
-              iconSize={24}
-              appearance="dark"
-            />
-          </View>
-        </View>
+        <CloseButton />
 
         <IosAddWidgetPopup
           visible={popupIosWidgetVisible}
@@ -513,6 +490,89 @@ const QRCode = ({
     </Canvas>
   ) : null;
 };
+
+const shakeAndShareQuery = graphql`
+  query ShakeAndShareScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        id
+        invited
+        webCard {
+          id
+          cardIsPublished
+          userName
+          ...CoverRenderer_webCard
+        }
+        ...SignaturePreview_profile
+        ...useQRCodeKey_profile
+        ...ContactCardExportVcf_card
+        ...useContactCardAccess_profile
+      }
+    }
+    currentUser {
+      email
+    }
+  }
+`;
+
+const ShakeAndShareScreenFallback = () => {
+  return (
+    <Container style={{ flex: 1 }} collapsable={false}>
+      <LinearGradient
+        colors={['rgba(0, 0, 0,0.6)', 'rgba(0, 0, 0, 1)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0.2, 0.55]}
+        style={styles.linear}
+      />
+      <CloseButton />
+    </Container>
+  );
+};
+
+const CloseButton = () => {
+  const router = useRouter();
+  const { bottom } = useScreenInsets();
+  const { height } = useScreenDimensions();
+  return (
+    <View style={[styles.closeButtonContainer, { bottom }]}>
+      <LinearGradient
+        colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0, 0.7]}
+        style={{ width: '100%', height }}
+        pointerEvents="none"
+      />
+      <View
+        style={[
+          styles.iconContainerStyle,
+          { bottom: Platform.OS === 'ios' ? bottom + 20 : 0 },
+        ]}
+      >
+        <IconButton
+          icon="close"
+          onPress={router.back}
+          iconSize={24}
+          appearance="dark"
+        />
+      </View>
+    </View>
+  );
+};
+
+export default relayScreen(ShakeAndShareScreen, {
+  query: shakeAndShareQuery,
+  fallback: ShakeAndShareScreenFallback,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId,
+  }),
+  getScreenOptions: () => ({
+    stackPresentation: Platform.OS === 'ios' ? 'formSheet' : 'transparentModal',
+    stackAnimation: 'slide_from_bottom',
+  }),
+  fetchPolicy: 'store-or-network',
+});
 
 const { width } = Dimensions.get('window');
 
@@ -623,42 +683,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.white,
   },
-});
-
-const shakeAndShareQuery = graphql`
-  query ShakeAndShareScreenQuery($profileId: ID!) {
-    node(id: $profileId) {
-      ... on Profile @alias(as: "profile") {
-        id
-        invited
-        webCard {
-          id
-          cardIsPublished
-          userName
-          ...CoverRenderer_webCard
-        }
-        ...SignaturePreview_profile
-        ...useQRCodeKey_profile
-        ...ContactCardExportVcf_card
-        ...useContactCardAccess_profile
-      }
-    }
-    currentUser {
-      email
-    }
-  }
-`;
-
-//ShakeAndShareScreen.getScreenOptions = () => ({ stackAnimation: 'formSheet' });
-
-export default relayScreen(ShakeAndShareScreen, {
-  query: shakeAndShareQuery,
-  getVariables: (_, profileInfos) => ({
-    profileId: profileInfos?.profileId,
-  }),
-  getScreenOptions: () => ({
-    stackPresentation: Platform.OS === 'ios' ? 'formSheet' : 'fullScreenModal',
-    stackAnimation: 'slide_from_bottom',
-  }),
-  fetchPolicy: 'store-or-network',
 });
