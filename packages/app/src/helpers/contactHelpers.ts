@@ -809,19 +809,21 @@ export const addContactUpdater = (
         'contacts',
       );
     } else {
-      const node = store.create(
-        `${userByDatesConnection.getDataID()}_${user.getDataID()}_${date.toISOString()}`,
-        'ContactsByDate',
-      );
-      node.setValue(date.toISOString(), 'date');
-      node.setLinkedRecords([newContact], 'contacts');
-      node.setValue(1, 'nbContacts');
-      const newDateEdge = ConnectionHandler.createEdge(
-        store,
-        userByDatesConnection,
-        node,
-        'ContactsByDateEdge',
-      );
+      const createEdge = () => {
+        const node = store.create(
+          `${userByDatesConnection.getDataID()}_${user.getDataID()}_${date.toISOString()}`,
+          'ContactsByDate',
+        );
+        node.setValue(date.toISOString(), 'date');
+        node.setLinkedRecords([newContact], 'contacts');
+        node.setValue(1, 'nbContacts');
+        return ConnectionHandler.createEdge(
+          store,
+          userByDatesConnection,
+          node,
+          'ContactsByDateEdge',
+        );
+      };
       const nextEdge = userByDatesConnection
         .getLinkedRecords('edges')
         ?.find(edge => {
@@ -836,11 +838,21 @@ export const addContactUpdater = (
           const edgeDate = new Date(edgeDateStr);
           return edgeDate < date;
         });
-      ConnectionHandler.insertEdgeBefore(
-        userByDatesConnection,
-        newDateEdge,
-        nextEdge?.getValue('cursor') as string | undefined,
-      );
+      if (nextEdge) {
+        ConnectionHandler.insertEdgeBefore(
+          userByDatesConnection,
+          createEdge(),
+          nextEdge.getValue('cursor') as string,
+        );
+      } else {
+        const pageInfo = userByDatesConnection.getLinkedRecord('pageInfo');
+        if (!pageInfo?.getValue('hasNextPage')) {
+          ConnectionHandler.insertEdgeAfter(
+            userByDatesConnection,
+            createEdge(),
+          );
+        }
+      }
     }
   });
 
@@ -967,19 +979,22 @@ export const addContactUpdater = (
         'contacts',
       );
     } else {
-      const node = store.create(
-        `${userByLocationsConnection.getDataID()}_${user.getDataID()}_${location}`,
-        'ContactsByLocation',
-      );
-      node.setValue(location, 'location');
-      node.setLinkedRecords([newContact], 'contacts');
-      node.setValue(1, 'nbContacts');
-      const newLocationEdge = ConnectionHandler.createEdge(
-        store,
-        userByLocationsConnection,
-        node,
-        'ContactsByLocationEdge',
-      );
+      const createEdge = () => {
+        const node = store.create(
+          `${userByLocationsConnection.getDataID()}_${user.getDataID()}_${location}`,
+          'ContactsByLocation',
+        );
+        node.setValue(location, 'location');
+        node.setLinkedRecords([newContact], 'contacts');
+        node.setValue(1, 'nbContacts');
+        return ConnectionHandler.createEdge(
+          store,
+          userByLocationsConnection,
+          node,
+          'ContactsByLocationEdge',
+        );
+      };
+      const pageInfo = userByLocationsConnection.getLinkedRecord('pageInfo');
       if (location) {
         const nextEdge = userByLocationsConnection
           .getLinkedRecords('edges')
@@ -995,15 +1010,17 @@ export const addContactUpdater = (
             }
             return locationName > location;
           });
-        ConnectionHandler.insertEdgeBefore(
-          userByLocationsConnection,
-          newLocationEdge,
-          nextEdge?.getValue('cursor') as string | undefined,
-        );
-      } else {
+        if (nextEdge || !pageInfo?.getValue('hasNextPage')) {
+          ConnectionHandler.insertEdgeBefore(
+            userByLocationsConnection,
+            createEdge(),
+            nextEdge?.getValue('cursor') as string | undefined,
+          );
+        }
+      } else if (!pageInfo?.getValue('hasNextPage')) {
         ConnectionHandler.insertEdgeAfter(
           userByLocationsConnection,
-          newLocationEdge,
+          createEdge(),
         );
       }
     }
@@ -1027,47 +1044,33 @@ export const removeContactUpdater = (
   // Update user by date connection
   const userByDatesConnections = getContactsByDateConnection(store, user);
   userByDatesConnections.forEach(userByDatesConnection => {
-    const meetingDate = deleteContact.getValue('meetingDate');
-    if (meetingDate) {
-      const date = new Date(meetingDate.toString());
-      const dateEdge = userByDatesConnection
-        .getLinkedRecords('edges')
-        ?.find(edge => {
-          const node = edge?.getLinkedRecord('node');
-          if (!node) {
-            return false;
-          }
-          const edgeDateStr = node.getValue('date');
-          if (typeof edgeDateStr !== 'string') {
-            return false;
-          }
-          const edgeDate = new Date(edgeDateStr);
-          return (
-            edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
-            edgeDate.getUTCMonth() === date.getUTCMonth() &&
-            edgeDate.getUTCDate() === date.getUTCDate()
-          );
-        });
-      if (dateEdge) {
-        const dateEdgeNode = dateEdge.getLinkedRecord('node');
-        const nbContacts = dateEdgeNode?.getValue('nbContacts');
-        dateEdgeNode?.setValue(
-          typeof nbContacts === 'number' ? nbContacts - 1 : 0,
-          'nbContacts',
-        );
-        const dateEdgeContacts =
-          dateEdgeNode
-            ?.getLinkedRecords('contacts')
-            ?.filter(contact => contact.getDataID() !== contactID) ?? [];
+    const dateEdge = userByDatesConnection
+      .getLinkedRecords('edges')
+      ?.find(edge =>
+        edge
+          ?.getLinkedRecord('node')
+          ?.getLinkedRecords('contacts')
+          ?.some(contact => contact.getDataID() === contactID),
+      );
+    if (dateEdge) {
+      const dateEdgeNode = dateEdge.getLinkedRecord('node');
+      const nbContacts = dateEdgeNode?.getValue('nbContacts');
+      dateEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts - 1 : 0,
+        'nbContacts',
+      );
+      const dateEdgeContacts =
+        dateEdgeNode
+          ?.getLinkedRecords('contacts')
+          ?.filter(contact => contact.getDataID() !== contactID) ?? [];
 
-        if (dateEdgeNode && dateEdgeContacts.length === 0) {
-          ConnectionHandler.deleteNode(
-            userByDatesConnection,
-            dateEdgeNode.getDataID(),
-          );
-        } else {
-          dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
-        }
+      if (dateEdgeNode && dateEdgeContacts.length === 0) {
+        ConnectionHandler.deleteNode(
+          userByDatesConnection,
+          dateEdgeNode.getDataID(),
+        );
+      } else {
+        dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
       }
     }
   });
@@ -1082,26 +1085,14 @@ export const removeContactUpdater = (
     user,
   );
   userByLocationsConnections.forEach(userByLocationsConnection => {
-    const meetingPlace = deleteContact.getLinkedRecord('meetingPlace');
-    const location: string | null = meetingPlace
-      ? (getFriendlyNameFromLocation({
-          city: meetingPlace?.getValue('city') as string | null,
-          region: meetingPlace?.getValue('region') as string | null,
-          subregion: meetingPlace?.getValue('subregion') as string | null,
-          country: meetingPlace?.getValue('country') as string | null,
-        }) ?? null)
-      : null;
-
     const locationEdge = userByLocationsConnection
       .getLinkedRecords('edges')
-      ?.find(edge => {
-        const node = edge?.getLinkedRecord('node');
-        if (!node) {
-          return false;
-        }
-        const locationName = node.getValue('location');
-        return (locationName ?? null) === location;
-      });
+      ?.find(edge =>
+        edge
+          ?.getLinkedRecord('node')
+          ?.getLinkedRecords('contacts')
+          ?.some(contact => contact.getDataID() === contactID),
+      );
 
     if (locationEdge) {
       const locationEdgeNode = locationEdge.getLinkedRecord('node');

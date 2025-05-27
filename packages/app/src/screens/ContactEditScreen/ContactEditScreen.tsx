@@ -113,6 +113,10 @@ const ContactEditScreen = ({
     ) {
       saveContact(contactId: $contactId, input: $contact) {
         id
+        ...ContactActionModal_contact
+        ...ContactsHorizontalList_contacts
+        ...ContactDetailsBody_contact
+        ...ContactsListItem_contact
       }
     }
   `);
