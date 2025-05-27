@@ -1,3 +1,7 @@
+## 2.0.0-canary.39
+
+* **fix:**  - **contactCard:** [#9021](https://github.com/AzzappApp/azzapp/pull/9021) put back tooltip on contact card ([#9022](https://github.com/AzzappApp/azzapp/pull/9022))
+
 ## 2.0.0-canary.38
 
 * **fix:**  - **ShakeShare:** white flash when opening ([#9019](https://github.com/AzzappApp/azzapp/pull/9019))
