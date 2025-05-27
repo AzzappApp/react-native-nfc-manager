@@ -20,8 +20,7 @@ export default ContactListEmptyComponent;
 
 const styles = StyleSheet.create({
   emptyScreenContainer: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

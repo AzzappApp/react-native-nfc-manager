@@ -91,7 +91,6 @@ const ContactsList = ({
       keyboardShouldPersistTaps="always"
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      style={{ flexGrow: 1 }}
       contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
       onScroll={onScroll}
       ListEmptyComponent={ContactListEmptyComponent}

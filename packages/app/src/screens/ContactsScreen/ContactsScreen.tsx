@@ -253,51 +253,53 @@ const ContactsScreen = ({
                   onChangeText={onChangeText}
                 />
               </Animated.View>
-              <TabView
-                currentTab={currentTab}
-                style={styles.content}
-                tabs={[
-                  {
-                    id: 'date',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <ContactsByDateList
-                          queryRef={data}
-                          search={debounceSearch}
-                          onShowContact={onShowContact}
-                          onScroll={onScroll}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                  {
-                    id: 'name',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <UserContactsList
-                          search={debounceSearch}
-                          location={undefined}
-                          date={undefined}
-                          onShowContact={onShowContact}
-                          onScroll={onScroll}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                  {
-                    id: 'location',
-                    element: (
-                      <Suspense fallback={<LoadingView />}>
-                        <ContactsByLocationList
-                          search={debounceSearch}
-                          onShowContact={onShowContact}
-                          onScroll={onScroll}
-                        />
-                      </Suspense>
-                    ),
-                  },
-                ]}
-              />
+              <View style={styles.tabContainer}>
+                <TabView
+                  currentTab={currentTab}
+                  style={styles.content}
+                  tabs={[
+                    {
+                      id: 'date',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByDateList
+                            queryRef={data}
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            onScroll={onScroll}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'name',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <UserContactsList
+                            search={debounceSearch}
+                            location={undefined}
+                            date={undefined}
+                            onShowContact={onShowContact}
+                            onScroll={onScroll}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'location',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByLocationList
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            onScroll={onScroll}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                  ]}
+                />
+              </View>
             </Container>
           </Animated.View>
           <Container style={[styles.footer, { paddingBottom: insets.bottom }]}>
@@ -459,4 +461,5 @@ const stylesheet = createStyleSheet(appearance => ({
     },
     shadow({ appearance, direction: 'top' }),
   ],
+  tabContainer: { flex: 1 },
 }));
