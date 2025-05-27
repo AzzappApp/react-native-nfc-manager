@@ -2,7 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { View, StyleSheet, Keyboard } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import * as z from 'zod';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -10,11 +11,11 @@ import { colors } from '#theme';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import ToastContainer from '#components/Toast';
 import { changePassword } from '#helpers/MobileWebAPI';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { ResetPasswordRoute } from '#routes';
@@ -29,8 +30,6 @@ const ResetPasswordScreenSchema = z
     path: ['confirmPassword'],
     message: 'Passwords do not match',
   });
-
-const VERTICAL_OFFSET = 100;
 
 type ResetPasswordForm = z.infer<typeof ResetPasswordScreenSchema>;
 
@@ -98,89 +97,80 @@ const ResetPasswordScreen = ({
     [handleSubmit, intl, navigateToLogin, params.issuer, params.token],
   );
 
+  const insets = useScreenInsets();
+
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior="padding"
-          keyboardVerticalOffset={-VERTICAL_OFFSET}
-          style={{ flex: 1, rowGap: 20 }}
-        >
-          <View style={styles.form}>
-            <Icon icon="unlock_line" style={styles.logo} />
-            <Text variant="xlarge">
-              <FormattedMessage
-                defaultMessage="Create new password"
-                description="Create new password screen title"
-              />
-            </Text>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => {
-                return (
-                  <SecuredTextInput
-                    returnKeyType="next"
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                    style={styles.field}
-                    onSubmitEditing={() => {
-                      confirmPasswordRef.current?.focus();
-                    }}
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'New password',
-                      description: 'New password input placeholder',
-                    })}
-                  />
-                );
-              }}
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <View style={styles.form}>
+          <Icon icon="unlock_line" style={styles.logo} />
+          <Text variant="xlarge">
+            <FormattedMessage
+              defaultMessage="Create new password"
+              description="Create new password screen title"
             />
-            <Controller
-              name="confirmPassword"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => {
-                return (
-                  <SecuredTextInput
-                    returnKeyType="done"
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    ref={confirmPasswordRef}
-                    value={value}
-                    style={styles.field}
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Confirm password',
-                      description: 'Confirm password input placeholder',
-                    })}
-                  />
-                );
-              }}
-            />
+          </Text>
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => {
+              return (
+                <SecuredTextInput
+                  returnKeyType="next"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  style={styles.field}
+                  onSubmitEditing={() => {
+                    confirmPasswordRef.current?.focus();
+                  }}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'New password',
+                    description: 'New password input placeholder',
+                  })}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="confirmPassword"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => {
+              return (
+                <SecuredTextInput
+                  returnKeyType="done"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  ref={confirmPasswordRef}
+                  value={value}
+                  style={styles.field}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Confirm password',
+                    description: 'Confirm password input placeholder',
+                  })}
+                />
+              );
+            }}
+          />
 
-            <Button
-              variant="primary"
-              testID="submitButton"
-              label={intl.formatMessage({
-                defaultMessage: 'Create new password',
-                description: 'Create new password screen button label',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to create new password',
-                description:
-                  'Create new password Screen - AccessibilityLabel Create New Password button',
-              })}
-              style={styles.field}
-              disabled={!isDirty || isSubmitting || isSubmitSuccessful}
-              loading={isSubmitting}
-              onPress={onSubmit}
-            />
-          </View>
-
-          <View style={{ flex: 2, alignItems: 'center', rowGap: 20 }}>
+          <Button
+            variant="primary"
+            testID="submitButton"
+            label={intl.formatMessage({
+              defaultMessage: 'Create new password',
+              description: 'Create new password screen button label',
+            })}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to create new password',
+              description:
+                'Create new password Screen - AccessibilityLabel Create New Password button',
+            })}
+            style={styles.field}
+            disabled={!isDirty || isSubmitting || isSubmitSuccessful}
+            loading={isSubmitting}
+            onPress={onSubmit}
+          />
+          <View style={{ alignItems: 'center', rowGap: 20 }}>
             {errors.password && (
               <Text variant="error" style={{ textAlign: 'center' }}>
                 <FormattedMessage
@@ -198,12 +188,12 @@ const ResetPasswordScreen = ({
               </Text>
             )}
           </View>
-        </KeyboardAvoidingView>
+        </View>
         <View
           style={{
-            marginBottom: 10,
             justifyContent: 'center',
             alignItems: 'center',
+            paddingBottom: insets.bottom,
           }}
         >
           <PressableNative onPress={navigateToLogin}>
@@ -215,7 +205,7 @@ const ResetPasswordScreen = ({
             </Text>
           </PressableNative>
         </View>
-      </SafeAreaView>
+      </KeyboardAvoidingView>
       <ToastContainer />
     </Container>
   );
@@ -224,8 +214,8 @@ const ResetPasswordScreen = ({
 const styles = StyleSheet.create({
   back: { color: colors.grey200 },
   form: {
-    flex: 3,
-    justifyContent: 'flex-end',
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     rowGap: 20,
     paddingHorizontal: 20,

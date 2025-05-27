@@ -117,24 +117,24 @@ const ForgotPasswordConfirmationScreen = ({
             disabled={!(code.length === CELL_COUNT)}
           />
         </View>
+        <View
+          style={{
+            paddingBottom: insets.bottom,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <PressableNative onPress={navigateToLogin}>
+            <Text style={styles.back} variant="medium">
+              <FormattedMessage
+                defaultMessage="Back to Log In"
+                description="ForgotPasswordScreen - Back to Log In bottom screen link"
+              />
+            </Text>
+          </PressableNative>
+        </View>
       </KeyboardAvoidingView>
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={navigateToLogin}>
-          <Text style={styles.back} variant="medium">
-            <FormattedMessage
-              defaultMessage="Back to Log In"
-              description="ForgotPasswordScreen - Back to Log In bottom screen link"
-            />
-          </Text>
-        </PressableNative>
-      </View>
     </Container>
   );
 };
@@ -143,8 +143,9 @@ export default ForgotPasswordConfirmationScreen;
 
 const styles = StyleSheet.create({
   inner: {
-    height: 300,
+    flex: 1,
     rowGap: 20,
+    justifyContent: 'center',
   },
   textForgotExplain: {
     color: colors.grey400,
@@ -165,7 +166,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 100,
     paddingHorizontal: 15,
   },
   logoContainer: {

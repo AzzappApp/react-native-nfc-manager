@@ -141,24 +141,24 @@ const ForgotPasswordScreen = () => {
               />
             </View>
           </View>
+          <View
+            style={{
+              bottom: insets.bottom,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <PressableNative onPress={onBack}>
+              <Text style={styles.back} variant="medium">
+                <FormattedMessage
+                  defaultMessage="Back to Log In"
+                  description="ForgotPasswordScreen - Back to Log In bottom screen link"
+                />
+              </Text>
+            </PressableNative>
+          </View>
         </KeyboardAvoidingView>
-      </View>
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={onBack}>
-          <Text style={styles.back} variant="medium">
-            <FormattedMessage
-              defaultMessage="Back to Log In"
-              description="ForgotPasswordScreen - Back to Log In bottom screen link"
-            />
-          </Text>
-        </PressableNative>
       </View>
     </Container>
   );
