@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -29,6 +29,7 @@ export const ContactDetailItem = ({
   onRemoveField?: () => void;
 }) => {
   const styles = useStyleSheet(stylesheet);
+  const appearance = useColorScheme();
 
   const isEnrichmentOngoing = state === 'waitingApproval' && isEnrichedItem;
 
@@ -44,7 +45,18 @@ export const ContactDetailItem = ({
           style={styles.linearGradient}
         />
       )}
-      <View style={styles.itemContainer}>
+      <View
+        style={[
+          styles.itemContainer,
+          {
+            backgroundColor: isEnrichmentOngoing
+              ? 'transparent'
+              : appearance === 'dark'
+                ? colors.grey900
+                : colors.white,
+          },
+        ]}
+      >
         <View style={styles.pressableContainer}>
           <PressableNative onPress={onPress} style={styles.pressable}>
             <View style={styles.label}>
@@ -109,7 +121,6 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   itemContainer: {
     flex: 1,
-    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     borderRadius: ITEM_RADIUS,
     ...shadow({ appearance, direction: 'center' }),
   },
