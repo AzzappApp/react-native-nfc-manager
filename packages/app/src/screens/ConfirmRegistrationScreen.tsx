@@ -183,33 +183,33 @@ const ConfirmRegistrationScreen = ({
             loading={isSubmitting}
           />
         </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingBottom: insets.bottom,
+          }}
+        >
+          <PressableNative onPress={navigateToSignup}>
+            <Text style={styles.back} variant="medium">
+              <FormattedMessage
+                defaultMessage="Back to Sign Up"
+                description="ConfirmRegistrationScreen - Back to Sign Up bottom screen link"
+              />
+            </Text>
+          </PressableNative>
+        </View>
       </KeyboardAvoidingView>
-
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={navigateToSignup}>
-          <Text style={styles.back} variant="medium">
-            <FormattedMessage
-              defaultMessage="Back to Sign Up"
-              description="ConfirmRegistrationScreen - Back to Sign Up bottom screen link"
-            />
-          </Text>
-        </PressableNative>
-      </View>
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
   inner: {
-    height: 300,
     rowGap: 20,
+    flex: 1,
+    justifyContent: 'center',
   },
   textForgotExplain: {
     color: colors.grey400,
@@ -228,9 +228,8 @@ const styles = StyleSheet.create({
   button: { marginHorizontal: 20 },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 100,
     paddingHorizontal: 15,
   },
   logoContainer: {
