@@ -30,12 +30,14 @@ const TermsCheckBoxes = ({
       <View style={styles.checkboxesContainer}>
         <CheckBox
           label={
-            <Text style={styles.checkLabel} variant="medium">
-              <FormattedMessage
-                defaultMessage="I want to receive communications about promotions and news from azzapp."
-                description="Signup Screen - accept communications label"
-              />{' '}
-            </Text>
+            <View style={styles.checkLabelContainer}>
+              <Text style={styles.checkLabel} variant="medium">
+                <FormattedMessage
+                  defaultMessage="I want to receive communications about promotions and news from azzapp."
+                  description="Signup Screen - accept communications label"
+                />
+              </Text>
+            </View>
           }
           status={communicationChecked}
           onValueChange={onCommunicationCheckChange}
@@ -48,26 +50,28 @@ const TermsCheckBoxes = ({
         />
         <CheckBox
           label={
-            <Text style={styles.checkLabel} variant="medium">
-              <FormattedMessage
-                defaultMessage="I have read and accept the <tosLink>Terms of Use</tosLink> and <ppLink>Privacy Policy</ppLink> of azzapp"
-                description="Signup Screen - 'I have read and accept the' Terms of use"
-                values={{
-                  tosLink: value => (
-                    <HyperLink
-                      label={value[0] as string}
-                      url={TERMS_OF_SERVICE}
-                    />
-                  ),
-                  ppLink: value => (
-                    <HyperLink
-                      label={value[0] as string}
-                      url={`${PRIVACY_POLICY}`}
-                    />
-                  ),
-                }}
-              />
-            </Text>
+            <View style={styles.checkLabelContainer}>
+              <Text style={styles.checkLabel} variant="medium">
+                <FormattedMessage
+                  defaultMessage="I have read and accept the <tosLink>Terms of Use</tosLink> and <ppLink>Privacy Policy</ppLink> of azzapp"
+                  description="Signup Screen - 'I have read and accept the' Terms of use"
+                  values={{
+                    tosLink: value => (
+                      <HyperLink
+                        label={value[0] as string}
+                        url={TERMS_OF_SERVICE}
+                      />
+                    ),
+                    ppLink: value => (
+                      <HyperLink
+                        label={value[0] as string}
+                        url={`${PRIVACY_POLICY}`}
+                      />
+                    ),
+                  }}
+                />
+              </Text>
+            </View>
           }
           status={termsOfUseChecked}
           onValueChange={onTermsOfUseCheckChange}
@@ -96,8 +100,12 @@ const styles = StyleSheet.create({
   checkboxesContainer: {
     marginBottom: 20,
   },
+  checkLabelContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
   checkLabel: {
-    paddingLeft: 11,
+    flex: 1,
   },
   error: {
     paddingLeft: 10,
