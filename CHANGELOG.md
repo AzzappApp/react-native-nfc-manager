@@ -1,3 +1,12 @@
+## 2.0.0-canary.34
+
+* **fix:**  - **signup:** [#8994](https://github.com/AzzappApp/azzapp/pull/8994) fix padding ([#9002](https://github.com/AzzappApp/azzapp/pull/9002))
+* **fix:**  - **home:** [#8995](https://github.com/AzzappApp/azzapp/pull/8995) put tooltips on top ([#9001](https://github.com/AzzappApp/azzapp/pull/9001))
+* **fix:**  - **signup:** [#8991](https://github.com/AzzappApp/azzapp/pull/8991) move toast message on top ([#9000](https://github.com/AzzappApp/azzapp/pull/9000))
+* **fix:**  - **signup:** [#8993](https://github.com/AzzappApp/azzapp/pull/8993) move link to have it visible ([#8998](https://github.com/AzzappApp/azzapp/pull/8998))
+* **feat:**  - **enrichment:** add hide profile capability ([#8971](https://github.com/AzzappApp/azzapp/pull/8971))
+* **fix:**  - **Contact:** properly handle connection by date/location update ([#8981](https://github.com/AzzappApp/azzapp/pull/8981))
+
 ## 2.0.0-canary.33
 
 * **fix:**  - **enrichment:** [#8985](https://github.com/AzzappApp/azzapp/pull/8985) wrong avatar upload ([#8992](https://github.com/AzzappApp/azzapp/pull/8992))
