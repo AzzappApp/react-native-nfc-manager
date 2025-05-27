@@ -76,7 +76,7 @@ const HomeProfileMenu = () => {
     <View style={styles.mainContainer}>
       <Animated.View style={[styles.insideContainer, bottomPanelStyle]}>
         <LinearGradient
-          colors={['transparent', '#FFFFFF26']}
+          colors={['#FFFFFF00', '#FFFFFF26']}
           style={[styles.containerGradient, styles.containerGradientLeft]}
         >
           <Pressable
@@ -97,7 +97,7 @@ const HomeProfileMenu = () => {
           </Pressable>
         </LinearGradient>
         <LinearGradient
-          colors={['transparent', '#FFFFFF26']}
+          colors={['#FFFFFF00', '#FFFFFF26']}
           style={styles.containerGradient}
         >
           <Pressable
@@ -114,7 +114,7 @@ const HomeProfileMenu = () => {
           </Pressable>
         </LinearGradient>
         <LinearGradient
-          colors={['transparent', '#FFFFFF26']}
+          colors={['#FFFFFF00', '#FFFFFF26']}
           style={[styles.containerGradient, styles.containerGradientRight]}
         >
           <Pressable
