@@ -119,6 +119,10 @@ const AddContactModal = ({
           firstName
           company
           ...useOnInviteContactDataQuery_contact
+          ...ContactActionModal_contact
+          ...ContactsHorizontalList_contacts
+          ...ContactDetailsBody_contact
+          ...ContactsListItem_contact
         }
       }
     }
