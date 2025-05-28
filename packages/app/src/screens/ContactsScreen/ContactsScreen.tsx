@@ -454,10 +454,9 @@ const stylesheet = createStyleSheet(appearance => ({
       bottom: 0,
       left: 0,
       right: 0,
-    },
-    {
       padding: 20,
       justifyContent: 'center',
+      elevation: 10, // on android, the shadow is not visible on absolute positioned element
     },
     shadow({ appearance, direction: 'top' }),
   ],
