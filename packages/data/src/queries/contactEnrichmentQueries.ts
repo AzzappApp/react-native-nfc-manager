@@ -1,4 +1,4 @@
-import { eq, or, and, desc, isNull } from 'drizzle-orm';
+import { eq, or, and, desc, isNull, inArray } from 'drizzle-orm';
 import { db } from '../database';
 import {
   ContactEnrichmentTable,
@@ -46,6 +46,31 @@ export const getContactEnrichmentByContactId = async (contactId: string) => {
     .orderBy(desc(ContactEnrichmentTable.enrichedAt))
     .limit(1)
     .then(res => res[0]);
+};
+
+export const getContactEnrichmentsByContactIds = async (
+  contactIds: string[],
+) => {
+  const enrichments = await db()
+    .select()
+    .from(ContactEnrichmentTable)
+    .where(
+      and(
+        inArray(ContactEnrichmentTable.contactId, contactIds),
+        or(
+          isNull(ContactEnrichmentTable.approved),
+          eq(ContactEnrichmentTable.approved, true),
+        ),
+      ),
+    )
+    .orderBy(desc(ContactEnrichmentTable.enrichedAt))
+    .limit(1);
+
+  const enrichmentsByContactId: Record<string, ContactEnrichment> = {};
+  enrichments.forEach(enrichment => {
+    enrichmentsByContactId[enrichment.contactId] = enrichment;
+  });
+  return contactIds.map(contactId => enrichmentsByContactId[contactId] ?? null);
 };
 
 export const getContactEnrichmentById = async (id: string) => {

@@ -12,6 +12,8 @@ import {
   getContactCountPerOwner,
   getNbNewContactsForUser,
   getProfilesByUserAndWebCards,
+  getContactEnrichmentByContactId,
+  getContactEnrichmentsByContactIds,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -85,6 +87,20 @@ export const webCardLoader = createSessionDataLoader(
 export const contactLoader = createSessionDataLoader(
   'ContactLoader',
   createEntitiesBatchLoadFunction('Contact'),
+);
+
+export const enrichmentByContactLoader = createSessionDataLoader(
+  'ContactEnrichmentLoader',
+  async (keys: readonly string[]) => {
+    if (keys.length === 0) {
+      return [];
+    }
+    if (keys.length === 1) {
+      const enrichment = await getContactEnrichmentByContactId(keys[0]);
+      return enrichment ? [enrichment] : [null];
+    }
+    return getContactEnrichmentsByContactIds(keys as string[]);
+  },
 );
 
 export const moduleBackgroundLoader = createDataLoader(

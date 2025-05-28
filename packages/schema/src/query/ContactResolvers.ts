@@ -1,5 +1,8 @@
-import { getContactEnrichmentByContactId } from '@azzapp/data';
-import { profileLoader, webCardLoader } from '#loaders';
+import {
+  enrichmentByContactLoader,
+  profileLoader,
+  webCardLoader,
+} from '#loaders';
 import { filterHiddenContactFields } from '#helpers/contactHelpers';
 import { idResolver } from '#helpers/relayIdHelpers';
 import type {
@@ -137,7 +140,7 @@ export const Contact: ContactResolvers = {
   },
   enrichment: async contact => {
     if (contact.enrichmentStatus && contact.enrichmentStatus !== 'failed') {
-      return getContactEnrichmentByContactId(contact.id);
+      return enrichmentByContactLoader.load(contact.id);
     }
     return null;
   },
