@@ -478,6 +478,7 @@ export const getUserContactsGroupedByDate = async (
               lte(ContactTable.meetingDate, firstDate),
             ),
           )
+          .orderBy(desc(ContactTable.createdAt))
       : [];
   const dateMap = new Map<string, Contact[]>();
   for (const { Contact: contact } of data) {
@@ -581,7 +582,7 @@ export const getUserContactsGroupedByLocation = async (
             ),
           ),
         )
-        .orderBy(desc(ContactTable.meetingDate))
+        .orderBy(desc(ContactTable.createdAt))
     : [];
 
   const locationMap = new Map<string | null, Contact[]>();
