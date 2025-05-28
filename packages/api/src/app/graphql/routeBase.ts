@@ -249,6 +249,21 @@ const { handleRequest } = createYoga({
             }),
         );
       },
+      sendPushNotification: async (userId, message) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'send/pushNotification',
+              data: {
+                userId,
+                message,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
+      },
     };
   },
   plugins: [

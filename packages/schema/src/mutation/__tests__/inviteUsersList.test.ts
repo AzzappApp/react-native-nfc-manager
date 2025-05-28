@@ -11,9 +11,8 @@ import {
   getProfilesByIds,
 } from '@azzapp/data';
 
-import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers } from '#externals';
+import { sendPushNotification, notifyUsers } from '#externals';
 import {
   webCardLoader,
   profileLoader,
@@ -47,6 +46,7 @@ jest.mock('#loaders', () => ({
 
 jest.mock('#externals', () => ({
   notifyUsers: jest.fn(),
+  sendPushNotification: jest.fn(),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -57,10 +57,6 @@ jest.mock('#helpers/relayIdHelpers', () => jest.fn(() => 'profile-123'));
 
 jest.mock('@azzapp/shared/profileHelpers', () => ({
   profileHasAdminRight: jest.fn(() => true),
-}));
-
-jest.mock('@azzapp/service/notificationsHelpers', () => ({
-  sendPushNotification: jest.fn(),
 }));
 
 jest.mock('#helpers/subscriptionHelpers', () => ({

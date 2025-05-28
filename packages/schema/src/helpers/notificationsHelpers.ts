@@ -1,4 +1,4 @@
-import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
+import { sendPushNotification } from '#externals';
 import type { User, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
 

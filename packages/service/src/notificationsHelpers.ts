@@ -10,7 +10,7 @@ import type { PushNotificationData } from '@azzapp/shared/notificationHelpers';
 
 let accessToken: string | null = null;
 let tokenExpiry = 0;
-type MessageType = {
+export type MessageType = {
   mediaId?: string | null;
   sound?: string; // sound is optional, default will use the default sound, for custom sound they have to be compiled with the app
   title: string;

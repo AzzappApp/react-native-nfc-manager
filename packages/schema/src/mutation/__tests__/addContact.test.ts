@@ -50,10 +50,6 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
 
-jest.mock('@azzapp/service/notificationsHelpers', () => ({
-  sendPushNotification: jest.fn(),
-}));
-
 jest.mock('graphql-relay', () => ({
   fromGlobalId: jest
     .fn()

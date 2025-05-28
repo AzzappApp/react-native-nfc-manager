@@ -2,6 +2,7 @@ import { externalFunction } from './GraphQLContext';
 import type { ContactInput } from '#__generated__/types';
 import type { Contact, Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+import type { MessageType } from '@azzapp/service/notificationsHelpers';
 
 type Parameters = {
   profile?: Profile;
@@ -61,3 +62,7 @@ export const enrichContact =
 export const cancelEnrichContact = externalFunction<
   (userId: string, contactId: string) => void
 >('cancelEnrichContact');
+
+export const sendPushNotification = externalFunction<
+  (userId: string, message: MessageType) => Promise<void>
+>('sendPushNotification');

@@ -14,12 +14,11 @@ import {
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/index';
-import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';

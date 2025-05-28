@@ -5,10 +5,8 @@ import {
   cancelEnrichContact,
   enrichContact,
 } from '#inngest/functions/enrichContact';
-import {
-  notifyWebCardUsersBatch,
-  notifyWebCardUser,
-} from '#inngest/functions/notifyWebCardUsers';
+import { sendPushNotification } from '#inngest/functions/notify';
+import { notifyWebCardUsersBatch } from '#inngest/functions/notifyWebCardUsers';
 import {
   sendEmailSignature,
   sendEmailSignatureBatch,
@@ -21,9 +19,9 @@ export const { GET, POST, PUT } = serve({
     sendEmailSignature,
     sendEmailSignatureBatch,
     notifyWebCardUsersBatch,
-    notifyWebCardUser,
     enrichContact,
     cancelEnrichContact,
+    sendPushNotification,
   ],
 });
 
