@@ -872,7 +872,7 @@ const stylesheet = createStyleSheet(appearance => ({
   close: {
     position: 'absolute',
     top: 10,
-    left: 10,
+    left: 30,
     width: 44,
     height: 44,
     borderRadius: 38,
@@ -883,7 +883,7 @@ const stylesheet = createStyleSheet(appearance => ({
   share: {
     position: 'absolute',
     top: 10,
-    right: 10,
+    right: 30,
     width: 44,
     height: 44,
     borderRadius: 38,
@@ -897,6 +897,7 @@ const stylesheet = createStyleSheet(appearance => ({
     flexDirection: 'column',
     alignItems: 'center',
     overflow: 'visible',
+    paddingHorizontal: 20,
   },
   company: {
     marginTop: 5,
@@ -927,7 +928,6 @@ const stylesheet = createStyleSheet(appearance => ({
     height: 387,
   },
   scroll: {
-    marginHorizontal: 20,
     overflow: 'visible',
   },
   menuAiIndicator: {

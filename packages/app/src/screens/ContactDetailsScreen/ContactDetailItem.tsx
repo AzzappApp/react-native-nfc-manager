@@ -105,6 +105,7 @@ export const ContactDetailItem = ({
             iconSize={14}
             style={styles.close}
             onPress={onRemoveField}
+            hitSlop={5}
           />
         )}
       </View>

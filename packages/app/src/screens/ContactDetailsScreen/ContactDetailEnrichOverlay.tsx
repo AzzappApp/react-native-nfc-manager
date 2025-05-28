@@ -195,7 +195,7 @@ export const ContactDetailEnrichOverlay = ({
               height: 267 + bottom,
               position: 'absolute',
               width: '100%',
-              pointerEvents: 'box-none',
+              pointerEvents: 'none',
             }}
           />
           <View
