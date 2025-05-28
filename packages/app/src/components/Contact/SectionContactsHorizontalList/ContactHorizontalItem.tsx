@@ -130,8 +130,8 @@ const ContactHorizontalItem = ({
 const styles = StyleSheet.create({
   profile: {
     position: 'relative',
-    marginBottom: 30,
-    overflow: 'hidden',
+    paddingBottom: 30,
+    overflow: 'visible',
   },
   invite: {
     position: 'absolute',
