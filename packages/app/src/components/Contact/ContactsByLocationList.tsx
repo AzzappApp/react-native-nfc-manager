@@ -72,7 +72,10 @@ const ContactsByLocationList = ({
 
   const currentSearch = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (currentSearch.current === search) {
+    if (
+      (!currentSearch.current && !search) ||
+      currentSearch.current === search
+    ) {
       return;
     }
     currentSearch.current = search;
