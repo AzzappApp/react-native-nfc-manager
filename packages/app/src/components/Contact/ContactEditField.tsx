@@ -5,6 +5,7 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import TextInput from '#ui/TextInput';
+import TextInputWithEllipsizeMode from '#ui/TextInputWithEllipsizeMode';
 import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
@@ -25,6 +26,7 @@ const ContactEditField = <TFieldValues extends FieldValues>({
   requiresPremium,
   returnKeyType,
   multiline,
+  ellipsize,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -43,8 +45,11 @@ const ContactEditField = <TFieldValues extends FieldValues>({
   requiresPremium?: boolean;
   returnKeyType?: TextInputProps['returnKeyType'];
   multiline?: boolean;
+  ellipsize?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
+
+  const Input = ellipsize ? TextInputWithEllipsizeMode : TextInput;
 
   return (
     <Controller
@@ -62,7 +67,7 @@ const ContactEditField = <TFieldValues extends FieldValues>({
           deleteField={deleteField}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >
-          <TextInput
+          <Input
             value={value}
             onChangeText={trim ? value => onChange(value.trim()) : onChange}
             style={styles.input}

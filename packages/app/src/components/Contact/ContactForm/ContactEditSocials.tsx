@@ -125,6 +125,7 @@ export const ContactEditSocialFieldWithEnrichment = ({
         description: 'Placeholder for social profile inside contact card',
       })}
       returnKeyType="done"
+      ellipsize
     />
   );
 };
