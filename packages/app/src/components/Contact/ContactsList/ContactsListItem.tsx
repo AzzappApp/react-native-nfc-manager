@@ -143,14 +143,19 @@ const ContactsListItem = ({
 };
 
 const GAP = 15;
+const VERTICAL_PADDING = 20;
+
+export const CONTACT_LIST_ITEM_HEIGHT =
+  COVER_WIDTH / COVER_RATIO + VERTICAL_PADDING * 2;
 
 const styles = StyleSheet.create({
   contactInfos: {
     paddingHorizontal: 10,
-    paddingVertical: 20,
     flexDirection: 'row',
     flex: 1,
     columnGap: GAP,
+    height: CONTACT_LIST_ITEM_HEIGHT,
+    alignItems: 'center',
   },
   date: {
     color: colors.grey400,

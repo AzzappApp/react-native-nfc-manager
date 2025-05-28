@@ -15,7 +15,6 @@ import type { UserContactsListQuery } from '#relayArtifacts/UserContactsListQuer
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
-  SectionListData,
   ViewStyle,
 } from 'react-native';
 import type { FetchPolicy } from 'react-relay';
@@ -204,26 +203,16 @@ const UserContactsList = ({
     );
   }, [contacts, orderBy]);
 
-  const renderHeaderSection = useCallback(
-    ({
-      section: { title },
-    }: {
-      section: SectionListData<
-        ContactsListItemType,
-        { title: string; data: ContactsListItemType[] }
-      >;
-    }) => {
-      if (isNotFalsyString(title)) {
-        return (
-          <Container style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
-          </Container>
-        );
-      }
-      return null;
-    },
-    [],
-  );
+  const renderHeaderSection = useCallback((title: string) => {
+    if (isNotFalsyString(title)) {
+      return (
+        <Container style={styles.titleContainer}>
+          <Text style={styles.title}>{title}</Text>
+        </Container>
+      );
+    }
+    return null;
+  }, []);
 
   return (
     <>
@@ -239,6 +228,7 @@ const UserContactsList = ({
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
         onScroll={onScroll}
+        headerHeight={SECTION_HEIGHT}
       />
       <ContactActionModal
         data={contactActionData}
@@ -249,10 +239,13 @@ const UserContactsList = ({
   );
 };
 
+const SECTION_HEIGHT = 58;
+
 const styles = StyleSheet.create({
   titleContainer: {
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    height: SECTION_HEIGHT,
+    justifyContent: 'center',
   },
   title: {
     textTransform: 'uppercase',

@@ -1,15 +1,15 @@
-import { useCallback } from 'react';
-import { SectionList, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactListEmptyComponent from '../ContactListEmptyComponent';
-import ContactsListItem from './ContactsListItem';
+import ContactsListItem, { CONTACT_LIST_ITEM_HEIGHT } from './ContactsListItem';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
-  SectionListData,
-  SectionListRenderItemInfo,
   ViewStyle,
 } from 'react-native';
 
@@ -24,12 +24,8 @@ export type ContactListProps = {
   refreshing: boolean;
   onShowContact: (contactId: string) => void;
   onShowContactAction: (contactId: string) => void;
-  renderSectionHeader: (args: {
-    section: SectionListData<
-      ContactsListItemType,
-      { title: string; data: ContactsListItemType[] }
-    >;
-  }) => JSX.Element | null;
+  renderSectionHeader: (title: string) => JSX.Element | null;
+  headerHeight?: number;
   ListHeaderComponent?:
     | React.ComponentType<any>
     | React.ReactElement
@@ -58,12 +54,10 @@ const ContactsList = ({
   onScroll,
 }: ContactListProps) => {
   const renderListItem = useCallback(
-    ({
-      item,
-    }: SectionListRenderItemInfo<
-      ContactsListItemType,
-      { title: string; data: ContactsListItemType[] }
-    >) => {
+    ({ item }: ListRenderItemInfo<ContactsListItemType | string>) => {
+      if (typeof item === 'string') {
+        return renderSectionHeader(item);
+      }
       return (
         <ContactsListItem
           contact={item}
@@ -72,16 +66,33 @@ const ContactsList = ({
         />
       );
     },
-    [onShowContactAction, onShowContact],
+    [onShowContact, onShowContactAction, renderSectionHeader],
   );
 
+  const { data, headerIndices } = useMemo(() => {
+    const data: Array<ContactsListItemType | string> = [];
+    const headerIndices: number[] = [];
+    let index = 0;
+
+    for (const section of sections) {
+      headerIndices.push(index);
+      data.push(section.title);
+      index++;
+      for (const item of section.data) {
+        data.push(item);
+        index++;
+      }
+    }
+    return { data, headerIndices };
+  }, [sections]);
+
   return (
-    <SectionList
+    <FlashList
       accessibilityRole="list"
-      sections={sections}
+      data={data}
+      stickyHeaderIndices={headerIndices}
       keyExtractor={sectionKeyExtractor}
       renderItem={renderListItem}
-      renderSectionHeader={renderSectionHeader}
       showsVerticalScrollIndicator={false}
       onEndReached={onEndReached}
       refreshing={refreshing}
@@ -91,15 +102,20 @@ const ContactsList = ({
       keyboardShouldPersistTaps="always"
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
+      contentContainerStyle={{ flexGrow: 1, ...contentContainerStyle }}
       onScroll={onScroll}
       ListEmptyComponent={ContactListEmptyComponent}
+      estimatedItemSize={CONTACT_LIST_ITEM_HEIGHT}
     />
   );
 };
 
-const sectionKeyExtractor = (item: { id?: string }, index: number) => {
-  return item.id ?? `${index}`;
+const SEPARATOR_HEIGHT = 1;
+
+const sectionKeyExtractor = (item: string | { id?: string }, index: number) => {
+  return typeof item === 'string'
+    ? `header-${index}`
+    : item.id || `item-${index}`;
 };
 
 const ItemSeparator = () => {
@@ -109,7 +125,7 @@ const ItemSeparator = () => {
 
 const stylesheet = createStyleSheet(appearance => ({
   separator: {
-    height: 1,
+    height: SEPARATOR_HEIGHT,
     width: '100%',
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
   },
