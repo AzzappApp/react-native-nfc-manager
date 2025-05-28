@@ -1,3 +1,7 @@
+## 2.0.0-canary.47
+
+* **fix:**  - update for missing horizontal padding management ([#9082](https://github.com/AzzappApp/azzapp/pull/9082))
+
 ## 2.0.0-canary.46
 
 * **fix:**  - **contacts:** [#9077](https://github.com/AzzappApp/azzapp/pull/9077) shadow are cut ([#9080](https://github.com/AzzappApp/azzapp/pull/9080))
