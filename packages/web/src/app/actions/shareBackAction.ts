@@ -142,14 +142,14 @@ export const processShareBackSubmission = async (
       });
     }
 
-    let phone = submission.value.phone?.number || '';
+    let phone = submission.value.number || '';
     const email = submission?.value?.email || '';
 
     try {
       const { number } = parsePhoneNumberWithError(
-        submission.value.phone?.number || '',
+        submission.value.number || '',
         {
-          defaultCountry: submission.value.phone?.countryCode as CountryCode,
+          defaultCountry: submission.value?.countryCode as CountryCode,
         },
       );
       phone = number;
@@ -257,9 +257,7 @@ export const processShareBackSubmission = async (
       });
     }
 
-    return submission.reply({
-      formErrors: [],
-    });
+    return submission.reply();
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);

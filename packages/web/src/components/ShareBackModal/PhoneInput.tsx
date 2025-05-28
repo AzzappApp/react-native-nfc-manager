@@ -8,38 +8,48 @@ import {
   type ChangeEvent,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { useDebouncedCallback } from 'use-debounce';
 import ConditionalWrapper from '#components/ConditionalWrapper';
 import EmailOrPhonenumberSelect from '#components/EmailOrPhonenumberSelect';
 import FormLabel from '#ui/Form/FormLabel/FormLabel';
 import Input from '#ui/Form/Input';
-import type { phoneNumberSchemaType } from './shareBackFormSchema';
-import type { FieldMetadata } from '@conform-to/react';
+import type { FieldMetadata, SubmissionResult } from '@conform-to/react';
 import type { CountryCode, PhoneNumber } from 'libphonenumber-js';
 
 type PhoneInputProps = InputHTMLAttributes<HTMLInputElement> & {
-  field: FieldMetadata<phoneNumberSchemaType>;
-} & (
+  number: FieldMetadata<string>;
+  countryCode: FieldMetadata<string>;
+} & { lastResult?: SubmissionResult | null } & (
     | { withLabel: true; labelText: string }
     | { withLabel?: false; labelText?: never }
   );
 
 // eslint-disable-next-line react/display-name
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
-  ({ field, className, withLabel = false, labelText, ...others }, ref) => {
+  (
+    {
+      number: numberField,
+      countryCode: countryCodeField,
+      className,
+      withLabel = false,
+      labelText,
+      lastResult,
+      ...others
+    },
+    ref,
+  ) => {
     const intl = useIntl();
-    const countryCode = useInputControl(field.getFieldset().countryCode);
-    const number = useInputControl(field.getFieldset().number);
-    const inputProps = getInputProps(field.getFieldset().number, {
+    const countryCode = useInputControl(countryCodeField);
+    const number = useInputControl(numberField);
+    const inputProps = getInputProps(numberField, {
       type: 'text',
     });
-    const [value, setValue] = useState(number.value || '');
 
     const parseNumber = useCallback(
       (numberToParse?: string) => {
         try {
           const phone = parsePhoneNumberWithError(numberToParse || '', {
-            defaultCountry: countryCode.value as CountryCode,
+            defaultCountry: (countryCode.value ||
+              lastResult?.initialValue?.countryCode.toString()) as CountryCode,
           });
 
           return phone;
@@ -48,26 +58,25 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           return undefined;
         }
       },
-      [countryCode.value],
+      [countryCode.value, lastResult?.initialValue?.countryCode],
     );
 
     const [parsedPhoneNumber, setParsedPhoneNumber] = useState<
       PhoneNumber | undefined
     >(() => {
-      return parseNumber(number.value);
+      return parseNumber(
+        number.value || lastResult?.initialValue?.number.toString(),
+      );
     });
 
-    const debounced = useDebouncedCallback(val => {
-      const parsedNumber = parseNumber(val);
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+      setParsedPhoneNumber(undefined);
+      const val = event.target.value;
+      const parsedNumber = parseNumber(
+        val || lastResult?.initialValue?.number.toString(),
+      );
       setParsedPhoneNumber(parsedNumber);
       number.change(parsedPhoneNumber?.number ?? val);
-    }, 300);
-
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value;
-      setParsedPhoneNumber(undefined);
-      debounced(event.target.value);
-      setValue(newValue);
     };
 
     return (
@@ -80,7 +89,11 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         )}
       >
         <EmailOrPhonenumberSelect
-          value={countryCode.value || ''}
+          value={
+            countryCode.value ||
+            lastResult?.initialValue?.countryCode.toString() ||
+            ''
+          }
           onChange={countryCode.change}
         />
 
@@ -98,8 +111,8 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             description: 'Phone input placeHolder',
           })}
           inputClassName={className}
-          error={!!field.errors}
-          value={parsedPhoneNumber?.nationalNumber || value}
+          error={!!numberField.errors}
+          value={lastResult?.initialValue?.number.toString() || undefined}
           {...others}
         />
       </ConditionalWrapper>
