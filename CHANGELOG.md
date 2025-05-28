@@ -1,3 +1,12 @@
+## 2.0.0-canary.46
+
+* **fix:**  - **contacts:** [#9077](https://github.com/AzzappApp/azzapp/pull/9077) shadow are cut ([#9080](https://github.com/AzzappApp/azzapp/pull/9080))
+* **fix:**  - **shareBack:** [#9015](https://github.com/AzzappApp/azzapp/pull/9015) put back given values to avoid form clearing ([#9058](https://github.com/AzzappApp/azzapp/pull/9058))
+* **fix:**  - **shareBack:** [#9034](https://github.com/AzzappApp/azzapp/pull/9034) push notifications cannot be sent on edge ([#9071](https://github.com/AzzappApp/azzapp/pull/9071))
+* **fix:**  - **enrichment:** [#9023](https://github.com/AzzappApp/azzapp/pull/9023) always display the tab ([#9068](https://github.com/AzzappApp/azzapp/pull/9068))
+* **fix:**  - **contacts:** [#9034](https://github.com/AzzappApp/azzapp/pull/9034) add elevation for android ([#9074](https://github.com/AzzappApp/azzapp/pull/9074))
+* **fix:**  - **Contact:** don't try to reuse contacts ([#9073](https://github.com/AzzappApp/azzapp/pull/9073))
+
 ## 2.0.0-canary.45
 
 * **fix:**  - multiple issues with cross management on details enrichement ([#9064](https://github.com/AzzappApp/azzapp/pull/9064))
