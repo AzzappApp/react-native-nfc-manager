@@ -152,7 +152,10 @@ export const EnrichmentOverlay = ({
           flex: 1,
           transform: [{ scale }],
           top: small ? -AVATAR_DEFAULT_WIDTH * scale : 0,
-          left: small ? -AVATAR_DEFAULT_WIDTH * COVER_RATIO * scale : 0,
+          left: small
+            ? -AVATAR_DEFAULT_WIDTH * COVER_RATIO * scale +
+              styles.placeholder.paddingHorizontal
+            : 0,
           width: AVATAR_DEFAULT_WIDTH,
           borderRadius: AVATAR_DEFAULT_WIDTH * COVER_CARD_RADIUS,
         }}
