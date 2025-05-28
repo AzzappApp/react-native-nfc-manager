@@ -1,3 +1,9 @@
+## 2.0.0-canary.42
+
+* **fix:**  - remove mediaScreen header ([#9045](https://github.com/AzzappApp/azzapp/pull/9045))
+* **fix:**  - **Contact:** remove usage of deprecate webCard field ([#9037](https://github.com/AzzappApp/azzapp/pull/9037))
+* **fix:**  - add safety check on birthday ([#9016](https://github.com/AzzappApp/azzapp/pull/9016))
+
 ## 2.0.0-canary.41
 
 * **fix:**  - **multiUser:** [#9028](https://github.com/AzzappApp/azzapp/pull/9028) add padding on search bar ([#9033](https://github.com/AzzappApp/azzapp/pull/9033))
