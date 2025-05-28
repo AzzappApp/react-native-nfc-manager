@@ -417,7 +417,6 @@ const ContactCreateScreen = ({
         phoneNumber => {
           return {
             ...extractPhoneNumberDetails(phoneNumber.phone),
-            selected: true,
             label: phoneNumber.label,
           };
         },
@@ -513,7 +512,7 @@ const ContactCreateScreen = ({
       const formattedEmails = data?.emails
         ?.map((email: string) => {
           if (email) {
-            return { address: email, selected: true, label: 'Work' };
+            return { address: email, label: 'Work' };
           }
           return null;
         })
@@ -528,7 +527,6 @@ const ContactCreateScreen = ({
           if (phoneNumber) {
             return {
               ...extractPhoneNumberDetails(phoneNumber),
-              selected: true,
               label: 'Work',
             };
           }
@@ -556,7 +554,7 @@ const ContactCreateScreen = ({
 
       const formattedAdress = data?.addresses
         ?.map(add => {
-          return { address: add, selected: true, label: 'Work' };
+          return { address: add, label: 'Work' };
         })
         .filter(n => n != null);
 

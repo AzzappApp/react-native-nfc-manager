@@ -99,7 +99,7 @@ export const getPhonenumberWithCountryCode = (
 
 export const extractPhoneNumberDetails = (
   phoneNumber: string,
-): { number: string; countryCode?: string | undefined } => {
+): { number: string; countryCode?: string } => {
   try {
     const parsedNumber = parsePhoneNumberWithError(phoneNumber);
     if (parsedNumber) {
@@ -108,8 +108,10 @@ export const extractPhoneNumberDetails = (
         number: parsedNumber.nationalNumber.replace(/\D/g, ''),
       };
     }
-    return { number: phoneNumber.replace(/\D/g, '') };
-  } catch {
-    return { number: phoneNumber.replace(/\D/g, '') };
+  } catch (error) {
+    console.warn(`Failed to extract phone number details: ${error}`);
   }
+  return {
+    number: phoneNumber.replace(/\D/g, ''),
+  };
 };
