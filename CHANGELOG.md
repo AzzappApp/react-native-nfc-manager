@@ -1,3 +1,8 @@
+## 2.0.0-canary.44
+
+* **fix:**  - **Contact:** sort contact by creation date ([#9055](https://github.com/AzzappApp/azzapp/pull/9055))
+* **fix:**  - fix pixel line on contact card android and simplification ([#9057](https://github.com/AzzappApp/azzapp/pull/9057))
+
 ## 2.0.0-canary.43
 
 * **fix:**  - **Contact:** fetch necessary field when adding contact ([#9035](https://github.com/AzzappApp/azzapp/pull/9035))
