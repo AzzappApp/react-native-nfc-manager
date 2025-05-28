@@ -42,12 +42,14 @@ export const ContactDetailEnrichOverlay = ({
   onValidateEnrichment,
   onRefuseEnrichment,
   currentUserKey,
+  setOverlayState,
 }: {
   onEnrich: () => void;
   onStopEnrich: () => void;
   state: ContactDetailEnrichState;
   onValidateEnrichment: () => void;
   onRefuseEnrichment: () => void;
+  setOverlayState: (state: ContactDetailEnrichState) => void;
   currentUserKey: ContactDetailEnrichOverlay_user$key | null;
 }) => {
   const styles = useStyleSheet(styleSheet);
@@ -98,9 +100,11 @@ export const ContactDetailEnrichOverlay = ({
   useEffect(() => {
     if (state === 'tooltipVisible') {
       openTooltips([ENRICH_TOOLTIP]);
-    } else if (state === 'waitingApproval') {
-      closeTooltips([ENRICH_TOOLTIP]);
-    } else if (state === 'idle') {
+    } else if (
+      state === 'waitingApproval' ||
+      state === 'idle' ||
+      state === 'maxEnrichmentReached'
+    ) {
       closeTooltips([ENRICH_TOOLTIP]);
     }
   }, [toggleTooltips, state, openTooltips, closeTooltips]);
@@ -111,7 +115,7 @@ export const ContactDetailEnrichOverlay = ({
 
   return (
     <View style={styles.container}>
-      {state === 'loading' ? (
+      {state === 'loading' || state === 'maxEnrichmentReached' ? (
         <View style={styles.fullscreen}>
           <Canvas style={styles.fullscreen}>
             <Rect x={0} y={0} width={width} height={height}>
@@ -122,42 +126,75 @@ export const ContactDetailEnrichOverlay = ({
               />
             </Rect>
           </Canvas>
-          <LottieView
-            source={require('#assets/azzapp_AI_loading.json')}
-            autoPlay
-            loop
-            hardwareAccelerationAndroid
-            style={{
-              left: -width / 2,
-              width: width * 2,
-              height: width * 2,
-            }}
-          />
-          <PressableOpacity
-            style={styles.stopEnrichContainer}
-            onPress={onStopEnrich}
-          >
-            <Text variant="small" style={styles.stopEnrichText}>
-              {intl.formatMessage({
-                defaultMessage: 'Stop enrichment',
-                description: 'ContactDetail enrich overlay - Stop enrichment',
-              })}
-            </Text>
-          </PressableOpacity>
-
-          <View
-            style={{
-              alignSelf: 'center',
-              top: -width + 50,
-            }}
-          >
-            <Text variant="large" style={styles.aiEnrichText}>
-              <FormattedMessage
-                defaultMessage="AI enrichment"
-                description="ContactDetail enrich overlay - AI enrichment subtitle"
+          {state === 'loading' ? (
+            <>
+              <LottieView
+                source={require('#assets/azzapp_AI_loading.json')}
+                autoPlay
+                loop
+                hardwareAccelerationAndroid
+                style={{
+                  left: -width / 2,
+                  width: width * 2,
+                  height: width * 2,
+                }}
               />
-            </Text>
-          </View>
+              <PressableOpacity
+                style={styles.stopEnrichContainer}
+                onPress={onStopEnrich}
+              >
+                <Text variant="small" style={styles.stopEnrichText}>
+                  {intl.formatMessage({
+                    defaultMessage: 'Stop enrichment',
+                    description:
+                      'ContactDetail enrich overlay - Stop enrichment',
+                  })}
+                </Text>
+              </PressableOpacity>
+
+              <View
+                style={{
+                  alignSelf: 'center',
+                  top: -width + 50,
+                }}
+              >
+                <Text variant="large" style={styles.aiEnrichText}>
+                  <FormattedMessage
+                    defaultMessage="AI enrichment"
+                    description="ContactDetail enrich overlay - AI enrichment subtitle"
+                  />
+                </Text>
+              </View>
+            </>
+          ) : (
+            <View
+              style={[
+                {
+                  paddingBottom: bottom + 120,
+                },
+                styles.enrichErrorContainer,
+              ]}
+            >
+              <Text variant="xlarge" style={styles.enrichErrorText}>
+                <FormattedMessage
+                  defaultMessage="You've Reached the Limit!"
+                  description="ContactDetail enrich overlay - Max enrichment reached title message"
+                />
+              </Text>
+              <Text variant="medium" style={styles.enrichErrorText}>
+                <FormattedMessage
+                  defaultMessage="We're thrilled you enjoyed enriching your contacts with AI! You've reached the maximum number of free enrichments."
+                  description="ContactDetail enrich overlay - Max enrichment reached detail message"
+                />
+              </Text>
+              <Text variant="medium" style={styles.enrichErrorText}>
+                <FormattedMessage
+                  defaultMessage="This feature will be available soon as part of a premium offering — stay tuned!"
+                  description="ContactDetail enrich overlay - Max enrichment reached detail message"
+                />
+              </Text>
+            </View>
+          )}
           <View
             style={[
               styles.enrichmentCounterContainer,
@@ -169,7 +206,16 @@ export const ContactDetailEnrichOverlay = ({
             <View style={styles.enrichmentCounterContainerHeader}>
               <Text
                 variant="xlarge"
-                style={(styles.aiEnrichText, styles.enrichmentCounterBigNumber)}
+                style={[
+                  styles.aiEnrichText,
+                  styles.enrichmentCounterBigNumber,
+                  {
+                    color:
+                      state === 'maxEnrichmentReached'
+                        ? colors.red400
+                        : colors.tropicalAquaTone,
+                  },
+                ]}
               >
                 {data?.nbEnrichments?.total ?? 0}{' '}
               </Text>
@@ -191,7 +237,11 @@ export const ContactDetailEnrichOverlay = ({
               iconSize={24}
               iconStyle={styles.closeIcon}
               style={styles.closeIconContainer}
-              onPress={router.back}
+              onPress={
+                state === 'loading'
+                  ? router.back
+                  : () => setOverlayState('idle')
+              }
             />
           </View>
         </View>
@@ -435,7 +485,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignSelf: 'center',
   },
-  enrichmentCounterBigNumber: { bottom: 4, color: colors.tropicalAquaTone },
+  enrichmentCounterBigNumber: { bottom: 4 },
   stopEnrichContainer: {
     position: 'absolute',
     flex: 1,
@@ -449,4 +499,14 @@ const styleSheet = createStyleSheet(appearance => ({
     textDecorationLine: 'underline',
     opacity: 0.3,
   },
+  enrichErrorContainer: {
+    position: 'absolute',
+    width: '90%',
+    height: '100%',
+    padding: 20,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    gap: 20,
+  },
+  enrichErrorText: { textAlign: 'center', color: colors.white },
 }));

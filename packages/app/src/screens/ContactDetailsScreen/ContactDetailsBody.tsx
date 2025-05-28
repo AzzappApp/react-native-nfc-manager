@@ -9,6 +9,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { ENABLE_DATA_ENRICHMENT } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -42,6 +43,7 @@ import type { ContactDetailsRoute } from '#routes';
 export type ContactDetailEnrichState =
   | 'idle'
   | 'loading'
+  | 'maxEnrichmentReached'
   | 'tooltipVisible'
   | 'waitingApproval';
 
@@ -416,16 +418,20 @@ const ContactDetailsBody = ({
           }
         }
       },
-      onError: () => {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Enrichment failure',
-            description:
-              'ContactDetailsScreen - Error message when enrichment start failed',
-          }),
-        });
-        setOverlayState('idle');
+      onError: error => {
+        if (error.message === ERRORS.MAX_ENRICHMENTS_REACHED) {
+          setOverlayState('maxEnrichmentReached');
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Enrichment failure',
+              description:
+                'ContactDetailsScreen - Error message when enrichment start failed',
+            }),
+          });
+          setOverlayState('idle');
+        }
       },
     });
   }, [commit, data?.id, hideMore, intl]);
@@ -685,6 +691,7 @@ const ContactDetailsBody = ({
           onValidateEnrichment={onValidateEnrichment}
           onRefuseEnrichment={onRefuseEnrichment}
           currentUserKey={userData || null}
+          setOverlayState={setOverlayState}
         />
       )}
       {backgroundImageUrl ? (
