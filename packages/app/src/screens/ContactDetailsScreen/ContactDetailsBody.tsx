@@ -35,6 +35,7 @@ import type {
   ContactDetailsBody_contact$data,
   ContactDetailsBody_contact$key,
 } from '#relayArtifacts/ContactDetailsBody_contact.graphql';
+import type { ContactDetailsBody_user$key } from '#relayArtifacts/ContactDetailsBody_user.graphql';
 
 import type { ContactDetailsRoute } from '#routes';
 
@@ -49,6 +50,7 @@ const BLUR_GAP = 20;
 type ContactDetailsBodyProps = {
   webCard: ContactDetailAvatar_webCard$key | null;
   contactKey: ContactDetailsBody_contact$key | null;
+  currentUser: ContactDetailsBody_user$key | null;
   onClose: () => void;
   onSave: () => void;
   refreshQuery?: () => void;
@@ -80,6 +82,7 @@ const ContactDetailsBody = ({
   onClose,
   refreshQuery,
   hasFocus,
+  currentUser,
 }: ContactDetailsBodyProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
@@ -175,6 +178,15 @@ const ContactDetailsBody = ({
       }
     `,
     contactKey,
+  );
+
+  const userData = useFragment(
+    graphql`
+      fragment ContactDetailsBody_user on User {
+        ...ContactDetailEnrichOverlay_user
+      }
+    `,
+    currentUser,
   );
 
   const [isMoreVisible, showMore, hideMore] = useBoolean(false);
@@ -303,6 +315,18 @@ const ContactDetailsBody = ({
       },
       onCompleted: () => {
         setOverlayState('loading');
+      },
+      updater: store => {
+        const currentUser = store.getRoot().getLinkedRecord('currentUser');
+        const nbEnrichments = currentUser?.getLinkedRecord('nbEnrichments');
+        if (nbEnrichments) {
+          const newNbEnrichments = nbEnrichments.getValue('total');
+          if (newNbEnrichments && typeof newNbEnrichments === 'number') {
+            nbEnrichments.setValue(newNbEnrichments + 1, 'total');
+          } else {
+            nbEnrichments.setValue(1, 'total');
+          }
+        }
       },
       onError: () => {
         Toast.show({
@@ -604,6 +628,7 @@ const ContactDetailsBody = ({
           state={overlayState}
           onValidateEnrichment={onValidateEnrichment}
           onRefuseEnrichment={onRefuseEnrichment}
+          currentUserKey={userData || null}
         />
       )}
       {backgroundImageUrl ? (

@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { Placement } from 'react-native-popover-view/dist/Types';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useFragment } from 'react-relay';
+import { graphql } from 'relay-runtime';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -27,6 +29,7 @@ import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
+import type { ContactDetailEnrichOverlay_user$key } from '#relayArtifacts/ContactDetailEnrichOverlay_user.graphql';
 import type { ContactDetailEnrichState } from './ContactDetailsBody';
 import type { Component, RefObject } from 'react';
 
@@ -37,13 +40,27 @@ export const ContactDetailEnrichOverlay = ({
   state,
   onValidateEnrichment,
   onRefuseEnrichment,
+  currentUserKey,
 }: {
   onEnrich: () => void;
   state: ContactDetailEnrichState;
   onValidateEnrichment: () => void;
   onRefuseEnrichment: () => void;
+  currentUserKey: ContactDetailEnrichOverlay_user$key | null;
 }) => {
   const styles = useStyleSheet(styleSheet);
+
+  const data = useFragment(
+    graphql`
+      fragment ContactDetailEnrichOverlay_user on User {
+        nbEnrichments {
+          max
+          total
+        }
+      }
+    `,
+    currentUserKey,
+  );
 
   const enrichButtonRef = useRef<View>(null);
   const intl = useIntl();
@@ -127,20 +144,42 @@ export const ContactDetailEnrichOverlay = ({
               />
             </Text>
           </View>
-          <IconButton
-            icon="close"
-            size={44}
-            iconSize={24}
-            iconStyle={styles.closeIcon}
-            style={{
-              position: 'absolute',
-              alignSelf: 'center',
-              bottom: 20 + bottom,
-              backgroundColor: colors.black,
-              borderColor: colors.white,
-            }}
-            onPress={router.back}
-          />
+          <View
+            style={[
+              styles.enrichmentCounterContainer,
+              {
+                bottom: bottom + 40,
+              },
+            ]}
+          >
+            <View style={styles.enrichmentCounterContainerHeader}>
+              <Text
+                variant="xlarge"
+                style={(styles.aiEnrichText, styles.enrichmentCounterBigNumber)}
+              >
+                {data?.nbEnrichments?.total ?? 0}{' '}
+              </Text>
+
+              <Text variant="medium" style={styles.aiEnrichText}>
+                / {data?.nbEnrichments?.max ?? 0}
+              </Text>
+            </View>
+            <Text variant="medium" style={styles.aiEnrichText}>
+              <FormattedMessage
+                defaultMessage="free enrichments"
+                description="ContactDetail enrich overlay - enrichment counter subtitle"
+              />
+            </Text>
+
+            <IconButton
+              icon="close"
+              size={44}
+              iconSize={24}
+              iconStyle={styles.closeIcon}
+              style={styles.closeIconContainer}
+              onPress={router.back}
+            />
+          </View>
         </View>
       ) : state === 'waitingApproval' ? (
         <Animated.View
@@ -357,6 +396,13 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     height: '100%',
   },
+  closeIconContainer: {
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: 0,
+    backgroundColor: colors.black,
+    borderColor: colors.white,
+  },
   closeIcon: { tintColor: colors.white },
   tooltipText: {
     alignSelf: 'center',
@@ -365,5 +411,15 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   tooltipButton: { alignSelf: 'center' },
   tooltipButtonText: { color: colors.black },
-  aiEnrichText: { color: colors.white },
+  aiEnrichText: { color: colors.white, textAlign: 'center' },
+  enrichmentCounterContainer: {
+    position: 'absolute',
+    height: '20%',
+    width: '100%',
+  },
+  enrichmentCounterContainerHeader: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+  },
+  enrichmentCounterBigNumber: { bottom: 4, color: colors.tropicalAquaTone },
 }));

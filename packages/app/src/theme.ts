@@ -37,6 +37,9 @@ export const colors = {
   white: '#FFFFFF',
   black: '#0E1216',
   green: '#0FD59E',
+
+  // enrichment colors
+  tropicalAquaTone: '#23CFCC',
 };
 export const fontFamilies = {
   extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold' },

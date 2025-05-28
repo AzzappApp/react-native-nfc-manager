@@ -14,6 +14,9 @@ import type { ContactDetailsRoute } from '#routes';
 
 const query = graphql`
   query ContactsDetailScreenQuery($contactId: ID!) {
+    currentUser {
+      ...ContactDetailsBody_user
+    }
     node(id: $contactId) {
       ... on Contact @alias(as: "contact") {
         id
@@ -45,7 +48,7 @@ const ContactDetailsScreen = ({
   hasFocus,
 }: RelayScreenProps<ContactDetailsRoute, ContactsDetailScreenQuery>) => {
   const router = useRouter();
-  const { node } = usePreloadedQuery<ContactsDetailScreenQuery>(
+  const { node, currentUser } = usePreloadedQuery<ContactsDetailScreenQuery>(
     query,
     preloadedQuery,
   );
@@ -74,6 +77,7 @@ const ContactDetailsScreen = ({
             webCard={webCard}
             onSave={onInviteContactInner}
             hasFocus={hasFocus}
+            currentUser={currentUser}
           />
         ) : undefined}
       </View>
