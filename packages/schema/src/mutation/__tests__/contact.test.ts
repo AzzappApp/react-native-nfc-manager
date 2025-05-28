@@ -218,6 +218,7 @@ describe('addContact Mutation', () => {
           lastName: 'Doe',
           company: 'Azzapp',
           title: 'CEO',
+          birthday: '2022-09-10',
           phoneNumbers: [{ label: 'Work', number: '123456789' }],
           emails: [{ label: 'Work', address: 'john@example.com' }],
           addresses: [{ label: 'Office', address: '123 Street, City' }],
@@ -234,7 +235,7 @@ describe('addContact Mutation', () => {
     expect(updateContact).toHaveBeenCalled();
     expect(updateContact).toHaveBeenCalledWith('contact-123', {
       addresses: [{ address: '123 Street, City', label: 'Office' }],
-      birthday: null,
+      birthday: '2022-09-10',
       company: 'Azzapp',
       contactProfileId: 'contact-123',
       deleted: false,
@@ -256,10 +257,109 @@ describe('addContact Mutation', () => {
         lastName: 'Doe',
         company: 'Azzapp',
         title: 'CEO',
+        birthday: '2022-09-10',
       }),
     });
     expect(incrementContactsImportFromScan).not.toHaveBeenCalled();
     expect(incrementImportFromScan).not.toHaveBeenCalled();
+  });
+  test('should update a new contact with short date format', async () => {
+    mockUser('user-456');
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (getContactByProfiles as jest.Mock).mockResolvedValue({
+      id: 'contact-123',
+    });
+    (updateContact as jest.Mock).mockResolvedValue('contact-123');
+
+    const result = await createContact(
+      {},
+      {
+        profileId: 'gql-profile-123',
+        input: {
+          firstName: 'John',
+          lastName: 'Doe',
+          birthday: '2022-09-10T10:10:10Z',
+          contactProfileId: 'contact-123',
+        },
+        withShareBack: false,
+        notify: false,
+        scanUsed: false,
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(updateContact).toHaveBeenCalledWith('contact-123', {
+      birthday: '2022-09-10',
+      addresses: [],
+      company: '',
+      emails: [],
+      phoneNumbers: [],
+      title: '',
+      contactProfileId: 'contact-123',
+      deleted: false,
+      deletedAt: null,
+      firstName: 'John',
+      lastName: 'Doe',
+      meetingDate: undefined,
+      ownerProfileId: 'profile-123',
+      socials: undefined,
+      type: 'contact',
+    });
+    expect(result).toEqual({
+      contact: expect.objectContaining({
+        id: 'contact-123',
+        firstName: 'John',
+        lastName: 'Doe',
+        birthday: '2022-09-10',
+      }),
+    });
+  });
+  test('should update a new contact with invalid date format', async () => {
+    mockUser('user-456');
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (getContactByProfiles as jest.Mock).mockResolvedValue({
+      id: 'contact-123',
+    });
+    (updateContact as jest.Mock).mockResolvedValue('contact-123');
+
+    await createContact(
+      {},
+      {
+        profileId: 'gql-profile-123',
+        input: {
+          firstName: 'John',
+          lastName: 'Doe',
+          birthday: 'invalid-date-format',
+          contactProfileId: 'contact-123',
+        },
+        withShareBack: false,
+        notify: false,
+        scanUsed: false,
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(updateContact).toHaveBeenCalledWith('contact-123', {
+      birthday: null,
+      addresses: [],
+      company: '',
+      emails: [],
+      phoneNumbers: [],
+      title: '',
+      contactProfileId: 'contact-123',
+      deleted: false,
+      deletedAt: null,
+      firstName: 'John',
+      lastName: 'Doe',
+      meetingDate: undefined,
+      ownerProfileId: 'profile-123',
+      socials: undefined,
+      type: 'contact',
+    });
   });
 
   test('should validate subscription if scan is used', async () => {

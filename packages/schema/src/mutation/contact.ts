@@ -26,6 +26,7 @@ import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
+import { formatDateToYYYYMMDD } from '@azzapp/shared/timeHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import env from '#env';
 import { notifyUsers } from '#externals';
@@ -78,6 +79,7 @@ export const createContact: MutationResolvers['createContact'] = async (
     await referencesMedias(data, null);
   }
 
+  const dateBirthday = new Date(input.birthday || '');
   const contactToCreate: NewContact = {
     ...input,
     addresses: input.addresses ?? [],
@@ -87,7 +89,9 @@ export const createContact: MutationResolvers['createContact'] = async (
     type: 'contact',
     company: input.company || '',
     title: input.title || '',
-    birthday: input.birthday || null,
+    birthday: !isNaN(dateBirthday.getTime())
+      ? formatDateToYYYYMMDD(dateBirthday)
+      : null,
     firstName: input.firstName || '',
     lastName: input.lastName || '',
     meetingDate: input.meetingDate ?? undefined,
