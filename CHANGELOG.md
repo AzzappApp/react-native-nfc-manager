@@ -1,3 +1,10 @@
+## 2.0.0-canary.45
+
+* **fix:**  - multiple issues with cross management on details enrichement ([#9064](https://github.com/AzzappApp/azzapp/pull/9064))
+* **fix:**  - close icon style on avatar ([#9060](https://github.com/AzzappApp/azzapp/pull/9060))
+* **fix:**  - **contact:** [#8913](https://github.com/AzzappApp/azzapp/pull/8913) change contact edition social field ([#9059](https://github.com/AzzappApp/azzapp/pull/9059))
+* **fix:**  - **Contact:** instantly start loading indicator in add contact modal ([#9065](https://github.com/AzzappApp/azzapp/pull/9065))
+
 ## 2.0.0-canary.44
 
 * **fix:**  - **Contact:** sort contact by creation date ([#9055](https://github.com/AzzappApp/azzapp/pull/9055))
