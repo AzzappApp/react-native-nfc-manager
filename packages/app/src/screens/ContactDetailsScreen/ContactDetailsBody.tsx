@@ -232,6 +232,10 @@ const ContactDetailsBody = ({
       enrichContact(contactId: $contactId) {
         contact {
           id
+          enrichmentStatus
+          enrichment {
+            approved
+          }
         }
       }
     }

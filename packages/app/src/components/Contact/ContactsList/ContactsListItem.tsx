@@ -9,7 +9,7 @@ import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactAvatar from '../ContactAvatar';
+import ContactAvatar, { EnrichmentOverlay } from '../ContactAvatar';
 import WhatsappButton from '../WhatsappButton';
 import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
@@ -44,6 +44,13 @@ const ContactsListItem = ({
           country
           region
           subregion
+        }
+        enrichmentStatus
+        enrichment {
+          approved
+          fields {
+            company
+          }
         }
         contactProfile {
           webCard {
@@ -112,6 +119,21 @@ const ContactsListItem = ({
             avatar={avatarSource}
           />
         )}
+
+        <EnrichmentOverlay
+          overlayEnrichmentInProgress={
+            contact.enrichmentStatus === 'running' ||
+            contact.enrichmentStatus === 'pending'
+          }
+          overlayEnrichmentApprovementNeeded={
+            contact.enrichmentStatus === 'completed' &&
+            !contact.enrichment?.approved
+          }
+          small
+          scale={0.4375}
+          name={name}
+          company={contact.enrichment?.fields?.company || contact.company}
+        />
         <View style={styles.infos}>
           {(contact.firstName || contact.lastName) && (
             <Text variant="large" numberOfLines={1}>

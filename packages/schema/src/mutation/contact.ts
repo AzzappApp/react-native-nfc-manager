@@ -425,7 +425,7 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
   enrichContact(user.id, existingContact);
 
   return {
-    contact: existingContact,
+    contact: { ...existingContact, enrichmentStatus: 'pending' },
   };
 };
 

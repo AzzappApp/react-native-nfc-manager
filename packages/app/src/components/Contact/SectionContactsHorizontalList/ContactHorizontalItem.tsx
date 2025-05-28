@@ -5,7 +5,7 @@ import useImageFromContact from '#components/Contact/useImageFromContact';
 import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
 import PressableNative from '#ui/PressableNative';
-import ContactAvatar from '../ContactAvatar';
+import ContactAvatar, { EnrichmentOverlay } from '../ContactAvatar';
 import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 import type { ContactHorizontalItem_contact$key } from '#relayArtifacts/ContactHorizontalItem_contact.graphql';
 
@@ -30,6 +30,17 @@ const ContactHorizontalItem = ({
         phoneNumbers {
           number
           label
+        }
+        enrichmentStatus
+        enrichment {
+          approved
+          fields {
+            company
+            phoneNumbers {
+              number
+              label
+            }
+          }
         }
         contactProfile {
           webCard {
@@ -84,13 +95,32 @@ const ContactHorizontalItem = ({
             firstName={firstName}
             lastName={lastName}
             name={name}
-            company={contact.company}
+            company={contact.enrichment?.fields?.company || contact.company}
             avatar={avatarSource}
           />
         )}
+        <EnrichmentOverlay
+          overlayEnrichmentInProgress={
+            contact.enrichmentStatus === 'running' ||
+            contact.enrichmentStatus === 'pending'
+          }
+          overlayEnrichmentApprovementNeeded={
+            contact.enrichmentStatus === 'completed' &&
+            contact.enrichment?.approved === null
+          }
+          small={false}
+          scale={1}
+          name={name}
+          company={contact.enrichment?.fields?.company || contact.company}
+        />
       </PressableNative>
       <WhatsappButton
-        phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
+        phoneNumbers={
+          [
+            ...(contact.phoneNumbers || []),
+            ...(contact?.enrichment?.fields?.phoneNumbers || []),
+          ] as ContactPhoneNumberType[]
+        }
         style={styles.invite}
       />
     </View>

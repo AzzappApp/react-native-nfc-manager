@@ -21,6 +21,18 @@ const useImageFromContact = (contactKey: useImageFromContact_contact$key) => {
           id
           uri(width: 180, pixelRatio: $pixelRatio, format: png)
         }
+        enrichment {
+          fields {
+            avatar {
+              id
+              uri(width: 112, pixelRatio: $pixelRatio, format: png)
+            }
+            logo {
+              id
+              uri(width: 180, pixelRatio: $pixelRatio, format: png)
+            }
+          }
+        }
         contactProfile {
           webCard {
             id
@@ -44,10 +56,24 @@ const useImageFromContact = (contactKey: useImageFromContact_contact$key) => {
   );
 
   return useMemo(() => {
+    if (contact.enrichment?.fields?.avatar?.uri) {
+      return {
+        uri: contact.enrichment.fields.avatar.uri,
+        mediaId: contact.enrichment.fields.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
     if (contact.avatar?.uri) {
       return {
         uri: contact.avatar.uri,
         mediaId: contact.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
+    if (contact.enrichment?.fields?.logo?.uri) {
+      return {
+        uri: contact.enrichment.fields.logo.uri,
+        mediaId: contact.enrichment.fields.logo.id ?? '',
         requestedSize: 26,
       };
     }
@@ -73,13 +99,17 @@ const useImageFromContact = (contactKey: useImageFromContact_contact$key) => {
 
     return null;
   }, [
-    contact.avatar?.id,
+    contact.enrichment?.fields?.avatar?.uri,
+    contact.enrichment?.fields?.avatar?.id,
+    contact.enrichment?.fields?.logo?.uri,
+    contact.enrichment?.fields?.logo?.id,
     contact.avatar?.uri,
-    contact.logo?.id,
+    contact.avatar?.id,
     contact.logo?.uri,
-    contact.contactProfile?.webCard?.cardIsPublished,
+    contact.logo?.id,
     contact.contactProfile?.webCard?.coverMedia,
     contact.contactProfile?.webCard?.hasCover,
+    contact.contactProfile?.webCard?.cardIsPublished,
   ]);
 };
 
