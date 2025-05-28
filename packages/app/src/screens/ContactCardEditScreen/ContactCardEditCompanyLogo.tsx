@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -132,6 +132,7 @@ const ContactCardEditCompanyLogo = ({
     },
     [field],
   );
+  const defaultLogo = useRef(field.value);
 
   if (!canEditLogo) {
     return (
@@ -169,6 +170,11 @@ const ContactCardEditCompanyLogo = ({
       </>
     );
   }
+  const fixedLogo = defaultLogo.current?.id
+    ? defaultLogo.current
+    : pickerImage?.id
+      ? pickerImage
+      : undefined;
   return (
     <Controller
       control={control}
@@ -217,7 +223,7 @@ const ContactCardEditCompanyLogo = ({
                 <Icon icon="add_filled" style={styles.addButton} />
               </Pressable>
               <Pressable
-                style={[styles.boxItem, value?.uri == null && styles.selected]}
+                style={[styles.boxItem, value?.id == null && styles.selected]}
                 onPress={() => onChange(null)}
                 testID="companylogo_remove_logo"
               >
@@ -228,19 +234,22 @@ const ContactCardEditCompanyLogo = ({
                   />
                 </Text>
               </Pressable>
-              {pickerImage && (
+              {fixedLogo?.id && (
                 <LogoComponentItem
-                  key={pickerImage.uri}
+                  key={fixedLogo.uri}
                   testID="companylogo_picker_logo_manual"
-                  item={{
-                    id: pickerImage.id,
-                    uri: pickerImage.uri,
-                    score: 100,
-                  }}
-                  selected={value?.id === pickerImage.id}
+                  item={
+                    fixedLogo
+                      ? {
+                          ...fixedLogo,
+                          score: 100,
+                        }
+                      : null
+                  }
+                  selected={value?.id && value?.id === fixedLogo.id}
                   onSelect={onSelectFetchedLogo}
-                  width={pickerImage.width}
-                  height={pickerImage.height}
+                  width={fixedLogo.width}
+                  height={fixedLogo.height}
                 />
               )}
               {logos?.map(logo => {
@@ -249,7 +258,7 @@ const ContactCardEditCompanyLogo = ({
                     <LogoComponentItem
                       key={logo.id}
                       item={logo}
-                      selected={value?.id === logo.id}
+                      selected={value?.id && value?.id === logo.id}
                       onSelect={onSelectFetchedLogo}
                       width={1280} //size requested in request api
                       height={1280}

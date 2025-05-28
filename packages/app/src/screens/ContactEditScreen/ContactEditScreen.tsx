@@ -222,9 +222,7 @@ const ContactEditScreen = ({
       lastName: contact?.lastName,
       title: contact?.enrichment?.fields?.title ?? contact?.title,
       company: contact?.enrichment?.fields?.company ?? contact?.company,
-      logo: {
-        uri: contact?.logo?.uri || '',
-      },
+      logo: contact?.logo,
       phoneNumbers: [
         ...(contact?.phoneNumbers.map(({ label, number }) => {
           const { countryCode, number: parsedPhoneNumber } =
