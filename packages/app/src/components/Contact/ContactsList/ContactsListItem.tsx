@@ -45,9 +45,11 @@ const ContactsListItem = ({
           region
           subregion
         }
-        webCard {
-          userName
-          ...CoverRenderer_webCard
+        contactProfile {
+          webCard {
+            userName
+            ...CoverRenderer_webCard
+          }
         }
         ...useImageFromContact_contact
       }
@@ -65,7 +67,8 @@ const ContactsListItem = ({
 
   const avatarSource = useImageFromContact(contact);
 
-  const [firstname, lastname, name] = useMemo(() => {
+  const webCard = contact.contactProfile?.webCard;
+  const [firstName, lastName, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {
       return [
         contact.firstName,
@@ -74,12 +77,12 @@ const ContactsListItem = ({
       ];
     }
 
-    if (contact.webCard?.userName) {
-      return [contact.webCard.userName, '', contact.webCard.userName];
+    if (webCard?.userName) {
+      return [webCard.userName, '', webCard.userName];
     }
 
     return ['', '', ''];
-  }, [contact.firstName, contact.lastName, contact.webCard?.userName]);
+  }, [contact.firstName, contact.lastName, webCard?.userName]);
 
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
@@ -89,20 +92,20 @@ const ContactsListItem = ({
         onLongPress={onMore}
         style={styles.contactInfos}
       >
-        {!avatarSource && contact.webCard ? (
+        {!avatarSource && webCard ? (
           <View style={styles.cover}>
             <CoverRenderer
               style={styles.webcard}
               width={COVER_WIDTH}
-              webCard={contact.webCard}
+              webCard={webCard}
               large
             />
           </View>
         ) : (
           <ContactAvatar
             style={styles.webcard}
-            firstName={firstname}
-            lastName={lastname}
+            firstName={firstName}
+            lastName={lastName}
             name={name}
             company={contact.company}
             small
@@ -115,13 +118,11 @@ const ContactsListItem = ({
               {`${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim()}
             </Text>
           )}
-          {!contact.firstName &&
-            !contact.lastName &&
-            contact.webCard?.userName && (
-              <Text variant="large" numberOfLines={1}>
-                {contact.webCard?.userName}
-              </Text>
-            )}
+          {!contact.firstName && !contact.lastName && webCard?.userName && (
+            <Text variant="large" numberOfLines={1}>
+              {webCard?.userName}
+            </Text>
+          )}
           {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}
           <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
             {contact.meetingDate

@@ -31,9 +31,11 @@ const ContactHorizontalItem = ({
           number
           label
         }
-        webCard {
-          userName
-          ...CoverRenderer_webCard
+        contactProfile {
+          webCard {
+            userName
+            ...CoverRenderer_webCard
+          }
         }
         ...useImageFromContact_contact
       }
@@ -45,7 +47,8 @@ const ContactHorizontalItem = ({
     onShowContact(contact.id);
   }, [contact, onShowContact]);
 
-  const [firstname, lastname, name] = useMemo(() => {
+  const webCard = contact.contactProfile?.webCard;
+  const [firstName, lastName, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {
       return [
         contact.firstName,
@@ -54,12 +57,12 @@ const ContactHorizontalItem = ({
       ];
     }
 
-    if (contact.webCard?.userName) {
-      return [contact.webCard.userName, '', contact.webCard.userName];
+    if (webCard?.userName) {
+      return [webCard.userName, '', webCard.userName];
     }
 
     return ['', '', ''];
-  }, [contact.firstName, contact.lastName, contact.webCard?.userName]);
+  }, [contact.firstName, contact.lastName, webCard?.userName]);
 
   const onMore = useCallback(() => {
     onShowContactAction(contact.id);
@@ -74,12 +77,12 @@ const ContactHorizontalItem = ({
         android_ripple={{ borderless: true, foreground: true }}
         onLongPress={onMore}
       >
-        {!avatarSource && contact.webCard ? (
-          <CoverRenderer width={80} webCard={contact.webCard} />
+        {!avatarSource && webCard ? (
+          <CoverRenderer width={80} webCard={webCard} />
         ) : (
           <ContactAvatar
-            firstName={firstname}
-            lastName={lastname}
+            firstName={firstName}
+            lastName={lastName}
             name={name}
             company={contact.company}
             avatar={avatarSource}
