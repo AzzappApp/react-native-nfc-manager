@@ -10,11 +10,11 @@ import useQuitWebCard from '#hooks/useQuitWebCard';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { HomeBottomPanelInvitationAcceptMutation } from '#relayArtifacts/HomeBottomPanelInvitationAcceptMutation.graphql';
-import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
+import type { HomeBottomPanelMessage_user$data } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 type HomeBottomPanelInvitationProps = {
-  profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
+  profile: ArrayItemType<HomeBottomPanelMessage_user$data['profiles']>;
 };
 
 const HomeBottomPanelInvitation = ({

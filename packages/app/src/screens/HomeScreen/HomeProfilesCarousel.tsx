@@ -256,7 +256,12 @@ const HomeProfilesCarousel = (
   return (
     <View
       ref={refCarousel}
-      style={[styles.container, { maxHeight: windowWidth / (2 * COVER_RATIO) }]}
+      style={[
+        styles.container,
+        {
+          maxHeight: windowWidth / (1.8 * COVER_RATIO),
+        },
+      ]}
     >
       <CarouselSelectList
         ref={carouselRef}
@@ -276,7 +281,7 @@ const HomeProfilesCarousel = (
   );
 };
 
-const SCALE_RATIO = 108 / 291;
+const SCALE_RATIO = 95 / 291;
 
 const MARGIN_VERTICAL = 10;
 

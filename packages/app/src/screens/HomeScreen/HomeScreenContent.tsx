@@ -71,7 +71,8 @@ const HomeScreenContent = ({
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
-        ...HomeBottomPanel_user
+        ...HomeContactCard_user
+        ...HomeBottomPanelMessage_user
         ...HomeHeader_user
         ...HomeBottomBar_user
         ...HomeBottomBar_shareButton_user

@@ -10,8 +10,7 @@ import { onChangeWebCard } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
-import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
-import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
+import type { HomeBottomPanelMessage_user$data } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
 import type { HomeBottomPanelTransferOwnerAcceptMutation } from '#relayArtifacts/HomeBottomPanelTransferOwnerAcceptMutation.graphql';
 import type { HomeBottomPanelTransferOwnerDeclineMutation } from '#relayArtifacts/HomeBottomPanelTransferOwnerDeclineMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -20,8 +19,8 @@ const HomeBottomPanelTransferOwner = ({
   profile,
   userSubscription,
 }: {
-  profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
-  userSubscription: HomeBottomPanel_user$data['userSubscription'];
+  profile: ArrayItemType<HomeBottomPanelMessage_user$data['profiles']>;
+  userSubscription: HomeBottomPanelMessage_user$data['userSubscription'];
 }) => {
   const router = useRouter();
   const intl = useIntl();

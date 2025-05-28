@@ -1,12 +1,16 @@
-import { useMemo, useCallback, memo, useRef } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { useMemo, useCallback, memo, useRef, Suspense } from 'react';
+import {
+  PixelRatio,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
-import { graphql, useFragment } from 'react-relay';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useTooltipContext } from '#helpers/TooltipContext';
 
@@ -14,61 +18,21 @@ import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 
 import { useHomeScreenContext } from './HomeScreenContext';
-
-import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
+import type { HomeBottomPanelMessage_user$key } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
+import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
 
 type HomeBottomPanelProps = {
-  user: HomeBottomPanel_user$key;
+  user: HomeBottomPanelMessage_user$key & HomeContactCard_user$key;
 };
 
 // TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
 
-const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
-  //#region data
-  const user = useFragment(
-    graphql`
-      fragment HomeBottomPanel_user on User {
-        ...HomeContactCard_user
-        userSubscription {
-          issuer
-        }
-        profiles {
-          id
-          invited
-          profileRole
-          promotedAsOwner
-          webCard {
-            id
-            isMultiUser
-            userName
-            cardIsPublished
-            hasCover
-            owner {
-              email
-              phoneNumber
-            }
-            cardModules {
-              kind
-            }
-            webCardKind
-            cardColors {
-              primary
-              dark
-            }
-          }
-          ...HomeBottomPanelMessage_profiles
-        }
-      }
-    `,
-    userKey,
-  );
-  const { profiles } = user;
-  //#endregion
-
+const HomeBottomPanel = ({ user }: HomeBottomPanelProps) => {
   //#region Layout
   const { width: windowWidth } = useWindowDimensions();
-  const panelWidth = windowWidth - 40;
-  const panelHeight = panelWidth / CONTACT_CARD_RATIO;
+  const panelHeight = PixelRatio.roundToNearestPixel(
+    (windowWidth - 40) / CONTACT_CARD_RATIO,
+  );
   //#endregion
 
   // #region MainTabBar visibility
@@ -123,21 +87,15 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   return (
     <View style={containerStyle} ref={ref}>
       <View style={styles.informationPanel}>
-        <HomeBottomPanelMessage
-          user={profiles!}
-          userSubscription={user.userSubscription}
-        />
+        <Suspense>
+          <HomeBottomPanelMessage user={user} />
+        </Suspense>
       </View>
       <Animated.View
         style={[styles.bottomPanel, bottomPanelStyle]}
         collapsable={false}
       >
-        <HomeContactCard
-          height={panelHeight}
-          width={panelWidth}
-          gap={20}
-          user={user}
-        />
+        <HomeContactCard height={panelHeight} user={user} />
       </Animated.View>
     </View>
   );
