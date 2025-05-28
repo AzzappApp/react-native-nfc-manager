@@ -775,32 +775,30 @@ const ContactDetailsBody = ({
             onRemove={() => onRemoveField('title')}
             state={overlayState}
           />
-          {ENABLE_DATA_ENRICHMENT &&
-            (data?.enrichment?.publicProfile ||
-              data?.enrichmentStatus !== 'completed') && (
-              <View style={styles.saveContainer}>
-                <MenuItem
-                  onSelect={() => setSubView('contact')}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Contact',
-                    description:
-                      'ContactDetailsModal - Button to switch to contact view',
-                  })}
-                  selected={subView === 'contact'}
-                  overlayState={overlayState}
-                />
-                <MenuItem
-                  onSelect={() => setSubView('AI')}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Profile',
-                    description:
-                      'ContactDetailsModal - Button to switch to AI profile view',
-                  })}
-                  selected={subView === 'AI'}
-                  overlayState={overlayState}
-                />
-              </View>
-            )}
+          {ENABLE_DATA_ENRICHMENT && (
+            <View style={styles.saveContainer}>
+              <MenuItem
+                onSelect={() => setSubView('contact')}
+                label={intl.formatMessage({
+                  defaultMessage: 'Contact',
+                  description:
+                    'ContactDetailsModal - Button to switch to contact view',
+                })}
+                selected={subView === 'contact'}
+                overlayState={overlayState}
+              />
+              <MenuItem
+                onSelect={() => setSubView('AI')}
+                label={intl.formatMessage({
+                  defaultMessage: 'Profile',
+                  description:
+                    'ContactDetailsModal - Button to switch to AI profile view',
+                })}
+                selected={subView === 'AI'}
+                overlayState={overlayState}
+              />
+            </View>
+          )}
           {subView === 'contact' && (
             <ContactDetailFragmentContact
               showMore={showMore}
