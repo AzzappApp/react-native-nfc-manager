@@ -22,7 +22,7 @@ extend type Mutation {
   updateContactEnrichmentHiddenFields(
     contactEnrichmentId: ID!
     input: HiddenFieldInput!
-  ): ContactEnrichmentPayload!
+  ): ContactEnrichmentPayload
 
   """
   Approves or rejects a contact enrichment request.

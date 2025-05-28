@@ -1,4 +1,4 @@
-import { filterHiddenContactFields } from '../contactHelpers';
+import { filterHiddenContactFields, mergeHiddenArray } from '../contactHelpers';
 import type {
   EnrichedContactFields,
   EnrichedContactHiddenFields,
@@ -72,5 +72,39 @@ describe('filterHiddenContactFields', () => {
 
     const result = filterHiddenContactFields(baseContact, hidden);
     expect(result).toEqual(baseContact);
+  });
+});
+
+describe('merge boolean array', () => {
+  test('invalid input', async () => {
+    const newArray = mergeHiddenArray(undefined, undefined);
+    expect(newArray).toEqual(undefined);
+  });
+  test('disable all', async () => {
+    const newArray = mergeHiddenArray([false, false], [true, true]);
+    expect(newArray).toEqual([true, true]);
+  });
+  test('disable last', async () => {
+    const newArray = mergeHiddenArray([false, false], [false, true]);
+    expect(newArray).toEqual([false, true]);
+  });
+  test('disable first', async () => {
+    const newArray = mergeHiddenArray([false, false], [true, false]);
+    expect(newArray).toEqual([true, false]);
+  });
+  test('disable with already disable first', async () => {
+    const newArray = mergeHiddenArray([true, false], [true]);
+    expect(newArray).toEqual([true, true]);
+  });
+  test('disable with already disable last', async () => {
+    const newArray = mergeHiddenArray([false, true], [true]);
+    expect(newArray).toEqual([true, true]);
+  });
+  test('disable with already disable mix', async () => {
+    const newArray = mergeHiddenArray(
+      [true, false, true, false, false],
+      [true, false, true],
+    );
+    expect(newArray).toEqual([true, true, true, false, true]);
   });
 });

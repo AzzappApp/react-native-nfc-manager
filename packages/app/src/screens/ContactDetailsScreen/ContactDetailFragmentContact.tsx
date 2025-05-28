@@ -123,9 +123,9 @@ export const ContactDetailFragmentContact = ({
     ? getFriendlyNameFromLocation(data.meetingPlace)
     : undefined;
 
-  const displayedBirthday = hiddenFields?.contact.birthday
-    ? data?.birthday
-    : data?.enrichment?.fields?.birthday || data?.birthday;
+  const displayedBirthday =
+    data?.enrichment?.fields?.birthday || data?.birthday;
+
   /// SOCIALS
   const onPressSocialLink = (social: ContactSocialType) => () => {
     if (social.url) {
@@ -304,7 +304,7 @@ export const ContactDetailFragmentContact = ({
             month: 'long',
             day: 'numeric',
           })}
-          isEnrichedItem={!hiddenFields?.contact.birthday}
+          isEnrichedItem={!!data?.enrichment?.fields?.birthday}
           state={state}
           onRemoveField={() => onRemoveField('birthday')}
         />

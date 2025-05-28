@@ -22,7 +22,6 @@ const ContactEditDateStringField = <TFieldValues extends FieldValues>({
   valueKey,
   control,
   labelValues,
-  onChangeLabel,
   title,
 }: {
   labelKey?: FieldPath<TFieldValues>;
@@ -30,7 +29,6 @@ const ContactEditDateStringField = <TFieldValues extends FieldValues>({
   valueKey: FieldPath<TFieldValues>;
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
-  onChangeLabel?: (label: string) => void;
   title: string;
 }) => {
   const styles = useStyleSheet(stylesheet);
@@ -40,7 +38,6 @@ const ContactEditDateStringField = <TFieldValues extends FieldValues>({
       labelKey={labelKey}
       control={control}
       labelValues={labelValues}
-      onChangeLabel={onChangeLabel}
       deleteField={deleteField}
     >
       <Controller

@@ -78,11 +78,6 @@ const ContactEditFieldWrapper = <TFieldValues extends FieldValues>({
     }
   }, [deleteButtonRect, deleteField, deleteMode, deleted]);
 
-  // const callback = useCallback(() => {
-  //   'worklet';
-  //   runOnJS(closeDeleteButton)();
-  // }, [closeDeleteButton]);
-
   const watchable = labelKey
     ? {
         control,

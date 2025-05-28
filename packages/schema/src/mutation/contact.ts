@@ -37,6 +37,7 @@ import {
   userLoader,
   webCardLoader,
 } from '#loaders';
+import { mergeHiddenArray } from '#helpers/contactHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -469,6 +470,9 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
     const existingContactEnrichment =
       await getContactEnrichmentById(contactEnrichmentId);
 
+    if (!existingContactEnrichment) {
+      return null;
+    }
     const existingContact = await getContactById(
       existingContactEnrichment.contactId,
     );
@@ -483,8 +487,53 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
+    const hiddenFieldsContact =
+      existingContactEnrichment.hiddenFields?.contact || {};
+    if (input.contact?.company) {
+      hiddenFieldsContact.company = true;
+    }
+    if (input.contact?.firstName) {
+      hiddenFieldsContact.firstName = true;
+    }
+    if (input.contact?.lastName) {
+      hiddenFieldsContact.lastName = true;
+    }
+    if (input.contact?.title) {
+      hiddenFieldsContact.title = true;
+    }
+    if (input.contact?.avatarId) {
+      hiddenFieldsContact.avatarId = true;
+    }
+    if (input.contact?.logoId) {
+      hiddenFieldsContact.logoId = true;
+    }
+    hiddenFieldsContact.phoneNumbers = mergeHiddenArray(
+      hiddenFieldsContact.phoneNumbers,
+      input.contact?.phoneNumbers,
+    );
+    hiddenFieldsContact.emails = mergeHiddenArray(
+      hiddenFieldsContact.emails,
+      input.contact?.emails,
+    );
+    hiddenFieldsContact.urls = mergeHiddenArray(
+      hiddenFieldsContact.urls,
+      input.contact?.urls,
+    );
+    hiddenFieldsContact.socials = mergeHiddenArray(
+      hiddenFieldsContact.socials,
+      input.contact?.socials,
+    );
+    hiddenFieldsContact.addresses = mergeHiddenArray(
+      hiddenFieldsContact.addresses,
+      input.contact?.addresses,
+    );
+
     await updateContactEnrichment(contactEnrichmentId, {
-      hiddenFields: input,
+      hiddenFields: {
+        contact: hiddenFieldsContact,
+        profile:
+          input.profile || existingContactEnrichment.hiddenFields?.profile,
+      },
     });
 
     return {

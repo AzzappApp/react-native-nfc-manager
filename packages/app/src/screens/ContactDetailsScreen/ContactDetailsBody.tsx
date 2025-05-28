@@ -517,7 +517,7 @@ const ContactDetailsBody = ({
 
   const onRemoveField = useCallback((field: string, index?: number) => {
     setHiddenFields(prev => {
-      if (!field || !(field in prev)) {
+      if (!field || !(field in prev.contact)) {
         return prev;
       }
       const newField = cloneDeep(prev);

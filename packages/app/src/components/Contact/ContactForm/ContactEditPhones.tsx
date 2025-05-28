@@ -1,10 +1,10 @@
-import { Fragment } from 'react';
-import { useFieldArray } from 'react-hook-form';
+import { Fragment, useEffect, useRef } from 'react';
+import { useController, useFieldArray, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { colors } from '#theme';
-import ContactPhoneField from '#components/Contact/ContactEditPhoneField';
+import ContactEditPhoneField from '#components/Contact/ContactEditPhoneField';
 import {
   contactEditStyleSheet,
   useContactPhoneLabels,
@@ -28,28 +28,16 @@ const ContactEditPhones = ({
     name: 'phoneNumbers',
   });
 
-  const intl = useIntl();
-
-  const labelValues = useContactPhoneLabels();
-
   const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
       {fields.map((phone, index) => (
         <Fragment key={phone.id}>
-          <ContactPhoneField
+          <ContactEditPhoneFieldWithEnrichment
             control={control}
-            labelKey={`phoneNumbers.${index}.label`}
-            valueKey={`phoneNumbers.${index}.number`}
-            countryCodeKey={`phoneNumbers.${index}.countryCode`}
-            deleteField={() => remove(index)}
-            keyboardType="phone-pad"
-            labelValues={labelValues}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Phone number',
-              description: 'Placeholder for phone number inside contact card',
-            })}
+            remove={remove}
+            index={index}
           />
           <Separation small />
         </Fragment>
@@ -76,6 +64,72 @@ const ContactEditPhones = ({
         </PressableNative>
       </View>
     </>
+  );
+};
+
+export const ContactEditPhoneFieldWithEnrichment = ({
+  control,
+  index,
+  remove,
+}: {
+  control: Control<contactFormValues>;
+  index: number;
+  remove: (index: number) => void;
+}) => {
+  const labelValues = useContactPhoneLabels();
+  const intl = useIntl();
+
+  const value = useWatch({
+    control,
+    name: `phoneNumbers.${index}.number`,
+  });
+
+  const label = useWatch({
+    control,
+    name: `phoneNumbers.${index}.label`,
+  });
+
+  const country = useWatch({
+    control,
+    name: `phoneNumbers.${index}.countryCode`,
+  });
+
+  const refValue = useRef(value);
+  const refLabel = useRef(label);
+  const refCountry = useRef(country);
+
+  const { field: removedFromEnrichment } = useController({
+    control,
+    name: `phoneNumbers.${index}.removedFromEnrichment`,
+  });
+
+  useEffect(() => {
+    if (
+      refValue.current !== value ||
+      refLabel.current !== label ||
+      refCountry.current !== country
+    ) {
+      removedFromEnrichment.onChange(true);
+    }
+    refValue.current = value;
+    refLabel.current = label;
+    refCountry.current = country;
+  }, [value, removedFromEnrichment, label, country]);
+
+  return (
+    <ContactEditPhoneField
+      control={control}
+      labelKey={`phoneNumbers.${index}.label`}
+      valueKey={`phoneNumbers.${index}.number`}
+      countryCodeKey={`phoneNumbers.${index}.countryCode`}
+      deleteField={() => remove(index)}
+      keyboardType="phone-pad"
+      labelValues={labelValues}
+      placeholder={intl.formatMessage({
+        defaultMessage: 'Phone number',
+        description: 'Placeholder for phone number inside contact card',
+      })}
+    />
   );
 };
 

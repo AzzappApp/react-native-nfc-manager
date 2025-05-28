@@ -3,7 +3,6 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactEditField from '#components/Contact/ContactEditField';
 import {
   contactEditStyleSheet,
   useContactEmailLabels,
@@ -13,6 +12,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
+import { ContactEditFieldWithEnrichment } from './ContactEditFieldWithEnrichement';
 import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 
@@ -36,11 +36,13 @@ const ContactEditEmails = ({
     <>
       {fields.map((email, index) => (
         <Fragment key={email.id}>
-          <ContactEditField
+          <ContactEditFieldWithEnrichment
             control={control}
             labelKey={`emails.${index}.label`}
             valueKey={`emails.${index}.address`}
-            deleteField={() => remove(index)}
+            removedFromEnrichmentKey={`emails.${index}.removedFromEnrichment`}
+            remove={remove}
+            index={index}
             keyboardType="email-address"
             autoCapitalize="none"
             labelValues={labelValues}

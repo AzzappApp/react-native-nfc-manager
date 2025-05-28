@@ -27,7 +27,6 @@ const ContactEditPhoneField = <TFieldValues extends FieldValues>({
   countryCodeKey,
   labelValues,
   placeholder,
-  onChangeLabel,
   autoCapitalize,
   errorMessage,
   trim = false,
@@ -41,7 +40,6 @@ const ContactEditPhoneField = <TFieldValues extends FieldValues>({
   countryCodeKey: FieldPath<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
-  onChangeLabel?: (label: string) => void;
   errorMessage?: string;
   trim?: boolean;
 }) => {
@@ -60,7 +58,6 @@ const ContactEditPhoneField = <TFieldValues extends FieldValues>({
           labelKey={labelKey}
           control={control}
           labelValues={labelValues}
-          onChangeLabel={onChangeLabel}
           deleteField={deleteField}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >

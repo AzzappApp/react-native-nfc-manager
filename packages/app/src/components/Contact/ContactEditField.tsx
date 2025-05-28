@@ -35,6 +35,7 @@ const ContactEditField = <TFieldValues extends FieldValues>({
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
+  onChangeValue?: (value: string) => void;
   errorMessage?: string;
   trim?: boolean;
   autoComplete?: TextInputProps['autoComplete'];
@@ -62,7 +63,7 @@ const ContactEditField = <TFieldValues extends FieldValues>({
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >
           <TextInput
-            value={value as string}
+            value={value}
             onChangeText={trim ? value => onChange(value.trim()) : onChange}
             style={styles.input}
             numberOfLines={4}

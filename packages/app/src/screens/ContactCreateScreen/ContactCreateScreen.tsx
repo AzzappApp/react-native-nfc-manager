@@ -222,7 +222,12 @@ const ContactCreateScreen = ({
             avatarId,
             logoId,
             emails: data.emails?.length
-              ? data.emails.filter(email => email.address)
+              ? data.emails
+                  .filter(email => email.address)
+                  .map(email => ({
+                    address: email.address,
+                    label: email.label,
+                  }))
               : [],
             phoneNumbers: data.phoneNumbers?.length
               ? data.phoneNumbers
@@ -235,9 +240,17 @@ const ContactCreateScreen = ({
                     return { label: phoneNumber.label, number };
                   })
               : [],
-            urls: data.urls,
-            addresses: data.addresses,
-            socials: data.socials,
+            urls: data.urls.map(url => ({
+              url: url.url,
+            })),
+            addresses: data.addresses.map(address => ({
+              address: address.address,
+              label: address.label,
+            })),
+            socials: data.socials.map(social => ({
+              url: social.url,
+              label: social.label,
+            })),
             company: data.company || '',
             firstName: data.firstName || '',
             lastName: data.lastName || '',

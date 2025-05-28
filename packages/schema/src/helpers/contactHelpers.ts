@@ -34,3 +34,20 @@ export const filterHiddenContactFields = (
 
   return result as EnrichedContactFields;
 };
+
+export const mergeHiddenArray = (
+  hiddenFieldsContact: boolean[] | null | undefined,
+  input: boolean[] | null | undefined,
+) => {
+  if (!input) {
+    return input;
+  }
+  let dataIndex = 0;
+  return hiddenFieldsContact?.map(value => {
+    if (value) return true;
+    // didn't change
+    const result = !!input?.[dataIndex];
+    dataIndex += 1;
+    return result;
+  });
+};

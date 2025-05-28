@@ -1,5 +1,5 @@
-import { Fragment } from 'react';
-import { useFieldArray } from 'react-hook-form';
+import { Fragment, useEffect, useRef } from 'react';
+import { useController, useFieldArray, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
@@ -23,32 +23,17 @@ const ContactEditUrls = ({
     name: 'urls',
   });
 
-  const intl = useIntl();
-
   const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
       {fields.map((url, index) => (
         <Fragment key={url.id}>
-          <ContactEditField
+          <ContactEditUrlFieldWithEnrichment
+            key={url.id}
             control={control}
-            valueKey={`urls.${index}.url`}
-            deleteField={() => remove(index)}
-            keyboardType="url"
-            autoCapitalize="none"
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Enter a URL',
-              description:
-                'ContactEditUrls  - Placeholder for URL inside contact card',
-            })}
-            errorMessage={intl.formatMessage({
-              defaultMessage: 'Please enter a valid url',
-              description:
-                'ContactEditUrls - Error message when a url is wrongly formatted',
-            })}
-            trim
-            returnKeyType="done"
+            remove={remove}
+            index={index}
           />
           <Separation small />
         </Fragment>
@@ -70,6 +55,58 @@ const ContactEditUrls = ({
         </PressableNative>
       </View>
     </>
+  );
+};
+
+export const ContactEditUrlFieldWithEnrichment = ({
+  control,
+  index,
+  remove,
+}: {
+  control: Control<contactFormValues>;
+  index: number;
+  remove: (index: number) => void;
+}) => {
+  const intl = useIntl();
+  const value = useWatch({
+    control,
+    name: `urls.${index}.url`,
+  });
+
+  const refValue = useRef(value);
+
+  const { field: removedFromEnrichment } = useController({
+    control,
+    name: `urls.${index}.removedFromEnrichment`,
+  });
+
+  useEffect(() => {
+    if (refValue.current !== value) {
+      removedFromEnrichment.onChange(true);
+    }
+    refValue.current = value;
+  }, [value, removedFromEnrichment]);
+
+  return (
+    <ContactEditField
+      control={control}
+      valueKey={`urls.${index}.url`}
+      deleteField={() => remove(index)}
+      keyboardType="url"
+      placeholder={intl.formatMessage({
+        defaultMessage: 'Enter a URL',
+        description:
+          'ContactEditUrls  - Placeholder for URL inside contact card',
+      })}
+      autoCapitalize="none"
+      errorMessage={intl.formatMessage({
+        defaultMessage: 'Please enter a valid url',
+        description:
+          'ContactEditUrls - Error message when a url is wrongly formatted',
+      })}
+      returnKeyType="done"
+      trim
+    />
   );
 };
 

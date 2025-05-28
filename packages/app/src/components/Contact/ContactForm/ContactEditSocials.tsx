@@ -1,5 +1,5 @@
-import { Fragment } from 'react';
-import { useFieldArray } from 'react-hook-form';
+import { Fragment, useEffect, useRef } from 'react';
+import { useController, useFieldArray, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import {
@@ -22,12 +22,10 @@ const ContactEditSocials = ({
 }: {
   control: Control<contactFormValues>;
 }) => {
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: 'socials',
   });
-
-  const intl = useIntl();
 
   const styles = useStyleSheet(contactEditStyleSheet);
 
@@ -35,27 +33,10 @@ const ContactEditSocials = ({
     <>
       {fields.map((social, index) => (
         <Fragment key={social.id}>
-          <ContactEditField
+          <ContactEditSocialFieldWithEnrichment
             control={control}
-            labelKey={`socials.${index}.label`}
-            valueKey={`socials.${index}.url`}
-            labelValues={SOCIAL_NETWORK_LINKS_LABELS}
-            deleteField={() => remove(index)}
-            keyboardType="default"
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Enter a social profile',
-              description: 'Placeholder for social profile inside contact card',
-            })}
-            onChangeLabel={label => {
-              update(index, {
-                label,
-                url:
-                  SOCIAL_NETWORK_LINKS.find(
-                    socialLink => socialLink.id === label,
-                  )?.mask ?? '',
-              });
-            }}
-            returnKeyType="done"
+            remove={remove}
+            index={index}
           />
           <Separation small />
         </Fragment>
@@ -80,6 +61,71 @@ const ContactEditSocials = ({
         </PressableNative>
       </View>
     </>
+  );
+};
+
+export const ContactEditSocialFieldWithEnrichment = ({
+  control,
+  index,
+  remove,
+}: {
+  control: Control<contactFormValues>;
+  index: number;
+  remove: (index: number) => void;
+}) => {
+  const intl = useIntl();
+
+  const value = useWatch({
+    control,
+    name: `socials.${index}.url`,
+  });
+
+  const label = useWatch({
+    control,
+    name: `socials.${index}.label`,
+  });
+
+  const refValue = useRef(value);
+  const refLabel = useRef(label);
+
+  const { field: removedFromEnrichment } = useController({
+    control,
+    name: `socials.${index}.removedFromEnrichment`,
+  });
+
+  const { field: labelUrl } = useController({
+    control,
+    name: `socials.${index}.url`,
+  });
+
+  useEffect(() => {
+    if (refValue.current !== value || refLabel.current !== label) {
+      if (refLabel.current !== label) {
+        labelUrl.onChange(
+          SOCIAL_NETWORK_LINKS.find(socialLink => socialLink.id === label)
+            ?.mask ?? '',
+        );
+      }
+      removedFromEnrichment.onChange(true);
+    }
+    refValue.current = value;
+    refLabel.current = label;
+  }, [value, removedFromEnrichment, label, labelUrl]);
+
+  return (
+    <ContactEditField
+      control={control}
+      labelKey={`socials.${index}.label`}
+      valueKey={`socials.${index}.url`}
+      deleteField={() => remove(index)}
+      keyboardType="default"
+      labelValues={SOCIAL_NETWORK_LINKS_LABELS}
+      placeholder={intl.formatMessage({
+        defaultMessage: 'Enter a social profile',
+        description: 'Placeholder for social profile inside contact card',
+      })}
+      returnKeyType="done"
+    />
   );
 };
 

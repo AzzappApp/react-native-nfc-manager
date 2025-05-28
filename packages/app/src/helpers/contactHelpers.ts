@@ -24,7 +24,13 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
+import {
+  addressSchema,
+  emailSchema,
+  phoneNumberSchema,
+  socialSchema,
+  urlSchema,
+} from '#helpers/phoneNumbersHelper';
 import { sanitizeFilePath } from './fileHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import { getRelayEnvironment } from './relayEnvironment';
@@ -565,24 +571,10 @@ export const contactSchema = z
     company: z.string().nullable().optional(),
     note: z.string().nullable().optional(),
     phoneNumbers: z.array(phoneNumberSchema),
-    emails: z.array(
-      z.object({
-        label: z.string(),
-        address: z.string(),
-      }),
-    ),
-    urls: z.array(
-      z.object({
-        url: z.string(),
-      }),
-    ),
-    addresses: z.array(
-      z.object({
-        label: z.string(),
-        address: z.string(),
-      }),
-    ),
-    // @todo need to change birthday behaviour
+    emails: z.array(emailSchema),
+    urls: z.array(urlSchema),
+    addresses: z.array(addressSchema),
+    // @todo need to change birthday behavior
     birthday: z
       .object({
         birthday: z.string().nullable().optional(),
@@ -590,12 +582,7 @@ export const contactSchema = z
       .nullable()
       .optional(),
     meetingDate: z.date().optional(),
-    socials: z.array(
-      z.object({
-        url: z.string(),
-        label: z.string(),
-      }),
-    ),
+    socials: z.array(socialSchema),
     avatar: z
       .object({
         uri: z.string(),
