@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import cloneDeep from 'lodash/cloneDeep';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { useColorScheme, View } from 'react-native';
+import { Alert, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import Toast from 'react-native-toast-message';
@@ -190,6 +190,40 @@ const ContactDetailsBody = ({
   );
 
   const [isMoreVisible, showMore, hideMore] = useBoolean(false);
+  const enrichStatusToOverlayState = useCallback(
+    (data: ContactDetailsBody_contact$data) => {
+      console.log('state', data?.enrichmentStatus, data?.enrichment?.approved);
+      return data?.enrichmentStatus === 'pending' ||
+        data?.enrichmentStatus === 'running'
+        ? 'loading'
+        : ((data?.enrichmentStatus === 'completed' ||
+              data?.enrichmentStatus === 'failed') &&
+              data?.enrichment?.approved !== null) ||
+            data?.enrichmentStatus === 'canceled'
+          ? 'idle'
+          : data?.enrichment?.approved === null
+            ? 'waitingApproval'
+            : 'idle';
+    },
+    [],
+  );
+
+  const initOverlayState = useCallback((): ContactDetailEnrichState => {
+    if (router.getCurrentRoute()?.route === 'CONTACT_DETAILS') {
+      const initialOverlayRoute = (
+        router.getCurrentRoute() as ContactDetailsRoute
+      ).params.overlay;
+      if (initialOverlayRoute) {
+        return initialOverlayRoute;
+      }
+    }
+    if (!data) return 'idle';
+    return enrichStatusToOverlayState(data);
+  }, [data, enrichStatusToOverlayState, router]);
+
+  const [overlayState, setOverlayState] = useState<ContactDetailEnrichState>(
+    () => initOverlayState(),
+  );
 
   const getDefaultContactEnrichmentHiddenFields = useCallback(() => {
     return {
@@ -236,6 +270,17 @@ const ContactDetailsBody = ({
           enrichment {
             approved
           }
+        }
+      }
+    }
+  `);
+
+  const [commitStopEnrich] = useMutation(graphql`
+    mutation ContactDetailsBodyStopEnrichMutation($contactId: ID!) {
+      cancelEnrichContact(contactId: $contactId) {
+        contact {
+          id
+          enrichmentStatus
         }
       }
     }
@@ -310,6 +355,45 @@ const ContactDetailsBody = ({
       }
     }
   `);
+
+  const onStopEnrich = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Stop enrichment?',
+        description: 'ContactDetails - Stop enrichment alert title',
+      }),
+      intl.formatMessage({
+        defaultMessage: 'To enrich again, you’ll need to make a new request.',
+        description: 'ContactDetails - Stop enrichment alert message',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'ContactDetails - Stop enrichment alert cancel',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Stop',
+            description:
+              'ContactDetails - Stop enrichment alert confirm stop enrichment',
+          }),
+          onPress: () => {
+            if (overlayState === 'loading') {
+              // ensure enrichment is still ongoing before trying to stop it
+              commitStopEnrich({
+                variables: {
+                  contactId: data?.id,
+                },
+              });
+            }
+          },
+        },
+      ],
+    );
+  }, [commitStopEnrich, data?.id, intl, overlayState]);
 
   const onEnrich = useCallback(async () => {
     hideMore();
@@ -445,39 +529,6 @@ const ContactDetailsBody = ({
   }, [data?.id, hideMore, router]);
 
   const [subView, setSubView] = useState<'AI' | 'contact'>('contact');
-
-  const enrichStatusToOverlayState = useCallback(
-    (data: ContactDetailsBody_contact$data) => {
-      return data?.enrichmentStatus === 'pending' ||
-        data?.enrichmentStatus === 'running'
-        ? 'loading'
-        : (data?.enrichmentStatus === 'completed' ||
-              data?.enrichmentStatus === 'failed') &&
-            data?.enrichment?.approved !== null
-          ? 'idle'
-          : data?.enrichment?.approved === null
-            ? 'waitingApproval'
-            : 'idle';
-    },
-    [],
-  );
-
-  const initOverlayState = useCallback((): ContactDetailEnrichState => {
-    if (router.getCurrentRoute()?.route === 'CONTACT_DETAILS') {
-      const initialOverlayRoute = (
-        router.getCurrentRoute() as ContactDetailsRoute
-      ).params.overlay;
-      if (initialOverlayRoute) {
-        return initialOverlayRoute;
-      }
-    }
-    if (!data) return 'idle';
-    return enrichStatusToOverlayState(data);
-  }, [data, enrichStatusToOverlayState, router]);
-
-  const [overlayState, setOverlayState] = useState<ContactDetailEnrichState>(
-    () => initOverlayState(),
-  );
 
   useEffect(() => {
     if (data && overlayState !== 'tooltipVisible') {
@@ -629,6 +680,7 @@ const ContactDetailsBody = ({
       {ENABLE_DATA_ENRICHMENT && (
         <ContactDetailEnrichOverlay
           onEnrich={onEnrich}
+          onStopEnrich={onStopEnrich}
           state={overlayState}
           onValidateEnrichment={onValidateEnrichment}
           onRefuseEnrichment={onRefuseEnrichment}

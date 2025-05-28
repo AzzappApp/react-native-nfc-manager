@@ -1,4 +1,8 @@
-import { updateContact } from '@azzapp/data';
+import {
+  decrementNbEnrichments,
+  transaction,
+  updateContact,
+} from '@azzapp/data';
 import { enrichContact as enrichContactData } from '@azzapp/enrichment';
 import { inngest } from '../client';
 import type { Contact } from '@azzapp/data';
@@ -17,11 +21,15 @@ export const enrichContact = inngest.createFunction(
         if: 'event.data.contactId == event.data.contactId',
       },
     ],
-    onFailure: ({ event }) => {
+    onFailure: async ({ event }) => {
       const contact = event.data.event.data?.contact;
+      const userId: string = event.data.event.data?.userId;
       if (contact) {
-        return updateContact(contact.id, {
-          enrichmentStatus: 'failed',
+        await transaction(async () => {
+          await decrementNbEnrichments(userId);
+          return updateContact(contact.id, {
+            enrichmentStatus: 'failed',
+          });
         });
       }
     },
@@ -40,8 +48,11 @@ export const enrichContact = inngest.createFunction(
         enrichmentStatus: 'completed',
       });
     } catch (e) {
-      await updateContact(contact.id, {
-        enrichmentStatus: 'failed',
+      await transaction(async () => {
+        await decrementNbEnrichments(userId);
+        await updateContact(contact.id, {
+          enrichmentStatus: 'failed',
+        });
       });
       throw e;
     }

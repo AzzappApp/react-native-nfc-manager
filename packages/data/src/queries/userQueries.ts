@@ -536,3 +536,9 @@ export const incrementNbEnrichments = (userId: string) =>
     .update(UserTable)
     .set({ nbEnrichments: sql`${UserTable.nbEnrichments} + 1` })
     .where(eq(UserTable.id, userId));
+
+export const decrementNbEnrichments = (userId: string) =>
+  db()
+    .update(UserTable)
+    .set({ nbEnrichments: sql`${UserTable.nbEnrichments} - 1` })
+    .where(eq(UserTable.id, userId));

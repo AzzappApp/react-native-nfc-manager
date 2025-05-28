@@ -37,12 +37,14 @@ const ENRICH_TOOLTIP = 'enrichTooltip';
 
 export const ContactDetailEnrichOverlay = ({
   onEnrich,
+  onStopEnrich,
   state,
   onValidateEnrichment,
   onRefuseEnrichment,
   currentUserKey,
 }: {
   onEnrich: () => void;
+  onStopEnrich: () => void;
   state: ContactDetailEnrichState;
   onValidateEnrichment: () => void;
   onRefuseEnrichment: () => void;
@@ -131,6 +133,18 @@ export const ContactDetailEnrichOverlay = ({
               height: width * 2,
             }}
           />
+          <PressableOpacity
+            style={styles.stopEnrichContainer}
+            onPress={onStopEnrich}
+          >
+            <Text variant="small" style={styles.stopEnrichText}>
+              {intl.formatMessage({
+                defaultMessage: 'Stop enrichment',
+                description: 'ContactDetail enrich overlay - Stop enrichment',
+              })}
+            </Text>
+          </PressableOpacity>
+
           <View
             style={{
               alignSelf: 'center',
@@ -422,4 +436,17 @@ const styleSheet = createStyleSheet(appearance => ({
     alignSelf: 'center',
   },
   enrichmentCounterBigNumber: { bottom: 4, color: colors.tropicalAquaTone },
+  stopEnrichContainer: {
+    position: 'absolute',
+    flex: 1,
+    top: 100,
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  stopEnrichText: {
+    color: colors.white,
+    textAlign: 'right',
+    textDecorationLine: 'underline',
+    opacity: 0.3,
+  },
 }));

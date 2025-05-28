@@ -3,7 +3,6 @@ import isEqual from 'lodash/isEqual';
 import {
   transaction,
   saveContactEnrichment,
-  incrementNbEnrichments,
   updateContactEnrichment,
   referencesMedias,
   type Contact,
@@ -271,7 +270,6 @@ export const enrichContact = async (
                 publicProfile: enriched.profile,
                 trace,
               });
-              await incrementNbEnrichments(userId);
             } else {
               await updateContactEnrichment(enrichmentId, {
                 fields: enriched.contact,

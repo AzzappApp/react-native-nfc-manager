@@ -19,6 +19,7 @@ import {
   getProfileById,
   updateContactEnrichment,
   getProfileByContactEnrichmentId,
+  incrementNbEnrichments,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
@@ -421,6 +422,7 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
   await updateContact(contactId, {
     enrichmentStatus: 'pending',
   });
+  await incrementNbEnrichments(user.id);
 
   enrichContact(user.id, existingContact);
 
@@ -455,7 +457,7 @@ export const cancelEnrichContact: MutationResolvers['cancelEnrichContact'] =
     });
 
     return {
-      contact: existingContact,
+      contact: { ...existingContact, enrichmentStatus: 'canceled' },
     };
   };
 
