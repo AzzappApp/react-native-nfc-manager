@@ -1,3 +1,8 @@
+## 2.0.0-canary.43
+
+* **fix:**  - **Contact:** fetch necessary field when adding contact ([#9035](https://github.com/AzzappApp/azzapp/pull/9035))
+* **fix:**  - **Contact:** Contact by name.-transform SectionList in flashlist ([#9050](https://github.com/AzzappApp/azzapp/pull/9050))
+
 ## 2.0.0-canary.42
 
 * **fix:**  - remove mediaScreen header ([#9045](https://github.com/AzzappApp/azzapp/pull/9045))
