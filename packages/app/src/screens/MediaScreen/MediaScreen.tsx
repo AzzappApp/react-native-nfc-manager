@@ -270,14 +270,7 @@ const MediaScreen = ({
 
   return (
     <Container style={styles.flex}>
-      <AccountHeader
-        webCard={profile?.webCard}
-        title={intl.formatMessage({
-          defaultMessage: 'About',
-          description: 'Title of the about screen',
-        })}
-        leftIcon="close"
-      />
+      <AccountHeader webCard={profile?.webCard} leftIcon="close" />
       <Animated.View style={[fixedHeaderStyle, styles.fixedHeaderStyle]}>
         <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
       </Animated.View>
