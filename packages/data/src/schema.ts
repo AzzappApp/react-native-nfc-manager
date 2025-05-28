@@ -1003,7 +1003,7 @@ export const ContactTable = cols.table(
   table => {
     return {
       profilesKey: cols
-        .uniqueIndex('Contact_profiles_key')
+        .index('Contact_profiles_key')
         .on(table.ownerProfileId, table.contactProfileId),
     };
   },

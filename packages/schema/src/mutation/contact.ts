@@ -68,13 +68,6 @@ export const createContact: MutationResolvers['createContact'] = async (
   }
   const webCard = await webCardLoader.load(profile.webCardId);
 
-  const existingContact = input.contactProfileId
-    ? await getContactByProfiles({
-        owner: profileId,
-        contact: input.contactProfileId,
-      })
-    : null;
-
   const data = [input.avatarId, input.logoId].filter(isDefined);
   if (data.length) {
     await checkMedias(data);
@@ -102,21 +95,9 @@ export const createContact: MutationResolvers['createContact'] = async (
     deletedAt: null,
   };
 
-  let contact: Contact;
+  const id = await createNewContact(contactToCreate);
 
-  if (existingContact) {
-    await updateContact(existingContact.id, contactToCreate);
-
-    contact = {
-      ...existingContact,
-      ...contactToCreate,
-    };
-  } else {
-    const id = await createNewContact(contactToCreate);
-
-    contact = await getContactById(id);
-  }
-
+  const contact = await getContactById(id);
   if (scanUsed) {
     await validateCurrentSubscription(
       user.id,
