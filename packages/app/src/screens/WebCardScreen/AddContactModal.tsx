@@ -100,7 +100,7 @@ const AddContactModal = ({
     webCardKey,
   );
 
-  const [commit, saving] = useMutation<AddContactModalMutation>(graphql`
+  const [commit] = useMutation<AddContactModalMutation>(graphql`
     mutation AddContactModalMutation(
       $profileId: ID!
       $contact: ContactInput!
@@ -269,8 +269,10 @@ const AddContactModal = ({
     }
   }, [contactKey, onRequestAddContactToPhonebook]);
 
+  const [saving, setSaving] = useState(false);
   const onAddContactToProfile = useCallback(async () => {
     if (!scanned || !viewer) return;
+    setSaving(true);
     const contact = await getContactInput();
     if (!contact) return;
     commit({
@@ -303,6 +305,7 @@ const AddContactModal = ({
           }),
         });
         setContactKey(data.createContact?.contact);
+        setSaving(false);
       },
       onError: e => {
         console.warn('error adding contact', e);
@@ -315,6 +318,7 @@ const AddContactModal = ({
               'Toast message when a contact failed to be created successfully',
           }),
         });
+        setSaving(false);
       },
     });
   }, [scanned, viewer, getContactInput, commit, withShareBack, close, intl]);
