@@ -177,7 +177,8 @@ export const ContactDetailAvatar = ({
       {isAiAvatar && (
         <IconButton
           icon="close"
-          size={24}
+          size={20}
+          iconSize={14}
           onPress={onRemoveField}
           style={styles.closeIcon}
         />
