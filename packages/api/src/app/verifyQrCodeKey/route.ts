@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createId } from '@azzapp/data';
 import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
-import { buildAvatarUrl } from '@azzapp/service/mediaServices';
+import { buildAvatarUrl, buildLogoUrl } from '@azzapp/service/mediaServices';
 import { displayName } from '@azzapp/shared/contactCardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { deserializeGeolocation } from '@azzapp/shared/urlHelpers';
@@ -64,6 +64,7 @@ const verifyQrCodeKeyApi = async (req: Request) => {
 
     if (profile) {
       const avatarUrl = await buildAvatarUrl(profile, webCard);
+      const logoUrl = await buildLogoUrl(profile, webCard);
 
       // the payload has been copied from verifySign - don’t understand why we have all these fields (seems there is duplication with the response) - to be analyzed
       const token = await new SignJWT({
@@ -87,6 +88,7 @@ const verifyQrCodeKeyApi = async (req: Request) => {
       return NextResponse.json(
         {
           avatarUrl,
+          logoUrl,
           profileId: profile.id,
           contactCard: mergeContactCardWithCommonInfos(
             webCard,

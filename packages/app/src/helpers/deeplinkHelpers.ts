@@ -195,6 +195,7 @@ export const matchUrlWithRoute = async (
             userName,
             contactCard: res.contactCard,
             avatarUrl: res.avatarUrl,
+            logoUrl: res.logoUrl,
             contactProfileId: res.profileId,
             geolocation: builtGeolocation,
           },

@@ -35,7 +35,10 @@ import {
 } from '#helpers/contactHelpers';
 import { createHash } from '#helpers/cryptoHelpers';
 import { isFileURL } from '#helpers/fileHelpers';
-import { prepareAvatarForUpload } from '#helpers/imageHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
 import { uploadMedia } from '#helpers/MobileWebAPI';
 import useBoolean from '#hooks/useBoolean';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -73,6 +76,7 @@ const AddContactModal = ({
     geolocation,
     contactCard,
     avatarUrl,
+    logoUrl,
     contactProfileId,
   },
   webCard: webCardKey,
@@ -141,19 +145,30 @@ const AddContactModal = ({
   > => {
     if (!scanned || !viewer) return;
 
-    let uploadedAvatarId: string | undefined;
+    const uploads = [];
+
     if (isFileURL(scanned.avatar?.uri) && scanned.avatar?.uri) {
       const { file, uploadURL, uploadParameters } =
-        await prepareAvatarForUpload(scanned.avatar?.uri);
+        await prepareAvatarForUpload(scanned.avatar.uri);
 
-      uploadedAvatarId = await uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      ).promise.then(({ public_id }) => {
-        return public_id;
-      });
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
     }
+
+    if (isFileURL(scanned.logo?.uri) && scanned.logo?.uri) {
+      const { file, uploadURL, uploadParameters } = await prepareLogoForUpload(
+        scanned.logo.uri,
+      );
+
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
+    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+      uploads.map(p => p?.promise.then(r => r.public_id)),
+    );
 
     const addresses = scanned.addresses;
     const emails = scanned.emails;
@@ -190,6 +205,7 @@ const AddContactModal = ({
         url: social.url,
       })),
       avatarId: uploadedAvatarId,
+      logoId: uploadedLogoId,
       location: geolocation?.location,
       meetingPlace: geolocation?.address,
     };
@@ -346,6 +362,7 @@ const AddContactModal = ({
             contactCard,
             contactProfileId ?? '',
             avatarUrl,
+            logoUrl,
             webCard.userName,
           );
 
@@ -363,6 +380,7 @@ const AddContactModal = ({
     contactCard,
     avatarUrl,
     contactProfileId,
+    logoUrl,
   ]);
 
   const userName = useMemo(() => {
@@ -450,20 +468,20 @@ const AddContactModal = ({
 
 export default AddContactModal;
 
-const downloadAvatar = async (avatarUrl?: string) => {
+const downloadImage = async (url?: string) => {
   let image: Image | undefined = undefined;
-  if (avatarUrl) {
+  if (url) {
     try {
-      const hash = createHash(avatarUrl);
-      const avatar = new File(Paths.cache.uri + hash);
-      if (!avatar.exists) {
-        await File.downloadFileAsync(avatarUrl, avatar);
+      const hash = createHash(url);
+      const file = new File(Paths.cache.uri + hash);
+      if (!file.exists) {
+        await File.downloadFileAsync(url, file);
       }
 
       image = {
         width: 720,
         height: 720,
-        uri: avatar.uri,
+        uri: file.uri,
       };
     } catch (e) {
       console.warn('error downloading avatar', e);
@@ -478,9 +496,13 @@ const buildContactFromContactCard = async (
   contactCard: ContactCard,
   profileId: string,
   avatarUrl?: string,
+  logoUrl?: string,
   userName?: string,
 ) => {
-  const image = await downloadAvatar(avatarUrl);
+  const [avatar, logo] = await Promise.all([
+    downloadImage(avatarUrl),
+    downloadImage(logoUrl),
+  ]);
 
   const contact: ContactType = {
     firstName: contactCard.firstName ?? '',
@@ -527,7 +549,10 @@ const buildContactFromContactCard = async (
       })) ?? [],
     ),
     avatar: {
-      uri: image?.uri,
+      uri: avatar?.uri,
+    },
+    logo: {
+      uri: logo?.uri,
     },
     profileId,
     meetingDate: new Date(),
@@ -582,7 +607,7 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  const image = await downloadAvatar(additionalContactData?.avatarUrl);
+  const image = await downloadImage(additionalContactData?.avatarUrl);
 
   const contact: ContactType = {
     id: profileId,

@@ -89,17 +89,16 @@ export type WebCardRoute = {
   params: {
     contactCard?: ContactCard | null;
     avatarUrl?: string;
+    logoUrl?: string;
     contactProfileId?: string;
     contactData?: string | null;
-    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
-      avatarUrl?: string;
-    };
   } & {
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
       avatarUrl?: string;
+      logoUrl?: string | null;
     };
     geolocation?: Geolocation | null;
     fromCreation?: boolean;

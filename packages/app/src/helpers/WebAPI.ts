@@ -334,6 +334,7 @@ export const verifyQrCodeKey: APIMethod<
   {
     contactCard: ContactCard;
     avatarUrl?: string;
+    logoUrl?: string;
     profileId: string;
   }
 > = async (params, init) =>
