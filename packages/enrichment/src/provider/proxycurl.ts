@@ -78,13 +78,16 @@ export const proxyCurlLookup: ApiResolver = {
 };
 
 const buildDataFromResponse = async (
-  profile: PersonProfileResponse,
+  profile: PersonProfileResponse | undefined,
   mediaPromises: Array<Promise<string | null>>,
   linkedinProfileUrl?: string | null,
 ) => {
+  if (!profile) {
+    return {};
+  }
   const logos = new Set(
     (profile.experiences?.map(exp => exp.logo_url) ?? [])
-      .concat(profile?.education?.map(edu => edu.logo_url) ?? [])
+      .concat(profile.education?.map(edu => edu.logo_url) ?? [])
       .filter(isDefined),
   );
 
@@ -96,7 +99,7 @@ const buildDataFromResponse = async (
     mediaPromises.push(res.promise);
   });
 
-  const avatar = profile?.profile_pic_url
+  const avatar = profile.profile_pic_url
     ? uploadMediaFromUrl(profile.profile_pic_url)
     : null;
   let avatarId;
@@ -279,7 +282,7 @@ export const proxyCurlProfile: ApiResolver = {
       const json: PersonProfileResponse = await response.json();
       const mediaPromises: Array<Promise<string>> = [];
       return {
-        data: json ? await buildDataFromResponse(json, mediaPromises) : {},
+        data: await buildDataFromResponse(json, mediaPromises),
         mediaPromises,
       };
     } else {
