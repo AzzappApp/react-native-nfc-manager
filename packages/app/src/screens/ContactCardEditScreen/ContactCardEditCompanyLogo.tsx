@@ -170,11 +170,8 @@ const ContactCardEditCompanyLogo = ({
       </>
     );
   }
-  const fixedLogo = defaultLogo.current?.id
-    ? defaultLogo.current
-    : pickerImage?.id
-      ? pickerImage
-      : undefined;
+  const fixedLogo = defaultLogo.current;
+
   return (
     <Controller
       control={control}
@@ -234,9 +231,25 @@ const ContactCardEditCompanyLogo = ({
                   />
                 </Text>
               </Pressable>
+              {pickerImage && pickerImage.id !== fixedLogo?.id && (
+                <LogoComponentItem
+                  testID="companylogo_picker_logo_manual"
+                  item={
+                    pickerImage
+                      ? {
+                          ...pickerImage,
+                          score: 100,
+                        }
+                      : null
+                  }
+                  selected={value?.id && value?.id === pickerImage.id}
+                  onSelect={onSelectFetchedLogo}
+                  width={pickerImage.width}
+                  height={pickerImage.height}
+                />
+              )}
               {fixedLogo?.id && (
                 <LogoComponentItem
-                  key={fixedLogo.uri}
                   testID="companylogo_picker_logo_manual"
                   item={
                     fixedLogo
