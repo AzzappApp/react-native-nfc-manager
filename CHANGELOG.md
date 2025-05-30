@@ -1,3 +1,7 @@
+## 2.0.0-canary.55
+
+* **fix:**  - **contact:** [#9061](https://github.com/AzzappApp/azzapp/pull/9061) only count sharebacks ([#9097](https://github.com/AzzappApp/azzapp/pull/9097))
+
 ## 2.0.0-canary.54
 
 * **fix:**  - **contacts:** [#9063](https://github.com/AzzappApp/azzapp/pull/9063) remove deleted contacts ([#9075](https://github.com/AzzappApp/azzapp/pull/9075))
