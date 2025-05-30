@@ -443,6 +443,16 @@ const ContactDetailsBody = ({
 
   const backgroundWidth = screenWidth + BLUR_GAP * 2;
   const backgroundImageUrl = useMemo(() => {
+    if (data?.logo) {
+      if (data?.logo?.id) {
+        const localFile = getLocalCachedMediaFile(data?.logo.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      return data.logo.uri;
+    }
+
     if (!hiddenFields.contact.avatarId && data?.enrichment?.fields?.avatar) {
       if (data?.enrichment?.fields?.avatar.id) {
         const localFile = getLocalCachedMediaFile(
@@ -455,15 +465,7 @@ const ContactDetailsBody = ({
       }
       return data?.enrichment?.fields?.avatar.uri;
     }
-    if (data?.logo) {
-      if (data?.logo?.id) {
-        const localFile = getLocalCachedMediaFile(data?.logo.id, 'image');
-        if (localFile) {
-          return localFile;
-        }
-      }
-      return data.logo.uri;
-    }
+
     if (data?.avatar) {
       if (data?.avatar?.id) {
         const localFile = getLocalCachedMediaFile(data.avatar.id, 'image');
