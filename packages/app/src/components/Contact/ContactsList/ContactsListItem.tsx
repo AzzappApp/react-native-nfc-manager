@@ -127,7 +127,7 @@ const ContactsListItem = ({
           }
           overlayEnrichmentApprovementNeeded={
             contact.enrichmentStatus === 'completed' &&
-            !contact.enrichment?.approved
+            contact.enrichment?.approved === null
           }
           small
           scale={0.4375}

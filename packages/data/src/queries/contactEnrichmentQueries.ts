@@ -63,12 +63,14 @@ export const getContactEnrichmentsByContactIds = async (
         ),
       ),
     )
-    .orderBy(desc(ContactEnrichmentTable.enrichedAt))
-    .limit(1);
+    .orderBy(desc(ContactEnrichmentTable.enrichedAt));
 
   const enrichmentsByContactId: Record<string, ContactEnrichment> = {};
   enrichments.forEach(enrichment => {
-    enrichmentsByContactId[enrichment.contactId] = enrichment;
+    if (!enrichmentsByContactId[enrichment.contactId]) {
+      // first enrichment was the most recent one
+      enrichmentsByContactId[enrichment.contactId] = enrichment;
+    }
   });
   return contactIds.map(contactId => enrichmentsByContactId[contactId] ?? null);
 };
