@@ -1,3 +1,16 @@
+## 2.0.0-canary.51
+
+* **fix:**  - disable share contact and add to phone during enrichment ([#9111](https://github.com/AzzappApp/azzapp/pull/9111))
+* **fix:**  - **contact:** [#9099](https://github.com/AzzappApp/azzapp/pull/9099) priorize logo in background ([#9110](https://github.com/AzzappApp/azzapp/pull/9110))
+* **fix:**  - **contact:** [#9103](https://github.com/AzzappApp/azzapp/pull/9103) display picked image ([#9109](https://github.com/AzzappApp/azzapp/pull/9109))
+* **fix:**  - remove unexpected shadow on avatar overlay ([#9113](https://github.com/AzzappApp/azzapp/pull/9113))
+* **fix:**  - **contact:** [#9105](https://github.com/AzzappApp/azzapp/pull/9105) birthday not editable ([#9108](https://github.com/AzzappApp/azzapp/pull/9108))
+* **fix:**  - **home:** [#9101](https://github.com/AzzappApp/azzapp/pull/9101) display toast when not allowed to see multi user screen ([#9107](https://github.com/AzzappApp/azzapp/pull/9107))
+* **fix:**  - **contactCard:** [#9062](https://github.com/AzzappApp/azzapp/pull/9062) contact card views are not counted ([#9104](https://github.com/AzzappApp/azzapp/pull/9104))
+* **fix:**  - **multiUser:** [#8573](https://github.com/AzzappApp/azzapp/pull/8573) too many searches triggered ([#9100](https://github.com/AzzappApp/azzapp/pull/9100))
+* **fix:**  - **emailSignature:** [#9041](https://github.com/AzzappApp/azzapp/pull/9041) put back link as black ([#9098](https://github.com/AzzappApp/azzapp/pull/9098))
+* **fix:**  - **shareBack:** [#9088](https://github.com/AzzappApp/azzapp/pull/9088) add missing avatar and logo ([#9096](https://github.com/AzzappApp/azzapp/pull/9096))
+
 ## 2.0.0-canary.50
 
 
