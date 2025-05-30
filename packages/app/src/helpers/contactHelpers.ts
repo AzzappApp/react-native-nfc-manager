@@ -1062,14 +1062,7 @@ export const removeContactUpdater = (
           ?.getLinkedRecords('contacts')
           ?.filter(contact => contact.getDataID() !== contactID) ?? [];
 
-      if (dateEdgeNode && dateEdgeContacts.length === 0) {
-        ConnectionHandler.deleteNode(
-          userByDatesConnection,
-          dateEdgeNode.getDataID(),
-        );
-      } else {
-        dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
-      }
+      dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
     }
   });
 
@@ -1104,14 +1097,7 @@ export const removeContactUpdater = (
           ?.getLinkedRecords('contacts')
           ?.filter(contact => contact.getDataID() !== contactID) ?? [];
 
-      if (locationEdgeNode && locationEdgeContacts.length === 0) {
-        ConnectionHandler.deleteNode(
-          userByLocationsConnection,
-          locationEdgeNode.getDataID(),
-        );
-      } else {
-        locationEdgeNode?.setLinkedRecords(locationEdgeContacts, 'contacts');
-      }
+      locationEdgeNode?.setLinkedRecords(locationEdgeContacts, 'contacts');
     }
   });
 };

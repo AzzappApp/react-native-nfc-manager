@@ -197,7 +197,6 @@ const ContactEditScreen = ({
         ...ContactsHorizontalList_contacts
         ...ContactDetailsBody_contact
         ...ContactsListItem_contact
-        birthday
       }
     }
   `);
