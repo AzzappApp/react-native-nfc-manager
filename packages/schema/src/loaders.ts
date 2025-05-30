@@ -10,7 +10,6 @@ import {
   getContactsByUser,
   getUserSubscriptions,
   getContactCountPerOwner,
-  getNbNewContactsForUser,
   getProfilesByUserAndWebCards,
   getContactEnrichmentByContactId,
   getContactEnrichmentsByContactIds,
@@ -296,17 +295,5 @@ export const contactCountForProfileLoader = createSessionDataLoader(
     return keys.map(
       k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
     );
-  },
-);
-
-export const newContactsCountForUserLoader = createSessionDataLoader(
-  'newContactsCountForProfileLoader',
-  async (keys: readonly string[]) => {
-    if (keys.length === 0) {
-      return [];
-    }
-
-    const count = await getNbNewContactsForUser(keys[0]);
-    return [count];
   },
 );

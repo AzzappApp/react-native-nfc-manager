@@ -576,6 +576,7 @@ export const getNbNewContactsForUser = async (
     .where(
       and(
         eq(UserTable.id, userId),
+        eq(ContactTable.type, 'shareback'),
         eq(ContactTable.deleted, false),
         gt(ContactTable.createdAt, UserTable.lastContactViewAt), // Compare createdAt with user's last view date
       ),

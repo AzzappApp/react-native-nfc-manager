@@ -11,6 +11,7 @@ import {
   getUserContactsGroupedByDate,
   getUserContactsCount,
   getUserContactsGroupedByLocation,
+  getNbNewContactsForUser,
 } from '@azzapp/data';
 import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
@@ -20,7 +21,6 @@ import {
   profileLoader,
   webCardLoader,
   webCardOwnerLoader,
-  newContactsCountForUserLoader,
 } from '#loaders';
 import {
   cursorToDate,
@@ -105,7 +105,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     return subscriptions[0] ?? null;
   },
   nbNewContacts: async user => {
-    return newContactsCountForUserLoader.load(user.id);
+    return getNbNewContactsForUser(user.id);
   },
   isPremium: async user => {
     if (!isSameUser(user)) {
