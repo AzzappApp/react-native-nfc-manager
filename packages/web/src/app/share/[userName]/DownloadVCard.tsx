@@ -98,14 +98,21 @@ const DownloadVCard = ({
   ]);
 
   useEffect(() => {
-    if (!loading.current && contactCard) {
-      loading.current = true;
-      processVCard()
-        .catch(() => void 0)
-        .finally(() => {
-          loading.current = false;
-        });
-    }
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        if (!loading.current && contactCard) {
+          loading.current = true;
+          processVCard()
+            .catch(() => void 0)
+            .finally(() => {
+              loading.current = false;
+            });
+        }
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, [contactCard, processVCard]);
 
   const handleClose = useCallback(() => {
