@@ -127,7 +127,7 @@ const renderFullEmailSignature = ({
             line-height: 14px;
             font-weight: 500;
             text-align: center;
-            color: ${titleColor};
+            color: black;
             text-align: left;
             text-decoration: none;
             text-decoration: unset;"
