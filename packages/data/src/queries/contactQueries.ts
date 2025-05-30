@@ -244,7 +244,11 @@ export const getUserContactsCount = async (userId: string): Promise<number> => {
     .from(ContactTable)
     .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
     .where(
-      and(eq(ProfileTable.userId, userId), eq(ContactTable.deleted, false)),
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.deleted, false),
+        eq(ContactTable.deleted, false),
+      ),
     )
     .then(rows => rows[0].count);
   return res;
@@ -323,6 +327,7 @@ export const getUserContacts = async (
     .where(
       and(
         eq(ProfileTable.userId, userId),
+        eq(ProfileTable.deleted, false),
         eq(ContactTable.deleted, false),
         afterClause,
         search
@@ -425,6 +430,7 @@ export const getUserContactsGroupedByDate = async (
 }> => {
   const whereConditions = [
     eq(ProfileTable.userId, userId),
+    eq(ProfileTable.deleted, false),
     eq(ContactTable.deleted, false),
     search
       ? or(
@@ -536,6 +542,7 @@ export const getUserContactsGroupedByLocation = async (
 
   const whereConditions = [
     eq(ProfileTable.userId, userId),
+    eq(ProfileTable.deleted, false),
     eq(ContactTable.deleted, false),
     search
       ? or(
@@ -629,6 +636,7 @@ export const searchProfileContactByLocation = async (
 }> => {
   const whereConditions = [
     eq(ContactTable.ownerProfileId, ownerProfileId),
+    eq(ProfileTable.deleted, false),
     eq(ContactTable.deleted, false),
     search
       ? or(
@@ -645,6 +653,7 @@ export const searchProfileContactByLocation = async (
         date: sql<string>`DATE(meetingDate)`.as('date'),
       })
       .from(ContactTable)
+      .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
       .where(
         and(
           ...whereConditions,
@@ -719,6 +728,7 @@ export const searchContactsByWebcardId = async ({
       .where(
         and(
           eq(WebCardTable.id, webcardId),
+          eq(ProfileTable.deleted, false),
           (ownerProfileId && eq(ContactTable.ownerProfileId, ownerProfileId)) ||
             undefined,
           (!withDeleted && eq(ContactTable.deleted, false)) || undefined,
@@ -739,6 +749,7 @@ export const searchContactsByWebcardId = async ({
       .where(
         and(
           eq(WebCardTable.id, webcardId),
+          eq(ProfileTable.deleted, false),
           (ownerProfileId && eq(ContactTable.ownerProfileId, ownerProfileId)) ||
             undefined,
           (!withDeleted && eq(ContactTable.deleted, false)) || undefined,
