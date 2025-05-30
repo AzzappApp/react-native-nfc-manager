@@ -172,7 +172,7 @@ const HomeProfilesCarousel = (
       const newIndex = selectedIndex - 1 > 0 ? selectedIndex - 1 : 0;
       const profile = profiles?.[newIndex];
 
-      carouselRef.current?.scrollToIndex(newIndex, true);
+      carouselRef.current?.scrollToIndex(newIndex + 1, true);
       if (profile) {
         onChangeWebCard({
           profileId: profile.id,
