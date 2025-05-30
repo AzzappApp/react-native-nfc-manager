@@ -597,6 +597,7 @@ const ContactCreateScreen = ({
             icon="close"
             onPress={router.back}
             style={styles.leftArrowIcon}
+            disabled={showProfilesSelector}
           />
         }
         rightElement={
@@ -610,7 +611,7 @@ const ContactCreateScreen = ({
             onPress={submit}
             variant="primary"
             style={styles.headerButton}
-            disabled={!isValid}
+            disabled={!isValid || showProfilesSelector}
           />
         }
       />
