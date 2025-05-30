@@ -1,3 +1,7 @@
+## 2.0.0-canary.50
+
+
+
 ## 2.0.0-canary.49
 
 * **fix:**  - fix connection management when only 1 contact is in the list ([#9095](https://github.com/AzzappApp/azzapp/pull/9095))
