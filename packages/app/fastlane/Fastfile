@@ -318,7 +318,7 @@ platform :ios do
     ###########################
     # SENTRY SOURCEMAP UPLOAD
     ###########################
-    release_name = "#{app_ident}@#{version_number}"
+    release_name = "#{version_number}"
 
     # Upload vers Sentry via le plugin officiel
     sentry_upload_sourcemap(
