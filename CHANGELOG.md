@@ -1,3 +1,9 @@
+## 2.0.0-canary.48
+
+* **fix:**  - enrichment incoherent status ([#9093](https://github.com/AzzappApp/azzapp/pull/9093))
+* **feat:**  - **contact:** [#9079](https://github.com/AzzappApp/azzapp/pull/9079) disable header buttons ([#9092](https://github.com/AzzappApp/azzapp/pull/9092))
+* **fix:**  - **shareBack:** [#9085](https://github.com/AzzappApp/azzapp/pull/9085) all fields are optional ([#9090](https://github.com/AzzappApp/azzapp/pull/9090))
+
 ## 2.0.0-canary.47
 
 * **fix:**  - update for missing horizontal padding management ([#9082](https://github.com/AzzappApp/azzapp/pull/9082))
