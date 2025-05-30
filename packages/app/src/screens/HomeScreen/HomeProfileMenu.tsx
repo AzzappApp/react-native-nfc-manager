@@ -4,19 +4,51 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { graphql, useFragment } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
+import type { HomeProfileMenu_profile$key } from '#relayArtifacts/HomeProfileMenu_profile.graphql';
 import type { ReactNode } from 'react';
 
-const HomeProfileMenu = () => {
+const HomeProfileMenu = ({
+  profile: profileKey,
+}: {
+  profile: HomeProfileMenu_profile$key | null;
+}) => {
+  const profile = useFragment(
+    graphql`
+      fragment HomeProfileMenu_profile on Profile {
+        id
+        invited
+        profileRole
+      }
+    `,
+    profileKey ?? null,
+  );
+
   const router = useRouter();
   const intl = useIntl();
+
   const onMultiUserPress = useCallback(() => {
-    router.push({ route: 'MULTI_USER' });
-  }, [router]);
+    if (profileInfoHasAdminRight(profile)) {
+      router.push({
+        route: 'MULTI_USER',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description:
+            'Error message when trying to create a cover without the right permissions',
+        }),
+      });
+    }
+  }, [profile, router, intl]);
 
   const onAnalyticsPress = useCallback(() => {
     router.push({ route: 'ANALYTICS' });

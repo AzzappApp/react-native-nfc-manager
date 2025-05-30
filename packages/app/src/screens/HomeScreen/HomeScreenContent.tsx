@@ -63,6 +63,7 @@ const HomeScreenContent = ({
               primary
             }
           }
+          ...HomeProfileMenu_profile
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
         }
@@ -225,7 +226,7 @@ const HomeScreenContent = ({
         <View style={styles.viewCarrousel}>
           <HomeProfilesCarousel ref={selectListRef} user={user} />
         </View>
-        <HomeProfileMenu />
+        <HomeProfileMenu profile={currentProfile ?? null} />
         <HomeBottomPanel user={user} />
         <HomeBottomBar user={user} />
       </View>
