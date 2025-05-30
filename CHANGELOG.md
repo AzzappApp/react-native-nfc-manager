@@ -1,3 +1,8 @@
+## 2.0.0-canary.53
+
+* **fix:**  - add safety check on proxyCurl data ([#9119](https://github.com/AzzappApp/azzapp/pull/9119))
+* **feat:**  - add tooltip of profile button after enrichement ([#9118](https://github.com/AzzappApp/azzapp/pull/9118))
+
 ## 2.0.0-canary.52
 
 * **fix:**  - **contactCard:** [#9018](https://github.com/AzzappApp/azzapp/pull/9018) force reprocessing contactCard when page is shown ([#9117](https://github.com/AzzappApp/azzapp/pull/9117))
