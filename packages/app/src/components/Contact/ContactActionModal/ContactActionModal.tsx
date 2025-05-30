@@ -41,6 +41,10 @@ const ContactActionModal = ({
     graphql`
       fragment ContactActionModal_contact on Contact {
         id
+        enrichment {
+          approved
+        }
+        enrichmentStatus
         contactProfile {
           webCard {
             userName
@@ -92,6 +96,12 @@ const ContactActionModal = ({
               onShare(contact);
               close();
             },
+            disabled:
+              !contact ||
+              contact.enrichmentStatus === 'running' ||
+              contact.enrichmentStatus === 'pending' ||
+              (contact.enrichmentStatus === 'completed' &&
+                contact.enrichment?.approved === null),
           }
         : undefined,
       isSingleContact
@@ -121,6 +131,12 @@ const ContactActionModal = ({
             close();
           }
         },
+        disabled:
+          !contact ||
+          contact.enrichmentStatus === 'running' ||
+          contact.enrichmentStatus === 'pending' ||
+          (contact.enrichmentStatus === 'completed' &&
+            contact.enrichment?.approved === null),
       },
     ].filter(isDefined);
   }, [

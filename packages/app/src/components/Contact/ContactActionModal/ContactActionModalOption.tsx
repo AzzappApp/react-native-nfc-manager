@@ -9,15 +9,21 @@ export type ContactActionModalOptionProps = {
   icon: Icons;
   text: ReactNode;
   onPress: () => void;
+  disabled?: boolean;
 };
 
 const ContactActionModalOption = ({
   icon,
   text,
   onPress,
+  disabled,
 }: ContactActionModalOptionProps) => {
   const inner = (
-    <PressableNative style={styles.bottomSheetOptionButton} onPress={onPress}>
+    <PressableNative
+      style={styles.bottomSheetOptionButton}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <View style={styles.bottomSheetOptionContainer}>
         <View style={styles.bottomSheetOptionIconLabel}>
           <Icon icon={icon} />
