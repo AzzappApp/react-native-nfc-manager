@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useDebounce } from 'use-debounce';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
@@ -43,6 +44,8 @@ const MultiUserAddList = ({
 }: MultiUserAddListProps) => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
 
+  const [debouncedSearchValue] = useDebounce(searchValue, 300);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const pageOffset = useRef(0);
@@ -59,14 +62,13 @@ const MultiUserAddList = ({
 
   const loadContacts = useCallback(async () => {
     if (loadNextPage.current || !hasNextPage.current) return;
-
+    loadNextPage.current = true;
     const { status } =
       contactPermission !== 'granted'
         ? await requestPhonebookPermissionAndRedirectToSettingsAsync()
         : { status: ContactPermissionStatus.GRANTED };
 
     if (status === ContactPermissionStatus.GRANTED) {
-      loadNextPage.current = true;
       setIsLoading(true);
       const { data, hasNextPage: hasNextPageValue } = await getContactsAsync({
         pageSize: PAGE_SIZE,
@@ -97,6 +99,8 @@ const MultiUserAddList = ({
       hasNextPage.current = hasNextPageValue;
       setIsLoading(false);
       loadNextPage.current = false;
+    } else {
+      loadNextPage.current = false;
     }
   }, [contactPermission, requestPhonebookPermissionAndRedirectToSettingsAsync]);
 
@@ -105,8 +109,8 @@ const MultiUserAddList = ({
   }, [loadContacts]);
 
   const contactData = useMemo(() => {
-    if (isNotFalsyString(searchValue)) {
-      const searchLower = searchValue!.toLowerCase();
+    if (isNotFalsyString(debouncedSearchValue)) {
+      const searchLower = debouncedSearchValue!.toLowerCase();
       return contacts.filter(contact => {
         return (
           (contact.name && contact.name.toLowerCase().includes(searchLower)) ||
@@ -129,16 +133,16 @@ const MultiUserAddList = ({
       });
     }
     return contacts;
-  }, [contacts, searchValue]);
+  }, [contacts, debouncedSearchValue]);
 
   useEffect(() => {
     if (
-      isNotFalsyString(searchValue) &&
+      isNotFalsyString(debouncedSearchValue) &&
       contactData.length < MIN_SEARCH_RESULTS
     ) {
       loadContacts();
     }
-  }, [contactData, loadContacts, searchValue]);
+  }, [contactData, loadContacts, debouncedSearchValue]);
 
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Contacts.Contact>) => {
