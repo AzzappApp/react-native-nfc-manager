@@ -1,3 +1,8 @@
+## 2.0.0-canary.52
+
+* **fix:**  - **contactCard:** [#9018](https://github.com/AzzappApp/azzapp/pull/9018) force reprocessing contactCard when page is shown ([#9117](https://github.com/AzzappApp/azzapp/pull/9117))
+* **fix:**  - **shareBack:** [#9034](https://github.com/AzzappApp/azzapp/pull/9034) set correct receiver ([#9115](https://github.com/AzzappApp/azzapp/pull/9115))
+
 ## 2.0.0-canary.51
 
 * **fix:**  - disable share contact and add to phone during enrichment ([#9111](https://github.com/AzzappApp/azzapp/pull/9111))
