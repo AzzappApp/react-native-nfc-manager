@@ -181,6 +181,10 @@ export const createContact: MutationResolvers['createContact'] = async (
       socials: commonInformationToMerge.socials.concat(socials),
       meetingLocation: input.location ?? null,
       meetingPlace: input.meetingPlace ?? null,
+      logoId: webCard?.isMultiUser
+        ? (webCard?.logoId ?? profile.logoId)
+        : profile.logoId,
+      avatarId: profile.avatarId,
     };
 
     const existingShareBack = await getContactByProfiles({
@@ -193,6 +197,12 @@ export const createContact: MutationResolvers['createContact'] = async (
     if (inputProfileId) {
       if (!existingShareBack) {
         await transaction(async () => {
+          await referencesMedias(
+            [shareBackToCreate.avatarId, shareBackToCreate.logoId].filter(
+              isDefined,
+            ),
+            null,
+          );
           await createNewContact(shareBackToCreate);
           await incrementShareBacksTotal(inputProfileId);
           await incrementShareBacks(inputProfileId, true);
