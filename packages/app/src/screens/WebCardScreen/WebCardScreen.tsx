@@ -1,4 +1,3 @@
-import { fromGlobalId } from 'graphql-relay';
 import {
   Suspense,
   useCallback,
@@ -93,25 +92,26 @@ export const WebCardScreen = ({
   const [commit] = useMutation(UPDATE_CONTACT_CARD_SCANS);
 
   useEffect(() => {
-    if (params.contactData && webCard?.id) {
-      const contactData = parseContactCard(params.contactData);
+    if ((params.contactData || params.contactProfileId) && webCard?.id) {
+      const profileId =
+        params.contactProfileId ??
+        (params.contactData
+          ? parseContactCard(params.contactData).profileId
+          : null);
 
-      if (
-        contactData.webCardId === fromGlobalId(webCard?.id).id &&
-        scannedContactCard.current !== contactData.profileId
-      ) {
-        scannedContactCard.current = contactData.profileId;
+      if (profileId && scannedContactCard.current !== profileId) {
+        scannedContactCard.current = profileId;
         // the profile is open from a scan contact card with the phone
         commit({
           variables: {
             input: {
-              scannedProfileId: contactData?.profileId,
+              scannedProfileId: profileId,
             },
           },
         });
       }
     }
-  }, [commit, webCard?.id, params.contactData]);
+  }, [commit, webCard?.id, params]);
 
   const [showWebcardModal, openWebcardModal, closeWebcardModal] =
     useBoolean(false);
