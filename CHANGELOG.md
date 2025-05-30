@@ -1,3 +1,8 @@
+## 2.0.0-canary.49
+
+* **fix:**  - fix connection management when only 1 contact is in the list ([#9095](https://github.com/AzzappApp/azzapp/pull/9095))
+* **fix:**  - **contact:** [#9087](https://github.com/AzzappApp/azzapp/pull/9087) missing logo in created contact ([#9094](https://github.com/AzzappApp/azzapp/pull/9094))
+
 ## 2.0.0-canary.48
 
 * **fix:**  - enrichment incoherent status ([#9093](https://github.com/AzzappApp/azzapp/pull/9093))
