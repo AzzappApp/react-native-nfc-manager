@@ -143,7 +143,6 @@ export const EnrichmentOverlay = ({
           borderRadius: AVATAR_DEFAULT_WIDTH * COVER_CARD_RADIUS,
         },
         style,
-        styles.shadow,
       ]}
     >
       <View
