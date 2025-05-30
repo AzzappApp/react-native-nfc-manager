@@ -380,7 +380,7 @@ const ContactEditScreen = ({
 
       const isEnrichedBirthday =
         contact?.enrichment?.fields?.birthday &&
-        data.birthday === contact?.enrichment?.fields?.birthday;
+        data.birthday?.birthday === contact?.enrichment?.fields?.birthday;
 
       const hiddenFields = {
         contact: {
