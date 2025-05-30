@@ -221,7 +221,7 @@ export const createContact: MutationResolvers['createContact'] = async (
     if (profileToNotify) {
       const userToNotify = await userLoader.load(profileToNotify?.userId);
       if (userToNotify) {
-        await sendPushNotification(profile.userId, {
+        await sendPushNotification(userToNotify.id, {
           mediaId: null,
           sound: 'default',
           title: context.intl.formatMessage({
@@ -236,7 +236,7 @@ export const createContact: MutationResolvers['createContact'] = async (
               'Push Notification body message for contact share back',
           }),
           data: {
-            webCardId: toGlobalId('WebCard', profile.webCardId),
+            webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
             type: 'shareBack',
           },
         });
