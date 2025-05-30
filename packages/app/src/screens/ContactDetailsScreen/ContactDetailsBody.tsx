@@ -2,11 +2,12 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import cloneDeep from 'lodash/cloneDeep';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, useColorScheme, View } from 'react-native';
+import { Alert, Platform, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { Placement } from 'react-native-popover-view/dist/Types';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
@@ -16,6 +17,10 @@ import { useRouter } from '#components/NativeRouter';
 import { useShareContact } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
+import {
+  useTooltipContext,
+  useTooltipDataContext,
+} from '#helpers/TooltipContext';
 import useBoolean from '#hooks/useBoolean';
 import useRemoveContact from '#hooks/useRemoveContact';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -26,6 +31,7 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import Text from '#ui/Text';
+import Tooltip from '#ui/Tooltip';
 import ContactDetailActionModal from './ContactDetailActionModal';
 import { ContactDetailAvatar } from './ContactDetailAvatar';
 import { ContactDetailEnrichOverlay } from './ContactDetailEnrichOverlay';
@@ -39,6 +45,7 @@ import type {
 import type { ContactDetailsBody_user$key } from '#relayArtifacts/ContactDetailsBody_user.graphql';
 
 import type { ContactDetailsRoute } from '#routes';
+import type { Component, RefObject } from 'react';
 
 export type ContactDetailEnrichState =
   | 'idle'
@@ -58,6 +65,8 @@ type ContactDetailsBodyProps = {
   refreshQuery?: () => void;
   hasFocus?: boolean;
 };
+
+const AI_TOOLTIP = 'AI_TOOLTIP';
 
 export type HiddenFields = {
   contact: {
@@ -194,7 +203,6 @@ const ContactDetailsBody = ({
   const [isMoreVisible, showMore, hideMore] = useBoolean(false);
   const enrichStatusToOverlayState = useCallback(
     (data: ContactDetailsBody_contact$data) => {
-      console.log('state', data?.enrichmentStatus, data?.enrichment?.approved);
       return data?.enrichmentStatus === 'pending' ||
         data?.enrichmentStatus === 'running'
         ? 'loading'
@@ -683,6 +691,32 @@ const ContactDetailsBody = ({
     data?.id,
   ]);
 
+  const { openTooltips, closeTooltips, registerTooltip, unregisterTooltip } =
+    useTooltipContext();
+  const aiButtonRef = useRef<View>(null);
+  const { tooltips } = useTooltipDataContext();
+
+  useEffect(() => {
+    registerTooltip(AI_TOOLTIP, {
+      ref: aiButtonRef,
+    });
+    return () => {
+      unregisterTooltip(AI_TOOLTIP);
+    };
+  }, [registerTooltip, unregisterTooltip]);
+
+  const onCloseToolTipEnrich = useCallback(() => {
+    closeTooltips([AI_TOOLTIP]);
+  }, [closeTooltips]);
+  useEffect(() => {
+    if (
+      data?.enrichment?.approved === null &&
+      data?.enrichmentStatus === 'completed'
+    ) {
+      openTooltips([AI_TOOLTIP]);
+    }
+  }, [data?.enrichment?.approved, data?.enrichmentStatus, openTooltips]);
+
   return (
     <Container style={styles.container}>
       {ENABLE_DATA_ENRICHMENT && (
@@ -784,6 +818,27 @@ const ContactDetailsBody = ({
             onRemove={() => onRemoveField('title')}
             state={overlayState}
           />
+
+          <Tooltip
+            offset={Platform.OS === 'ios' ? 0 : 25}
+            tooltipWidth={192}
+            from={tooltips[AI_TOOLTIP]?.ref as RefObject<Component>}
+            placement={Placement.TOP}
+            isVisible={tooltips[AI_TOOLTIP]?.visible}
+            onRequestClose={onCloseToolTipEnrich}
+            onPress={onCloseToolTipEnrich}
+            header={intl.formatMessage({
+              defaultMessage: 'Check the profile',
+              description:
+                'ContactDetailsModal - Tooltip header for AI profile',
+            })}
+            description={intl.formatMessage({
+              defaultMessage:
+                'azzapp AI not only enrichies contact information, it also generate a profile',
+              description:
+                'ContactDetailsModal - Tooltip content for AI profile',
+            })}
+          />
           {ENABLE_DATA_ENRICHMENT && (
             <View style={styles.saveContainer}>
               <MenuItem
@@ -797,7 +852,11 @@ const ContactDetailsBody = ({
                 overlayState={overlayState}
               />
               <MenuItem
-                onSelect={() => setSubView('AI')}
+                containerRef={aiButtonRef}
+                onSelect={() => {
+                  closeTooltips([AI_TOOLTIP]);
+                  setSubView('AI');
+                }}
                 label={intl.formatMessage({
                   defaultMessage: 'Profile',
                   description:
@@ -849,16 +908,19 @@ const MenuItem = ({
   label,
   selected,
   overlayState,
+  containerRef,
 }: {
   onSelect: () => void;
   label: string;
   selected: boolean;
   overlayState: ContactDetailEnrichState;
+  containerRef?: React.RefObject<View | null>;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
   return (
     <RoundedMenuComponent
+      containerRef={containerRef}
       selected={selected}
       label={label}
       id="contact"

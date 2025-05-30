@@ -18,6 +18,7 @@ type Props = {
   textStyle?: TextStyle;
   selectedTextStyle?: TextStyle | TextStyle[];
   rightElement?: JSX.Element;
+  containerRef?: React.RefObject<View | null>;
 };
 
 const RoundedMenuComponent = ({
@@ -31,6 +32,7 @@ const RoundedMenuComponent = ({
   textStyle,
   rightElement,
   selectedTextStyle,
+  containerRef,
 }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -50,6 +52,7 @@ const RoundedMenuComponent = ({
 
   return (
     <View
+      ref={containerRef}
       style={[
         styles.menu,
         selected && styles.menuSelected,
