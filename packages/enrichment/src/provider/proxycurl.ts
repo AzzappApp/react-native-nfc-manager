@@ -79,7 +79,7 @@ export const proxyCurlLookup: ApiResolver = {
 
 const buildDataFromResponse = async (
   profile: PersonProfileResponse,
-  mediaPromises: Array<Promise<string>>,
+  mediaPromises: Array<Promise<string | null>>,
   linkedinProfileUrl?: string | null,
 ) => {
   const logos = new Set(

@@ -51,7 +51,8 @@ export const uploadMediaFromUrl = (url: string) => {
       }
       return res.blob();
     })
-    .then(blob => uploadMedia(blob, mediaId));
+    .then(blob => uploadMedia(blob, mediaId))
+    .catch(() => null);
 
   return {
     id: mediaId,
