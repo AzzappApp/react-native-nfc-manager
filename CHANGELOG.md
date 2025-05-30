@@ -1,3 +1,7 @@
+## 2.0.0-canary.54
+
+* **fix:**  - **contacts:** [#9063](https://github.com/AzzappApp/azzapp/pull/9063) remove deleted contacts ([#9075](https://github.com/AzzappApp/azzapp/pull/9075))
+
 ## 2.0.0-canary.53
 
 * **fix:**  - add safety check on proxyCurl data ([#9119](https://github.com/AzzappApp/azzapp/pull/9119))
