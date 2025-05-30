@@ -91,7 +91,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         <EmailOrPhonenumberSelect
           value={
             countryCode.value ||
-            lastResult?.initialValue?.countryCode.toString() ||
+            lastResult?.initialValue?.countryCode?.toString() ||
             ''
           }
           onChange={countryCode.change}
@@ -112,7 +112,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           })}
           inputClassName={className}
           error={!!numberField.errors}
-          value={lastResult?.initialValue?.number.toString() || undefined}
+          value={lastResult?.initialValue?.number?.toString() || undefined}
           {...others}
         />
       </ConditionalWrapper>
