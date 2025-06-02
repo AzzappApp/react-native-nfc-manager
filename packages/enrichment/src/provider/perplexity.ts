@@ -48,6 +48,7 @@ If the information matches a known public profile, only return a JSON with two k
 1. "profile": includes { ${profile} }
 2. "contact": includes { ${contact} }
 
+The country name must be in ISO 3166-1 official name format.
 Don’t include fields where the value is null or empty.
 Only include websites in urls (no social media).
 For socials, use the lowercase name of the social platform as the label.

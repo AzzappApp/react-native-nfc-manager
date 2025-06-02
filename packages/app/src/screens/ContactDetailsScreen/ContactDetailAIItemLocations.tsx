@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
+import { isDefined } from '@azzapp/shared/isDefined';
 import Text from '#ui/Text';
 import type { ContactDetailAIItemLocations_enrichment$key } from '#relayArtifacts/ContactDetailAIItemLocations_enrichment.graphql';
 import type { CountryCode } from 'libphonenumber-js';
@@ -35,7 +36,11 @@ export const ContactDetailAIItemLocations = ({
     <View key="location" style={styles.container}>
       {flagUri && <Image source={{ uri: flagUri }} style={styles.image} />}
       {(location.country.name || location.city) && (
-        <Text variant="medium">{`${location.country.name ? location.country.name : ''} ${location.city ? location.city : ''}`}</Text>
+        <Text variant="medium">
+          {[...new Set([location.country.name, location.city])]
+            .filter(isDefined)
+            .join(' - ')}
+        </Text>
       )}
     </View>
   );
