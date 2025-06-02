@@ -81,6 +81,13 @@ const ContactHorizontalItem = ({
 
   const avatarSource = useImageFromContact(contact);
 
+  const enrichmentInProgress =
+    contact.enrichmentStatus === 'running' ||
+    contact.enrichmentStatus === 'pending';
+  const enrichmentNeedApproval =
+    contact.enrichmentStatus === 'completed' &&
+    contact.enrichment?.approved === null;
+
   return (
     <View style={styles.profile}>
       <PressableNative
@@ -100,29 +107,25 @@ const ContactHorizontalItem = ({
           />
         )}
         <EnrichmentOverlay
-          overlayEnrichmentInProgress={
-            contact.enrichmentStatus === 'running' ||
-            contact.enrichmentStatus === 'pending'
-          }
-          overlayEnrichmentApprovementNeeded={
-            contact.enrichmentStatus === 'completed' &&
-            contact.enrichment?.approved === null
-          }
+          overlayEnrichmentInProgress={enrichmentInProgress}
+          overlayEnrichmentApprovementNeeded={enrichmentNeedApproval}
           small={false}
           scale={1}
           name={name}
           company={contact.enrichment?.fields?.company || contact.company}
         />
       </PressableNative>
-      <WhatsappButton
-        phoneNumbers={
-          [
-            ...(contact.phoneNumbers || []),
-            ...(contact?.enrichment?.fields?.phoneNumbers || []),
-          ] as ContactPhoneNumberType[]
-        }
-        style={styles.invite}
-      />
+      {!enrichmentNeedApproval && !enrichmentInProgress && (
+        <WhatsappButton
+          phoneNumbers={
+            [
+              ...(contact.phoneNumbers || []),
+              ...(contact?.enrichment?.fields?.phoneNumbers || []),
+            ] as ContactPhoneNumberType[]
+          }
+          style={styles.invite}
+        />
+      )}
     </View>
   );
 };

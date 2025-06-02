@@ -91,6 +91,13 @@ const ContactsListItem = ({
     return ['', '', ''];
   }, [contact.firstName, contact.lastName, webCard?.userName]);
 
+  const enrichmentInProgress =
+    contact.enrichmentStatus === 'running' ||
+    contact.enrichmentStatus === 'pending';
+  const enrichmentNeedApproval =
+    contact.enrichmentStatus === 'completed' &&
+    contact.enrichment?.approved === null;
+
   const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
     <View key={contact.id}>
@@ -121,14 +128,8 @@ const ContactsListItem = ({
         )}
 
         <EnrichmentOverlay
-          overlayEnrichmentInProgress={
-            contact.enrichmentStatus === 'running' ||
-            contact.enrichmentStatus === 'pending'
-          }
-          overlayEnrichmentApprovementNeeded={
-            contact.enrichmentStatus === 'completed' &&
-            contact.enrichment?.approved === null
-          }
+          overlayEnrichmentInProgress={enrichmentInProgress}
+          overlayEnrichmentApprovementNeeded={enrichmentNeedApproval}
           small
           scale={0.4375}
           name={name}
@@ -154,9 +155,12 @@ const ContactsListItem = ({
           </Text>
         </View>
         <View style={styles.actions}>
-          <WhatsappButton
-            phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
-          />
+          {!enrichmentNeedApproval && !enrichmentInProgress && (
+            <WhatsappButton
+              phoneNumbers={contact.phoneNumbers as ContactPhoneNumberType[]}
+            />
+          )}
+
           <IconButton variant="icon" icon="more" onPress={onMore} hitSlop={5} />
         </View>
       </PressableNative>
