@@ -1,8 +1,11 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, View } from 'react-native';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -10,7 +13,7 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { shadow } from '#theme';
+import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -20,7 +23,7 @@ import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
-import Button, { BUTTON_HEIGHT } from '#ui/Button';
+import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -38,7 +41,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { ContactsRoute } from '#routes';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery {
@@ -130,26 +132,6 @@ const ContactsScreen = ({
     [searchBarVisible],
   );
 
-  const previousScrollPosition = useRef(0);
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const scrollPosition = event.nativeEvent.contentOffset.y;
-      if (
-        scrollPosition > SEARCHBAR_HEIGHT &&
-        scrollPosition > previousScrollPosition.current
-      ) {
-        toggleSearchBar(false);
-      } else if (
-        previousScrollPosition.current < SEARCHBAR_HEIGHT ||
-        previousScrollPosition.current - scrollPosition > 10
-      ) {
-        toggleSearchBar(true);
-      }
-      previousScrollPosition.current = scrollPosition;
-    },
-    [toggleSearchBar],
-  );
-
   const onTabChange = useCallback(
     (tab: 'date' | 'location' | 'name') => {
       setCurrentTab(tab);
@@ -158,22 +140,48 @@ const ContactsScreen = ({
     [toggleSearchBar],
   );
 
-  const isAndroid = Platform.OS === 'android';
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollY.value = event.contentOffset.y;
+  });
+
   const searchBarContainerStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, SEARCHBAR_HEIGHT],
+      [0, -SEARCHBAR_HEIGHT],
+      Extrapolation.CLAMP,
+    );
     return {
-      height: SEARCHBAR_HEIGHT * (isAndroid ? 1 : searchBarVisible.value),
+      transform: [{ translateY: Platform.OS === 'ios' ? translateY : 0 }],
     };
-  }, [searchBarVisible]);
+  });
+
+  const tabBarContainerStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, SEARCHBAR_HEIGHT],
+      [0, -SEARCHBAR_HEIGHT],
+      Extrapolation.CLAMP,
+    );
+    return {
+      transform: [{ translateY: Platform.OS === 'ios' ? translateY : 0 }],
+    };
+  });
 
   const { progress: keyboardProgress } = useReanimatedKeyboardAnimation();
   const keyboardHeight = useKeyboardHeight();
-  const footHeight = 20 + BUTTON_HEIGHT + insets.bottom;
   const contentHeight = useAnimatedStyle(() => {
     return {
       height:
-        screenHeight -
-        keyboardHeight.value -
-        (1 - keyboardProgress.value) * footHeight,
+        screenHeight - keyboardHeight.value - (1 - keyboardProgress.value),
+    };
+  });
+
+  const paddingBottom = useAnimatedStyle(() => {
+    return {
+      paddingBottom: keyboardHeight.value > insets.bottom ? 10 : insets.bottom,
     };
   });
 
@@ -181,62 +189,62 @@ const ContactsScreen = ({
     <>
       {currentUser?.nbContacts ? (
         <View style={styles.container}>
-          <Animated.View
-            style={[{ height: screenHeight - footHeight }, contentHeight]}
-          >
+          <Animated.View style={[{ height: screenHeight }, contentHeight]}>
             <Container style={[styles.container, { paddingTop: insets.top }]}>
-              <Header
-                leftElement={
-                  <IconButton
-                    icon="close"
-                    onPress={onBack}
-                    variant="icon"
-                    hitSlop={40}
-                  />
-                }
-                middleElement={
-                  <Text variant="large" style={styles.title}>
-                    <FormattedMessage
-                      defaultMessage="{contacts, plural,=0 {# contacts received}=1 {# contact received}other {# contacts received}}"
-                      description="ContactsScreen - Title"
-                      values={{ contacts: currentUser?.nbContacts ?? 0 }}
+              <Container style={styles.header}>
+                <Header
+                  leftElement={
+                    <IconButton
+                      icon="close"
+                      onPress={onBack}
+                      variant="icon"
+                      hitSlop={40}
                     />
-                  </Text>
-                }
-                rightElement={<View style={{ width: 24 }} />}
-              />
-              <View style={styles.menu}>
-                <RoundedMenuComponent
-                  selected={currentTab === 'date'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Date',
-                    description: 'Date selector label in ContactsScreen',
-                  })}
-                  id="date"
-                  onSelect={() => onTabChange('date')}
-                  style={styles.menuLeft}
+                  }
+                  middleElement={
+                    <Text variant="large" style={styles.title}>
+                      <FormattedMessage
+                        defaultMessage="{contacts, plural,=0 {# contacts received}=1 {# contact received}other {# contacts received}}"
+                        description="ContactsScreen - Title"
+                        values={{ contacts: currentUser?.nbContacts ?? 0 }}
+                      />
+                    </Text>
+                  }
+                  rightElement={<View style={{ width: 24 }} />}
                 />
-                <RoundedMenuComponent
-                  selected={currentTab === 'name'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Name',
-                    description: 'Name selector label in ContactsScreen',
-                  })}
-                  id="name"
-                  onSelect={() => onTabChange('name')}
-                  style={styles.menuMiddle}
-                />
-                <RoundedMenuComponent
-                  selected={currentTab === 'location'}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Location',
-                    description: 'Location selector label in ContactsScreen',
-                  })}
-                  id="location"
-                  onSelect={() => onTabChange('location')}
-                  style={styles.menuRight}
-                />
-              </View>
+                <View style={styles.menu}>
+                  <RoundedMenuComponent
+                    selected={currentTab === 'date'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Date',
+                      description: 'Date selector label in ContactsScreen',
+                    })}
+                    id="date"
+                    onSelect={() => onTabChange('date')}
+                    style={styles.menuLeft}
+                  />
+                  <RoundedMenuComponent
+                    selected={currentTab === 'name'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Name',
+                      description: 'Name selector label in ContactsScreen',
+                    })}
+                    id="name"
+                    onSelect={() => onTabChange('name')}
+                    style={styles.menuMiddle}
+                  />
+                  <RoundedMenuComponent
+                    selected={currentTab === 'location'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Location',
+                      description: 'Location selector label in ContactsScreen',
+                    })}
+                    id="location"
+                    onSelect={() => onTabChange('location')}
+                    style={styles.menuRight}
+                  />
+                </View>
+              </Container>
               <Animated.View
                 style={[
                   { height: SEARCHBAR_HEIGHT, overflow: 'hidden' },
@@ -253,7 +261,9 @@ const ContactsScreen = ({
                   onChangeText={onChangeText}
                 />
               </Animated.View>
-              <View style={styles.tabContainer}>
+              <Animated.View
+                style={[styles.tabContainer, tabBarContainerStyle]}
+              >
                 <TabView
                   currentTab={currentTab}
                   style={styles.content}
@@ -266,7 +276,13 @@ const ContactsScreen = ({
                             queryRef={data}
                             search={debounceSearch}
                             onShowContact={onShowContact}
-                            onScroll={onScroll}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT
+                                  : 0,
+                            }}
                           />
                         </Suspense>
                       ),
@@ -280,7 +296,13 @@ const ContactsScreen = ({
                             location={undefined}
                             date={undefined}
                             onShowContact={onShowContact}
-                            onScroll={onScroll}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT
+                                  : 0,
+                            }}
                           />
                         </Suspense>
                       ),
@@ -292,27 +314,33 @@ const ContactsScreen = ({
                           <ContactsByLocationList
                             search={debounceSearch}
                             onShowContact={onShowContact}
-                            onScroll={onScroll}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT
+                                  : 0,
+                            }}
                           />
                         </Suspense>
                       ),
                     },
                   ]}
                 />
-              </View>
+              </Animated.View>
+              <Animated.View style={[styles.footer, paddingBottom]}>
+                <Button
+                  label={
+                    <FormattedMessage
+                      description="ContactsScreen - Create contact button"
+                      defaultMessage="Add a new Contact"
+                    />
+                  }
+                  onPress={openNewContactMenu}
+                />
+              </Animated.View>
             </Container>
           </Animated.View>
-          <Container style={[styles.footer, { paddingBottom: insets.bottom }]}>
-            <Button
-              label={
-                <FormattedMessage
-                  description="ContactsScreen - Create contact button"
-                  defaultMessage="Add a new Contact"
-                />
-              }
-              onPress={openNewContactMenu}
-            />
-          </Container>
         </View>
       ) : (
         <ContactsScreenEmpty
@@ -405,6 +433,9 @@ const stylesheet = createStyleSheet(appearance => ({
   title: {
     textAlign: 'center',
   },
+  header: {
+    zIndex: 1,
+  },
   menu: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -456,9 +487,13 @@ const stylesheet = createStyleSheet(appearance => ({
       right: 0,
       padding: 20,
       justifyContent: 'center',
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
       elevation: 10, // on android, the shadow is not visible on absolute positioned element
     },
     shadow({ appearance, direction: 'top' }),
   ],
-  tabContainer: { flex: 1 },
+  tabContainer: {
+    flex: 1,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
 }));

@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { FlatList, View } from 'react-native';
+import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactListEmptyComponent from '../ContactListEmptyComponent';
@@ -78,7 +79,7 @@ const SectionContactsHorizontalList = ({
   );
 
   return (
-    <FlatList
+    <Animated.FlatList
       data={sections}
       keyExtractor={sectionKeyExtractor}
       renderItem={renderItem}
@@ -94,7 +95,6 @@ const SectionContactsHorizontalList = ({
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
       onScroll={onScroll}
-      style={{ flexGrow: 1 }}
       contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
       ListEmptyComponent={ContactListEmptyComponent}
     />

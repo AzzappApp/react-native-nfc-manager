@@ -1,12 +1,13 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ContactListEmptyComponent from '../ContactListEmptyComponent';
 import ContactsListItem, { CONTACT_LIST_ITEM_HEIGHT } from './ContactsListItem';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -87,7 +88,7 @@ const ContactsList = ({
   }, [sections]);
 
   return (
-    <FlashList
+    <AnimatedFlashList
       accessibilityRole="list"
       data={data}
       stickyHeaderIndices={headerIndices}
@@ -109,6 +110,12 @@ const ContactsList = ({
     />
   );
 };
+
+const AnimatedFlashList = Animated.createAnimatedComponent(
+  FlashList as React.ComponentType<
+    FlashListProps<ContactsListItemType | string>
+  >,
+);
 
 const SEPARATOR_HEIGHT = 1;
 
