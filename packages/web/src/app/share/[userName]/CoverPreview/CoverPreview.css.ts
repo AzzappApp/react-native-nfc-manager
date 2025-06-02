@@ -6,7 +6,14 @@ const coverPreviewContainer = style({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '100%',
+  height: '100vh', // fallback
+  // override if supported
+  '@supports': {
+    '(height: 100dvh)': {
+      height: '100dvh',
+    },
+  },
+  overflow: 'hidden',
 });
 
 const coverContainer = style({

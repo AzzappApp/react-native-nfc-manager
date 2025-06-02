@@ -105,11 +105,14 @@ const DownloadVCard = ({
           processVCard()
             .catch(() => void 0)
             .finally(() => {
+              setOpened(true);
               loading.current = false;
             });
         }
       }
     };
+
+    handlePageShow({ persisted: true } as PageTransitionEvent);
 
     window.addEventListener('pageshow', handlePageShow);
     return () => window.removeEventListener('pageshow', handlePageShow);

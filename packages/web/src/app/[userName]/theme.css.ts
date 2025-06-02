@@ -135,7 +135,6 @@ globalStyle('body, #__next, .root', {
 
 globalStyle('body', {
   color: vars.color.black,
-  height: '100%',
 });
 
 globalStyle('.root', {
