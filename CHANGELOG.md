@@ -1,3 +1,9 @@
+## 2.0.0-canary.61
+
+* **fix:**  - **webCard:** [#8488](https://github.com/AzzappApp/azzapp/pull/8488) put updated value on reopening ([#9151](https://github.com/AzzappApp/azzapp/pull/9151))
+* **fix:**  - do not display whatsapp button duroing enrichment ([#9150](https://github.com/AzzappApp/azzapp/pull/9150))
+* **fix:**  - do not try to update shareback contact, duplicate it ([#9149](https://github.com/AzzappApp/azzapp/pull/9149))
+
 ## 2.0.0-canary.60
 
 * **fix:**  - position of popup positionning on first edit contact ([#9147](https://github.com/AzzappApp/azzapp/pull/9147))
