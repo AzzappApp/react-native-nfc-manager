@@ -1,3 +1,7 @@
+## 2.0.0-canary.59
+
+* **fix:**  - **share:** 9018 properly fix reopening of download vcard ([#9140](https://github.com/AzzappApp/azzapp/pull/9140))
+
 ## 2.0.0-canary.58
 
 * **fix:**  - **contacts:** [#9126](https://github.com/AzzappApp/azzapp/pull/9126) missed part of query ([#9141](https://github.com/AzzappApp/azzapp/pull/9141))
