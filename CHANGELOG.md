@@ -1,3 +1,7 @@
+## 2.0.0-canary.60
+
+* **fix:**  - position of popup positionning on first edit contact ([#9147](https://github.com/AzzappApp/azzapp/pull/9147))
+
 ## 2.0.0-canary.59
 
 * **fix:**  - **share:** 9018 properly fix reopening of download vcard ([#9140](https://github.com/AzzappApp/azzapp/pull/9140))
