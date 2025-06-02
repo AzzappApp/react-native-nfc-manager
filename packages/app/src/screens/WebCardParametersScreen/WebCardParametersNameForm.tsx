@@ -53,10 +53,15 @@ const WebcardParametersNameForm = ({
     watch,
     trigger,
     formState: { isSubmitting, errors },
-    setValue,
+    reset,
   } = useForm<UserNameForm>({
     defaultValues: {
       userName: webCard.userName || '',
+    },
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
     },
     mode: 'onSubmit',
     resolver: async data => {
@@ -119,10 +124,12 @@ const WebcardParametersNameForm = ({
   });
 
   useEffect(() => {
-    if (visible && webCard.userName) {
-      setValue('userName', webCard.userName);
+    if (visible) {
+      reset({
+        userName: webCard.userName ?? '',
+      });
     }
-  }, [setValue, visible, webCard.userName]);
+  }, [reset, visible, webCard.userName]);
 
   const intl = useIntl();
 
@@ -144,7 +151,7 @@ const WebcardParametersNameForm = ({
 
   const environment = useRelayEnvironment();
 
-  const [commitMutation] = useMutation(graphql`
+  const [commitMutation, isLoading] = useMutation(graphql`
     mutation WebCardParametersNameFormMutation(
       $webCardId: ID!
       $input: UpdateWebCardInput!
@@ -168,9 +175,7 @@ const WebcardParametersNameForm = ({
           userName,
         },
       },
-      onCompleted: () => {
-        toggleBottomSheet();
-      },
+      onCompleted: toggleBottomSheet,
       onError: error => {
         const response = ('response' in error ? error.response : undefined) as
           | { errors: GraphQLError[] }
@@ -273,8 +278,10 @@ const WebcardParametersNameForm = ({
         }
         rightElement={
           <Button
-            loading={isSubmitting}
-            disabled={isSubmitting || webCard.userName === userName}
+            loading={isSubmitting || isLoading}
+            disabled={
+              isSubmitting || isLoading || webCard.userName === userName
+            }
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit Webcard Name modal save button label',
