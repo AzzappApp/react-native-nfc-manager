@@ -77,6 +77,7 @@ describe('saveCommonInformation', () => {
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       commonInformation: { company: 'New Company' },
       logoId: undefined,
+      isMultiUser: true,
     });
     expect(updateWebCardProfiles).toHaveBeenCalledWith('webcard-123', {
       lastContactCardUpdate: expect.any(Date),
@@ -87,6 +88,7 @@ describe('saveCommonInformation', () => {
         ...mockWebCard,
         commonInformation: { company: 'New Company' },
         logoId: undefined,
+        isMultiUser: true,
       },
     });
   });

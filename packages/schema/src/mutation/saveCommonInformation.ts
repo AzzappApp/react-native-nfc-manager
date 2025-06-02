@@ -15,6 +15,17 @@ import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
+const checkCommonInformationsUpdate = (data: Partial<WebCard>) => {
+  if (data.bannerId || data.logoId) {
+    return true;
+  }
+  if (data.commonInformation) {
+    return Object.entries(data.commonInformation).some(([, value]) =>
+      Array.isArray(value) ? value.length > 0 : !!value,
+    );
+  }
+};
+
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
   async (
     _,
@@ -29,11 +40,19 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    const updates: Partial<WebCard> = {
+    let updates: Partial<WebCard> = {
       commonInformation: { ...data, socials: filterSocialLink(socials) },
       logoId,
       bannerId,
     };
+
+    if (checkCommonInformationsUpdate(updates) && !webCard.isMultiUser) {
+      updates = {
+        ...updates,
+        isMultiUser: true,
+      };
+    }
+
     try {
       const addedMedia = [logoId, bannerId].filter(mediaId => mediaId != null);
       await checkMedias(addedMedia);
