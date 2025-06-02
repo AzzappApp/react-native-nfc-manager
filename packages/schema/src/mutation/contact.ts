@@ -421,6 +421,14 @@ export const enrichContact: MutationResolvers['enrichContact'] = async (
   };
 };
 
+const arrayKeys = [
+  'phoneNumbers',
+  'emails',
+  'urls',
+  'socials',
+  'addresses',
+] as const;
+
 export const cancelEnrichContact: MutationResolvers['cancelEnrichContact'] =
   async (_, { contactId: gqlContactId }, { cancelEnrichContact }) => {
     const user = await getSessionUser();
@@ -479,46 +487,25 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
-    const hiddenFieldsContact =
-      existingContactEnrichment.hiddenFields?.contact || {};
-    if (input.contact?.company) {
-      hiddenFieldsContact.company = true;
+    const hiddenFieldsContact = {
+      ...existingContactEnrichment.hiddenFields?.contact,
+    };
+
+    for (const [key, value] of Object.entries(input.contact ?? {})) {
+      if (value == null) continue;
+
+      if (arrayKeys.includes(key as (typeof arrayKeys)[number])) {
+        // ts-ignore-next-line
+        hiddenFieldsContact[key as (typeof arrayKeys)[number]] =
+          mergeHiddenArray(
+            hiddenFieldsContact[key as (typeof arrayKeys)[number]],
+            value as boolean[],
+          );
+      } else {
+        // @ts-expect-error-next-line
+        hiddenFieldsContact[key] = value as boolean;
+      }
     }
-    if (input.contact?.firstName) {
-      hiddenFieldsContact.firstName = true;
-    }
-    if (input.contact?.lastName) {
-      hiddenFieldsContact.lastName = true;
-    }
-    if (input.contact?.title) {
-      hiddenFieldsContact.title = true;
-    }
-    if (input.contact?.avatarId) {
-      hiddenFieldsContact.avatarId = true;
-    }
-    if (input.contact?.logoId) {
-      hiddenFieldsContact.logoId = true;
-    }
-    hiddenFieldsContact.phoneNumbers = mergeHiddenArray(
-      hiddenFieldsContact.phoneNumbers,
-      input.contact?.phoneNumbers,
-    );
-    hiddenFieldsContact.emails = mergeHiddenArray(
-      hiddenFieldsContact.emails,
-      input.contact?.emails,
-    );
-    hiddenFieldsContact.urls = mergeHiddenArray(
-      hiddenFieldsContact.urls,
-      input.contact?.urls,
-    );
-    hiddenFieldsContact.socials = mergeHiddenArray(
-      hiddenFieldsContact.socials,
-      input.contact?.socials,
-    );
-    hiddenFieldsContact.addresses = mergeHiddenArray(
-      hiddenFieldsContact.addresses,
-      input.contact?.addresses,
-    );
 
     await updateContactEnrichment(contactEnrichmentId, {
       hiddenFields: {
