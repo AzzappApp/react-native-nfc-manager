@@ -4,9 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import cloneDeep from 'lodash/cloneDeep';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, Platform, useColorScheme, View } from 'react-native';
+import { Alert, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { PopoverMode } from 'react-native-popover-view';
 import { Placement } from 'react-native-popover-view/dist/Types';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -820,7 +821,7 @@ const ContactDetailsBody = ({
           />
 
           <Tooltip
-            offset={Platform.OS === 'ios' ? 0 : 25}
+            mode={PopoverMode.RN_MODAL}
             tooltipWidth={192}
             from={tooltips[AI_TOOLTIP]?.ref as RefObject<Component>}
             placement={Placement.TOP}
@@ -867,6 +868,7 @@ const ContactDetailsBody = ({
               />
             </View>
           )}
+
           {subView === 'contact' && (
             <ContactDetailFragmentContact
               showMore={showMore}

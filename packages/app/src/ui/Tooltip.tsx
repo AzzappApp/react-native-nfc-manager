@@ -1,5 +1,6 @@
 import { StyleSheet, useColorScheme } from 'react-native';
 import Popover, { PopoverMode } from 'react-native-popover-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadow } from '#theme';
 import PressableNative from './PressableNative';
 import Text from './Text';
@@ -22,6 +23,7 @@ const Tooltip = ({
     onPress?: () => void;
   }) => {
   const scheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   return (
     <Popover
       mode={PopoverMode.JS_MODAL}
@@ -41,6 +43,7 @@ const Tooltip = ({
           forceOldShadow: true,
         }),
       }}
+      displayAreaInsets={insets}
       {...props}
     >
       {children || (
