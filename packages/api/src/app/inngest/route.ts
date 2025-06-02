@@ -25,4 +25,6 @@ export const { GET, POST, PUT } = serve({
   ],
 });
 
+export const maxDuration = 180; // for long-running enrichments
+
 export const runtime = 'nodejs';
