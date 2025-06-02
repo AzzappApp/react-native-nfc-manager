@@ -1,3 +1,7 @@
+## 2.0.0-canary.57
+
+* **fix:**  - positionning of popover on android ([#9139](https://github.com/AzzappApp/azzapp/pull/9139))
+
 ## 2.0.0-canary.56
 
 * **fix:**  - **contact:** [#9105](https://github.com/AzzappApp/azzapp/pull/9105) simplify mutation to cover all fields ([#9129](https://github.com/AzzappApp/azzapp/pull/9129))
