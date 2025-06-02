@@ -1,3 +1,9 @@
+## 2.0.0-canary.58
+
+* **fix:**  - **contacts:** [#9126](https://github.com/AzzappApp/azzapp/pull/9126) missed part of query ([#9141](https://github.com/AzzappApp/azzapp/pull/9141))
+* **fix:**  - **enrichment:** [#9137](https://github.com/AzzappApp/azzapp/pull/9137) increase duration limit ([#9138](https://github.com/AzzappApp/azzapp/pull/9138))
+* **fix:**  - **enrichment:** add separation character between country and city ([#9136](https://github.com/AzzappApp/azzapp/pull/9136))
+
 ## 2.0.0-canary.57
 
 * **fix:**  - positionning of popover on android ([#9139](https://github.com/AzzappApp/azzapp/pull/9139))
