@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { PopoverMode } from 'react-native-popover-view';
 import { Placement } from 'react-native-popover-view/dist/Types';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useFragment } from 'react-relay';
@@ -314,7 +315,7 @@ export const ContactDetailEnrichOverlay = ({
           entering={Platform.OS === 'ios' ? FadeIn : undefined}
         >
           <Tooltip
-            offset={Platform.OS === 'ios' ? 0 : 25}
+            mode={PopoverMode.RN_MODAL}
             tooltipWidth={269}
             from={tooltips[ENRICH_TOOLTIP]?.ref as RefObject<Component>}
             placement={Placement.TOP}
