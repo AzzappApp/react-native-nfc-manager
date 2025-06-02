@@ -75,7 +75,6 @@ const ContactCard = ({
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
-        ...useContactCardAccess_profile
       }
     `,
     profileKey,

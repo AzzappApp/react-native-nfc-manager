@@ -103,6 +103,7 @@ describe('ContactCardExportVcf', () => {
           <ContactCardExportVcf
             profile={data.node.profile}
             publicKey="publicKey"
+            contactCardAccessId="contactCardAccessId"
             {...props}
           />
         )

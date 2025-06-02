@@ -132,7 +132,11 @@ const useQRCodeKey = (profileKey?: useQRCodeKey_profile$key | null) => {
     }
   }, [contactCardAccessId, id, setPublicKey, publicKey, intl]);
 
-  return publicKey;
+  const result = useMemo(
+    () => ({ publicKey, contactCardAccessId }),
+    [publicKey, contactCardAccessId],
+  );
+  return result;
 };
 
 export default useQRCodeKey;

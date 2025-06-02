@@ -46,6 +46,7 @@ import ShakeAndShareScreen from '#screens/ShakeAndShareScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
 import TitleTextModuleWebCardEditionScreen from '#screens/TitleTextModuleWebCardEditionScreen';
+import ToolsScreen from '#screens/ToolsScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import AddModuleSectionScreen from '#screens/WebCardEditScreen/AddModuleSection';
 import CardModuleConfirmationScreen from '#screens/WebCardEditScreen/AddModuleSection/CardModuleConfirmationScreen';
@@ -111,6 +112,7 @@ const screens = {
   CONTACTS_BY_LOCATION: ContactsFilteredListScreen,
   CONTACTS_BY_DATE: ContactsFilteredListScreen,
   SHAKE_AND_SHARE: ShakeAndShareScreen,
+  TOOLS: ToolsScreen,
 } satisfies ScreenMap;
 
 export default screens;

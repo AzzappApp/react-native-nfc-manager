@@ -509,6 +509,9 @@ const icons = {
   get tips() {
     return require('./assets/tips.png');
   },
+  get tools() {
+    return require('./assets/tools.png');
+  },
   get transition() {
     return require('./assets/transition.png');
   },

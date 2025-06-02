@@ -2,7 +2,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useMMKVBoolean } from 'react-native-mmkv';
+import Animated, { FadeOut, useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
@@ -53,6 +54,15 @@ const HomeProfileMenu = ({
   const onAnalyticsPress = useCallback(() => {
     router.push({ route: 'ANALYTICS' });
   }, [router]);
+
+  const [toolsOpened, setToolsOpened] = useMMKVBoolean(
+    'toolsNotificationForEnrichment',
+  );
+
+  const onToolsPress = useCallback(() => {
+    setToolsOpened(true);
+    router.push({ route: 'TOOLS' });
+  }, [router, setToolsOpened]);
 
   const onNetworkPress = useCallback(() => {
     const { profileInfos } = getAuthState();
@@ -147,7 +157,7 @@ const HomeProfileMenu = ({
         </LinearGradient>
         <LinearGradient
           colors={['#FFFFFF00', '#FFFFFF26']}
-          style={[styles.containerGradient, styles.containerGradientRight]}
+          style={styles.containerGradient}
         >
           <Pressable
             style={styles.pressableUnderCover}
@@ -158,6 +168,30 @@ const HomeProfileMenu = ({
               <FormattedMessage
                 defaultMessage="Network"
                 description="Home Profile Menu button network"
+              />
+            </Text>
+          </Pressable>
+        </LinearGradient>
+        <LinearGradient
+          colors={['#FFFFFF00', '#FFFFFF26']}
+          style={[styles.containerGradient, styles.containerGradientRight]}
+        >
+          <Pressable style={styles.pressableUnderCover} onPress={onToolsPress}>
+            {!toolsOpened && (
+              <Animated.View
+                exiting={FadeOut}
+                style={styles.toolsNotificationContainer}
+              >
+                <Text appearance="dark" variant="xsmallbold">
+                  1
+                </Text>
+              </Animated.View>
+            )}
+            <Icon icon="tools" style={styles.iconStyle} size={20} />
+            <Text style={styles.buttonText} variant="small">
+              <FormattedMessage
+                defaultMessage="Tools"
+                description="Home Profile Menu button tools"
               />
             </Text>
           </Pressable>
@@ -201,6 +235,18 @@ const styles = StyleSheet.create({
     width: '80%',
     paddingVertical: 10,
     gap: 3,
+  },
+  toolsNotificationContainer: {
+    backgroundColor: 'red',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    position: 'absolute',
+    right: 10,
+    top: -5,
   },
 });
 

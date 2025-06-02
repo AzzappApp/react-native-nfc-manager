@@ -177,6 +177,11 @@ export type AnalyticsRoute = {
   params?: never;
 };
 
+export type ToolsRoute = {
+  route: 'TOOLS';
+  params?: never;
+};
+
 export type FollowingsMosaicRoute = {
   route: 'FOLLOWINGS_MOSAIC';
   params?: never;
@@ -395,6 +400,7 @@ export type Route =
   | ShakeAndShareRoute
   | SignInRoute
   | SignUpRoute
+  | ToolsRoute
   | UserPayWallRoute
   | WebCardParametersRoute
   | WebCardRoute

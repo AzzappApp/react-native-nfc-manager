@@ -52,6 +52,11 @@ export const schema = z.object({
     .enum(['production', 'staging', 'development'])
     .default('development')
     .describe('Deployment environment'),
+  NEXT_PUBLIC_USER_MGMT_URL: z
+    .string()
+    .url()
+    .default('https://users.azzapp.com')
+    .describe('User management URL for the web application'),
 });
 
 const usedEnvVars = {

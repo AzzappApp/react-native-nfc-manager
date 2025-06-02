@@ -26,6 +26,7 @@ export type ButtonProps = PressableProps & {
   leftElement?: ReactNode;
   rightElement?: ReactNode;
   textStyle?: TextStyle;
+  loadingStyle?: StyleProp<ViewStyle>;
 };
 
 const Button = (
@@ -39,6 +40,7 @@ const Button = (
     leftElement,
     rightElement,
     textStyle,
+    loadingStyle,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -68,7 +70,7 @@ const Button = (
   const buttonProps = {
     accessibilityRole: 'button',
     children: loading ? (
-      <ActivityIndicator color={color} />
+      <ActivityIndicator style={loadingStyle} color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
         {leftElement}
