@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useRef, useEffect } from 'react';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/renderer/CoverRenderer';
@@ -33,6 +34,7 @@ const CoverPreview = ({
 }: CoverPreviewProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const dim = useDimensions(ref);
+  const router = useRouter();
   const appClipIsSupported = isAppClipSupported();
   const coverSize = getCoverSize(dim?.width, dim?.height);
   const wasHidden = useRef(false);
@@ -52,17 +54,18 @@ const CoverPreview = ({
         const urlWithoutShare = currentUrl.replace('/share/', '/');
         const urlWithoutParams = urlWithoutShare.split('?')[0];
 
-        // Redirect to the clean URL
-        window.location.href = urlWithoutParams;
+        // Use Next.js router for navigation
+        router.push(`${urlWithoutParams}?source=share`);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      console.log('remove');
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [appClipIsSupported]);
+  }, [appClipIsSupported, router]);
 
   return (
     <div className={styles.coverPreviewContainer}>
@@ -77,7 +80,7 @@ const CoverPreview = ({
           />
         </div>
       </div>
-      {!appClipIsSupported && contactData && (
+      {contactData && (
         <DownloadVCard
           userName={webCard.userName!}
           onClose={handleCloseDownloadVCard}

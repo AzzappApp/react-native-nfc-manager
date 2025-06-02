@@ -66,10 +66,7 @@ const WebCard = ({
   }>();
 
   useEffect(() => {
-    if (
-      searchParams.get('source') === 'share' &&
-      typeof window !== 'undefined'
-    ) {
+    if (searchParams.get('source') === 'share') {
       const storedData = sessionStorage.getItem(
         `azzapp_share_${webCard.userName}`,
       );

@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   displayName,
@@ -131,6 +131,7 @@ const CoverPageLayout = ({ webCard, media }: CoverPageLayoutProps) => {
   }, [compressedContactCard, keyData, webCard.userName]);
 
   // Store share data when we have contact data
+
   useEffect(() => {
     if (contactData?.token) {
       const shareData = {
@@ -143,7 +144,6 @@ const CoverPageLayout = ({ webCard, media }: CoverPageLayoutProps) => {
         avatarUrl: contactData.avatarUrl,
         expiresAt: Date.now() + 2 * 60 * 60 * 1000, // 2 hours
       };
-
       sessionStorage.setItem(
         `azzapp_share_${webCard.userName}`,
         JSON.stringify(shareData),
@@ -197,13 +197,13 @@ const CoverPageLayout = ({ webCard, media }: CoverPageLayoutProps) => {
       }, 450);
     }
   }, [contactData?.token, webCard?.id]);
-
-  const onShareBackClose = () => {
+  const router = useRouter();
+  const onShareBackClose = useCallback(() => {
     const currentUrl = window.location.href;
     const urlWithoutShare = currentUrl.replace('/share/', '/');
     const urlWithoutParams = urlWithoutShare.split('?')[0];
-    window.location.href = `${urlWithoutParams}?source=share`;
-  };
+    router.push(`${urlWithoutParams}?source=share`);
+  }, [router]);
 
   useEffect(() => {
     if (webCard?.id) {

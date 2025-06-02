@@ -1,73 +1,8 @@
 import CommonCrypto
-import CoreLocation
 import SwiftUI
 
-class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-  private let manager = CLLocationManager()
-  @Published var location: CLLocation?
-  @Published var locationError: Error?
-  @Published var meetingPlace: MeetingPlaceData?
-  private let geocoder = CLGeocoder()
-
-  override init() {
-    super.init()
-    manager.delegate = self
-    manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-    manager.allowsBackgroundLocationUpdates = false
-  }
-
-  func requestLocation() {
-    let status = manager.authorizationStatus
-
-    if status == .notDetermined {
-      DispatchQueue.main.async {
-        self.manager.requestWhenInUseAuthorization()
-      }
-    } else if status == .authorizedWhenInUse || status == .authorizedAlways {
-      manager.startUpdatingLocation()
-    }
-  }
-
-  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    guard let location = locations.last else { return }
-    self.location = location
-    manager.stopUpdatingLocation()
-
-    // Perform reverse geocoding
-    geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
-      guard let self = self else { return }
-
-      if let error = error {
-        print("Reverse geocoding error: \(error.localizedDescription)")
-        return
-      }
-
-      if let placemark = placemarks?.first {
-        self.meetingPlace = MeetingPlaceData(
-          city: placemark.locality,
-          country: placemark.country,
-          region: placemark.administrativeArea,
-          subregion: placemark.subAdministrativeArea
-        )
-      }
-    }
-  }
-
-  func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    locationError = error
-  }
-
-  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-    if manager.authorizationStatus == .authorizedWhenInUse
-      || manager.authorizationStatus == .authorizedAlways
-    {
-      manager.startUpdatingLocation()
-    }
-  }
-}
 
 struct ShareBackScreen: View {
-  @StateObject private var locationManager = LocationManager()
   @State var firstName: String = ""
   @State var lastName: String = ""
   @State var phone: String = ""
@@ -279,20 +214,6 @@ struct ShareBackScreen: View {
         showWelcomeMessage = false
       }
     }
-    .alert(localizedString("Welcome to Azzapp Share"), isPresented: $showWelcomeMessage) {
-      Button(localizedString("Don't Share"), role: .cancel) {
-        // User chose not to share location
-      }
-      Button(localizedString("Share Location")) {
-        hideKeyboard()
-        locationManager.requestLocation()
-      }
-    } message: {
-      Text(
-        localizedString(
-          "By sharing your location, you can:\n\n• Remember where you met\n• Make it easier to reconnect\n• Create more meaningful connections\n\nYour location is only shared with this specific contact."
-        ))
-    }
     .alert(localizedString("Error"), isPresented: $showErrorAlert) {
       Button(localizedString("OK"), role: .cancel) {}
     } message: {
@@ -310,19 +231,8 @@ struct ShareBackScreen: View {
 
   private func submitDetails() {
     guard validateForm() else { return }
-
     isSubmitting = true
-
-    // If we need location and don't have it yet, request it and wait
-    if contactData?.meetingLocation == nil && locationManager.location == nil {
-      locationManager.requestLocation()
-      // Wait for location with a timeout
-      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-        self.continueWithSubmission()
-      }
-    } else {
-      continueWithSubmission()
-    }
+    continueWithSubmission()
   }
 
   private func continueWithSubmission() {
@@ -374,21 +284,6 @@ struct ShareBackScreen: View {
         if let region = meetingPlace.region { placeDict["region"] = region }
         if let subregion = meetingPlace.subregion { placeDict["subregion"] = subregion }
         contactDataPayload["meetingPlace"] = placeDict
-      } else if let currentLocation = locationManager.location {
-        // Add current location and reverse geocoded place data
-        contactDataPayload["meetingLocation"] = [
-          "latitude": currentLocation.coordinate.latitude,
-          "longitude": currentLocation.coordinate.longitude,
-        ]
-
-        if let meetingPlace = locationManager.meetingPlace {
-          var placeDict: [String: Any] = [:]
-          if let city = meetingPlace.city { placeDict["city"] = city }
-          if let country = meetingPlace.country { placeDict["country"] = country }
-          if let region = meetingPlace.region { placeDict["region"] = region }
-          if let subregion = meetingPlace.subregion { placeDict["subregion"] = subregion }
-          contactDataPayload["meetingPlace"] = placeDict
-        }
       }
     }
 

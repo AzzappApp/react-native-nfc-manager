@@ -12,6 +12,8 @@
 	<array>
 		<string>webcredentials:dev.azzapp.com</string>
 		<string>appclips:192.168.2.1:3002/share</string>
+		<string>applinks:dev.azzapp.com</string>
+		<string>applinks:192.168.2.1:3002?mode=developer</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>

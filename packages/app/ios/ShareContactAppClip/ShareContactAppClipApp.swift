@@ -23,6 +23,7 @@ struct ContentView: View {
   @State var avatarUrl: String?
   @State var contactData: ContactData?
   @State var showPhoneNumberMenu: Bool = false
+  @Environment(\.scenePhase) private var scenePhase
 
   var body: some View {
     ZStack {
@@ -62,6 +63,13 @@ struct ContentView: View {
           .background(Color.white)
           .padding(.horizontal, 25)
           .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+          .onOpenURL { url in
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+              let activity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
+              activity.webpageURL = url
+              handleUserActivity(activity)
+            }
+          }
           .transition(.opacity)
         }
         // Floating buttons between WebView and ShareBackScreen
@@ -148,6 +156,12 @@ struct ContentView: View {
         .padding()
       }
     }
+    .onChange(of: scenePhase) { newPhase in
+      if newPhase == .active {
+        // Reset state when app becomes active
+        resetState()
+      }
+    }
   }
 
   private func openWhatsApp(phoneNumber: String) {
@@ -159,10 +173,23 @@ struct ContentView: View {
     let appStoreURL = URL(string: "https://apps.apple.com/app/6502694267")!
     UIApplication.shared.open(appStoreURL)
   }
+
+  private func resetState() {
+    username = nil
+    showShareBackScreen = false
+    avatarUrl = nil
+    contactData = nil
+    showPhoneNumberMenu = false
+  }
+
   private func handleUserActivity(_ userActivity: NSUserActivity) {
+    // Reset state before handling new activity
+    resetState()
+
     guard let webpageURL = userActivity.webpageURL else {
       return
     }
+ 
 
     // Handle App Clip URL
     if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
@@ -170,15 +197,17 @@ struct ContentView: View {
         let queryItems = urlComponents.queryItems,
         let username = queryItems.first(where: { $0.name == "u" })?.value
       else {
+        print("Failed to extract username from App Clip URL")
         return
       }
+     
 
       // Check for 'c' parameter (old format)
       if let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value {
         handleContactData(compressedContactCard: compressedContactCard, username: username)
       }
       // Check for 'k' parameter (new format)
-      else if let keyData = queryItems.first(where: { $0.name == "k" })?.value {
+      else if let keyData = queryItems.first(where: { $0.name == "k" })?.value {    
         handleKeyData(keyData: keyData, username: username)
       }
     }
@@ -190,6 +219,7 @@ struct ContentView: View {
         return
       }
 
+      self.username = username
       guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
         let queryItems = urlComponents.queryItems
       else {
@@ -208,14 +238,36 @@ struct ContentView: View {
   }
 
   private func handleKeyData(keyData: String, username: String) {
+  
+    // Try new format first (base64 + direct JSON)
+    if let decodedBase64 = base64Decode(keyData) {
+
+      // The decoded base64 is already a JSON string, no need for decompression
+      guard let jsonData = decodedBase64.data(using: String.Encoding.utf8) else {
+        print("Failed to convert to data")
+        return
+      }
+
+      processJsonData(jsonData, username: username)
+      return
+    }
+
+    // Fallback to old format (decompression)
     let decodedURI = keyData.removingPercentEncoding ?? ""
+ 
     let decompressedData = decompressFromEncodedURIComponent(input: decodedURI)
+
 
     guard let jsonData = decompressedData.data(using: String.Encoding.utf8) else {
       print("Failed to convert to data")
       return
     }
 
+    processJsonData(jsonData, username: username)
+  }
+
+  private func processJsonData(_ jsonData: Data, username: String) {
+   
     guard let jsonArray = try? JSONSerialization.jsonObject(with: jsonData) as? [Any],
       jsonArray.count >= 2,
       let contactCardAccessId = jsonArray[0] as? String,
@@ -232,6 +284,7 @@ struct ContentView: View {
     }
 
     // Call verifyQrCodeKey
+ 
     verifyQrCodeKey(
       contactCardAccessId: contactCardAccessId,
       key: key,
@@ -240,12 +293,15 @@ struct ContentView: View {
     ) { result in
       switch result {
       case .success(let response):
+    
         DispatchQueue.main.async {
           self.username = username
           self.avatarUrl = response.avatarUrl
+        
 
           // Map the contact card data to match the c parameter structure
           if let contactCard = response.contactCard as? [String: Any] {
+       
             var mappedContactData = ContactData()
             mappedContactData.avatarUrl = response.avatarUrl
             mappedContactData.token = response.token
@@ -340,17 +396,20 @@ struct ContentView: View {
             }
 
             self.contactData = mappedContactData
+       
 
             // Add contact to address book and show contact controller
+            
             ContactViewControllerDelegateHandler.shared.addContact(
               mappedContactData,
               username: username,
               showShareBackScreen: $showShareBackScreen
             )
+   
           }
         }
       case .failure(let error):
-        print("Error verifying QR code key: \(error.localizedDescription)")
+        print("Error verifying QR code key:", error.localizedDescription)
       }
     }
   }
@@ -631,6 +690,30 @@ struct ContentView: View {
         completion(.failure(error))
       }
     }.resume()
+  }
+
+  // Add base64 decoding function
+  private func base64Decode(_ input: String) -> String? {
+    // Remove any whitespace
+    let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    // Add padding if needed
+    var padded = trimmed
+    if padded.count % 4 != 0 {
+      padded = padded.padding(toLength: ((trimmed.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+    }
+
+    // Replace URL-safe characters
+    let base64 =
+      padded
+      .replacingOccurrences(of: "-", with: "+")
+      .replacingOccurrences(of: "_", with: "/")
+
+    guard let data = Data(base64Encoded: base64) else {
+      return nil
+    }
+
+    return String(data: data, encoding: .utf8)
   }
 
   struct ContentView_Previews: PreviewProvider {

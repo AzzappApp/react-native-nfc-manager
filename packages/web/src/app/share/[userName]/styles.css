@@ -1,22 +1,45 @@
+@supports (-webkit-touch-callout: none) {
+  /* iOS devices */
+  html {
+    height: -webkit-fill-available;
+  }
+
+  body {
+    min-height: -webkit-fill-available;
+    /* Remove the padding as it's causing issues */
+    padding: 0;
+  }
+}
+
 html {
   --vh: 1vh;
-  height: calc(var(--vh, 1vh) * 100);
+  height: 100%;
   scroll-behavior: smooth;
 }
+
 body,
 #__next,
 .root {
-  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100vh;
   margin: 0;
   padding: 0;
+  position: relative;
 }
+
 body {
   color: var(--colorsblack);
+  /* Prevent iOS from adding extra space */
+  overflow-x: hidden;
+  width: 100%;
 }
+
 .root {
   display: flex;
   flex-direction: column;
+  /* Ensure root takes full height */
+  height: 100%;
 }
+
 *,
 *:before,
 *:after {

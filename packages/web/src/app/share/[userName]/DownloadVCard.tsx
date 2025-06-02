@@ -3,6 +3,7 @@
 import cx from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -16,9 +17,14 @@ import env from '#env';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import ContactSteps from '#components/ContactSteps';
-import { DeviceType, getDeviceType } from '#helpers/userAgent';
+import {
+  DeviceType,
+  getDeviceType,
+  isAppClipSupported,
+} from '#helpers/userAgent';
 import Avatar from '#ui/Avatar/Avatar';
 import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
+import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -46,6 +52,8 @@ const DownloadVCard = ({
 }: DownloadVCardProps) => {
   const intl = useIntl();
   const deviceType = getDeviceType();
+  const appClipIsSupported = isAppClipSupported();
+  const searchParams = useSearchParams();
 
   const [fileUrl, setFileUrl] = useState<string | undefined>();
   const ref = useRef<HTMLDivElement>(null);
@@ -126,6 +134,28 @@ const DownloadVCard = ({
     }
   }, [onClose]);
 
+  const showAppClip = useCallback(
+    async (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      const compressedContactCard = searchParams.get('c');
+      const compressedQrcodeKey = searchParams.get('k');
+      if (!compressedContactCard || !compressedQrcodeKey) {
+        return;
+      }
+      let appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${userName}`;
+      if (compressedContactCard) {
+        appClipUrl += `&c=${compressedContactCard}`;
+      }
+      if (compressedQrcodeKey) {
+        appClipUrl += `&k=${compressedQrcodeKey}`;
+      }
+      // Open the App Clip URL
+      window.location.href = appClipUrl;
+    },
+    [searchParams, userName],
+  );
+  console.log('appClipIsSupported', appClipIsSupported);
+
   return (
     <>
       <div
@@ -170,7 +200,19 @@ const DownloadVCard = ({
           )}
         </div>
         {step === 0 && <ContactSteps step={step} />}
-        {fileUrl && userName ? (
+        {appClipIsSupported ? (
+          <LinkButton
+            size="medium"
+            onClick={showAppClip}
+            className={styles.buttonLink}
+          >
+            <FormattedMessage
+              defaultMessage="Create new contact"
+              id="spJduZ"
+              description="Save contact with AppClip modal message"
+            />
+          </LinkButton>
+        ) : fileUrl && userName ? (
           <DownloadVCardLinkButton
             size="medium"
             href={fileUrl}
