@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import {
   createContact as createNewContact,
-  getContactByProfiles,
   getWebcardsMediaFromContactIds,
   incrementContactsImportFromScan,
   incrementImportFromScan,
@@ -187,33 +186,20 @@ export const createContact: MutationResolvers['createContact'] = async (
       avatarId: profile.avatarId,
     };
 
-    const existingShareBack = await getContactByProfiles({
-      owner: input.contactProfileId,
-      contact: profileId,
-    });
-
     const inputProfileId = input.contactProfileId;
 
     if (inputProfileId) {
-      if (!existingShareBack) {
-        await transaction(async () => {
-          await referencesMedias(
-            [shareBackToCreate.avatarId, shareBackToCreate.logoId].filter(
-              isDefined,
-            ),
-            null,
-          );
-          await createNewContact(shareBackToCreate);
-          await incrementShareBacksTotal(inputProfileId);
-          await incrementShareBacks(inputProfileId, true);
-        });
-      } else {
-        await transaction(async () => {
-          await updateContact(existingShareBack.id, shareBackToCreate);
-          await incrementShareBacksTotal(inputProfileId);
-          await incrementShareBacks(inputProfileId, true);
-        });
-      }
+      await transaction(async () => {
+        await referencesMedias(
+          [shareBackToCreate.avatarId, shareBackToCreate.logoId].filter(
+            isDefined,
+          ),
+          null,
+        );
+        await createNewContact(shareBackToCreate);
+        await incrementShareBacksTotal(inputProfileId);
+        await incrementShareBacks(inputProfileId, true);
+      });
     }
 
     const profileToNotify = await profileLoader.load(input.contactProfileId);
