@@ -4,10 +4,11 @@ import {
   getUserById,
   getUserSubscriptions,
   updateNbFreeScans,
-  type UserSubscription,
 } from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
+import { subscriptionsForUserLoader, webCardOwnerLoader } from '#loaders';
+import type { WebCard, UserSubscription } from '@azzapp/data';
 
 export const calculateAvailableSeats = async (
   userSubscription: UserSubscription,
@@ -275,6 +276,21 @@ export const validateCurrentSubscription = async (
       }
     }
   }
+};
+
+export const isWebcardPremium = async (webCard: WebCard) => {
+  const owner = await webCardOwnerLoader.load(webCard.id);
+  //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
+  //Got a bug where the subscription is canceled however still active in the result set
+  const subscriptions = owner
+    ? await subscriptionsForUserLoader.load(owner.id)
+    : null;
+  const lastSubscription = subscriptions?.[0];
+  return !!(
+    lastSubscription &&
+    (lastSubscription.status === 'active' ||
+      lastSubscription.endAt > new Date())
+  );
 };
 
 export const updateMonthlySubscription = async (

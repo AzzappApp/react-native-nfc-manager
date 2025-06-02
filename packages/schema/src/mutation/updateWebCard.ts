@@ -4,6 +4,8 @@ import {
   transaction,
   createRedirectWebCard,
   deleteRedirectionFromTo,
+  referencesMedias,
+  updateWebCardProfiles,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -12,7 +14,10 @@ import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import {
+  isWebcardPremium,
+  validateCurrentSubscription,
+} from '#helpers/subscriptionHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -102,6 +107,20 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       },
       context.apiEndpoint,
     );
+    if (
+      profileUpdates.webCardKind === 'personal' &&
+      !(await isWebcardPremium(webCard))
+    ) {
+      if (profile.logoId) {
+        await referencesMedias([], [profile.logoId]);
+        await updateWebCardProfiles(webCardId, { logoId: null });
+      }
+      if (profile.contactCard?.urls?.length || profile.contactCard?.company) {
+        await updateWebCardProfiles(webCardId, {
+          contactCard: { ...profile.contactCard, urls: [], company: '' },
+        });
+      }
+    }
   }
 
   try {

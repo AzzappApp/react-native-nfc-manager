@@ -50,6 +50,7 @@ import fromGlobalIdWithType, {
   idResolver,
   maybeFromGlobalIdWithType,
 } from '#helpers/relayIdHelpers';
+import { isWebcardPremium } from '#helpers/subscriptionHelpers';
 import type { WebCardResolvers } from '#/__generated__/types';
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
@@ -218,18 +219,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return false;
     }
-    const owner = await webCardOwnerLoader.load(webCard.id);
-    //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
-    //Got a bug where the subscription is canceled however still active in the result set
-    const subscriptions = owner
-      ? await subscriptionsForUserLoader.load(owner.id)
-      : null;
-    const lastSubscription = subscriptions?.[0];
-    return !!(
-      lastSubscription &&
-      (lastSubscription.status === 'active' ||
-        lastSubscription.endAt > new Date())
-    );
+    return isWebcardPremium(webCard);
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {

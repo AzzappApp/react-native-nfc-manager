@@ -21,6 +21,10 @@ jest.mock('@azzapp/service/mediaServices', () => ({
   buildCoverImageUrl: jest.fn(),
 }));
 
+jest.mock('@azzapp/payment', () => ({
+  updateExistingSubscription: jest.fn(),
+}));
+
 jest.mock('#helpers/permissionsHelpers', () => ({
   hasWebCardProfileRight: jest.fn(),
 }));
