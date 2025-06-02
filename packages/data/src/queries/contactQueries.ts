@@ -728,10 +728,10 @@ export const searchContactsByWebcardId = async ({
       .where(
         and(
           eq(WebCardTable.id, webcardId),
-          eq(ProfileTable.deleted, false),
+          withDeleted ? undefined : eq(ProfileTable.deleted, false),
+          withDeleted ? undefined : eq(ContactTable.deleted, false),
           (ownerProfileId && eq(ContactTable.ownerProfileId, ownerProfileId)) ||
             undefined,
-          (!withDeleted && eq(ContactTable.deleted, false)) || undefined,
           search
             ? or(
                 like(ContactTable.firstName, `%${search}%`),
