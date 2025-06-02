@@ -9,6 +9,15 @@ const { mergeConfig, getDefaultConfig } = require('@react-native/metro-config');
 
 const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 
+const nativeClientAliases = {
+  crypto: 'react-native-quick-crypto',
+  'node:crypto': 'react-native-quick-crypto',
+  'expo-crypto': 'react-native-quick-crypto',
+  'base64-js': 'react-native-quick-base64',
+  base64: 'react-native-quick-base64',
+  'js-base64': 'react-native-quick-base64',
+};
+
 const config = {
   transformer: {
     assetPlugins: ['expo-asset/tools/hashAssetFiles'],
@@ -25,11 +34,10 @@ const config = {
   watchFolders: [path.resolve(__dirname, '../../')],
   resolver: {
     resolveRequest: (context, moduleName, platform) => {
-      if (moduleName === 'crypto') {
-        // when importing crypto, resolve to react-native-quick-crypto
+      if (nativeClientAliases[moduleName]) {
         return context.resolveRequest(
           context,
-          'react-native-quick-crypto',
+          nativeClientAliases[moduleName],
           platform,
         );
       }
