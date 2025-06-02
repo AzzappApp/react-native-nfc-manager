@@ -1,3 +1,8 @@
+## 2.0.0-canary.62
+
+* **fix:**  - **contacts:** [#9133](https://github.com/AzzappApp/azzapp/pull/9133) don’t animated height to avoid jerky behavior ([#9145](https://github.com/AzzappApp/azzapp/pull/9145))
+* **feat:**  - **home:** [#8957](https://github.com/AzzappApp/azzapp/pull/8957) add tools screen ([#9128](https://github.com/AzzappApp/azzapp/pull/9128))
+
 ## 2.0.0-canary.61
 
 * **fix:**  - **webCard:** [#8488](https://github.com/AzzappApp/azzapp/pull/8488) put updated value on reopening ([#9151](https://github.com/AzzappApp/azzapp/pull/9151))
