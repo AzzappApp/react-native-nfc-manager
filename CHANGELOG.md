@@ -1,3 +1,8 @@
+## 2.0.0-canary.56
+
+* **fix:**  - **contact:** [#9105](https://github.com/AzzappApp/azzapp/pull/9105) simplify mutation to cover all fields ([#9129](https://github.com/AzzappApp/azzapp/pull/9129))
+* **fix:**  - **contact:** [#9126](https://github.com/AzzappApp/azzapp/pull/9126) return contact of deleted profiles ([#9132](https://github.com/AzzappApp/azzapp/pull/9132))
+
 ## 2.0.0-canary.55
 
 * **fix:**  - **contact:** [#9061](https://github.com/AzzappApp/azzapp/pull/9061) only count sharebacks ([#9097](https://github.com/AzzappApp/azzapp/pull/9097))
