@@ -642,11 +642,8 @@ const MultiUserDetailsScreen = ({
               </Text>
               <Text variant="smallbold" style={styles.statsLabel}>
                 <FormattedMessage
-                  defaultMessage="Contact card{azzappA} views"
-                  description="Multi users statistics - Contact card views label"
-                  values={{
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  }}
+                  defaultMessage="Contact shares"
+                  description="Multi users statistics - Contact card share label"
                 />
               </Text>
             </View>
