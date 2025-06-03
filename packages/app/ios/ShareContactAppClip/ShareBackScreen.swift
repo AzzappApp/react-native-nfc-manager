@@ -1,7 +1,6 @@
 import CommonCrypto
 import SwiftUI
 
-
 struct ShareBackScreen: View {
   @State var firstName: String = ""
   @State var lastName: String = ""
@@ -19,6 +18,7 @@ struct ShareBackScreen: View {
   var username: String
   var avatarUrl: String?
   var contactData: ContactData?
+  var displayName: String
 
   enum Field {
     case firstName, lastName, phone, email, company, title
@@ -71,7 +71,7 @@ struct ShareBackScreen: View {
                 Text(localizedString("Share your details with"))
                   .font(.system(size: 16, weight: .regular))
                   .foregroundColor(Color(white: 0.2))
-                Text(username)
+                Text(displayName)
                   .font(.system(size: 16, weight: .bold))
                   .foregroundColor(.black)
               }
@@ -289,7 +289,7 @@ struct ShareBackScreen: View {
 
     // Prepare the final payload
     let payload: [String: Any] = [
-      "username": username,
+      "df": username,
       "timestamp": timestamp,
       "contactData": contactDataPayload,
       "token": contactData?.token ?? "",
@@ -312,10 +312,9 @@ struct ShareBackScreen: View {
     // Make the API call
     URLSession.shared.dataTask(with: request) { data, response, error in
       DispatchQueue.main.async {
-        isSubmitting = false
 
         if let error = error {
-          showErrorAlert = true
+          isSubmitting = false
           return
         }
 
@@ -325,7 +324,7 @@ struct ShareBackScreen: View {
               isPresented = false
             }
           } else {
-            showErrorAlert = true
+            isSubmitting = false
           }
         }
       }
@@ -417,20 +416,20 @@ struct BorderCircle: View {
 
   var body: some View {
     ZStack {
-      // Outer circle (38px)
+      // Outer circle (58px)
       Circle()
         .fill(Color.white)
-        .frame(width: 38, height: 38)
+        .frame(width: 58, height: 58)
 
-      // Middle circle (36px) with 2px border
+      // Middle circle (56px) with 2px border
       Circle()
         .stroke(Color.black, lineWidth: 2)
-        .frame(width: 36, height: 36)
+        .frame(width: 56, height: 56)
 
-      // Inner circle (34px) with gray background and 2px border
+      // Inner circle (54px) with gray background and 2px border
       Circle()
         .fill(Color(hex: "F5F5F6"))
-        .frame(width: 34, height: 34)
+        .frame(width: 54, height: 54)
 
       // Image in the center (scaled to fit)
       if let urlString = avatarUrl, let url = URL(string: urlString) {
@@ -442,13 +441,13 @@ struct BorderCircle: View {
             image
               .resizable()
               .scaledToFill()
-              .frame(width: 34, height: 34)
+              .frame(width: 54, height: 54)
               .clipShape(Circle())
           case .failure:
             Image("Frame")
               .resizable()
               .scaledToFit()
-              .frame(width: 16, height: 16)
+              .frame(width: 24, height: 24)
               .foregroundColor(.white)
           @unknown default:
             EmptyView()
@@ -458,7 +457,7 @@ struct BorderCircle: View {
         Image("Frame")
           .resizable()
           .scaledToFit()
-          .frame(width: 16, height: 16)
+          .frame(width: 24, height: 24)
           .foregroundColor(.white)
       }
     }

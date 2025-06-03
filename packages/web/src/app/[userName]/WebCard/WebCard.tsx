@@ -180,6 +180,21 @@ const WebCard = ({
           </aside>
         )}
         <div className={styles.floatingButtonsContainer}>
+          {shareData && !postsOpen && shareData && (
+            <div
+              className={styles.addContact}
+              onClick={() => {
+                router.back();
+              }}
+            >
+              <Image
+                alt="add contact"
+                src="/contact.svg"
+                width={20}
+                height={20}
+              />
+            </div>
+          )}
           {shareData && shareData.phoneNumbers.length > 0 && !postsOpen && (
             <WhatsappButton
               phoneNumbers={shareData.phoneNumbers}
@@ -199,21 +214,6 @@ const WebCard = ({
                 router.back();
               }}
             />
-          )}
-          {shareData && !postsOpen && shareData && (
-            <div
-              className={styles.addContact}
-              onClick={() => {
-                router.back();
-              }}
-            >
-              <Image
-                alt="add contact"
-                src="/contact.svg"
-                width={20}
-                height={20}
-              />
-            </div>
           )}
           {hasPosts && (
             <ButtonIcon

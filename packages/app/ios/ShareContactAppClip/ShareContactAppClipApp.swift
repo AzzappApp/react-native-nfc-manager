@@ -57,19 +57,21 @@ struct ContentView: View {
             .padding(.horizontal, 22)
             .lineSpacing(4)
             .multilineTextAlignment(.center)
+            // App Store download button
+            Button(action: openAppStore) {
+              Text(NSLocalizedString("create_webcard", comment: ""))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(maxWidth: 225)
+                .frame(height: 50)
+                .background(Color(hex: "#000000"))
+                .cornerRadius(23.5)
+            }
             Spacer()
           }
           .frame(maxWidth: .infinity)
           .background(Color.white)
           .padding(.horizontal, 25)
-          .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
-          .onOpenURL { url in
-            if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-              let activity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
-              activity.webpageURL = url
-              handleUserActivity(activity)
-            }
-          }
           .transition(.opacity)
         }
         // Floating buttons between WebView and ShareBackScreen
@@ -119,8 +121,20 @@ struct ContentView: View {
         ShareBackScreen(
           isPresented: $showShareBackScreen,
           username: username ?? "",
-          avatarUrl: avatarUrl,
-          contactData: contactData
+          avatarUrl: ContactViewControllerDelegateHandler.shared.contactData?.avatarUrl
+            ?? avatarUrl,
+          contactData: ContactViewControllerDelegateHandler.shared.contactData ?? contactData,
+          displayName: {
+            let contact = ContactViewControllerDelegateHandler.shared.contactData ?? contactData
+            if (contact?.firstName?.isEmpty == false) || (contact?.lastName?.isEmpty == false) {
+              return "\(contact?.firstName ?? "") \(contact?.lastName ?? "")".trimmingCharacters(
+                in: .whitespaces)
+            }
+            if let company = contact?.company, !company.isEmpty {
+              return company
+            }
+            return username ?? ""
+          }()
         )
         .transition(
           .asymmetric(
@@ -131,6 +145,14 @@ struct ContentView: View {
       }
     }
     .animation(.easeInOut(duration: 0.3), value: showShareBackScreen)
+    .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+    .onOpenURL { url in
+      if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+        let activity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
+        activity.webpageURL = url
+        handleUserActivity(activity)
+      }
+    }
     .sheet(isPresented: $showPhoneNumberMenu) {
       VStack {
         Text("Select a phone number")
@@ -154,12 +176,6 @@ struct ContentView: View {
           showPhoneNumberMenu = false
         }
         .padding()
-      }
-    }
-    .onChange(of: scenePhase) { newPhase in
-      if newPhase == .active {
-        // Reset state when app becomes active
-        resetState()
       }
     }
   }
@@ -189,7 +205,6 @@ struct ContentView: View {
     guard let webpageURL = userActivity.webpageURL else {
       return
     }
- 
 
     // Handle App Clip URL
     if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
@@ -200,14 +215,13 @@ struct ContentView: View {
         print("Failed to extract username from App Clip URL")
         return
       }
-     
 
       // Check for 'c' parameter (old format)
       if let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value {
         handleContactData(compressedContactCard: compressedContactCard, username: username)
       }
       // Check for 'k' parameter (new format)
-      else if let keyData = queryItems.first(where: { $0.name == "k" })?.value {    
+      else if let keyData = queryItems.first(where: { $0.name == "k" })?.value {
         handleKeyData(keyData: keyData, username: username)
       }
     }
@@ -238,7 +252,7 @@ struct ContentView: View {
   }
 
   private func handleKeyData(keyData: String, username: String) {
-  
+
     // Try new format first (base64 + direct JSON)
     if let decodedBase64 = base64Decode(keyData) {
 
@@ -254,9 +268,8 @@ struct ContentView: View {
 
     // Fallback to old format (decompression)
     let decodedURI = keyData.removingPercentEncoding ?? ""
- 
-    let decompressedData = decompressFromEncodedURIComponent(input: decodedURI)
 
+    let decompressedData = decompressFromEncodedURIComponent(input: decodedURI)
 
     guard let jsonData = decompressedData.data(using: String.Encoding.utf8) else {
       print("Failed to convert to data")
@@ -267,7 +280,7 @@ struct ContentView: View {
   }
 
   private func processJsonData(_ jsonData: Data, username: String) {
-   
+
     guard let jsonArray = try? JSONSerialization.jsonObject(with: jsonData) as? [Any],
       jsonArray.count >= 2,
       let contactCardAccessId = jsonArray[0] as? String,
@@ -284,7 +297,7 @@ struct ContentView: View {
     }
 
     // Call verifyQrCodeKey
- 
+
     verifyQrCodeKey(
       contactCardAccessId: contactCardAccessId,
       key: key,
@@ -293,15 +306,14 @@ struct ContentView: View {
     ) { result in
       switch result {
       case .success(let response):
-    
+
         DispatchQueue.main.async {
           self.username = username
           self.avatarUrl = response.avatarUrl
-        
 
           // Map the contact card data to match the c parameter structure
           if let contactCard = response.contactCard as? [String: Any] {
-       
+
             var mappedContactData = ContactData()
             mappedContactData.avatarUrl = response.avatarUrl
             mappedContactData.token = response.token
@@ -396,16 +408,15 @@ struct ContentView: View {
             }
 
             self.contactData = mappedContactData
-       
 
             // Add contact to address book and show contact controller
-            
+
             ContactViewControllerDelegateHandler.shared.addContact(
               mappedContactData,
               username: username,
               showShareBackScreen: $showShareBackScreen
             )
-   
+
           }
         }
       case .failure(let error):

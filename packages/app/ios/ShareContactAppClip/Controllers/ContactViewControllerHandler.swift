@@ -1,12 +1,12 @@
 import ContactsUI
 import SwiftUI
 
-
 class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDelegate {
   static let shared = ContactViewControllerDelegateHandler()
 
   var username: String?
   var showShareBackScreen: Binding<Bool>?
+  var contactData: ContactData?
 
   private func presentContactViewController(with contact: CNMutableContact) {
     let contactViewController = CNContactViewController(forNewContact: contact)
@@ -24,6 +24,7 @@ class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDel
     didCompleteWith contact: CNContact?
   ) {
     viewController.dismiss(animated: true) {
+      // Always show ShareBackScreen, regardless of whether contact was saved
       self.showShareBackScreen?.wrappedValue = true
     }
   }
@@ -32,6 +33,7 @@ class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDel
   {
     self.username = username
     self.showShareBackScreen = showShareBackScreen
+    self.contactData = contactData  // Store the contact data
 
     let contact = CNMutableContact()
     contact.givenName = contactData.firstName ?? ""
@@ -121,4 +123,3 @@ class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDel
     }
   }
 }
-
