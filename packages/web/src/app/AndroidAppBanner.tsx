@@ -17,10 +17,12 @@ export const AndroidAppBanner = () => {
   useEffect(() => {
     window.addEventListener('beforeinstallprompt', e => {
       e.preventDefault();
+      const isAndroid = /Android/i.test(navigator.userAgent);
       if (
         'prompt' in e &&
         typeof e.prompt === 'function' &&
-        !pathname.endsWith('/emailsignature')
+        !pathname.endsWith('/emailsignature') &&
+        isAndroid
       ) {
         deferredPrompt.current = e as { prompt: () => void };
         setVisible(true);
