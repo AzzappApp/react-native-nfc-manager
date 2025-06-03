@@ -1,3 +1,9 @@
+## 2.0.0-canary.68
+
+* **fix:**  - add missing cancel share discard ([#9179](https://github.com/AzzappApp/azzapp/pull/9179))
+* **fix:**  - **android:** [#8659](https://github.com/AzzappApp/azzapp/pull/8659) put back custom download app bar ([#9170](https://github.com/AzzappApp/azzapp/pull/9170))
+* **fix:**  - translation update contact shares ([#9178](https://github.com/AzzappApp/azzapp/pull/9178))
+
 ## 2.0.0-canary.67
 
 
