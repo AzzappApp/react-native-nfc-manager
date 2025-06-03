@@ -11,9 +11,7 @@ const Row = ({ children }: PropsWithChildren) => {
   return (
     <View style={styles.row}>
       <Image source={require('./assets/check.svg')} style={styles.check} />
-      <Text variant="medium" appearance="light">
-        {children}
-      </Text>
+      <Text variant="medium">{children}</Text>
     </View>
   );
 };
@@ -38,7 +36,7 @@ const MultiUserDescription = ({
         source={require('./assets/multi-user.mp4')}
       />
       <View style={styles.descriptionContainer}>
-        <Text variant="large" style={styles.title} appearance="light">
+        <Text variant="large" style={styles.title}>
           <FormattedMessage
             defaultMessage="Enjoy Multi-User on your Desktop"
             description="Multi-User screen : title to present user management desktop app"
