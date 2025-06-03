@@ -1,3 +1,7 @@
+## 2.0.0-canary.69
+
+* **fix:**  - gradient position in paywall ([#9181](https://github.com/AzzappApp/azzapp/pull/9181))
+
 ## 2.0.0-canary.68
 
 * **fix:**  - add missing cancel share discard ([#9179](https://github.com/AzzappApp/azzapp/pull/9179))
