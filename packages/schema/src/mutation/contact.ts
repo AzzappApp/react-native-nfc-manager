@@ -436,8 +436,19 @@ export const cancelEnrichContact: MutationResolvers['cancelEnrichContact'] =
     }
     cancelEnrichContact(user.id, existingContact.id);
 
-    await updateContact(contactId, {
-      enrichmentStatus: 'canceled',
+    await transaction(async () => {
+      await updateContact(contactId, {
+        enrichmentStatus: 'canceled',
+      });
+
+      const contactEnrichment = await getContactEnrichmentById(
+        existingContact.id,
+      );
+      if (contactEnrichment) {
+        await updateContactEnrichment(contactEnrichment.id, {
+          approved: false,
+        });
+      }
     });
 
     return {
