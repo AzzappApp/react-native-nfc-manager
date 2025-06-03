@@ -1,3 +1,7 @@
+## 2.0.0-canary.66
+
+* **fix:**  - **enrichment:** [#9143](https://github.com/AzzappApp/azzapp/pull/9143) desapprove found enrichment on cancelation ([#9154](https://github.com/AzzappApp/azzapp/pull/9154))
+
 ## 2.0.0-canary.65
 
 * **fix:**  - valid email and don't display provfile selector if not needed ([#9174](https://github.com/AzzappApp/azzapp/pull/9174))
