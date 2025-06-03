@@ -154,7 +154,6 @@ const DownloadVCard = ({
     },
     [searchParams, userName],
   );
-  console.log('appClipIsSupported', appClipIsSupported);
 
   return (
     <>

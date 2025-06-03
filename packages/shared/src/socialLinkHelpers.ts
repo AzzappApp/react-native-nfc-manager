@@ -29,7 +29,7 @@ const socialLinkTwitter = {
 } as const;
 const socialLinkLinkedin = {
   id: 'linkedin',
-  mask: 'linkedin.com/',
+  mask: 'linkedin.com/in/',
   label: 'LinkedIn',
 } as const;
 const socialLinkTiktok = {

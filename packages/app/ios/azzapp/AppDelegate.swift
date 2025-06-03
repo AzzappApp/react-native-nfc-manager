@@ -1,18 +1,18 @@
-import UIKit
-import React
-import React_RCTAppDelegate
-import ReactAppDependencyProvider
 import FirebaseCore
 import RNBootSplash
+import React
+import ReactAppDependencyProvider
+import React_RCTAppDelegate
+import UIKit
 
 @main
-	class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
- func application(
+  func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
@@ -29,7 +29,6 @@ import RNBootSplash
     FirebaseApp.configure()
     clearKeychainIfNecessary()
 
-    
     AZPAnimatorBridge.register(
       AZPCustomRevealTransition(),
       forName: "reveal"
@@ -44,7 +43,15 @@ import RNBootSplash
     return true
   }
 
-private func clearKeychainIfNecessary() {
+  func application(
+    _ application: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    return RCTLinkingManager.application(application, open: url, options: options)
+  }
+
+  private func clearKeychainIfNecessary() {
     let hasRunBefore = UserDefaults.standard.bool(forKey: "HAS_RUN_BEFORE")
     guard !hasRunBefore else { return }
 
@@ -55,7 +62,7 @@ private func clearKeychainIfNecessary() {
       kSecClassInternetPassword,
       kSecClassCertificate,
       kSecClassKey,
-      kSecClassIdentity
+      kSecClassIdentity,
     ]
 
     for secClass in secItemClasses {
@@ -71,16 +78,16 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
   }
 
   override func bundleURL() -> URL! {
-#if DEBUG
-    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-#else
-    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-#endif
+    #if DEBUG
+      return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+    #else
+      return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+    #endif
   }
 
   override func customize(_ rootView: RCTRootView) {
     super.customize(rootView)
-    RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView) // ⬅️ initialize the splash screen
+    RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView)  // ⬅️ initialize the splash screen
   }
 
 }
