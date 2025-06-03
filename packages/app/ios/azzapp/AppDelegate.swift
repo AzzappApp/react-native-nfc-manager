@@ -51,6 +51,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return RCTLinkingManager.application(application, open: url, options: options)
   }
 
+  func application(
+    _ application: UIApplication,
+    continue userActivity: NSUserActivity,
+    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+      return RCTLinkingManager.application(
+        application,
+        continue: userActivity,
+        restorationHandler: restorationHandler
+    )
+  }
+
   private func clearKeychainIfNecessary() {
     let hasRunBefore = UserDefaults.standard.bool(forKey: "HAS_RUN_BEFORE")
     guard !hasRunBefore else { return }
