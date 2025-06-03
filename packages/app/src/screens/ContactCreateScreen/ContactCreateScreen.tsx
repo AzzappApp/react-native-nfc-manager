@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import {
@@ -333,19 +334,37 @@ const ContactCreateScreen = ({
     setNotifyError(false);
     Keyboard.dismiss();
     handleSubmit(async data => {
-      if (notify && data.emails.length <= 0) {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not save your contact. Please add email or uncheck the box.',
-            description:
-              'Error toast message when saving contact card without email and box checked',
-          }),
-          onHide: () => {
-            setNotifyError(true);
-          },
-        });
+      if (notify) {
+        // No Email
+        if (data.emails.length <= 0) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact. Please add email or uncheck the box.',
+              description:
+                'Error toast message when saving contact card without email and box checked',
+            }),
+          });
+          setNotifyError(true);
+          return;
+        }
+        // No Valid Email
+        if (
+          data.emails.findIndex(email => isValidEmail(email.address)) === -1
+        ) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact. Please add a valid email or uncheck the box.',
+              description:
+                'Error toast message when saving contact card without valid email and box checked',
+            }),
+          });
+          setNotifyError(true);
+          return;
+        }
       }
       if (!currentUser?.profiles?.length) {
         // Should never happen, but just in case
