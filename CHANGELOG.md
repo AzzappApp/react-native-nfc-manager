@@ -1,3 +1,7 @@
+## 2.0.0-canary.71
+
+* **fix:**  - **ios:** [#9155](https://github.com/AzzappApp/azzapp/pull/9155) missing code to handle universal links ([#9186](https://github.com/AzzappApp/azzapp/pull/9186))
+
 ## 2.0.0-canary.70
 
 * **fix:**  - check that device is android for app banner ([#9182](https://github.com/AzzappApp/azzapp/pull/9182))
