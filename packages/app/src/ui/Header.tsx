@@ -103,11 +103,17 @@ const styles = StyleSheet.create({
   headerMiddle: {
     flex: 1,
     height: '100%',
+    width: '100%',
+    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 40,
+    pointerEvents: 'box-none',
   },
   title: {
     textAlign: 'center',
+    position: 'absolute',
+    width: '100%',
+    pointerEvents: 'box-none',
   },
 });
