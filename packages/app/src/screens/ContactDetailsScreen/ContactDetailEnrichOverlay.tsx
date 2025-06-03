@@ -406,7 +406,11 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   iconContainerStyle: {
     borderRadius: 50,
-    ...shadow({ appearance: 'light', direction: 'bottom' }),
+    ...shadow({
+      appearance: 'light',
+      direction: 'bottom',
+      forceOldShadow: true,
+    }),
   },
   confirmationContainer: {
     flex: 1,
