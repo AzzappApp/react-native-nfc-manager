@@ -1,3 +1,7 @@
+## 2.0.0-canary.72
+
+* **fix:**  - allow to discard birthday from enrichment ([#9191](https://github.com/AzzappApp/azzapp/pull/9191))
+
 ## 2.0.0-canary.71
 
 * **fix:**  - **ios:** [#9155](https://github.com/AzzappApp/azzapp/pull/9155) missing code to handle universal links ([#9186](https://github.com/AzzappApp/azzapp/pull/9186))
