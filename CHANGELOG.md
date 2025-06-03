@@ -1,3 +1,7 @@
+## 2.0.0-canary.73
+
+* **fix:**  - webcard issue with share back  ([#9193](https://github.com/AzzappApp/azzapp/pull/9193))
+
 ## 2.0.0-canary.72
 
 * **fix:**  - allow to discard birthday from enrichment ([#9191](https://github.com/AzzappApp/azzapp/pull/9191))
