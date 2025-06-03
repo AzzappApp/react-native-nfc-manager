@@ -43,15 +43,22 @@ const WebcardParametersCompanyNameForm = ({
     defaultValues: {
       companyName: webCard.companyName ?? '',
     },
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
     mode: 'onSubmit',
     resolver: zodResolver(companyNameFormSchema),
   });
 
   useEffect(() => {
     if (visible) {
-      reset();
+      reset({
+        companyName: webCard.companyName ?? '',
+      });
     }
-  }, [reset, visible]);
+  }, [reset, visible, webCard.companyName]);
 
   const intl = useIntl();
 
@@ -149,7 +156,7 @@ const WebcardParametersCompanyNameForm = ({
                 nativeID="companyName"
                 accessibilityLabelledBy="companyNameLabel"
                 placeholder={intl.formatMessage({
-                  defaultMessage: 'Select a WebCard name',
+                  defaultMessage: 'Company name',
                   description: 'ProfileForm companyname textinput placeholder',
                 })}
                 isErrored={!!companyNameError}
