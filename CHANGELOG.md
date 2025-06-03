@@ -1,3 +1,7 @@
+## 2.0.0-canary.70
+
+* **fix:**  - check that device is android for app banner ([#9182](https://github.com/AzzappApp/azzapp/pull/9182))
+
 ## 2.0.0-canary.69
 
 * **fix:**  - gradient position in paywall ([#9181](https://github.com/AzzappApp/azzapp/pull/9181))
