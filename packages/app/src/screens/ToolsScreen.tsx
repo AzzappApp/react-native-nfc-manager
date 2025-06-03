@@ -335,6 +335,7 @@ Only {price}/user/month."
                             'Description for the share dialog of the desktop platform link',
                         }),
                         url: env.NEXT_PUBLIC_USER_MGMT_URL,
+                        failOnCancel: false,
                       });
                     }}
                     label={intl.formatMessage({
