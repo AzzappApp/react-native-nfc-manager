@@ -290,6 +290,16 @@ const phoneMenu = style({
   zIndex: 1000,
 });
 
+const coverSharebackWrapper = style({
+  borderRadius: 35,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    },
+  },
+});
+
 const phoneMenuItem = style({
   display: 'flex',
   alignItems: 'center',
@@ -328,6 +338,7 @@ const styles = {
   postsClosed,
   coverContainer,
   coverWrapper,
+  coverSharebackWrapper,
   header,
   title,
   footer,

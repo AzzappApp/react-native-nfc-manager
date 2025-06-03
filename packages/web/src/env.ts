@@ -37,9 +37,7 @@ export const schema = z.object({
     .describe('Apple iTunes app meta'),
   NEXT_PUBLIC_APP_CLIP_BUNDLE_ID: z
     .string()
-    .default(
-      'app-clip-bundle-id=com.azzapp.app-dev.Clip, app-clip-display=card',
-    )
+    .default('app-clip-bundle-id=com.azzapp.app.Clip, app-clip-display=card')
     .describe('Apple App Clip meta'),
 });
 

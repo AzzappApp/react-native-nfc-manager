@@ -5,12 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
+import arrows from '@azzapp/web/public/arrows@3x.png';
 import { FlipIcon, InviteIcon } from '#assets';
 import env from '#env';
 import { ButtonIcon } from '#ui';
+import ContactSteps from '#components/ContactSteps';
 import FullScreenOverlay from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
@@ -51,6 +53,7 @@ const WebCard = ({
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
   const router = useRouter();
+  const intl = useIntl();
 
   const searchParams = useSearchParams();
 
@@ -65,8 +68,10 @@ const WebCard = ({
     }>;
   }>();
 
+  const isShareBack = searchParams.get('source') === 'share';
+
   useEffect(() => {
-    if (searchParams.get('source') === 'share') {
+    if (isShareBack) {
       const storedData = sessionStorage.getItem(
         `azzapp_share_${webCard.userName}`,
       );
@@ -81,7 +86,7 @@ const WebCard = ({
         }
       }
     }
-  }, [searchParams, webCard.userName]);
+  }, [isShareBack, webCard.userName]);
 
   return (
     <FullScreenOverlay cardStyle={cardStyle}>
@@ -111,9 +116,29 @@ const WebCard = ({
             [styles.modulesWithPosts]: hasPosts && postsOpen,
           })}
         >
+          {isShareBack && (
+            <div className={styles.header}>
+              <ContactSteps step={2} />
+              <div className={styles.title}>
+                {intl.formatMessage({
+                  defaultMessage: 'Discover the WebCard',
+                  id: '5RopcC',
+                  description: 'Discover the WebCard title',
+                })}
+              </div>
+              <Image
+                style={{ marginTop: 20 }}
+                src={arrows.src}
+                alt=""
+                width={24}
+                height={35}
+              />
+            </div>
+          )}
           <div
             style={{
               position: 'relative',
+              marginTop: isShareBack ? 130 : 0,
             }}
           >
             <CoverRendererBackground media={media} />
@@ -125,7 +150,12 @@ const WebCard = ({
                 } 95%)`,
               }}
             >
-              <div className={cn(styles.coverWrapper)}>
+              <div
+                className={cn(
+                  styles.coverWrapper,
+                  isShareBack && styles.coverSharebackWrapper,
+                )}
+              >
                 <CoverRenderer webCard={webCard} media={media} priority />
               </div>
             </div>
@@ -215,7 +245,7 @@ const WebCard = ({
               }}
             />
           )}
-          {hasPosts && (
+          {!isShareBack && hasPosts && (
             <ButtonIcon
               Icon={FlipIcon}
               size={24}
