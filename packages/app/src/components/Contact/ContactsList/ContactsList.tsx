@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -91,7 +91,11 @@ const ContactsList = ({
     <AnimatedFlashList
       accessibilityRole="list"
       data={data}
-      stickyHeaderIndices={headerIndices}
+      stickyHeaderIndices={
+        // workaround for Android FlashList issue with sticky headers
+        // see: https://github.com/Shopify/flash-list/issues/885
+        Platform.OS === 'android' && refreshing ? [] : headerIndices
+      }
       keyExtractor={sectionKeyExtractor}
       renderItem={renderListItem}
       showsVerticalScrollIndicator={false}

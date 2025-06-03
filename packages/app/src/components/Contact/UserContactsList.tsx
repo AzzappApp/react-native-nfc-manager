@@ -8,6 +8,7 @@ import Container from '#ui/Container';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import Text from '#ui/Text';
 import ContactActionModal from './ContactActionModal';
+import useRefetch from './useRefetch';
 import type { ContactsListItemType } from '#components/Contact/ContactsList/ContactsList';
 import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { UserContactsList_root$key } from '#relayArtifacts/UserContactsList_root.graphql';
@@ -135,19 +136,16 @@ const UserContactsList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refetch(
-      { search },
-      {
-        fetchPolicy: 'network-only',
-        onComplete: () => {
-          setRefreshing(false);
-        },
-      },
-    );
-  }, [refetch, search]);
+  const { refreshing, onRefresh } = useRefetch({
+    query: UserContactsListQueryNode,
+    variables: {
+      location: location !== null ? location : '\uffff',
+      date,
+      orderBy,
+      search,
+      first: 20,
+    },
+  });
 
   const contacts = useMemo(
     () =>

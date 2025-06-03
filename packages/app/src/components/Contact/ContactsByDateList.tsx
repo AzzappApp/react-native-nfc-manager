@@ -3,8 +3,10 @@ import { useIntl } from 'react-intl';
 import { graphql, usePaginationFragment } from 'react-relay';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import { useRouter } from '#components/NativeRouter';
+import ContactsByDateListNode from '#relayArtifacts/ContactsByDateListQuery.graphql';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import ContactActionModal from './ContactActionModal';
+import useRefetch from './useRefetch';
 import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { ContactsByDateList_root$key } from '#relayArtifacts/ContactsByDateList_root.graphql';
 import type { ContactsByDateListQuery } from '#relayArtifacts/ContactsByDateListQuery.graphql';
@@ -87,19 +89,13 @@ const ContactsByDateList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refetch(
-      { search },
-      {
-        fetchPolicy: 'network-only',
-        onComplete: () => {
-          setRefreshing(false);
-        },
-      },
-    );
-  }, [refetch, search]);
+  const { refreshing, onRefresh } = useRefetch({
+    query: ContactsByDateListNode,
+    variables: {
+      first: 10,
+      search,
+    },
+  });
 
   const router = useRouter();
   const onSeeAll = useCallback(

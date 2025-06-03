@@ -6,9 +6,11 @@ import { useRouter } from '#components/NativeRouter';
 import ContactsByLocationListQueryNode from '#relayArtifacts/ContactsByLocationListQuery.graphql';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import ContactActionModal from './ContactActionModal';
+import useRefetch from './useRefetch';
 import type { ContactActionModal_contact$key } from '#relayArtifacts/ContactActionModal_contact.graphql';
 import type { ContactsByLocationList_root$key } from '#relayArtifacts/ContactsByLocationList_root.graphql';
 import type { ContactsByLocationListQuery } from '#relayArtifacts/ContactsByLocationListQuery.graphql';
+
 import type {
   ViewStyle,
   NativeScrollEvent,
@@ -88,19 +90,13 @@ const ContactsByLocationList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refetch(
-      { search },
-      {
-        fetchPolicy: 'network-only',
-        onComplete: () => {
-          setRefreshing(false);
-        },
-      },
-    );
-  }, [refetch, search]);
+  const { refreshing, onRefresh } = useRefetch({
+    query: ContactsByLocationListQueryNode,
+    variables: {
+      first: 10,
+      search,
+    },
+  });
 
   const router = useRouter();
   const onSeeAll = useCallback(
