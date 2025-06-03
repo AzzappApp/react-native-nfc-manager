@@ -21,9 +21,10 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '@azzapp/shared/colorsHelpers';
+import env from '#env';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
-import { cachedGetWebCardByUserName } from './dataAccess';
+import { cachedGetWebCardByUserName } from '../dataAccess';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
@@ -204,6 +205,9 @@ export async function generateMetadata(
       twitter: {
         card: 'summary_large_image',
         images: `/api/og/${params.userName}${imageUrlOption}`,
+      },
+      itunes: {
+        appId: `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_ID}`,
       },
     },
   });

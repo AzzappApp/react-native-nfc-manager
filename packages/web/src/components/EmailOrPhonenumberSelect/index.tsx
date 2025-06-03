@@ -7,7 +7,7 @@ import { useEffect, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
-import { textSmall } from '#app/[userName]/theme.css';
+import { textSmall } from '#app/theme.css';
 import Select from '#components/Select';
 import {
   countryCallingCode,

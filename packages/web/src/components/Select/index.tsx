@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { textSmall, textSmallBold } from '#app/[userName]/theme.css';
+import { textSmall, textSmallBold } from '#app/theme.css';
 import useOnClickOutside from '#hooks/useOnClickOutside';
 import * as selectStyles from './Select.css';
 import type { ReactNode } from 'react';

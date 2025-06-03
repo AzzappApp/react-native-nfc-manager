@@ -2,7 +2,8 @@ import capitalize from 'lodash/capitalize';
 import { notFound, redirect } from 'next/navigation';
 import { getMediasByIds, getRedirectWebCardByUserName } from '@azzapp/data';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
-import { cachedGetWebCardByUserName } from '#app/[userName]/dataAccess';
+import env from '#env';
+import { cachedGetWebCardByUserName } from '#app/dataAccess';
 import { getMetaData } from '#helpers/seo';
 import CoverPageLayout from './CoverPageLayout';
 import type { Metadata } from 'next';
@@ -76,6 +77,9 @@ export async function generateMetadata(
       twitter: {
         card: 'summary_large_image',
         images: `/api/og/${params.userName}${imageUrlOption}`,
+      },
+      itunes: {
+        appId: `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_ID}, ${env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID}`,
       },
     },
   });

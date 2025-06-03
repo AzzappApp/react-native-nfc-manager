@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery } from '../../../[userName]/theme.css';
+import { MediaQuery } from '../../../theme.css';
 
 const coverPreviewContainer = style({
   display: 'flex',

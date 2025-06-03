@@ -2,11 +2,7 @@
 
 import classNames from 'classnames';
 import { forwardRef, type InputHTMLAttributes } from 'react';
-import {
-  textField,
-  textMedium,
-  textSmallBold,
-} from '#app/[userName]/theme.css';
+import { textField, textMedium, textSmallBold } from '#app/theme.css';
 import formInputStyles, { INPUT_HEIGHT } from '../FormInput/FormInput.css';
 import { containerWithPrefix, inputContainer, prefixSpan } from './Input.css';
 

@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { colors } from '@azzapp/shared/colorsHelpers';
-import { MediaQuery, textSmall, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, textSmall, vars } from '#app/theme.css';
 
 const wrapper = style({
   width: '100%',

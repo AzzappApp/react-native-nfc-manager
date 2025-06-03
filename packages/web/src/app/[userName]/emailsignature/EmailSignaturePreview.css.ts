@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { MediaQuery } from '../theme.css';
+import { MediaQuery } from '../../theme.css';
 
 const styles = {
   simpleSignaturePreviewContainer: style({

@@ -8,6 +8,7 @@ import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { getTranslationMessages } from '@azzapp/service/i18nServices';
 import env from '#env';
 import ClientWrapper from '#components/ClientWrapper';
+import { AndroidAppBanner } from './AndroidAppBanner';
 import { cachedGetWebCardByUserName } from './dataAccess';
 import { themeClass } from './theme.css';
 import type { ClientWrapperProps } from '#components/ClientWrapper';
@@ -82,14 +83,11 @@ const RootLayout = async (props: {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        <meta
-          name="apple-itunes-app"
-          content={`${env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
-        />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
           {children}
+          <AndroidAppBanner />
         </ClientWrapper>
         <Script id="vh-fix" async>
           {`
@@ -98,7 +96,6 @@ const RootLayout = async (props: {
             }
             applyVH();
             window.addEventListener('resize', applyVH);
-
          `}
         </Script>
         <div id="portal" />

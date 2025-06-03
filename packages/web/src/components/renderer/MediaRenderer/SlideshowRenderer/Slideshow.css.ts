@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery } from '#app/[userName]/theme.css';
+import { MediaQuery } from '#app/theme.css';
 
 const container = style({
   display: 'flex',

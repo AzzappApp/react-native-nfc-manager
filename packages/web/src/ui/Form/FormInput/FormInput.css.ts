@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textField, textFieldError, vars } from '#app/[userName]/theme.css';
+import { textField, textFieldError, vars } from '#app/theme.css';
 
 export const INPUT_HEIGHT = 47;
 export const INPUT_PADDING_HORIZONTAL = 5;

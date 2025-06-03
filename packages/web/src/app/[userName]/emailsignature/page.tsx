@@ -16,7 +16,7 @@ import azzappFull from '#assets/images/azzapp-full.png';
 import { CopyrightFooter } from '#components/CopyrightFooter';
 import { getDeviceInfo } from '#helpers/devices';
 import { getServerIntl } from '#helpers/i18nHelpers';
-import { cachedGetWebCardByUserName } from '../dataAccess';
+import { cachedGetWebCardByUserName } from '../../dataAccess';
 import notFound from '../not-found';
 import CopySignatureButton from './CopySignatureButton';
 import EmailSignaturePreview from './EmailSignaturePreview';

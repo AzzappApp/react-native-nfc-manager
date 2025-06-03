@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textField, vars } from '#app/[userName]/theme.css';
+import { textField, vars } from '#app/theme.css';
 import { INPUT_PADDING_HORIZONTAL } from '../FormInput/FormInput.css';
 
 export const inputContainer = style({

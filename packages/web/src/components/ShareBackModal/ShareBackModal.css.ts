@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textLargeSemiBold, vars } from '#app/[userName]/theme.css';
+import { textLargeSemiBold, vars } from '#app/theme.css';
 
 const AVATAR_CONTAINER_TOP_POSITION = 35;
 

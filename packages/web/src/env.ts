@@ -31,9 +31,9 @@ export const schema = z.object({
     .default('http://localhost:3000')
     .describe('API endpoint'),
   NEXT_PUBLIC_GTM_ID: z.string().default('').describe('Google Tag Manager ID'),
-  NEXT_PUBLIC_APPLE_ITUNES_APP_META: z
+  NEXT_PUBLIC_APPLE_ITUNES_APP_ID: z
     .string()
-    .default('app-id=6502694267')
+    .default('6502694267')
     .describe('Apple iTunes app meta'),
   NEXT_PUBLIC_APP_CLIP_BUNDLE_ID: z
     .string()
@@ -49,8 +49,7 @@ const env = schema.safeParse({
   NEXT_PUBLIC_APPLE_APP_ENABLED: process.env.NEXT_PUBLIC_APPLE_APP_ENABLED,
   NEXT_PUBLIC_APPLE_APP_CLIP_URL: process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL,
   NEXT_PUBLIC_APP_CLIP_BUNDLE_ID: process.env.NEXT_PUBLIC_APP_CLIP_BUNDLE_ID,
-  NEXT_PUBLIC_APPLE_ITUNES_APP_META:
-    process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META,
+  NEXT_PUBLIC_APPLE_ITUNES_APP_ID: process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_ID,
   NEXT_PUBLIC_DOWNLOAD_IOS_APP: process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP,
   NEXT_PUBLIC_DOWNLOAD_ANDROID_APP:
     process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP,

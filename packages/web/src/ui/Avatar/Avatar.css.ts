@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textXLarge, vars } from '#app/[userName]/theme.css';
+import { textXLarge, vars } from '#app/theme.css';
 
 const contentWrapper = style({
   display: 'flex',

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, textButtonMedium, vars } from './theme.css';
+import { MediaQuery, textButtonMedium, vars } from '../theme.css';
 
 const whatsappAvatar = style({
   width: 50,

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, textLarge, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, textLarge, vars } from '#app/theme.css';
 import { MAX_COVER_WIDTH } from '#components/renderer/CoverRenderer/CoverRenderer.css';
 
 const wrapper = style({

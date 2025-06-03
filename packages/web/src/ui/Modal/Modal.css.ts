@@ -1,6 +1,6 @@
 import { style, keyframes } from '@vanilla-extract/css';
 import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
-import { vars } from '#app/[userName]/theme.css';
+import { vars } from '#app/theme.css';
 
 const slideUp = keyframes({
   '0%': { transform: 'translateY(100%)' },

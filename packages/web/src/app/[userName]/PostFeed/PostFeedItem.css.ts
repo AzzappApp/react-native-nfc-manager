@@ -5,7 +5,7 @@ import {
   textSmall,
   textSmallBold,
   vars,
-} from '#app/[userName]/theme.css';
+} from '#app/theme.css';
 
 const post = style({
   '@media': {

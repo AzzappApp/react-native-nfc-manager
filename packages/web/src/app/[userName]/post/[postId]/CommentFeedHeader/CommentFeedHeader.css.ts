@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, vars } from '#app/theme.css';
 
 const feedHeader = style({
   padding: '20px 10px',

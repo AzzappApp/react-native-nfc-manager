@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textLargeSemiBold, textMedium, vars } from '#app/[userName]/theme.css';
+import { textLargeSemiBold, textMedium, vars } from '#app/theme.css';
 
 const bottomContainer = style({
   display: 'flex',

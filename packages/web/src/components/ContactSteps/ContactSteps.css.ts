@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textXSmall, vars } from '#app/[userName]/theme.css';
+import { textXSmall, vars } from '#app/theme.css';
 
 const stepContainer = style({
   display: 'flex',

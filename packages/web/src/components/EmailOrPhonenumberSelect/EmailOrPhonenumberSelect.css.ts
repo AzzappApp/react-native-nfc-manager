@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { vars } from '#app/[userName]/theme.css';
+import { vars } from '#app/theme.css';
 
 export const selectContainer = style({
   backgroundColor: vars.color.grey50,
