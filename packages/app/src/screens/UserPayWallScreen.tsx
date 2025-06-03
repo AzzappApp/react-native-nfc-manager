@@ -389,9 +389,9 @@ const UserPayWallScreen = ({
             colors={['rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.95)']}
             locations={[0, 1]}
             style={{
+              top: 0,
               height: height - BOTTOM_HEIGHT + 130,
               width,
-
               position: 'absolute',
             }}
             pointerEvents="none"
@@ -833,7 +833,6 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     justifyContent: 'space-between',
     flex: 1,
-
     marginBottom: 10,
   },
   selectionItem: {
