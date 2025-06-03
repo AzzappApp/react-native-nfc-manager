@@ -280,7 +280,7 @@ platform :ios do
       --bundle-output "#{build_dir}/main.jsbundle" \
       --assets-dest "#{absolute_app_dir}" \
       --minify false \
-      --sourcemap-output "#{build_dir}/packager.jsbundle.map"
+      --sourcemap-output "#{build_dir}/main.jsbundle.map"
 
       #{hermesc} -emit-binary -max-diagnostic-width=80 -O \
         -output-source-map \
@@ -291,10 +291,9 @@ platform :ios do
       RN_PATH=$(dirname "$RN_PATH")
 
       node $RN_PATH/scripts/compose-source-maps.js \
-        #{build_dir}/packager.jsbundle.map \
+        #{build_dir}/main.jsbundle.map \
         #{absolute_app_dir}/main.jsbundle.map \
         -o #{build_dir}/main.jsbundle.map
-
     BASH
 
     ###########################
@@ -329,6 +328,7 @@ platform :ios do
       app_identifier: app_ident,
       build: build_number,
       dist: build_number,
+      url_prefix: '~/',
       sourcemap: ['./fastlane/builds/main.jsbundle', './fastlane/builds/main.jsbundle.map'],
       rewrite: true
     )
