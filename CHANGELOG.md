@@ -1,3 +1,9 @@
+## 2.0.0-canary.64
+
+* **fix:**  - ensure header middle element is well centered ([#9169](https://github.com/AzzappApp/azzapp/pull/9169))
+* **fix:**  - do not force light mode in multiuserScreen ([#9166](https://github.com/AzzappApp/azzapp/pull/9166))
+* **fix:**  - remove unused variable ([#9165](https://github.com/AzzappApp/azzapp/pull/9165))
+
 ## 2.0.0-canary.63
 
 
