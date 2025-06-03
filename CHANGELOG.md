@@ -1,3 +1,9 @@
+## 2.0.0-canary.65
+
+* **fix:**  - valid email and don't display provfile selector if not needed ([#9174](https://github.com/AzzappApp/azzapp/pull/9174))
+* **fix:**  - **webCard:** [#8488](https://github.com/AzzappApp/azzapp/pull/8488) company name and activity cases ([#9173](https://github.com/AzzappApp/azzapp/pull/9173))
+* **fix:**  - refresh indicator not cleared on android ([#9142](https://github.com/AzzappApp/azzapp/pull/9142))
+
 ## 2.0.0-canary.64
 
 * **fix:**  - ensure header middle element is well centered ([#9169](https://github.com/AzzappApp/azzapp/pull/9169))
