@@ -1,3 +1,8 @@
+## 2.0.0-rc.4
+
+* **fix:**  - **contact:** [#9212](https://github.com/AzzappApp/azzapp/pull/9212) wrong url on contact creation ([#9214](https://github.com/AzzappApp/azzapp/pull/9214))
+* **fix:**  - [#9215](https://github.com/AzzappApp/azzapp/pull/9215) use explicitly process.env for babel plugin on mobile app ([#9216](https://github.com/AzzappApp/azzapp/pull/9216))
+
 ## 2.0.0-rc.3
 
 
