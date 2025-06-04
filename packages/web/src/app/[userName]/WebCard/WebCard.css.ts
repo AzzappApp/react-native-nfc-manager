@@ -170,10 +170,12 @@ const header = style({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: 10,
+  paddingTop: 10,
+  paddingBottom: 50,
   gap: 10,
   top: 0,
   width: '100%',
+  backgroundColor: vars.color.white,
 });
 
 const coverWrapper = style({

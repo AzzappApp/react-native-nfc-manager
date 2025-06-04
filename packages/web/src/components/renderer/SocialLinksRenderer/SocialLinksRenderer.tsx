@@ -75,7 +75,7 @@ const SocialLinksRenderer = ({
           >
             {linksOrdered.map(link => (
               <SocialLink
-                key={link.socialId}
+                key={`${link.socialId}-${link.position}`}
                 link={link}
                 borderWidth={borderWidth}
                 iconColor={swapColor(iconColor, colorPalette)}
@@ -101,7 +101,7 @@ const SocialLinksRenderer = ({
         >
           {linksOrdered.map(link => (
             <SocialLink
-              key={link.socialId}
+              key={`${link.socialId}-${link.position}`}
               link={link}
               borderWidth={borderWidth}
               iconColor={swapColor(iconColor, colorPalette)}
