@@ -1,3 +1,7 @@
+## 2.0.0-canary.76
+
+* **feat:**  - make email signature clickable and redirect to edit contact card ([#9205](https://github.com/AzzappApp/azzapp/pull/9205))
+
 ## 2.0.0-canary.75
 
 * **fix:**  - remove url from share on ios and keep only android strategy ([#9197](https://github.com/AzzappApp/azzapp/pull/9197))
