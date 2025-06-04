@@ -1,3 +1,7 @@
+## 2.1.0-canary.2
+
+
+
 ## 2.1.0-canary.1
 
 * **build:**  - fix release script
