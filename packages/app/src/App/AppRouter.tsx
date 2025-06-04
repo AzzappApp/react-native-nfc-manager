@@ -170,7 +170,8 @@ const MainRouter = () => {
         profileInfos?.profileId && // no webcard available
         !profileInfos?.invited && // invitation not validated
         !!profileInfos?.webCardUserName && // creation not finished
-        currentRoute?.route !== 'CONTACT_CARD_CREATE' // new contact card creation
+        currentRoute?.route !== 'CONTACT_CARD_CREATE' && // new contact card creation
+        profileInfos?.cardIsPublished
       ) {
         router.push({
           route: 'SHAKE_AND_SHARE',
