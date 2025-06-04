@@ -58,6 +58,8 @@ module.exports = withAxiom(
       silent: !process.env.CI,
       org: 'azzapp',
       project: 'web',
+
+      authToken: process.env.SENTRY_AUTH_TOKEN,
     },
     {
       // For all available options, see:
