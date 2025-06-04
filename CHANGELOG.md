@@ -1,3 +1,9 @@
+## 2.0.0-canary.74
+
+* **fix:**  - add missing padding in contacts screen ([#9198](https://github.com/AzzappApp/azzapp/pull/9198))
+* **fix:**  - remove transparent pixel in the border and fix background color ([#9194](https://github.com/AzzappApp/azzapp/pull/9194))
+* **feat:**  - add unpublish confirmation popup ([#9195](https://github.com/AzzappApp/azzapp/pull/9195))
+
 ## 2.0.0-canary.73
 
 * **fix:**  - webcard issue with share back  ([#9193](https://github.com/AzzappApp/azzapp/pull/9193))
