@@ -9,8 +9,8 @@ const coverPreviewContainer = style({
   height: '100vh', // fallback
   // override if supported
   '@supports': {
-    '(height: 100dvh)': {
-      height: '100dvh',
+    '(height: 100svh)': {
+      height: '100svh',
     },
   },
   overflow: 'hidden',
