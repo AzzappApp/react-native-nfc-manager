@@ -7,6 +7,11 @@ const pkg = require('../package.json');
 const buildChangeLog = require('./buildChangeLog');
 const setWorkspaceVersions = require('./setWorkspaceVersions');
 
+const extractVersionNumber = version => {
+  const [major, minor, patch] = version.split('-')[0].split('.');
+  return [Number(major), Number(minor), Number(patch)];
+};
+
 const main = async () => {
   const args = process.argv.slice(2);
   if (args.length > 1) {
@@ -115,9 +120,4 @@ const execSyncWithLog = (command, options) => {
     console.log('sdterr', err.stderr.toString());
     throw err;
   }
-};
-
-const extractVersionNumber = version => {
-  const [major, minor, patch] = version.split('-')[0].split('.');
-  return [Number(major), Number(minor), Number(patch)];
 };
