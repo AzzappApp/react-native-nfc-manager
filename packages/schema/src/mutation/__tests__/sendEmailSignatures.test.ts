@@ -94,9 +94,7 @@ describe('sendEmailSignaturesMutation', () => {
       mockInfo,
     );
 
-    expect(sendEmailSignatures).toHaveBeenCalledWith(['profile-1'], {
-      id: webCardId,
-    });
+    expect(sendEmailSignatures).toHaveBeenCalledWith(['profile-1']);
   });
 
   it('returns the correct response', async () => {

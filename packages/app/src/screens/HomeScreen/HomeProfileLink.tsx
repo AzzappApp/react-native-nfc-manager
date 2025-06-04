@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -10,12 +10,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
+import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
 import type { TextProps } from '#ui/Text';
@@ -39,8 +39,11 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     userKey,
   );
 
-  const { currentIndexProfileSharedValue, currentIndexSharedValue } =
-    useHomeScreenContext();
+  const {
+    currentIndexProfileSharedValue,
+    currentIndexSharedValue,
+    readableTextColor,
+  } = useHomeScreenContext();
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const userNames = useDerivedValue(
@@ -67,7 +70,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(
+      buildWebUrl(
         userNames.value[currentIndexProfileSharedValue.value - 1] ?? '',
       ),
     )
@@ -93,17 +96,21 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   const ref = useRef(null);
 
+  const onPressLatest = useLatestCallback(onPress);
   useEffect(() => {
     registerTooltip('profileLink', {
       ref,
-      onPress,
+      onPress: onPressLatest,
     });
 
     return () => {
       unregisterTooltip('profileLink');
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registerTooltip, unregisterTooltip]);
+  }, [onPressLatest, registerTooltip, unregisterTooltip]);
+
+  const iconStyles = useAnimatedStyle(() => ({
+    tintColor: readableTextColor.value,
+  }));
 
   return (
     <Animated.View ref={ref} style={[styles.container, opacityStyle]}>
@@ -112,9 +119,8 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="link" style={styles.iconLink} />
+        <Icon icon="link" style={[styles.iconLink, iconStyles]} />
         <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
-        <View style={styles.emptyViewCenter} />
       </PressableNative>
     </Animated.View>
   );
@@ -122,9 +128,17 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
 const HomeProfileLinkText = ({
   text,
+  style,
   ...props
 }: TextProps & { text: DerivedValue<string> }) => {
+  // Cause a reading of shared value during render
+  // eslint-disable-next-line react-compiler/react-compiler
+  'use no memo';
   const [textInner, setTextInner] = useState(() => text.value);
+  const { readableTextColor } = useHomeScreenContext();
+  const animatedStyle = useAnimatedStyle(() => {
+    return { color: readableTextColor.value };
+  });
 
   useAnimatedReaction(
     () => text.value,
@@ -133,9 +147,14 @@ const HomeProfileLinkText = ({
     },
   );
   return (
-    <Text variant="button" numberOfLines={1} {...props}>
+    <Animated.Text
+      variant="button"
+      numberOfLines={1}
+      {...props}
+      style={[style, animatedStyle]}
+    >
       {textInner}
-    </Text>
+    </Animated.Text>
   );
 };
 
@@ -143,7 +162,7 @@ export default memo(HomeProfileLink);
 
 export const PROFILE_LINK_HEIGHT = 29;
 
-export const PROFILE_LINK_MARGIN_TOP = 21;
+export const PROFILE_LINK_MARGIN_TOP = 10;
 
 const styles = StyleSheet.create({
   container: {
@@ -155,30 +174,24 @@ const styles = StyleSheet.create({
   },
   url: {
     maxWidth: '90%',
-    color: colors.white,
+    color: `${colors.white}BF`,
     lineHeight: 14,
     top: Platform.OS === 'ios' ? 1 : 0,
     height: 16,
-    paddingLeft: 5,
   },
   iconLink: {
-    tintColor: colors.white,
-    marginLeft: 10,
+    tintColor: `${colors.white}BF`,
     height: 18,
     width: 18,
   },
   containerText: {
     height: PROFILE_LINK_HEIGHT,
-    borderWidth: 1,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  emptyViewCenter: {
-    marginRight: 13,
-    height: 18,
+    backgroundColor: `${colors.white}1A`,
+    gap: 10,
+    paddingHorizontal: 13,
   },
 });

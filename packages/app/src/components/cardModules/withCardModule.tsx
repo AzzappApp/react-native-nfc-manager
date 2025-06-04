@@ -156,7 +156,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
           ...ModuleEditionScreenTitle_webCard
         }
       `,
-      data?.profile?.webCard as withCardModule_webCard$key,
+      data?.node?.profile?.webCard as withCardModule_webCard$key,
     );
 
     const cardModulesCount = useMemo(
@@ -216,10 +216,11 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
       variant as Variant<T>,
     );
 
+    // TODO REFACTOR THIS HORRIBLE CASTING THAT BREAKS THE TYPE SYSTEM aka @batical I'm watching you when you sleep
     const module = moduleId
-      ? (data?.profile?.webCard?.cardModules.find(
+      ? (data?.node?.profile?.webCard?.cardModules.find(
           module => module?.id === moduleId,
-        ) as unknown as V) //some hardCasting but was not able at the time to find a better solution
+        )?.innerModule as unknown as V) //some hardCasting but was not able at the time to find a better solution
       : null;
 
     // #endRegion

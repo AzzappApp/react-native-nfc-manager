@@ -31,11 +31,11 @@ const WebCardPostsList = ({
 
   const profileInfos = useProfileInfos();
 
-  const { webCard } = useLazyLoadQuery<WebCardPostsListQuery>(
+  const { node } = useLazyLoadQuery<WebCardPostsListQuery>(
     graphql`
       query WebCardPostsListQuery($id: ID!, $viewerWebCardId: ID!) {
-        webCard: node(id: $id) {
-          ... on WebCard {
+        node(id: $id) {
+          ... on WebCard @alias(as: "webCard") {
             ...WebCardPostsList_webCard
               @arguments(viewerWebCardId: $viewerWebCardId)
             ...PostRendererFragment_author
@@ -47,6 +47,7 @@ const WebCardPostsList = ({
     { id: webCardId, viewerWebCardId: profileInfos?.webCardId ?? '' },
     { fetchPolicy: 'store-and-network' },
   );
+  const webCard = node?.webCard;
 
   const router = useRouter();
   const onClose = () => {

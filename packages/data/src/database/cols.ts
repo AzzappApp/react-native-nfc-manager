@@ -22,7 +22,6 @@ import {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_VARCHAR_LENGTH,
 } from './constants';
-import sqliteCols from './sqliteCols';
 
 type DataPoint = { longitude: number; latitude: number };
 
@@ -65,7 +64,5 @@ const cols = {
     },
   }),
 };
-
-if (process.env.SQL_ENV === 'SQLITE') Object.assign(cols, sqliteCols);
 
 export default cols;

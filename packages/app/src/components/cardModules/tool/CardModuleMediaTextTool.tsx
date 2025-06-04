@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
@@ -94,13 +94,13 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     setLinkAction(cardModuleMedia.link?.label);
   }, [cardModuleMedia]);
 
+  const wasShown = useRef(false);
   useEffect(() => {
-    if (show && isNotFalsyString(linkUrl)) {
+    if (!wasShown && show && isNotFalsyString(linkUrl)) {
       setHasLinkError(!isValidUrl(linkUrl));
     }
-    //don't want to refrehs on linkUrl update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
+    wasShown.current = show;
+  }, [linkUrl, show]);
 
   const actionLabel = intl.formatMessage({
     defaultMessage: 'Open',

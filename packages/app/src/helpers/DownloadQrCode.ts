@@ -27,7 +27,6 @@ const DownloadQrCode = async (profileId: string, qrCode: string) => {
       url: filePath,
       type: 'image/png',
       failOnCancel: false,
-      saveToFiles: true,
     });
 
     // clean up file afterward

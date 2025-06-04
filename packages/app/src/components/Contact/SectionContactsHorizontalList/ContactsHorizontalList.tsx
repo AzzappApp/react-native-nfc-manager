@@ -1,67 +1,69 @@
-import { useCallback, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Button from '#ui/Button';
-import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactHorizontalItem from './ContactHorizontalItem';
-import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
 import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
+  ContactsHorizontalList_contacts$data,
+  ContactsHorizontalList_contacts$key,
+} from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type { ListRenderItemInfo } from 'react-native';
 
-type ContactsScreenSectionProps = {
+export type ContactsScreenSectionProps = {
   title: string;
-  data: ContactType[];
-  localContacts: Contact[];
-  onShowContact: (contact: ContactType) => void;
-  contactsPermissionStatus: ContactPermissionStatus;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
+  count?: number;
+  contacts: ContactsHorizontalList_contacts$key;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (arg: string[] | string) => void;
   showLocationInSubtitle?: boolean;
-  onPressAll?: (title: string) => void;
+  onSeeAll?: () => void;
 };
 
 const ContactsScreenSection = ({
   title,
-  data,
-  localContacts,
+  count,
+  contacts: contactsKey,
   onShowContact,
-  contactsPermissionStatus,
-  showContactAction,
-  onPressAll,
+  onShowContactAction,
+  onSeeAll,
   showLocationInSubtitle,
 }: ContactsScreenSectionProps) => {
-  const [invited, setInvited] = useState(false);
+  const contacts = useFragment(
+    graphql`
+      fragment ContactsHorizontalList_contacts on Contact @relay(plural: true) {
+        id
+        meetingPlace {
+          city
+          country
+          region
+          subregion
+        }
+        ...ContactHorizontalItem_contact
+      }
+    `,
+    contactsKey,
+  );
 
-  const onMore = useCallback(() => {
-    showContactAction({
-      contact: data,
-      showInvite: !invited,
-      hideInvitation: () => setInvited(false),
-    });
-  }, [data, invited, showContactAction]);
-
-  const RenderProfile = useCallback(
-    ({ item }: ListRenderItemInfo<ContactType>) => {
+  const renderProfile = useCallback(
+    ({ item }: ListRenderItemInfo<ItemType>) => {
       return (
         <ContactHorizontalItem
           contact={item}
           onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={showContactAction}
+          onShowContactAction={onShowContactAction}
         />
       );
     },
-    [localContacts, onShowContact, contactsPermissionStatus, showContactAction],
+    [onShowContact, onShowContactAction],
   );
 
   const intl = useIntl();
@@ -70,7 +72,7 @@ const ContactsScreenSection = ({
   const locations = showLocationInSubtitle
     ? Array.from(
         new Set(
-          data
+          contacts
             .map(x => getFriendlyNameFromLocation(x.meetingPlace))
             .filter(isDefined),
         ),
@@ -87,25 +89,27 @@ const ContactsScreenSection = ({
           <Text variant="small" style={styles.count}>
             <FormattedMessage
               defaultMessage="{contacts, plural,
-              =0 {# contacts received}
-              =1 {# contact received}
-              other {# contacts received}
-      }"
+                =0 {# contacts received}
+                =1 {# contact received}
+                other {# contacts received}
+              }"
               description="ContactsScreen - Contacts counter under section by location or date"
-              values={{ contacts: data.length }}
+              values={{ contacts: count ?? contacts.length }}
             />
             {locations}
           </Text>
         </View>
-        <PressableNative onPress={onMore}>
+        {/* This functionality is disabled for now, since not all contacts are
+          loaded anymore. So action needs to be refactored to adapt the new logic */}
+        {/* <PressableNative onPress={onMore}>
           <Icon icon="more" />
-        </PressableNative>
+        </PressableNative> */}
       </View>
 
       <FlatList
-        data={data}
+        data={contacts}
         keyExtractor={keyExtractor}
-        renderItem={RenderProfile}
+        renderItem={renderProfile}
         horizontal
         contentContainerStyle={styles.profiles}
         showsHorizontalScrollIndicator={false}
@@ -113,8 +117,24 @@ const ContactsScreenSection = ({
         decelerationRate="fast"
         scrollEventThrottle={16}
         nestedScrollEnabled
+        ListFooterComponent={
+          onSeeAll ? (
+            <PressableNative style={styles.morePlaceHolder} onPress={onSeeAll}>
+              <LinearGradient
+                colors={[`${colors.grey1000}FF`, `${colors.grey1000}00`]}
+                style={styles.morePlaceHolderBackground}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text variant="medium" style={styles.morePlaceHolderText}>
+                  + {(count ?? contacts.length) - contacts.length}
+                </Text>
+              </LinearGradient>
+            </PressableNative>
+          ) : null
+        }
       />
-      {onPressAll ? (
+      {onSeeAll ? (
         <View style={styles.seeAll}>
           <Button
             variant="little_round"
@@ -122,13 +142,15 @@ const ContactsScreenSection = ({
               defaultMessage: 'See all',
               description: 'See all found contacts',
             })}
-            onPress={() => onPressAll?.(title)}
+            onPress={onSeeAll}
           />
         </View>
       ) : null}
     </View>
   );
 };
+
+type ItemType = ContactsHorizontalList_contacts$data[number];
 
 const styles = StyleSheet.create({
   section: {
@@ -145,7 +167,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   profiles: {
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     marginTop: 15,
     gap: 5,
   },
@@ -153,6 +175,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     top: '40%',
+  },
+  morePlaceHolder: {
+    width: 80,
+    height: 80 / COVER_RATIO,
+    marginRight: 80,
+    borderRadius: COVER_CARD_RADIUS * 80,
+    overflow: 'hidden',
+  },
+  morePlaceHolderBackground: {
+    width: 80,
+    height: 80 / COVER_RATIO,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  morePlaceHolderText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 

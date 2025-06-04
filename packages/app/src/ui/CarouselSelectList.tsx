@@ -106,6 +106,11 @@ export type CarouselSelectListProps<TItem = any> = Omit<
    * @param width new width of carousel item
    */
   onItemWidthUpdated?: (width: number) => void;
+
+  /**
+   * If true, the item will be animated with opacity
+   */
+  withAnimatedOpacity?: boolean;
 };
 
 export type CarouselSelectListHandle = {
@@ -132,6 +137,7 @@ function CarouselSelectList<TItem = any>(
     currentProfileIndexSharedValue,
     onSelectedIndexChange,
     onItemWidthUpdated,
+    withAnimatedOpacity = false,
     ...props
   }: CarouselSelectListProps<TItem>,
   ref: ForwardedRef<CarouselSelectListHandle>,
@@ -186,7 +192,7 @@ function CarouselSelectList<TItem = any>(
           return;
         }
         if (!animated) {
-          scrollIndex.value = index;
+          scrollIndex.set(index);
         }
         listRef.current?.scrollToOffset({
           offset: index * itemWidth,
@@ -234,9 +240,9 @@ function CarouselSelectList<TItem = any>(
         return;
       }
       const index = event.contentOffset.x / itemWidth;
-      scrollIndex.value = index;
+      scrollIndex.set(index);
       if (currentProfileIndexSharedValue) {
-        currentProfileIndexSharedValue.value = index;
+        currentProfileIndexSharedValue.set(index);
       }
     },
   });
@@ -250,7 +256,7 @@ function CarouselSelectList<TItem = any>(
         currentProfileIndexSharedValue &&
         currentProfileIndexSharedValue.value !== Math.round(index)
       ) {
-        currentProfileIndexSharedValue.value = Math.round(index);
+        currentProfileIndexSharedValue.set(Math.round(index));
       }
     },
     [currentProfileIndexSharedValue, itemWidth, onSelectedIndexChange],
@@ -289,6 +295,7 @@ function CarouselSelectList<TItem = any>(
           renderChildren={renderItem}
           info={info}
           containerWidth={containerWidth ?? 0}
+          withAnimatedOpacity={withAnimatedOpacity}
         />
       );
     },
@@ -300,6 +307,7 @@ function CarouselSelectList<TItem = any>(
       containerHeight,
       renderItem,
       containerWidth,
+      withAnimatedOpacity,
     ],
   );
 
@@ -354,6 +362,7 @@ const AnimatedItemWrapper = ({
   width,
   height,
   containerWidth,
+  withAnimatedOpacity,
 }: {
   index: number;
   scrollIndex: SharedValue<number>;
@@ -364,6 +373,7 @@ const AnimatedItemWrapper = ({
   width: number;
   height: number;
   containerWidth: number;
+  withAnimatedOpacity: boolean;
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
     const offset = (width - width * scaleRatio) / 2;
@@ -382,7 +392,15 @@ const AnimatedItemWrapper = ({
       Extrapolation.CLAMP,
     );
 
+    const opacity = interpolate(
+      scrollIndex.value,
+      [index - 1, index, index + 1],
+      [0.44, 1, 0.44],
+      Extrapolation.CLAMP,
+    );
+
     return {
+      opacity: withAnimatedOpacity ? opacity : 1,
       transform: [{ translateX }, { scale }],
     };
   });

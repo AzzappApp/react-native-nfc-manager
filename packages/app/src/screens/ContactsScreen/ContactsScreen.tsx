@@ -1,177 +1,353 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { Platform, View } from 'react-native';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { colors } from '#theme';
-import AccountHeader from '#components/AccountHeader';
+import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
-import useNotificationsEvent from '#hooks/useNotifications';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
+import Header from '#ui/Header';
 import Icon from '#ui/Icon';
+import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SearchBarStatic from '#ui/SearchBarStatic';
+import TabView from '#ui/TabView';
 import Text from '#ui/Text';
-
-import ContactScreenLists from './ContactsScreenLists';
+import ContactsByDateList from '../../components/Contact/ContactsByDateList';
+import ContactsByLocationList from '../../components/Contact/ContactsByLocationList';
+import UserContactsList from '../../components/Contact/UserContactsList';
+import ContactsScreenEmpty from './ContactsScreenEmpty';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { ContactsRoute } from '#routes';
-import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 const contactsScreenQuery = graphql`
-  query ContactsScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
-        id
-        nbContacts
-        ...ContactsScreenLists_contacts
-        webCard {
-          id
-          ...CoverRenderer_webCard
-          ...AccountHeader_webCard
-        }
-      }
+  query ContactsScreenQuery {
+    currentUser {
+      nbContacts
     }
+    ...ContactsByDateList_root
   }
 `;
 
 const ContactsScreen = ({
   preloadedQuery,
-  refreshQuery,
 }: RelayScreenProps<ContactsRoute, ContactsScreenQuery>) => {
   const router = useRouter();
-  const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
+  const data = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
+  const { currentUser } = data;
 
   const styles = useStyleSheet(stylesheet);
 
-  const [searchBy, setSearchBy] = useState<'date' | 'location' | 'name'>(
+  const [currentTab, setCurrentTab] = useState<'date' | 'location' | 'name'>(
     'date',
   );
-  const [search, setSearch] = useState<string | undefined>(undefined);
+  const [search, setSearch] = useState<string>('');
   const [debounceSearch] = useDebounce(search, 500);
+  const onChangeText = useCallback((text: string | undefined) => {
+    setSearch(text ?? '');
+  }, []);
+
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
     useBoolean();
 
-  const onDeepLink = useCallback(
-    (notification: PushNotificationType) => {
-      if (
-        notification.type === 'shareBack' &&
-        notification.webCardId === profile?.webCard?.id
-      ) {
-        refreshQuery?.();
-      }
-    },
-    [profile?.webCard?.id, refreshQuery],
-  );
+  const [commitContactsLastView] =
+    useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
+      graphql`
+        mutation ContactsScreenListsMutationUpdateContactsLastViewMutation {
+          updateContactsLastView
+        }
+      `,
+    );
 
-  useNotificationsEvent({ onDeepLinkInApp: onDeepLink });
+  useEffect(() => {
+    const userId = getAuthState().profileInfos?.userId;
+    if (!userId) {
+      return;
+    }
+    commitContactsLastView({ variables: {} });
+  }, [commitContactsLastView]);
+
+  const onShowContact = useCallback(
+    async (contactId: string) => {
+      router.push({
+        route: 'CONTACT_DETAILS',
+        params: { contactId },
+      });
+    },
+    [router],
+  );
 
   const onCreateWithScanner = useCallback(() => {
     closeNewContactMenu();
-    if (profile?.id) {
-      router.push({
-        route: 'CONTACT_CREATE',
-        params: { showCardScanner: true },
-      });
-    }
-  }, [closeNewContactMenu, profile?.id, router]);
+    router.push({
+      route: 'CONTACT_CREATE',
+      params: { showCardScanner: true },
+    });
+  }, [closeNewContactMenu, router]);
 
   const onCreateContact = useCallback(() => {
     closeNewContactMenu();
-    if (profile?.id) {
-      router.push({
-        route: 'CONTACT_CREATE',
-        params: { showCardScanner: false },
-      });
-    }
-  }, [closeNewContactMenu, profile?.id, router]);
+    router.push({
+      route: 'CONTACT_CREATE',
+      params: { showCardScanner: false },
+    });
+  }, [closeNewContactMenu, router]);
 
   const intl = useIntl();
 
+  const onBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  const { height: screenHeight } = useScreenDimensions();
+  const insets = useScreenInsets();
+
+  const searchBarVisible = useSharedValue(1);
+  const toggleSearchBar = useCallback(
+    (show: boolean) => {
+      searchBarVisible.set(withTiming(show ? 1 : 0, { duration: 350 }));
+    },
+    [searchBarVisible],
+  );
+
+  const onTabChange = useCallback(
+    (tab: 'date' | 'location' | 'name') => {
+      setCurrentTab(tab);
+      toggleSearchBar(true);
+    },
+    [toggleSearchBar],
+  );
+
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollY.value = event.contentOffset.y;
+  });
+
+  const searchBarContainerStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, SEARCHBAR_HEIGHT],
+      [0, -SEARCHBAR_HEIGHT],
+      Extrapolation.CLAMP,
+    );
+    return {
+      transform: [{ translateY: Platform.OS === 'ios' ? translateY : 0 }],
+    };
+  });
+
+  const tabBarContainerStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, SEARCHBAR_HEIGHT],
+      [0, -SEARCHBAR_HEIGHT],
+      Extrapolation.CLAMP,
+    );
+    return {
+      transform: [{ translateY: Platform.OS === 'ios' ? translateY : 0 }],
+    };
+  });
+
+  const { progress: keyboardProgress } = useReanimatedKeyboardAnimation();
+  const keyboardHeight = useKeyboardHeight();
+  const contentHeight = useAnimatedStyle(() => {
+    return {
+      height:
+        screenHeight - keyboardHeight.value - (1 - keyboardProgress.value),
+    };
+  });
+
+  const paddingBottom = useAnimatedStyle(() => {
+    return {
+      paddingBottom: keyboardHeight.value > insets.bottom ? 10 : insets.bottom,
+    };
+  });
+
   return (
     <>
-      <Container style={styles.container}>
-        {profile?.webCard && (
-          <AccountHeader
-            leftIcon={null}
-            webCard={profile?.webCard}
-            title={
-              <Text variant="large">
-                <FormattedMessage
-                  description="ContactsScreen - Title"
-                  defaultMessage="{contacts, plural,
-                =0 {# contacts received}
-                =1 {# contact received}
-                other {# contacts received}
-        }"
-                  values={{ contacts: profile?.nbContacts ?? 0 }}
+      {currentUser?.nbContacts ? (
+        <View style={styles.container}>
+          <Animated.View style={[{ height: screenHeight }, contentHeight]}>
+            <Container style={[styles.container, { paddingTop: insets.top }]}>
+              <Container style={styles.header}>
+                <Header
+                  leftElement={
+                    <IconButton
+                      icon="close"
+                      onPress={onBack}
+                      variant="icon"
+                      hitSlop={40}
+                    />
+                  }
+                  middleElement={
+                    <Text variant="large" style={styles.title}>
+                      <FormattedMessage
+                        defaultMessage="{contacts, plural,=0 {# contacts received}=1 {# contact received}other {# contacts received}}"
+                        description="ContactsScreen - Title"
+                        values={{ contacts: currentUser?.nbContacts ?? 0 }}
+                      />
+                    </Text>
+                  }
+                  rightElement={<View style={{ width: 24 }} />}
                 />
-              </Text>
-            }
-          />
-        )}
-        <View style={styles.menu}>
-          <RoundedMenuComponent
-            selected={searchBy === 'date'}
-            label={intl.formatMessage({
-              defaultMessage: 'Date',
-              description: 'Date selector label in ContactsScreen',
-            })}
-            id="date"
-            onSelect={() => setSearchBy('date')}
-          />
-          <RoundedMenuComponent
-            selected={searchBy === 'name'}
-            label={intl.formatMessage({
-              defaultMessage: 'Name',
-              description: 'Name selector label in ContactsScreen',
-            })}
-            id="name"
-            onSelect={() => setSearchBy('name')}
-          />
-          <RoundedMenuComponent
-            selected={searchBy === 'location'}
-            label="Location"
-            id="location"
-            onSelect={() => setSearchBy('location')}
-          />
+                <View style={styles.menu}>
+                  <RoundedMenuComponent
+                    selected={currentTab === 'date'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Date',
+                      description: 'Date selector label in ContactsScreen',
+                    })}
+                    id="date"
+                    onSelect={() => onTabChange('date')}
+                    style={styles.menuLeft}
+                  />
+                  <RoundedMenuComponent
+                    selected={currentTab === 'name'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Name',
+                      description: 'Name selector label in ContactsScreen',
+                    })}
+                    id="name"
+                    onSelect={() => onTabChange('name')}
+                    style={styles.menuMiddle}
+                  />
+                  <RoundedMenuComponent
+                    selected={currentTab === 'location'}
+                    label={intl.formatMessage({
+                      defaultMessage: 'Location',
+                      description: 'Location selector label in ContactsScreen',
+                    })}
+                    id="location"
+                    onSelect={() => onTabChange('location')}
+                    style={styles.menuRight}
+                  />
+                </View>
+              </Container>
+              <Animated.View
+                style={[
+                  { height: SEARCHBAR_HEIGHT, overflow: 'hidden' },
+                  searchBarContainerStyle,
+                ]}
+              >
+                <SearchBarStatic
+                  style={styles.search}
+                  value={search}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search for name, company...',
+                    description: 'Search placeholder in ContactsScreen',
+                  })}
+                  onChangeText={onChangeText}
+                />
+              </Animated.View>
+              <Animated.View
+                style={[styles.tabContainer, tabBarContainerStyle]}
+              >
+                <TabView
+                  currentTab={currentTab}
+                  style={styles.content}
+                  tabs={[
+                    {
+                      id: 'date',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByDateList
+                            queryRef={data}
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
+                                  : 0,
+                            }}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'name',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <UserContactsList
+                            search={debounceSearch}
+                            location={undefined}
+                            date={undefined}
+                            onShowContact={onShowContact}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
+                                  : 0,
+                            }}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                    {
+                      id: 'location',
+                      element: (
+                        <Suspense fallback={<LoadingView />}>
+                          <ContactsByLocationList
+                            search={debounceSearch}
+                            onShowContact={onShowContact}
+                            onScroll={scrollHandler}
+                            contentContainerStyle={{
+                              paddingBottom:
+                                Platform.OS === 'android'
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
+                                  : 0,
+                            }}
+                          />
+                        </Suspense>
+                      ),
+                    },
+                  ]}
+                />
+              </Animated.View>
+              <Animated.View style={[styles.footer, paddingBottom]}>
+                <Button
+                  label={
+                    <FormattedMessage
+                      description="ContactsScreen - Create contact button"
+                      defaultMessage="Add a new Contact"
+                    />
+                  }
+                  onPress={openNewContactMenu}
+                />
+              </Animated.View>
+            </Container>
+          </Animated.View>
         </View>
-        <SearchBarStatic
-          style={styles.search}
-          value={search}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Search for name, company...',
-            description: 'Search placeholder in ContactsScreen',
-          })}
-          onChangeText={e => setSearch(e ?? '')}
+      ) : (
+        <ContactsScreenEmpty
+          onBack={onBack}
+          openNewContactMenu={openNewContactMenu}
         />
-        <Button
-          style={styles.createButton}
-          label={
-            <FormattedMessage
-              description="ContactsScreen - Create contact button"
-              defaultMessage="Add a new Contact"
-            />
-          }
-          onPress={openNewContactMenu}
-        />
-        <Suspense>
-          {profile && (
-            <ContactScreenLists
-              search={debounceSearch}
-              searchBy={searchBy}
-              profile={profile}
-            />
-          )}
-        </Suspense>
-      </Container>
+      )}
       <BottomSheetModal
         visible={isAddNewContactMenuOpen}
         onDismiss={closeNewContactMenu}
@@ -185,7 +361,7 @@ const ContactsScreen = ({
         </Text>
         <Button
           variant="secondary"
-          style={styles.addManualyButton}
+          style={styles.addManuallyButton}
           label={
             <FormattedMessage
               description="ContactsScreen - Scan a Card, Badge, email signature Add New Contact Menu"
@@ -193,12 +369,12 @@ const ContactsScreen = ({
             />
           }
           leftElement={<Icon icon="scan" />}
-          textStyle={styles.addManualyButtonLabel}
+          textStyle={styles.addManuallyButtonLabel}
           onPress={onCreateWithScanner}
         />
         <Button
           variant="secondary"
-          style={styles.addManualyButton}
+          style={styles.addManuallyButton}
           label={
             <FormattedMessage
               description="ContactsScreen - Add manually button label in Add New Contact Menu"
@@ -206,7 +382,7 @@ const ContactsScreen = ({
             />
           }
           leftElement={<Icon icon="edit" />}
-          textStyle={styles.addManualyButtonLabel}
+          textStyle={styles.addManuallyButtonLabel}
           onPress={onCreateContact}
         />
       </BottomSheetModal>
@@ -214,58 +390,77 @@ const ContactsScreen = ({
   );
 };
 
+export default relayScreen(ContactsScreen, {
+  query: contactsScreenQuery,
+  profileBound: false,
+  fallback: () => <ContactsScreenFallback />,
+  getScreenOptions: () => ({
+    stackAnimation: 'slide_from_bottom',
+  }),
+});
+
+const ContactsScreenFallback = () => {
+  const router = useRouter();
+  const onBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Container style={{ flex: 1 }}>
+        <Header
+          leftElement={
+            <IconButton
+              icon="close"
+              onPress={onBack}
+              variant="icon"
+              hitSlop={40}
+            />
+          }
+        />
+        <LoadingView />
+      </Container>
+    </SafeAreaView>
+  );
+};
+
+const SEARCHBAR_HEIGHT = 56;
+
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
   },
+  title: {
+    textAlign: 'center',
+  },
+  header: {
+    zIndex: 1,
+  },
   menu: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  menuLeft: {
+    flex: 1,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    borderRightWidth: 0,
+  },
+  menuMiddle: {
+    flex: 1,
+    borderRadius: 0,
+  },
+  menuRight: {
+    flex: 1,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderLeftWidth: 0,
   },
   search: {
     marginHorizontal: 20,
-    marginTop: 20,
-  },
-  createButton: {
-    marginHorizontal: 20,
-    marginTop: 20,
-  },
-  section: {
-    margin: 20,
-  },
-  contact: {
-    marginVertical: 20,
-    flexDirection: 'row',
-  },
-  date: {
-    color: colors.grey400,
-    marginTop: 5,
-  },
-  company: {
-    marginTop: 5,
-  },
-  separator: {
-    height: 1,
-    width: '100%',
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
-  },
-  initial: {
-    marginVertical: 20,
-  },
-  webcard: {
-    marginRight: 15,
-  },
-  infos: {
-    justifyContent: 'center',
-    width: '75%',
-  },
-  actions: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 15,
+    marginBottom: 10,
   },
   addNewContactMenu: {
     padding: 20,
@@ -274,28 +469,31 @@ const stylesheet = createStyleSheet(appearance => ({
     textAlign: 'center',
     marginBottom: 20,
   },
-  addManualyButton: {
+  addManuallyButton: {
     borderWidth: 0,
   },
-  addManualyButtonLabel: {
+  addManuallyButtonLabel: {
     flex: 1,
     paddingLeft: 20,
   },
+  content: {
+    flex: 1,
+  },
+  footer: [
+    {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: 20,
+      justifyContent: 'center',
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+      elevation: 10, // on android, the shadow is not visible on absolute positioned element
+    },
+    shadow({ appearance, direction: 'top' }),
+  ],
+  tabContainer: {
+    flex: 1,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
 }));
-
-const ContactsScreenFallback = () => (
-  <Container style={{ flex: 1 }}>
-    <AccountHeader leftIcon="close" title="" webCard={null} />
-    <LoadingView />
-  </Container>
-);
-
-export default relayScreen(ContactsScreen, {
-  query: contactsScreenQuery,
-  getVariables: (_, profileInfos) => ({
-    profileId: profileInfos?.profileId ?? '',
-    fetchPolicy: 'store-and-network',
-  }),
-  fallback: ContactsScreenFallback,
-  refreshOnFocus: true,
-});

@@ -1,104 +1,108 @@
-import { PermissionStatus } from 'expo-contacts';
-import { useCallback, useEffect, useState } from 'react';
-import { AppState, StyleSheet, View } from 'react-native';
-import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
-import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
-import useOnInviteContact from '#hooks/useOnInviteContact';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
-import SafeAreaView from '#ui/SafeAreaView';
+import { useCallback } from 'react';
+import { View } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { colors } from '#theme';
+import useOnInviteContact from '#components/Contact/useOnInviteContact';
+import { useRouter } from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import relayScreen from '#helpers/relayScreen';
+import { TooltipProvider } from '#helpers/TooltipContext';
 import ContactDetailsBody from './ContactDetailsBody';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactsDetailScreenQuery } from '#relayArtifacts/ContactsDetailScreenQuery.graphql';
 import type { ContactDetailsRoute } from '#routes';
-import type { Contact } from 'expo-contacts';
 
-type Props = NativeScreenProps<ContactDetailsRoute>;
+const query = graphql`
+  query ContactsDetailScreenQuery($contactId: ID!) {
+    currentUser {
+      ...ContactDetailsBody_user
+    }
+    node(id: $contactId) {
+      ... on Contact @alias(as: "contact") {
+        id
+        ...ContactDetailsBody_contact
+        ...contactHelpersShareContactData_contact
+        ...useOnInviteContactDataQuery_contact
+        enrichment {
+          publicProfile {
+            ...ContactDetailAIItemLocations_enrichment
+            ...ContactDetailAISummary_enrichment
+            ...ContactDetailAILabels_enrichment
+            ...ContactDetailAIItemProfessionalExperiences_enrichment
+            ...ContactDetailAIItemEducation_enrichment
+          }
+        }
+        contactProfile {
+          webCard {
+            ...ContactDetailAvatar_webCard
+          }
+        }
+      }
+    }
+  }
+`;
 
-const ContactDetailsScreen = ({ route }: Props) => {
-  const contact = route.params;
+const ContactDetailsScreen = ({
+  preloadedQuery,
+  refreshQuery,
+  hasFocus,
+}: RelayScreenProps<ContactDetailsRoute, ContactsDetailScreenQuery>) => {
   const router = useRouter();
-
-  const [localContacts, setLocalContacts] = useState<Contact[]>();
-  const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
-    PermissionStatus.UNDETERMINED,
+  const { node, currentUser } = usePreloadedQuery<ContactsDetailScreenQuery>(
+    query,
+    preloadedQuery,
   );
 
-  const { requestPhonebookPermissionAsync } = usePhonebookPermission();
-
-  const updatePermission = useCallback(async () => {
-    const { status } = await requestPhonebookPermissionAsync();
-    setContactsPermissionStatus(status);
-  }, [requestPhonebookPermissionAsync]);
-
-  // will setup the permission for this screen at first opening
-  useEffect(() => {
-    if (contactsPermissionStatus === PermissionStatus.UNDETERMINED) {
-      updatePermission();
-    }
-  }, [contactsPermissionStatus, updatePermission]);
-
-  // refresh local contact map
-  const refreshLocalContacts = useCallback(async () => {
-    if (contactsPermissionStatus === PermissionStatus.GRANTED) {
-      setLocalContacts(await getLocalContactsMap());
-    } else if (contactsPermissionStatus === PermissionStatus.DENIED) {
-      setLocalContacts([]);
-    } // else wait for permission update
-  }, [contactsPermissionStatus]);
-
-  useEffect(() => {
-    refreshLocalContacts();
-  }, [refreshLocalContacts]);
-
-  // ensure we refresh contacts oon resume
-  useEffect(() => {
-    if (contactsPermissionStatus === PermissionStatus.GRANTED) {
-      const subscription = AppState.addEventListener('change', state => {
-        if (state === 'active') {
-          refreshLocalContacts();
-        }
-      });
-      return () => {
-        subscription.remove();
-      };
-    }
-  }, [contactsPermissionStatus, refreshLocalContacts]);
+  const webCard = node?.contact?.contactProfile?.webCard ?? null;
 
   const onInviteContact = useOnInviteContact();
-
   const onInviteContactInner = useCallback(async () => {
-    const result = await onInviteContact(
-      contactsPermissionStatus,
-      contact,
-      localContacts,
-    );
-    if (result) {
-      if (result.status) {
-        setContactsPermissionStatus(result.status);
-      }
-      if (result.localContacts) {
-        setLocalContacts(result.localContacts);
-      }
+    if (!node?.contact) {
+      return;
     }
-  }, [contact, contactsPermissionStatus, localContacts, onInviteContact]);
+    await onInviteContact(node?.contact);
+  }, [node?.contact, onInviteContact]);
 
+  const styles = useStyleSheet(stylesheet);
+  /* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
+        Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */
   return (
-    <SafeAreaView style={styles.container}>
-      {/* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
-        Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */}
+    <TooltipProvider>
       <View collapsable={false} style={styles.container}>
-        <ContactDetailsBody
-          details={contact}
-          onClose={router.back}
-          onSave={onInviteContactInner}
-        />
+        {node?.contact ? (
+          <ContactDetailsBody
+            refreshQuery={refreshQuery}
+            contactKey={node?.contact}
+            onClose={router.back}
+            webCard={webCard}
+            onSave={onInviteContactInner}
+            hasFocus={hasFocus}
+            currentUser={currentUser}
+          />
+        ) : undefined}
       </View>
-    </SafeAreaView>
+    </TooltipProvider>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+export default relayScreen(ContactDetailsScreen, {
+  query,
+  getVariables: ({ contactId }) => {
+    return {
+      contactId,
+    };
   },
+  getScreenOptions() {
+    return {
+      stackAnimation: 'slide_from_bottom',
+    };
+  },
+  fetchPolicy: 'store-and-network',
 });
 
-export default ContactDetailsScreen;
+const stylesheet = createStyleSheet(appearance => ({
+  container: {
+    flex: 1,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+  },
+}));

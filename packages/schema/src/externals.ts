@@ -1,12 +1,13 @@
 import { externalFunction } from './GraphQLContext';
-import type { AddContactInput } from '#__generated__/types';
-import type { Profile, WebCard } from '@azzapp/data';
+import type { ContactInput } from '#__generated__/types';
+import type { Contact, Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
-import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
+import type { MessageType } from '@azzapp/service/notificationsHelpers';
 
 type Parameters = {
   profile?: Profile;
-  contact?: Partial<AddContactInput>;
+  contact?: Partial<ContactInput>;
+  qrCodeKey?: string | null;
 };
 
 export const notifyUsers =
@@ -41,26 +42,27 @@ export const notifyGooglePassWallet = externalFunction<
   (profileId: string, locale: string) => void
 >('notifyGooglePassWallet');
 
-type MessageType = {
-  notification: PushNotificationType;
-  mediaId?: string | null;
-  sound?: string;
-  locale: Locale;
-  localeParams?: Record<string, string>;
-};
-
-export const sendPushNotification = externalFunction<
-  (
-    targetUserId: string,
-    { notification, mediaId, sound, locale, localeParams }: MessageType,
-  ) => Promise<void>
->('sendPushNotification');
-
 export const sendEmailSignatures = externalFunction<
-  (profileIds: string[], webCard: WebCard) => void
+  (profileIds: string[]) => void
 >('sendEmailSignatures');
+
+export const sendEmailSignature =
+  externalFunction<(profileId: string, deviceId: string, key: string) => void>(
+    'sendEmailSignature',
+  );
 
 export const notifyWebCardUsers =
   externalFunction<(webCard: WebCard, editorUserId: string) => void>(
     'notifyWebCardUsers',
   );
+
+export const enrichContact =
+  externalFunction<(userId: string, contact: Contact) => void>('enrichContact');
+
+export const cancelEnrichContact = externalFunction<
+  (userId: string, contactId: string) => void
+>('cancelEnrichContact');
+
+export const sendPushNotification = externalFunction<
+  (userId: string, message: MessageType) => Promise<void>
+>('sendPushNotification');

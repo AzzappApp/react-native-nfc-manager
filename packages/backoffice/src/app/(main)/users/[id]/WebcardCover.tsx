@@ -8,10 +8,15 @@ import {
   CardContent,
   CardMedia,
   IconButton,
+  Link,
   Typography,
 } from '@mui/material';
 import { yellow } from '@mui/material/colors';
-import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURLForSize,
+  getVideoURL,
+} from '@azzapp/service/mediaServices/imageHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import type { WebCard } from '@azzapp/data';
 
 type Props = {
@@ -21,8 +26,7 @@ type Props = {
   onToggleStar: () => void;
 };
 
-const WIDTH = 276;
-const HEIGHT = 411;
+const HEIGHT = 200;
 
 const WebCardCover = ({
   webcard,
@@ -31,7 +35,7 @@ const WebCardCover = ({
   onToggleStar,
 }: Props) => {
   return (
-    <Card sx={{ minWidth: WIDTH, margin: 1 }}>
+    <Card sx={{ minWidth: 200, flex: 0 }}>
       {webcard.coverMediaId?.startsWith('v') ? (
         <CardMedia
           sx={{ height: HEIGHT }}
@@ -49,14 +53,20 @@ const WebCardCover = ({
         />
       )}
       <CardContent>
-        <Typography variant="body1">name: {webcard.userName}</Typography>
+        <Link
+          href={buildWebUrl(webcard.userName)}
+          target="_blank"
+          rel="noopener"
+        >
+          {webcard.userName}
+        </Link>
+        <Typography variant="body2">id: {webcard.id}</Typography>
         {webcard.companyName && (
-          <Typography variant="subtitle2">
+          <Typography variant="body2">
             Company: {webcard.companyName}
           </Typography>
         )}
-        <Typography variant="subtitle2">id: {webcard.id}</Typography>
-        <Typography variant="subtitle2">role: {role}</Typography>
+        <Typography variant="body2">user role: {role}</Typography>
       </CardContent>
       <CardActions>
         <Button

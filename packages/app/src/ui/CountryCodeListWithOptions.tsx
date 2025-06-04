@@ -20,12 +20,15 @@ export type CountryCodeListOption<T extends string> = {
   icon: Icons;
 };
 
-type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
+type CountryCodeListWithOptionsProps<T extends string> = Omit<
+  ViewProps,
+  'style'
+> & {
   otherSectionTitle?: string;
   options: Array<CountryCodeListOption<T>>;
   phoneSectionTitle: string;
   value: CountryCode | T;
-  inputRef?: RefObject<TextInput>;
+  inputRef?: RefObject<TextInput | null>;
   onChange: (value: CountryCode | T) => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -44,7 +47,6 @@ const CountryCodeListWithOptions = <T extends string>({
   onClose,
   onOpen,
   onDismiss,
-  style,
   ...props
 }: CountryCodeListWithOptionsProps<T>) => {
   const [showDropdown, openDropDown, closeDropDown] = useBoolean(false);
@@ -78,63 +80,67 @@ const CountryCodeListWithOptions = <T extends string>({
 
   return (
     <>
-      <PressableNative
-        {...props}
-        onPress={onButtonPress}
-        style={[styles.button, style]}
-        accessibilityRole="button"
-      >
-        {isSelectorType() ? (
-          <Icon icon={selectorIcon()!} style={[{ width: 24 }, styles.icon]} />
-        ) : (
-          <Image
-            source={{ uri: COUNTRY_FLAG[value as CountryCode] }}
-            style={{ width: 22, height: 16 }}
-          />
-        )}
-        <Icon icon="arrow_down" style={styles.chevronDown} />
-      </PressableNative>
-      <BottomSheetModal
-        visible={showDropdown}
-        height={windowHeight - 120}
-        onDismiss={onRequestClose}
-        dismissKeyboardOnOpening
-      >
-        <CountrySelector
-          value={isSelectorType() ? null : (value as CountryCode)}
-          onChange={onSelect}
-          ListHeaderComponent={
-            <View>
-              {otherSectionTitle ? (
+      <View style={styles.buttonContainer}>
+        <PressableNative
+          {...props}
+          onPress={onButtonPress}
+          accessibilityRole="button"
+          style={styles.button}
+        >
+          {isSelectorType() ? (
+            <Icon icon={selectorIcon()!} style={[{ width: 24 }, styles.icon]} />
+          ) : (
+            <Image
+              source={{ uri: COUNTRY_FLAG[value as CountryCode] }}
+              style={styles.country}
+            />
+          )}
+          <Icon icon="arrow_down" style={styles.chevronDown} />
+        </PressableNative>
+      </View>
+      {showDropdown && (
+        <BottomSheetModal
+          visible={showDropdown}
+          height={windowHeight - 120}
+          onDismiss={onRequestClose}
+          dismissKeyboardOnOpening
+        >
+          <CountrySelector
+            value={isSelectorType() ? null : (value as CountryCode)}
+            onChange={onSelect}
+            ListHeaderComponent={
+              <View>
+                {otherSectionTitle ? (
+                  <Text variant="large" style={styles.section}>
+                    {otherSectionTitle}
+                  </Text>
+                ) : null}
+                {options.map(({ type, title, icon }) => {
+                  return (
+                    <PressableBackground
+                      key={type}
+                      highlightColor={colors.grey400}
+                      onPress={() => onSelect(type)}
+                      style={[
+                        styles.emailItem,
+                        value === type && styles.emailItemSelected,
+                      ]}
+                    >
+                      <Icon icon={icon} />
+                      <Text variant="button" style={styles.emailItemName}>
+                        {title}
+                      </Text>
+                    </PressableBackground>
+                  );
+                })}
                 <Text variant="large" style={styles.section}>
-                  {otherSectionTitle}
+                  {phoneSectionTitle}
                 </Text>
-              ) : null}
-              {options.map(({ type, title, icon }) => {
-                return (
-                  <PressableBackground
-                    key={type}
-                    highlightColor={colors.grey400}
-                    onPress={() => onSelect(type)}
-                    style={[
-                      styles.emailItem,
-                      value === type && styles.emailItemSelected,
-                    ]}
-                  >
-                    <Icon icon={icon} />
-                    <Text variant="button" style={styles.emailItemName}>
-                      {title}
-                    </Text>
-                  </PressableBackground>
-                );
-              })}
-              <Text variant="large" style={styles.section}>
-                {phoneSectionTitle}
-              </Text>
-            </View>
-          }
-        />
-      </BottomSheetModal>
+              </View>
+            }
+          />
+        </BottomSheetModal>
+      )}
     </>
   );
 };
@@ -148,9 +154,13 @@ const styleSheet = createStyleSheet(appearance => ({
     columnGap: 6,
     width: 50,
     height: 47,
-    borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
+  buttonContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  country: { width: 22, height: 16 },
   icon: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },

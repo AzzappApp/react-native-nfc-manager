@@ -17,7 +17,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { IconButton, Box, Button, Typography } from '@mui/material';
 import uniqBy from 'lodash/uniqBy';
 import { useEffect, useState } from 'react';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { getImageURL } from '@azzapp/service/mediaServices/imageHelpers';
 import LottiePlayer from './LottiePlayer';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';

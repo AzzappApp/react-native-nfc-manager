@@ -1,19 +1,21 @@
+import {
+  getCloudinaryAssetURL,
+  type UrLForSizeParam,
+} from '@azzapp/service/mediaServices/imageHelpers';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import {
   CONTACT_CARD_AVATAR_SIZES,
   CONTACT_CARD_LOGO_SIZES,
 } from '@azzapp/shared/contactCardHelpers';
-import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
+  COVER_ASSET_SIZES,
   DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
-  getCloudinaryAssetURL,
-} from '@azzapp/shared/imagesHelpers';
+} from '@azzapp/shared/coverHelpers';
 import {
   POST_IMAGES_SIZES,
   POST_VIDEO_SIZES,
 } from '@azzapp/shared/postHelpers';
 import type { MediaResolverBaseType } from '#query/MediaResolvers';
-import type { UrLForSizeParam } from '@azzapp/shared/imagesHelpers';
 
 export const getPercentagePreview = (media: MediaResolverBaseType) => {
   if (typeof media === 'object' && 'previewPositionPercentage' in media) {
@@ -38,12 +40,14 @@ export const uriResolver =
     {
       width,
       height,
+      radius,
       pixelRatio,
       raw,
       format,
     }: {
       width?: number | null;
       height?: number | null;
+      radius?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
       format?: string | null;
@@ -67,7 +71,7 @@ export const uriResolver =
       case 'module':
         pregeneratedSizes = MODULE_IMAGES_SIZES;
         break;
-      case 'contactCard':
+      case 'avatar':
         pregeneratedSizes = CONTACT_CARD_AVATAR_SIZES;
         break;
       case 'post':
@@ -85,6 +89,7 @@ export const uriResolver =
       id,
       width,
       height,
+      radius,
       pixelRatio,
       pregeneratedSizes,
       previewPositionPercentage,

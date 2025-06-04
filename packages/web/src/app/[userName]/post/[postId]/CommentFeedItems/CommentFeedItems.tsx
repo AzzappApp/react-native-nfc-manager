@@ -5,8 +5,8 @@ import { FormattedMessage } from 'react-intl';
 import { CommentIcon } from '#assets';
 import { useScrollEnd } from '#hooks';
 import { Button } from '#ui';
-import { vars } from '#app/[userName]/theme.css';
 import { ProfileActions } from '#app/actions';
+import { vars } from '#app/theme.css';
 import CommentFeedItem from './CommentFeedItem';
 import styles from './CommentFeedItems.css';
 import type {

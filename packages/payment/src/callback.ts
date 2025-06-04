@@ -25,11 +25,17 @@ export const acknowledgeFirstPayment = async ({
   transactionId,
   paymentProviderResponse,
   webCardId,
+  pspAccountId,
+  transactionAlias,
+  apiEndpoint,
 }: {
   paymentMeanId: string;
   transactionId: string;
   paymentProviderResponse?: string;
   webCardId?: string | null;
+  pspAccountId: string;
+  transactionAlias: string;
+  apiEndpoint: string;
 }) => {
   let paymentId: string | undefined;
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
@@ -59,6 +65,8 @@ export const acknowledgeFirstPayment = async ({
           taxes,
           paymentMeanId,
           paymentProviderResponse,
+          pspAccountId,
+          transactionAlias,
         });
 
         const endAt = getNextPaymentDate(subscription.subscriptionPlan);
@@ -103,7 +111,7 @@ export const acknowledgeFirstPayment = async ({
               clientPaymentRequestUlid: paymentMeanId,
               rebill_manager_fail_rule: generateRebillFailRule(),
               rebill_manager_external_reference: subscription.id,
-              rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
+              rebill_manager_callback_url: `${apiEndpoint}/webhook/subscription`,
             },
           },
         );
@@ -224,13 +232,23 @@ export const rejectFirstPayment = async (
   return subscription;
 };
 
-export const acknowledgeRecurringPayment = async (
-  subscriptionId: string,
-  rebillManagerId: string,
-  transactionId: string,
-  amount: number,
-  paymentProviderResponse?: string,
-) => {
+export const acknowledgeRecurringPayment = async ({
+  subscriptionId,
+  rebillManagerId,
+  transactionId,
+  amount,
+  paymentProviderResponse,
+  pspAccountId,
+  transactionAlias,
+}: {
+  subscriptionId: string;
+  rebillManagerId: string;
+  transactionId: string;
+  amount: number;
+  paymentProviderResponse?: string;
+  pspAccountId: string;
+  transactionAlias: string;
+}) => {
   const subscription = await getSubscriptionById(subscriptionId);
   let paymentId: string | undefined;
   if (subscription) {
@@ -270,6 +288,8 @@ export const acknowledgeRecurringPayment = async (
             transactionId,
             paymentProviderResponse,
             rebillManagerId,
+            pspAccountId,
+            transactionAlias,
           });
           await updateSubscription(subscriptionId, updates);
           return id;

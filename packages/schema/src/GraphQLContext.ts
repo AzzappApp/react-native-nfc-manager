@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { userLoader } from '#loaders';
 import type * as externalsFunctions from './externals';
 import type { Locale } from '@azzapp/i18n';
 import type { IntlShape } from '@formatjs/intl';
@@ -12,6 +13,7 @@ export type GraphQLContext = {
   };
   locale: Locale;
   intl: IntlShape;
+  apiEndpoint: string;
 };
 
 const storage = new AsyncLocalStorage<GraphQLContext>();
@@ -86,3 +88,11 @@ export const externalFunction =
     }
     return (context[name] as T)(...args);
   };
+
+export const getSessionUser = async () => {
+  const { userId } = getSessionInfos();
+
+  const user = userId && (await userLoader.load(userId));
+  if (!user || user.deleted) return undefined;
+  return user;
+};

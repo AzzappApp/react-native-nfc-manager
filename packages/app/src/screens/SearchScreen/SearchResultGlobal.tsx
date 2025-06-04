@@ -26,11 +26,13 @@ export const searchResultGlobalQuery = graphql`
     $search: String!
     $useLocation: Boolean!
   ) {
-    profile: node(id: $profileId) {
-      ...SearchResultGlobalListHeader_profile
-        @arguments(search: $search, useLocation: $useLocation)
-      ...SearchResultGlobalPosts_profile
-        @arguments(search: $search, useLocation: $useLocation)
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...SearchResultGlobalListHeader_profile
+          @arguments(search: $search, useLocation: $useLocation)
+        ...SearchResultGlobalPosts_profile
+          @arguments(search: $search, useLocation: $useLocation)
+      }
     }
   }
 `;
@@ -48,10 +50,11 @@ const SearchResultGlobal = ({
   goToProfilesTab,
   renderNoResultComponent,
 }: SearchResultGlobalProps) => {
-  const { profile } = usePreloadedQuery<SearchResultGlobalQuery>(
+  const { node } = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
     queryReference,
   );
+  const profile = node?.profile;
 
   const { data, loadNext, isLoadingNext, hasNext, refetch } =
     usePaginationFragment<

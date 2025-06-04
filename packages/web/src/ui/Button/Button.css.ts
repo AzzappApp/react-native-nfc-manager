@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textButtonMedium, vars } from '#app/[userName]/theme.css';
+import { textButtonMedium, vars } from '#app/theme.css';
 
 const empty = style({
   cursor: 'pointer',

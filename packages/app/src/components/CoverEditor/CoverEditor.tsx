@@ -29,6 +29,7 @@ import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
+import { isSocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import {
@@ -78,7 +79,7 @@ import type {
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
-import type { ForwardedRef, Reducer } from 'react';
+import type { ForwardedRef } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 export type CoverEditorProps = Omit<ViewProps, 'children'> & {
@@ -206,8 +207,9 @@ const CoverEditorCore = (
 
   // #region Store
   const [coverEditorState, dispatch] = useReducer<
-    Reducer<CoverEditorState, CoverEditorAction>,
-    null
+    CoverEditorState,
+    null,
+    [CoverEditorAction]
   >(coverEditorReducer, null, () => {
     const data = coverTemplate?.data;
 
@@ -232,11 +234,17 @@ const CoverEditorCore = (
           },
           size: dataLinks.size ?? 24,
           links:
-            dataLinks.links?.map((link, index) => ({
-              socialId: link,
-              position: index,
-              link: '?',
-            })) ?? [],
+            dataLinks.links
+              ?.map((link, index) =>
+                isSocialLinkId(link)
+                  ? {
+                      socialId: link,
+                      position: index,
+                      link: '?',
+                    }
+                  : null,
+              )
+              .filter(link => link !== null) ?? [],
           rotation: 0,
           shadow: false,
         }

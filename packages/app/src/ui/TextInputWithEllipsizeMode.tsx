@@ -1,32 +1,42 @@
 import { useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
-import { colors } from '#theme';
+import { View } from 'react-native';
+import { colors, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from './Text';
 import { styleSheetData as textInputStyleSheet } from './TextInput';
+import TextInputWithPrefix from './TextInputWithPrefix';
 import type {
   TextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
   ViewStyle,
+  TextInput,
 } from 'react-native';
 
 export type TextInputWithEllipsizeModeProps = Pick<
   TextInputProps,
   | 'autoCapitalize'
+  | 'autoComplete'
+  | 'autoFocus'
+  | 'clearButtonMode'
   | 'enterKeyHint'
   | 'keyboardType'
+  | 'multiline'
+  | 'numberOfLines'
   | 'onBlur'
   | 'onChangeText'
   | 'onFocus'
   | 'placeholder'
+  | 'returnKeyType'
   | 'style'
+  | 'testID'
   | 'value'
 > & {
   /**
    * Whether the input is in error state
    */
   isErrored?: boolean;
+  prefix?: string;
 };
 
 /**
@@ -40,6 +50,7 @@ const TextInputWithEllipsizeMode = ({
   onFocus,
   onBlur,
   style,
+  prefix,
   ...props
 }: TextInputWithEllipsizeModeProps) => {
   //#region hooks
@@ -65,7 +76,7 @@ const TextInputWithEllipsizeMode = ({
 
   return (
     <View style={style as ViewStyle}>
-      <TextInput
+      <TextInputWithPrefix
         testID="nativeInputText"
         ref={nativeTextInputRef}
         selectionColor={colors.primary400}
@@ -79,28 +90,40 @@ const TextInputWithEllipsizeMode = ({
           style,
           isFocused && styles.focused,
           isErrored && styles.errored,
+        ]}
+        inputStyle={[
+          textStyles.textField,
+          style,
           !isFocused ? { color: 'transparent' } : undefined,
         ]}
+        prefix={prefix}
       />
       {!isFocused ? (
-        <Text
-          onPress={onTextPress}
-          {...props}
-          allowFontScaling={false}
-          ellipsizeMode="tail"
-          numberOfLines={1}
-          style={[
-            styles.input,
-            style,
-            isErrored && styles.errored,
-            styles.inputText,
-            {
-              opacity: !isFocused ? 1 : 0,
-            },
-          ]}
-        >
-          {props.value}
-        </Text>
+        <View style={styles.inputText}>
+          <Text
+            onPress={onTextPress}
+            {...props}
+            allowFontScaling={false}
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            style={[
+              styles.input,
+              style,
+              isErrored && styles.errored,
+              {
+                flex: 0,
+                padding: 0,
+                height: 'auto',
+                opacity: !isFocused ? 1 : 0,
+                borderWidth: 1,
+                borderColor: 'transparent',
+                color: props.value ? undefined : colors.grey400,
+              },
+            ]}
+          >
+            {props.value || props.placeholder}
+          </Text>
+        </View>
       ) : undefined}
     </View>
   );
@@ -109,10 +132,13 @@ const TextInputWithEllipsizeMode = ({
 const styleSheet = createStyleSheet(appearance => ({
   ...textInputStyleSheet(appearance),
   inputText: {
-    top: 9, // workaround for text positioning from react native
     backgroundColor: 'transparent',
     justifyContent: 'center',
     position: 'absolute',
+    flex: 1,
+    top: 0,
+    bottom: 0,
+    width: '100%',
   },
 }));
 

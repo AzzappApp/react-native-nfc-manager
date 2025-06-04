@@ -12,7 +12,7 @@ import {
   parsePhoneNumberFromString,
   type CountryCode,
 } from 'libphonenumber-js';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -103,6 +103,7 @@ const ContactCardCreateScreen = ({
         $webCardKind: String!
         $contactCard: ContactCardInput!
         $primaryColor: String
+        $backgroundColor: String
         $coverMediaId: String
         $publishWebCard: Boolean!
       ) {
@@ -110,12 +111,12 @@ const ContactCardCreateScreen = ({
           webCardKind: $webCardKind
           contactCard: $contactCard
           primaryColor: $primaryColor
+          backgroundColor: $backgroundColor
           coverMediaId: $coverMediaId
           publishWebCard: $publishWebCard
         ) {
           profile {
             id
-            contactCardUrl
             profileRole
             invited
             webCard {
@@ -422,6 +423,7 @@ const ContactCardCreateScreen = ({
       commit({
         variables: {
           primaryColor: data.primaryColor ?? colors.grey400,
+          backgroundColor: data.expendableColor ?? colors.white,
           webCardKind: webCardKind as string,
           coverMediaId: uploadedCoverId,
           publishWebCard: true,
@@ -622,8 +624,7 @@ const ContactCardCreateScreen = ({
     keyboardDismiss();
     openScanner();
   }, [hidePopup, openScanner]);
-
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
 
   return (
     <>
@@ -672,9 +673,20 @@ const ContactCardCreateScreen = ({
         <ScanMyPaperBusinessCard
           onPress={openScannerFromPopup}
           style={styles.scanBusinessCardButton}
+          label={intl.formatMessage({
+            defaultMessage: 'Scan a Card, Badge, email signature...',
+            description:
+              'ContactCardCreateScreen - Scan a Card, Badge, email signature buttonlabel',
+          })}
         />
 
-        <ContactCardCreateForm control={control} user={currentUser} />
+        <View style={{ flex: 1, paddingBottom: bottom }}>
+          <ContactCardCreateForm
+            control={control}
+            user={currentUser}
+            setValue={setValue}
+          />
+        </View>
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}
@@ -727,7 +739,14 @@ const ContactCardCreateScreen = ({
               description="ContactCardCreateScreen - Message in popup between 2 buttons"
             />
           </Text>
-          <ScanMyPaperBusinessCard onPress={openScannerFromPopup} />
+          <ScanMyPaperBusinessCard
+            onPress={openScannerFromPopup}
+            label={intl.formatMessage({
+              defaultMessage: 'Scan a Card, Badge, email signature...',
+              description:
+                'ContactCardCreateScreen - BottomSheetPopup - Scan a Card, Badge, email signature buttonlabel',
+            })}
+          />
         </View>
       </BottomSheetPopup>
       {showScanner && (
@@ -797,20 +816,17 @@ export default relayScreen(ContactCardCreateScreen, {
 
 export const ScanMyPaperBusinessCard = ({
   onPress,
+  label,
   style,
 }: {
   onPress: () => void;
+  label: string;
   style?: ViewStyle;
 }) => {
-  const intl = useIntl();
   return (
     <Button
       variant="secondary"
-      label={intl.formatMessage({
-        defaultMessage: 'Scan a Card, Badge, email signature...',
-        description:
-          'MultiUserAddModal - Scan a Card, Badge, email signature buttonlabel',
-      })}
+      label={label}
       onPress={onPress}
       leftElement={<Icon icon="scan" size={24} />}
       style={style}

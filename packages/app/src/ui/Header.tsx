@@ -3,6 +3,7 @@ import Text from '#ui/Text';
 import Container from './Container';
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
+
 export type HeaderProps = Omit<ViewProps, 'children'> & {
   /**
    * The title to display in the header.
@@ -31,7 +32,9 @@ export type HeaderProps = Omit<ViewProps, 'children'> & {
 
 /**
  * A mobile header with a title and two buttons.
- * we got issue with alignment of the title with right or left element, using flex 1.7 but we need to do better TODO: fix this.
+ *
+ * :warning: Don't change the layout of this component and put a fake view on left or right side.
+ * if you need a single button, you'll be fired if you add flex: 1 to the button.
  */
 const Header = ({
   middleElement,
@@ -48,20 +51,25 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
+        {leftElement && <View style={styles.element}>{leftElement}</View>}
         <View
           style={[styles.headerMiddle, middleElementStyle]}
           pointerEvents="box-none"
         >
           {typeof middleElement === 'string' || Array.isArray(middleElement) ? (
-            <Text variant="large" style={styles.title} numberOfLines={1}>
+            <Text
+              variant="large"
+              style={styles.title}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {middleElement}
             </Text>
           ) : middleElement != null ? (
             <View>{middleElement}</View>
           ) : undefined}
         </View>
-        {rightElement ? (leftElement ?? <View />) : leftElement}
-        {rightElement}
+        {rightElement && <View style={styles.element}>{rightElement}</View>}
       </View>
     </Container>
   );
@@ -87,15 +95,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerMiddle: {
-    position: 'absolute',
-    left: 0,
-    width: '100%',
+  element: {
     height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerMiddle: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 40,
+    pointerEvents: 'box-none',
   },
   title: {
     textAlign: 'center',
+    position: 'absolute',
+    width: '100%',
+    pointerEvents: 'box-none',
   },
 });

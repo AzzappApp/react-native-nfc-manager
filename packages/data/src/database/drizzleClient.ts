@@ -4,6 +4,7 @@ import {
   drizzle,
   type PlanetScaleDatabase,
 } from 'drizzle-orm/planetscale-serverless';
+import env from '../env';
 import {
   monitorRequest,
   monitorRequestEnd,
@@ -37,7 +38,7 @@ const databaseFetch = async (
   input: RequestInfo | URL,
   init: RequestInit | undefined,
 ) => {
-  if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+  if (isDatabaseMonitoringEnabled()) {
     monitorRequest(init);
   }
   let response: Response;
@@ -46,26 +47,29 @@ const databaseFetch = async (
   } catch (e) {
     throw e as any;
   } finally {
-    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+    if (isDatabaseMonitoringEnabled()) {
       monitorRequestEnd();
     }
   }
   return response;
 };
 
+export const isDatabaseMonitoringEnabled = () =>
+  env.ENABLE_DATABASE_MONITORING === 'true';
+
 export const createDrizzleClient = () => {
   // create the connection
   const connection = new Client({
-    host: process.env.DATABASE_HOST,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
+    host: env.DATABASE_HOST,
+    username: env.DATABASE_USERNAME,
+    password: env.DATABASE_PASSWORD,
     fetch: databaseFetch,
   });
 
   let replica: Client | null = null;
-  const replicaHost = process.env.REPLICA_DATABASE_HOST;
-  const replicaUsername = process.env.REPLICA_DATABASE_USERNAME;
-  const replicaPassword = process.env.REPLICA_DATABASE_PASSWORD;
+  const replicaHost = env.REPLICA_DATABASE_HOST;
+  const replicaUsername = env.REPLICA_DATABASE_USERNAME;
+  const replicaPassword = env.REPLICA_DATABASE_PASSWORD;
   if (replicaHost && replicaUsername && replicaPassword) {
     replica = new Client({
       host: replicaHost,

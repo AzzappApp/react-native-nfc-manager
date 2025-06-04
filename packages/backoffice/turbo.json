@@ -1,25 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "src/public/**"
-      ],
-      "outputs": [
-        ".next/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "src/public/**"],
+      "outputs": [".next/**"]
     },
-    "typecheck": {
-      "dependsOn": [
-        "^build"
-      ]
-    }
+    "typecheck": { "dependsOn": ["^build"] }
   }
 }

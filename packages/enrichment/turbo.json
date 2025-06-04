@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
+      "outputs": ["lib/**"]
+    },
+    "typecheck": {
+      "inputs": [
+        "src/**"
+      ]
+    },
+    "test": {
+      "inputs": [
+        "src/**",
+        "jest.config.js",
+        "scripts/jestSetup.js"
+      ]
+    }
+  }
+}

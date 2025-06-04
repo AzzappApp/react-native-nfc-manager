@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, textLarge, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, textLarge, vars } from '#app/theme.css';
 import { MAX_COVER_WIDTH } from '#components/renderer/CoverRenderer/CoverRenderer.css';
 
 const wrapper = style({
@@ -98,14 +98,25 @@ const postsBehind = style({
   },
 });
 
-const switchContent = style({
+const floatingButtonsContainer = style({
   position: 'fixed',
+  bottom: 15,
+  right: 15,
+  zIndex: 1000,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 10,
+});
+
+const switchContent = style({
   padding: '13px',
   backgroundColor: 'rgba(14, 18, 22, 0.40)',
-  bottom: '15px',
-  right: '15px',
   borderRadius: '200px',
-  zIndex: 3,
+  width: 50,
+  height: 50,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   '@media': {
     [MediaQuery.Desktop]: {
       display: 'none',
@@ -159,10 +170,12 @@ const header = style({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: 10,
+  paddingTop: 10,
+  paddingBottom: 50,
   gap: 10,
   top: 0,
   width: '100%',
+  backgroundColor: vars.color.white,
 });
 
 const coverWrapper = style({
@@ -176,16 +189,6 @@ const coverWrapper = style({
     [MediaQuery.Desktop]: {
       borderRadius: 35,
       maxWidth: MAX_COVER_WIDTH,
-    },
-  },
-});
-
-const coverSharebackWrapper = style({
-  borderRadius: 35,
-  '@media': {
-    [MediaQuery.Mobile]: {
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
     },
   },
 });
@@ -239,6 +242,89 @@ const azzapLink = style({
   textUnderlinePosition: 'from-font',
 });
 
+const addContact = style({
+  cursor: 'pointer',
+  padding: '13px',
+  width: 50,
+  height: 50,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'rgba(14, 18, 22, 0.40)',
+  borderRadius: '200px',
+});
+
+const whatsappContainer = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 50,
+  height: 50,
+  backgroundColor: 'rgba(14, 18, 22, 0.40)',
+  borderRadius: '200px',
+});
+
+const whatsappAvatar = style({
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+});
+
+const whatsappIcon = style({
+  position: 'absolute',
+  bottom: 0,
+  right: 0,
+});
+
+const phoneMenu = style({
+  minWidth: 200,
+  maxWidth: 300,
+  position: 'fixed',
+  bottom: 75,
+  right: 15,
+  backgroundColor: 'white',
+  borderRadius: 8,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+  padding: 8,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+  zIndex: 1000,
+});
+
+const coverSharebackWrapper = style({
+  borderRadius: 35,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    },
+  },
+});
+
+const phoneMenuItem = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: 8,
+  textDecoration: 'none',
+  color: 'inherit',
+  borderRadius: 4,
+  cursor: 'pointer',
+  selectors: {
+    '&:hover': {
+      backgroundColor: 'rgba(0,0,0,0.05)',
+    },
+  },
+});
+
+const whatsappButton = style({
+  position: 'relative',
+  width: 40,
+  height: 40,
+  cursor: 'pointer',
+});
+
 const styles = {
   wrapper,
   modules,
@@ -247,6 +333,7 @@ const styles = {
   modulesWithPosts,
   modulesBehind,
   postsBehind,
+  floatingButtonsContainer,
   switchContent,
   postNavigation,
   postNavigationHidden,
@@ -262,6 +349,13 @@ const styles = {
   poweredByLabel,
   storeContainer,
   azzapLink,
+  addContact,
+  whatsappContainer,
+  whatsappIcon,
+  whatsappAvatar,
+  phoneMenu,
+  phoneMenuItem,
+  whatsappButton,
 };
 
 export default styles;

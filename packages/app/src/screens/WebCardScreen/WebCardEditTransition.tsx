@@ -1,4 +1,4 @@
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { useCallback, useRef, useState } from 'react';
 import { Platform, StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import Animated, {

@@ -1,0 +1,35 @@
+{
+  "name": "@azzapp/enrichment",
+  "version": "2.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "dev": "tsc --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
+    "test": "jest"
+  },
+  "devScripts": [
+    "dev"
+  ],
+  "dependencies": {
+    "@azzapp/data": "workspace:^",
+    "@azzapp/service": "workspace:^",
+    "@azzapp/shared": "workspace:^",
+    "@sentry/nextjs": "^7.113.0",
+    "i18n-iso-countries": "^7.14.0",
+    "lodash": "^4.17.21",
+    "peopledatalabs": "^12.0.0",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.24.0",
+    "jest": "^29.7.0",
+    "typescript": "^5.8.3"
+  }
+}

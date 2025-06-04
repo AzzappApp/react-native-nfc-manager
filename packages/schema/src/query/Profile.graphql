@@ -10,8 +10,8 @@ type Profile implements Node {
   contactCard: ContactCard
   contactCardIsPrivate: Boolean!
   contactCardDisplayedOnWebCard: Boolean!
-  lastContactCardUpdate: DateTime!
-  createdAt: DateTime!
+  lastContactCardUpdate: DateTime
+  createdAt: DateTime
   """
   the number of total time the card was scan
   """
@@ -20,10 +20,11 @@ type Profile implements Node {
   the number of total Share Back
   """
   nbShareBacks: Int
+
   """
-  the number of new contact unread since last contact view open
+  the number of new contact imported from photo scan
   """
-  nbNewContacts: Int!
+  nbContactsImportFromScan: Int
   """
   The related user
   """
@@ -33,6 +34,10 @@ type Profile implements Node {
   """
   profileRole: ProfileRole!
   """
+  The user avatar media displayed
+  """
+  displayedAvatar: Media
+  """
   The user avatar
   """
   avatar: Media
@@ -40,6 +45,10 @@ type Profile implements Node {
   The contact card logo
   """
   logo: Media
+  """
+  The signature banner
+  """
+  banner: Media
   """
   True if user has been invited
   """
@@ -64,21 +73,6 @@ type Profile implements Node {
   True when the encrypted profile has been stored for the device
   """
   contactCardAccessId(deviceId: String!): ID
-
-  contactCardQrCode(
-    width: Int!
-    location: LocationInput
-    address: AddressInput
-    dark: String
-    light: String
-    deviceId: String
-    key: String
-  ): String! @deprecated(reason: "Use contact card url builder instead")
-
-  contactCardUrl(deviceId:String, key:String): String! @deprecated(reason: "Use contact card url builder instead")
-
-  serializedContactCard: String!
-    @deprecated(reason: "Use contactCardUrl instead")
 
   webCard: WebCard
 
@@ -191,7 +185,7 @@ type Profile implements Node {
     The filter to apply
     """
     filterBy: SearchFilter
-  ): ContactConnection!
+  ): ContactConnection! @deprecated(reason: "Does not fit the new design")
 
   """
   Return a list of profiles that match the search query

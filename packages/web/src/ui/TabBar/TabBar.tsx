@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { textButton } from '#app/[userName]/theme.css';
+import { textButton } from '#app/theme.css';
 import stylesVariants from './TabBar.css';
 
 type TabBarProps = {

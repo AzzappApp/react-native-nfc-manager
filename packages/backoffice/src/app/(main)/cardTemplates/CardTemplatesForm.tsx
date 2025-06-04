@@ -21,10 +21,9 @@ import {
 } from '@mui/material';
 import omit from 'lodash/omit';
 import { useMemo, useState, useTransition } from 'react';
-import { uploadMedia } from '@azzapp/shared/WebAPI';
-import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
 import { useForm } from '#helpers/formHelpers';
+import { uploadMedia } from '#helpers/mediaHelper';
 import TypeListInput from '../../../components/TypeListInput';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
@@ -126,28 +125,22 @@ const CardTemplateForm = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let public_id: string;
     startSaving(async () => {
-      let previewMediaId: string;
+      let previewMediaId: string | null | undefined;
       if (data.previewMediaId instanceof File) {
         const file = data.previewMediaId;
         setUploading(true);
         try {
-          const { uploadURL, uploadParameters } = await getSignedUpload(
-            'image',
-            'module',
-          );
-          ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
-            .promise);
+          const { public_id } = await uploadMedia(file, 'image');
+          previewMediaId = public_id;
           setUploading(false);
         } catch (error) {
           setError(error);
           setUploading(false);
+          previewMediaId = undefined;
         }
-
-        previewMediaId = public_id;
       } else {
-        previewMediaId = data.previewMediaId as any;
+        previewMediaId = data.previewMediaId;
       }
 
       setFormError(null);
@@ -156,7 +149,7 @@ const CardTemplateForm = ({
         const { success, formErrors } = await saveCardTemplate(
           {
             ...data,
-            previewMediaId,
+            previewMediaId: previewMediaId ?? undefined,
           },
           cardTemplate?.id,
         );

@@ -3,7 +3,7 @@
 import { useMemo, type PropsWithChildren } from 'react';
 import { IntlProvider as BaseIntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE, guessLocale } from '@azzapp/i18n';
-import { getTranslationMessages } from '#helpers/i18nHelpers';
+import { getTranslationMessages } from '@azzapp/service/i18nServices';
 
 const AppIntlProvider = ({ children }: PropsWithChildren) => {
   // #region Internationalization

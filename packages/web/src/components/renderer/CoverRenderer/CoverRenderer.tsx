@@ -7,8 +7,8 @@ import {
   COVER_RATIO,
   DEFAULT_COVER_HEIGHT,
   DEFAULT_COVER_WIDTH,
+  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
 } from '@azzapp/shared/coverHelpers';
-import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import { Plus_Jakarta_ExtraBold, Plus_Jakarta_Light } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
@@ -75,10 +75,8 @@ const CoverRenderer = ({
   const cover = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const current = cover.current;
-
     const onCoverSizeChange = () => {
-      if (current) {
+      if (cover.current) {
         setCoverSize({
           width: cover.current.clientWidth,
           height: cover.current.clientHeight,

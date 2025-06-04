@@ -4,42 +4,44 @@ import {
   transaction,
   createRedirectWebCard,
   deleteRedirectionFromTo,
+  referencesMedias,
+  updateWebCardProfiles,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
+import env from '#env';
 import { invalidateWebCard, notifyWebCardUsers } from '#externals';
-import {
-  webCardCategoryLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import {
+  isWebcardPremium,
+  validateCurrentSubscription,
+} from '#helpers/subscriptionHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );
 
 const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
-  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '2',
+  env.USERNAME_REDIRECTION_AVAILABILITY_DAY,
   10,
 );
 
 const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   _,
   { webCardId: gqlWebCardId, input: updates },
+  context,
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
   const profile = await checkWebCardProfileEditorRight(webCardId);
 
-  const { webCardCategoryId: graphqlWebCardCategoryId, ...profileUpdates } =
-    updates;
+  const { ...profileUpdates } = updates;
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -90,29 +92,35 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     }
   }
 
-  if (graphqlWebCardCategoryId) {
-    const webCardCategoryId = fromGlobalIdWithType(
-      graphqlWebCardCategoryId,
-      'WebCardCategory',
-    );
-    partialWebCard.webCardCategoryId = webCardCategoryId;
-
-    const webCardCategory = await webCardCategoryLoader.load(webCardCategoryId);
-
-    partialWebCard.webCardKind = webCardCategory?.webCardKind;
-  }
-
   if (profileUpdates.webCardKind) {
     const owner = await webCardOwnerLoader.load(webCardId);
 
     if (!owner) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_WEBCARD_KIND',
-      webCardKind: profileUpdates.webCardKind,
-    });
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_WEBCARD_KIND',
+        webCardKind: profileUpdates.webCardKind,
+      },
+      context.apiEndpoint,
+    );
+    if (
+      profileUpdates.webCardKind === 'personal' &&
+      !(await isWebcardPremium(webCard))
+    ) {
+      if (profile.logoId) {
+        await referencesMedias([], [profile.logoId]);
+        await updateWebCardProfiles(webCardId, { logoId: null });
+      }
+      if (profile.contactCard?.urls?.length || profile.contactCard?.company) {
+        await updateWebCardProfiles(webCardId, {
+          contactCard: { ...profile.contactCard, urls: [], company: '' },
+        });
+      }
+    }
   }
 
   try {

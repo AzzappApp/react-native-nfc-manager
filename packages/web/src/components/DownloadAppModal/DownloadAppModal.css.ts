@@ -1,10 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import {
-  textLarge,
-  textMedium,
-  textXLarge,
-  vars,
-} from '#app/[userName]/theme.css';
+import { textLarge, textMedium, textXLarge, vars } from '#app/theme.css';
 
 const coverWrapper = style({
   margin: 'auto',

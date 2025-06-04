@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { generateShareProfileLink } from '#helpers';
 import { useScrollEnd } from '#hooks';
 import CoverRenderer from '#components/renderer/CoverRenderer';
+import { generateShareProfileLink } from '#helpers/link';
 import { styles } from './PostLikesModal.css';
 import type { Media, WebCard } from '@azzapp/data';
 

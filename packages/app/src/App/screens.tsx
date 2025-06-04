@@ -1,6 +1,7 @@
 import AboutScreen from '#screens/AboutScreen';
 import AcceptTermsScreen from '#screens/AcceptTermsScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
+import AnalyticsScreen from '#screens/AnalyticsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import CommonInformationScreen from '#screens/CommonInformationScreen';
 import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
@@ -9,7 +10,8 @@ import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
-import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
+import ContactEditScreen from '#screens/ContactEditScreen/ContactEditScreen';
+import ContactsFilteredListScreen from '#screens/ContactsFilteredListScreen';
 import ContactsScreen from '#screens/ContactsScreen';
 import CookieContentScreen from '#screens/CookieConsentsScreen';
 import CookieSettingsScreen from '#screens/CookieSettingsScreen';
@@ -44,6 +46,7 @@ import ShakeAndShareScreen from '#screens/ShakeAndShareScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
 import TitleTextModuleWebCardEditionScreen from '#screens/TitleTextModuleWebCardEditionScreen';
+import ToolsScreen from '#screens/ToolsScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import AddModuleSectionScreen from '#screens/WebCardEditScreen/AddModuleSection';
 import CardModuleConfirmationScreen from '#screens/WebCardEditScreen/AddModuleSection/CardModuleConfirmationScreen';
@@ -57,6 +60,7 @@ const screens = {
   ABOUT: AboutScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   ACCEPT_TERMS: AcceptTermsScreen,
+  ANALYTICS: AnalyticsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CARD_MODULE_MEDIA_EDITION: MediaModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,
@@ -65,6 +69,7 @@ const screens = {
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONTACT_CARD_CREATE: ContactCardCreateScreen,
   CONTACT_CREATE: ContactCreateScreen,
+  CONTACT_EDIT: ContactEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,
@@ -104,8 +109,10 @@ const screens = {
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
-  CONTACTS_BY_LOCATION: ContactsByLocationScreen,
+  CONTACTS_BY_LOCATION: ContactsFilteredListScreen,
+  CONTACTS_BY_DATE: ContactsFilteredListScreen,
   SHAKE_AND_SHARE: ShakeAndShareScreen,
+  TOOLS: ToolsScreen,
 } satisfies ScreenMap;
 
 export default screens;

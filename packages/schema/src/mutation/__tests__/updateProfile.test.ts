@@ -1,30 +1,31 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
+  getMediasByIds,
   getWebCardById,
   referencesMedias,
   updateProfile,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/index';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, profileLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import updateProfileMutation from '../updateProfile';
 
 jest.mock('@azzapp/data', () => ({
-  checkMedias: jest.fn(),
   getWebCardById: jest.fn(),
   referencesMedias: jest.fn(),
   transaction: jest.fn(fn => fn()),
   updateProfile: jest.fn(),
+  getMediasByIds: jest.fn(),
 }));
 
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(() => {
-    return { userId: 'userId' };
-  }),
+jest.mock('@azzapp/service/mediaServices/index', () => ({
+  checkMedias: jest.fn(),
 }));
+
+jest.mock('#env', () => ({}));
 
 jest.mock('#loaders', () => ({
   profileByWebCardIdAndUserIdLoader: { load: jest.fn() },
@@ -54,6 +55,7 @@ describe('updateProfileMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('userId');
   });
 
   test('should throw PROFILE_DONT_EXISTS if profile does not exist', async () => {
@@ -71,7 +73,6 @@ describe('updateProfileMutation', () => {
   });
 
   test('should throw UNAUTHORIZED if user has no profile for the webCard', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'userId' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       webCardId: 'webCardId',
     });
@@ -91,7 +92,6 @@ describe('updateProfileMutation', () => {
   });
 
   test('should throw FORBIDDEN if user is not owner and tries to change role to owner', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'userId' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       webCardId: 'webCardId',
     });
@@ -112,7 +112,6 @@ describe('updateProfileMutation', () => {
   });
 
   test('should throw FORBIDDEN if user has no admin rights to update another profile', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'userId' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       webCardId: 'webCardId',
     });
@@ -133,7 +132,6 @@ describe('updateProfileMutation', () => {
   });
 
   test('should throw INVALID_REQUEST if user tries to change their own profile role', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'userId' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       webCardId: 'webCardId',
     });
@@ -154,7 +152,6 @@ describe('updateProfileMutation', () => {
   });
 
   test('should successfully update the profile', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'userId' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       webCardId: 'webCardId',
       avatarId: 'oldAvatar',
@@ -171,6 +168,10 @@ describe('updateProfileMutation', () => {
     (checkMedias as jest.Mock).mockResolvedValue(undefined);
     (updateProfile as jest.Mock).mockResolvedValue(undefined);
     (referencesMedias as jest.Mock).mockResolvedValue(undefined);
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'oldAvatar', type: 'avatar' },
+      { id: 'oldLogo', type: 'logo' },
+    ]);
 
     const result = await updateProfileMutation(
       {},

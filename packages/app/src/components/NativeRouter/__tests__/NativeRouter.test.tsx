@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-native';
 import { BackHandler } from 'react-native';
 import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import { useNativeRouter } from '../NativeRouter';
@@ -703,6 +703,7 @@ describe('useNativeRouter', () => {
       (BackHandler.addEventListener as jest.Mock).mockImplementationOnce(
         (_, callback) => {
           listener = callback;
+          return { remove: () => {} };
         },
       );
 

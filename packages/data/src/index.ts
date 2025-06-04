@@ -1,8 +1,7 @@
-export { transaction } from './database';
-
 export * from './helpers/databaseMonitorer';
 export * from './helpers/createId';
-
+export * from './database/drizzleClient';
+export * from './database/database';
 export * from './queries';
 
 export type {
@@ -32,6 +31,7 @@ export type {
   CoverTemplateParams,
   CoverTemplateTag,
   CoverTemplateType,
+  CoverTemplateMedia,
   CoverText,
   CoverTextType,
   FCMToken,
@@ -53,7 +53,14 @@ export type {
   User,
   UserSubscription,
   WebCard,
-  WebCardCategory,
   WebCardStatistic,
   Contact,
+  NewContact,
+  TermsOfUse,
+  PublicProfile,
+  EnrichedContactFields,
+  Position,
+  Education,
+  ContactEnrichment,
+  EnrichedContactHiddenFields,
 } from './schema';

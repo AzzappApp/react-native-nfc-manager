@@ -17,8 +17,8 @@ import type { FollowersRoute } from '#routes';
 
 const followersScreenQuery = graphql`
   query FollowersScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      ... on WebCard {
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
         id
         cardIsPrivate
         ...FollowersScreenList_webCard
@@ -31,7 +31,8 @@ const FollowersScreen = ({
   preloadedQuery,
 }: RelayScreenProps<FollowersRoute, FollowersScreenQuery>) => {
   const intl = useIntl();
-  const { webCard } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
+  const webCard = node?.webCard;
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const router = useRouter();
   const { top } = useScreenInsets();

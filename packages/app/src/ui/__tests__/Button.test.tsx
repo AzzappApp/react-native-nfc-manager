@@ -133,8 +133,10 @@ describe('Button component', () => {
 
   test('should render with the correct label on android platform', () => {
     jest.mock('react-native/Libraries/Utilities/Platform', () => ({
-      OS: 'android', // or 'ios'
-      select: () => null,
+      default: {
+        OS: 'android', // or 'ios'
+        select: () => null,
+      },
     }));
     render(<Button label={label} testID="button_testId" />);
     expect(screen.getByTestId('button_testId')).not.toBeNull();

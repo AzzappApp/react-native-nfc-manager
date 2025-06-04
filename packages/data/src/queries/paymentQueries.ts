@@ -57,6 +57,24 @@ export const getUserPayments = async (
   return query;
 };
 
+/**
+ * Retrieve subscription payments.
+ *
+ * @param subscriptionId  The id of the subscription to retrieve the payments from
+ * @returns the list of user payments
+ */
+export const getPaymentsBySubscriptionId = async (
+  subscriptionId: string,
+): Promise<Payment[]> => {
+  const query = db()
+    .select()
+    .from(PaymentTable)
+    .where(eq(PaymentTable.subscriptionId, subscriptionId))
+    .orderBy(desc(PaymentTable.createdAt));
+
+  return query;
+};
+
 export const getPaymentByTransactionId = async (
   subscriptionId: string,
   transactionId: string,

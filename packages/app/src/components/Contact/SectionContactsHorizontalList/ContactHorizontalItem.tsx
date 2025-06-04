@@ -1,114 +1,131 @@
-import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactHelpers';
-import useImageFromContact from '#hooks/useImageFromContact';
 import PressableNative from '#ui/PressableNative';
-import ContactAvatar from '../ContactAvatar';
-import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
-import type { Contact } from 'expo-contacts';
+import ContactAvatar, { EnrichmentOverlay } from '../ContactAvatar';
+import useContactAvatar from '../useContactAvatar';
+import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
+import type { ContactHorizontalItem_contact$key } from '#relayArtifacts/ContactHorizontalItem_contact.graphql';
 
-type Props = {
-  contact: ContactType;
-  onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
+type ContactHorizontalItemProps = {
+  contact: ContactHorizontalItem_contact$key;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (contactId: string) => void;
 };
 
 const ContactHorizontalItem = ({
-  contact,
+  contact: contactKey,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
-  showContactAction,
-}: Props) => {
-  const [showInvite, setShowInvite] = useState(false);
-
-  useEffect(() => {
-    const verifyInvitation = async () => {
-      if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-        const foundContact = await findLocalContact(
-          contact.phoneNumbers?.map(({ number }) => number) ?? [],
-          contact.emails?.map(({ address }) => address) ?? [],
-          localContacts,
-          contact.contactProfile?.id,
-        );
-        setShowInvite(!foundContact);
+  onShowContactAction,
+}: ContactHorizontalItemProps) => {
+  const contact = useFragment(
+    graphql`
+      fragment ContactHorizontalItem_contact on Contact {
+        id
+        firstName
+        lastName
+        company
+        phoneNumbers {
+          number
+          label
+        }
+        enrichmentStatus
+        enrichment {
+          approved
+          fields {
+            company
+            phoneNumbers {
+              number
+              label
+            }
+          }
+        }
+        contactProfile {
+          webCard {
+            userName
+            ...CoverRenderer_webCard
+          }
+        }
+        ...useContactAvatar_contact
       }
-    };
-
-    verifyInvitation();
-  }, [
-    contactsPermissionStatus,
-    contact.contactProfile,
-    contact.emails,
-    contact.phoneNumbers,
-    localContacts,
-  ]);
+    `,
+    contactKey,
+  );
 
   const onShow = useCallback(() => {
-    onShowContact(contact);
+    onShowContact(contact.id);
   }, [contact, onShowContact]);
 
-  const [firstname, lastname, name] = useMemo(() => {
+  const webCard = contact.contactProfile?.webCard;
+  const [firstName, lastName, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {
       return [
         contact.firstName,
         contact.lastName,
-        `${contact.firstName} ${contact.lastName}`,
+        `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim(),
       ];
     }
 
-    if (contact.contactProfile?.webCard?.userName) {
-      return [
-        contact.contactProfile.webCard.userName,
-        '',
-        contact.contactProfile.webCard.userName,
-      ];
+    if (webCard?.userName) {
+      return [webCard.userName, '', webCard.userName];
     }
 
     return ['', '', ''];
-  }, [
-    contact.contactProfile?.webCard?.userName,
-    contact.firstName,
-    contact.lastName,
-  ]);
+  }, [contact.firstName, contact.lastName, webCard?.userName]);
 
   const onMore = useCallback(() => {
-    showContactAction({
-      contact,
-      showInvite,
-      hideInvitation: () => {
-        setShowInvite(false);
-      },
-    });
-  }, [contact, showContactAction, showInvite]);
+    onShowContactAction(contact.id);
+  }, [contact, onShowContactAction]);
 
-  const avatarSource = useImageFromContact(contact);
+  const avatarSource = useContactAvatar(contact);
+
+  const enrichmentInProgress =
+    contact.enrichmentStatus === 'running' ||
+    contact.enrichmentStatus === 'pending';
+  const enrichmentNeedApproval =
+    contact.enrichmentStatus === 'completed' &&
+    contact.enrichment?.approved === null;
 
   return (
     <View style={styles.profile}>
-      <PressableNative onPress={onShow} onLongPress={onMore}>
-        {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
-          <CoverRenderer width={80} webCard={contact.webCard} />
+      <PressableNative
+        onPress={onShow}
+        android_ripple={{ borderless: true, foreground: true }}
+        onLongPress={onMore}
+      >
+        {!avatarSource && webCard ? (
+          <CoverRenderer width={80} webCard={webCard} />
         ) : (
           <ContactAvatar
-            firstName={firstname}
-            lastName={lastname}
+            firstName={firstName}
+            lastName={lastName}
             name={name}
-            company={contact.company}
+            company={contact.enrichment?.fields?.company || contact.company}
             avatar={avatarSource}
           />
         )}
+        <EnrichmentOverlay
+          overlayEnrichmentInProgress={enrichmentInProgress}
+          overlayEnrichmentApprovementNeeded={enrichmentNeedApproval}
+          small={false}
+          scale={1}
+          name={name}
+          company={contact.enrichment?.fields?.company || contact.company}
+        />
       </PressableNative>
-      <WhatsappButton
-        phoneNumber={contact?.phoneNumbers}
-        style={styles.invite}
-      />
+      {!enrichmentNeedApproval && !enrichmentInProgress && (
+        <WhatsappButton
+          phoneNumbers={
+            [
+              ...(contact.phoneNumbers || []),
+              ...(contact?.enrichment?.fields?.phoneNumbers || []),
+            ] as ContactPhoneNumberType[]
+          }
+          style={styles.invite}
+        />
+      )}
     </View>
   );
 };
@@ -116,7 +133,8 @@ const ContactHorizontalItem = ({
 const styles = StyleSheet.create({
   profile: {
     position: 'relative',
-    marginBottom: 30,
+    paddingBottom: 30,
+    overflow: 'visible',
   },
   invite: {
     position: 'absolute',

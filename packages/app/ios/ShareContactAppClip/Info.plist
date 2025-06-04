@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleShortVersionString</key>
-	<string>1.9.27</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
-	<key>NSAppClip</key>
 	<dict>
-		<key>NSAppClipRequestEphemeralUserNotification</key>
-		<false />
-		<key>NSAppClipRequestLocationConfirmation</key>
-		<false />
+		<key>AZZAPP_API_URL</key>
+		<string>$(AZZAPP_API_URL)</string>
+		<key>AZZAPP_WEB_URL</key>
+		<string>$(AZZAPP_WEB_URL)</string>
+		<key>NSAppClipLocalExperience</key>
+		<array>
+			<dict>
+				<key>NSAppClipLocalExperienceBundleIdentifier</key>
+				<string>com.azzapp.app-dev.Clip</string>
+				<key>NSAppClipLocalExperienceURL</key>
+				<string>http://192.168.2.1:3002</string>
+			</dict>
+		</array>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<false />
+			<key>NSAllowsLocalNetworking</key>
+			<true />
+		</dict>
 	</dict>
-</dict>
 </plist>

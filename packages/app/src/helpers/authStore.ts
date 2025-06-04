@@ -1,10 +1,15 @@
-import _ from 'lodash';
+import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
+import keys from 'lodash/keys';
+import pick from 'lodash/pick';
+
 import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
 import { logSignIn } from './analytics';
 import { addGlobalEventListener } from './globalEvents';
+import { cleanOfflineVCardData } from './offlineVCard';
 
 /**
  * this module is used to manage the auth tokens and auth related state
@@ -180,6 +185,7 @@ export const init = async () => {
   addGlobalEventListener('SIGN_OUT', async () => {
     authTokens = null;
     storage.delete(MMKVS_PROFILE_INFOS);
+    cleanOfflineVCardData();
     clearRecentSearch();
     encryptedStorage.clearAll();
   });
@@ -263,12 +269,12 @@ const emitAuthState = () => {
 export const getTokens = () => authTokens;
 
 export const commonKeysAreEqual = (a: any, b: any) => {
-  const commonKeys = _.intersection(_.keys(a), _.keys(b));
+  const commonKeys = intersection(keys(a), keys(b));
 
-  const obj1Common = _.pick(a, commonKeys);
-  const obj2Common = _.pick(b, commonKeys);
+  const obj1Common = pick(a, commonKeys);
+  const obj2Common = pick(b, commonKeys);
 
-  return _.isEqual(obj1Common, obj2Common);
+  return isEqual(obj1Common, obj2Common);
 };
 
 export const onChangeWebCard = (infos?: Partial<ProfileInfosInput> | null) => {

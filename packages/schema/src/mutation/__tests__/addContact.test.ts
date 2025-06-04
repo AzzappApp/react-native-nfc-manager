@@ -1,11 +1,16 @@
 import { GraphQLError } from 'graphql';
 
-import { createContact, getContactByProfiles } from '@azzapp/data';
+import {
+  createContact,
+  getContactByProfiles,
+  incrementContactsImportFromScan,
+  incrementImportFromScan,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import addContact from '../addContact';
 
 // Mock dependencies
@@ -18,6 +23,8 @@ jest.mock('@azzapp/data', () => ({
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateContact: jest.fn(),
+  incrementContactsImportFromScan: jest.fn(),
+  incrementImportFromScan: jest.fn(),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -25,16 +32,12 @@ jest.mock('@azzapp/i18n', () => ({
 }));
 
 jest.mock('@azzapp/shared/urlHelpers', () => ({
-  buildUserUrl: jest.fn(userName => `https://azzapp.com/${userName}`),
+  buildWebUrl: jest.fn(userName => `https://azzapp.com/${userName}`),
 }));
 
 jest.mock('#externals', () => ({
   notifyUsers: jest.fn(),
   sendPushNotification: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -54,7 +57,11 @@ jest.mock('graphql-relay', () => ({
 }));
 
 // Mock context and info
-const mockContext: any = {};
+const mockContext: any = {
+  intl: {
+    formatMessage: jest.fn(),
+  },
+};
 const mockInfo: any = {};
 
 describe('addContact Mutation', () => {
@@ -82,8 +89,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
-
+    mockUser();
     await expect(
       addContact(
         {},
@@ -109,7 +115,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should throw FORBIDDEN if profile does not belong to the user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-999' });
+    mockUser('user-999');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
 
     await expect(
@@ -137,7 +143,7 @@ describe('addContact Mutation', () => {
   });
 
   test('should create a new contact if no existing contact found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getContactByProfiles as jest.Mock).mockResolvedValue(null);
@@ -174,10 +180,12 @@ describe('addContact Mutation', () => {
         title: 'CEO',
       }),
     });
+    expect(incrementContactsImportFromScan).not.toHaveBeenCalled();
+    expect(incrementImportFromScan).not.toHaveBeenCalled();
   });
 
   test('should validate subscription if scan is used', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getContactByProfiles as jest.Mock).mockResolvedValue(null);
@@ -204,13 +212,19 @@ describe('addContact Mutation', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
-      action: 'ADD_CONTACT_WITH_SCAN',
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'user-456',
+      {
+        action: 'ADD_CONTACT_WITH_SCAN',
+      },
+      mockContext.apiEndpoint,
+    );
+    expect(incrementContactsImportFromScan).toHaveBeenCalled();
+    expect(incrementImportFromScan).toHaveBeenCalled();
   });
 
   test('should send email notification if notify is true', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    mockUser('user-456');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (userLoader.load as jest.Mock).mockResolvedValue({

@@ -1,32 +1,46 @@
 import * as Sentry from '@sentry/react-native';
-import {
-  presentFormAsync,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
-  ConnectionHandler,
   graphql,
   useFragment,
+  useLazyLoadQuery,
   useMutation,
 } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import useOnInviteContact from '#components/Contact/useOnInviteContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { findLocalContact } from '#helpers/contactHelpers';
-import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
+import ProfilesSelector, {
+  ProfilesSelectorFallback,
+} from '#components/ProfilesSelector';
+import {
+  stringToContactAddressLabelType,
+  stringToContactEmailLabelType,
+  stringToContactPhoneNumberLabelType,
+  addContactUpdater,
+} from '#helpers/contactHelpers';
 import { createHash } from '#helpers/cryptoHelpers';
-import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
+import { isFileURL } from '#helpers/fileHelpers';
+import {
+  prepareAvatarForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
+import { uploadMedia } from '#helpers/MobileWebAPI';
 import useBoolean from '#hooks/useBoolean';
-import useOnInviteContact from '#hooks/useOnInviteContact';
-import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -36,16 +50,19 @@ import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import AddContactModalProfiles, {
-  AddContactModalProfilesFallback,
-} from './AddContactModalProfiles';
+import type { ContactType } from '#helpers/contactHelpers';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
-import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type {
+  AddContactModalMutation,
+  ContactInput,
+} from '#relayArtifacts/AddContactModalMutation.graphql';
+import type { AddContactModalProfilesSelectorQuery } from '#relayArtifacts/AddContactModalProfilesSelectorQuery.graphql';
+import type { useOnInviteContactDataQuery_contact$key } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-import type { Contact, Image } from 'expo-contacts';
+import type { Image } from 'expo-contacts';
 
 type Props = {
   params: WebCardRoute['params'];
@@ -59,15 +76,22 @@ const AddContactModal = ({
     geolocation,
     contactCard,
     avatarUrl,
+    logoUrl,
     contactProfileId,
   },
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
-  const {
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-    requestPhonebookPermissionAsync,
-  } = usePhonebookPermission();
+  const [contactKey, setContactKey] = useState<
+    | (useOnInviteContactDataQuery_contact$key & {
+        firstName: string;
+        lastName: string;
+        company: string;
+        id: string;
+      })
+    | null
+    | undefined
+  >(null);
 
   const webCard = useFragment(
     graphql`
@@ -80,21 +104,29 @@ const AddContactModal = ({
     webCardKey,
   );
 
-  const [commit, saving] = useMutation<AddContactModalMutation>(graphql`
+  const [commit] = useMutation<AddContactModalMutation>(graphql`
     mutation AddContactModalMutation(
       $profileId: ID!
-      $input: AddContactInput!
-      $location: LocationInput
-      $address: AddressInput
+      $contact: ContactInput!
+      $withShareBack: Boolean!
     ) {
-      addContact(
+      createContact(
         profileId: $profileId
-        input: $input
-        location: $location
-        address: $address
+        input: $contact
+        notify: false
+        scanUsed: false
+        withShareBack: $withShareBack
       ) {
         contact {
           id
+          lastName
+          firstName
+          company
+          ...useOnInviteContactDataQuery_contact
+          ...ContactActionModal_contact
+          ...ContactsHorizontalList_contacts
+          ...ContactDetailsBody_contact
+          ...ContactsListItem_contact
         }
       }
     }
@@ -103,129 +135,97 @@ const AddContactModal = ({
   const intl = useIntl();
 
   const [withShareBack, setWithShareBack] = useState<CheckboxStatus>('checked');
-  const [scanned, setScanned] = useState<{
-    contact: Contact;
-    profileId: string;
-  } | null>(null);
+  const [scanned, setScanned] = useState<ContactType | null>(null);
 
   const [show, open, close] = useBoolean(false);
   const router = useRouter();
 
-  const getContactInput = useCallback(() => {
+  const getContactInput = useCallback(async (): Promise<
+    ContactInput | undefined
+  > => {
     if (!scanned || !viewer) return;
 
-    const addresses = scanned.contact.addresses?.map(({ label, street }) => ({
-      label,
-      address: street ?? '',
-    }));
+    const uploads = [];
 
-    const emails = scanned.contact.emails?.map(({ label, email }) => ({
-      label,
-      address: email ?? '',
-    }));
+    if (isFileURL(scanned.avatar?.uri) && scanned.avatar?.uri) {
+      const { file, uploadURL, uploadParameters } =
+        await prepareAvatarForUpload(scanned.avatar.uri);
 
-    const phoneNumbers = scanned.contact.phoneNumbers
-      ?.map(({ label, number }) => ({
-        label,
-        number,
-      }))
-      .filter(({ number }) => !!number) as Array<{
-      label: string;
-      number: string;
-    }>;
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
 
-    const socials = (scanned.contact?.socialProfiles
-      ?.filter(({ url }) => url)
-      .map(({ label, url }) => ({
-        label,
-        url,
-      })) ?? []) as Array<{
-      label: string;
-      url: string;
-    }>;
+    if (isFileURL(scanned.logo?.uri) && scanned.logo?.uri) {
+      const { file, uploadURL, uploadParameters } = await prepareLogoForUpload(
+        scanned.logo.uri,
+      );
 
-    const urls =
-      scanned.contact.urlAddresses
-        ?.map(url => {
-          return url.url ? { url: url.url } : undefined;
-        })
-        ?.filter(isDefined) || [];
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
 
-    const birthdayItem = scanned.contact?.dates?.find(
-      x => x.label === 'birthday',
+    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+      uploads.map(p => p?.promise.then(r => r.public_id)),
     );
 
-    const birthday =
-      birthdayItem &&
-      birthdayItem.year !== undefined &&
-      birthdayItem.month !== undefined &&
-      birthdayItem.day !== undefined
-        ? `${birthdayItem.year}-${`${birthdayItem.month + 1}`.padStart(2, '0')}-${`${birthdayItem.day}`.padStart(2, '0')}`
-        : null;
+    const addresses = scanned.addresses;
+    const emails = scanned.emails;
+
+    const phoneNumbers = scanned.phoneNumbers?.filter(({ number }) => !!number);
+
+    const socials = scanned?.socials?.filter(({ url }) => url);
+    const urls = scanned.urls?.filter(isDefined) || [];
 
     return {
-      addresses: addresses ?? [],
-      company: scanned.contact.company ?? '',
-      emails: emails ?? [],
-      firstname: scanned.contact.firstName ?? '',
-      lastname: scanned.contact.lastName ?? '',
-      phoneNumbers: phoneNumbers ?? [],
-      profileId: scanned.profileId ?? '',
-      title: scanned.contact.jobTitle ?? '',
-      withShareBack: withShareBack === 'checked',
-      birthday,
-      urls,
-      socials,
+      addresses: addresses?.map(address => ({
+        label: address.label,
+        address: address.address,
+      })),
+      company: scanned.company,
+      emails:
+        emails?.map(email => ({
+          label: email.label,
+          address: email.address,
+        })) ?? [],
+      firstName: scanned.firstName,
+      lastName: scanned.lastName,
+      phoneNumbers:
+        phoneNumbers?.map(number => ({
+          label: number.label,
+          number: number.number,
+        })) ?? [],
+      title: scanned.title,
+      birthday: scanned.birthday,
+      contactProfileId: scanned.profileId,
+      urls: urls.map(url => ({ url: url.url })),
+      socials: socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+      })),
+      avatarId: uploadedAvatarId,
+      logoId: uploadedLogoId,
+      location: geolocation?.location,
+      meetingPlace: geolocation?.address,
     };
-  }, [scanned, viewer, withShareBack]);
+  }, [geolocation, scanned, viewer]);
 
   const onInviteContact = useOnInviteContact();
 
   const onRequestAddContactToPhonebook = useCallback(async () => {
-    if (!scanned) return;
-
-    let localContacts = await getLocalContactsMap();
-
-    const findContact = async () => {
-      const phoneNumbers =
-        scanned.contact.phoneNumbers
-          ?.map(({ number }) => number)
-          .filter(isDefined) || [];
-      const emails =
-        scanned.contact.emails?.map(({ email }) => email).filter(isDefined) ||
-        [];
-
-      return findLocalContact(
-        phoneNumbers,
-        emails,
-        localContacts,
-        scanned.profileId,
-      );
-    };
-
+    if (!contactKey) return;
     const name = `${
-      `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
-      scanned.contact.company ||
+      `${contactKey.firstName ?? ''}  ${contactKey.lastName ?? ''}`.trim() ||
+      contactKey.company ||
       webCard.userName
     }`;
 
-    let foundContact: Contact | undefined = undefined;
-    const { status } = await requestPhonebookPermissionAsync();
-    if (status === ContactPermissionStatus.GRANTED) {
-      foundContact = await findContact();
-    }
-
-    const addOrUpdateText = foundContact
-      ? intl.formatMessage({
-          defaultMessage: 'Update',
-          description:
-            'confirmation button displayed to update an existing contact on phone',
-        })
-      : intl.formatMessage({
-          defaultMessage: 'Add',
-          description:
-            'confirmation button displayed to add an new contact on phone',
-        });
+    const addText = intl.formatMessage({
+      defaultMessage: 'Add',
+      description:
+        'confirmation button displayed to add an new contact on phone',
+    });
 
     Alert.alert(
       intl.formatMessage({
@@ -243,26 +243,10 @@ const AddContactModal = ({
       ),
       [
         {
-          text: addOrUpdateText,
+          text: addText,
           onPress: async () => {
             try {
-              const { status } =
-                await requestPhonebookPermissionAndRedirectToSettingsAsync();
-              if (
-                status === ContactPermissionStatus.GRANTED &&
-                !localContacts
-              ) {
-                localContacts = await getLocalContactsMap();
-              }
-              await onInviteContact(
-                status,
-                {
-                  ...scanned.contact,
-                  profileId: scanned.profileId,
-                  createdAt: new Date(),
-                },
-                localContacts,
-              );
+              await onInviteContact(contactKey);
             } catch (e) {
               console.error(e);
             }
@@ -274,31 +258,12 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            const allowSystemUI =
-              Platform.OS === 'ios'
-                ? (await requestPhonebookPermissionAndRedirectToSettingsAsync())
-                    .status === ContactPermissionStatus.GRANTED
-                : false;
-
-            if (allowSystemUI) {
-              try {
-                const updatedContact = reworkContactForDeviceInsert(
-                  scanned.contact,
-                );
-                await presentFormAsync(null, updatedContact, {
-                  isNew: true,
-                });
-              } catch (e) {
-                console.warn(e);
-                Sentry.captureException(e);
-              }
-            } else {
+            if (contactKey?.id) {
               router.push({
                 route: 'CONTACT_DETAILS',
                 params: {
-                  ...scanned.contact,
-                  createdAt: new Date(),
-                  profileId: scanned.profileId,
+                  contactId: contactKey.id,
+                  overlay: 'tooltipVisible',
                 },
               });
             }
@@ -307,51 +272,46 @@ const AddContactModal = ({
         { text: 'Cancel', style: 'cancel' },
       ],
       {
-        // options
         cancelable: true,
       },
     );
-  }, [
-    scanned,
-    webCard.userName,
-    requestPhonebookPermissionAsync,
-    intl,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-    onInviteContact,
-    router,
-  ]);
+  }, [contactKey, webCard.userName, intl, onInviteContact, router]);
 
-  const onAddContactToAzzapp = useCallback(() => {
+  const hasPhoneInsertRequested = useRef(false);
+  useEffect(() => {
+    if (contactKey && !hasPhoneInsertRequested.current) {
+      hasPhoneInsertRequested.current = true;
+      onRequestAddContactToPhonebook();
+    }
+  }, [contactKey, onRequestAddContactToPhonebook]);
+
+  const [saving, setSaving] = useState(false);
+  const onAddContactToProfile = useCallback(async () => {
     if (!scanned || !viewer) return;
-    const input = getContactInput();
-    if (!input) return;
+    setSaving(true);
+    const contact = await getContactInput();
+    if (!contact) return;
     commit({
       variables: {
-        input,
         profileId: viewer,
-        location: geolocation?.location,
-        address: geolocation?.address,
+        contact,
+        withShareBack: withShareBack === 'checked',
       },
       updater: (store, response) => {
-        if (response && response.addContact) {
-          const profile = store.get(viewer);
-          const nbContacts = profile?.getValue('nbContacts');
-
-          if (typeof nbContacts === 'number') {
-            profile?.setValue(nbContacts + 1, 'nbContacts');
+        if (response && response.createContact) {
+          const user = store.getRoot().getLinkedRecord('currentUser');
+          const newContact = store
+            .getRootField('createContact')
+            ?.getLinkedRecord('contact');
+          if (!user || !newContact) {
+            return;
           }
-
-          if (profile) {
-            ConnectionHandler.getConnection(
-              profile,
-              'Profile_searchContacts',
-            )?.invalidateRecord();
-          }
+          addContactUpdater(store, user, newContact);
         } else {
           console.warn('fail to add contact ?');
         }
       },
-      onCompleted: () => {
+      onCompleted: data => {
         close();
         Toast.show({
           type: 'success',
@@ -360,6 +320,8 @@ const AddContactModal = ({
             description: 'Toast message when a contact is created successfully',
           }),
         });
+        setContactKey(data.createContact?.contact);
+        setSaving(false);
       },
       onError: e => {
         console.warn('error adding contact', e);
@@ -372,18 +334,10 @@ const AddContactModal = ({
               'Toast message when a contact failed to be created successfully',
           }),
         });
+        setSaving(false);
       },
     });
-  }, [
-    scanned,
-    viewer,
-    getContactInput,
-    commit,
-    geolocation?.location,
-    geolocation?.address,
-    close,
-    intl,
-  ]);
+  }, [scanned, viewer, getContactInput, commit, withShareBack, close, intl]);
 
   useEffect(() => {
     (async () => {
@@ -395,22 +349,24 @@ const AddContactModal = ({
       }
       if (!scanned && webCard) {
         if (contactData) {
-          const { contact, profileId } = await buildContact(
+          const contact = await buildContact(
             contactData,
             additionalContactData,
             webCard.userName,
           );
 
-          setScanned({ contact, profileId });
+          setScanned(contact);
           open();
         } else if (contactCard) {
           const { contact } = await buildContactFromContactCard(
             contactCard,
+            contactProfileId ?? '',
             avatarUrl,
+            logoUrl,
             webCard.userName,
           );
 
-          setScanned({ contact, profileId: contactProfileId ?? '' });
+          setScanned(contact);
           open();
         }
       }
@@ -424,18 +380,17 @@ const AddContactModal = ({
     contactCard,
     avatarUrl,
     contactProfileId,
+    logoUrl,
   ]);
 
   const userName = useMemo(() => {
     if (scanned) {
-      const { contact } = scanned;
-
-      if (contact.firstName || contact.lastName) {
-        return `${contact.firstName} ${contact.lastName}`;
+      if (scanned.firstName || scanned.lastName) {
+        return `${scanned?.firstName ?? ''} ${scanned?.lastName ?? ''}`.trim();
       }
 
-      if (contact.company) {
-        return contact.company;
+      if (scanned.company) {
+        return scanned.company;
       }
     }
 
@@ -449,12 +404,7 @@ const AddContactModal = ({
   const coverWidth = dim.height < 700 + bottom ? dim.width / 4 : 120;
 
   return (
-    <BottomSheetModal
-      visible={show}
-      onDismiss={onRequestAddContactToPhonebook}
-      lazy
-      enableContentPanningGesture={false}
-    >
+    <BottomSheetModal visible={show} lazy enableContentPanningGesture={false}>
       <Header
         middleElement={
           <View style={styles.headerMiddleContent}>
@@ -479,8 +429,8 @@ const AddContactModal = ({
         <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
       </View>
 
-      <Suspense fallback={<AddContactModalProfilesFallback />}>
-        <AddContactModalProfiles onSelectProfile={setViewer} />
+      <Suspense fallback={<ProfilesSelectorFallback />}>
+        <AddContactModalProfilesSelector onSelectProfile={setViewer} />
       </Suspense>
 
       <View style={{ paddingHorizontal: 20 }}>
@@ -501,7 +451,7 @@ const AddContactModal = ({
             defaultMessage: 'Add to my WebCard contacts',
             description: 'AddContactModal - Submit title',
           })}
-          onPress={onAddContactToAzzapp}
+          onPress={onAddContactToProfile}
         />
         <PressableNative onPress={close} style={styles.notAddButton}>
           <Text variant="medium" style={styles.notAddLabel}>
@@ -516,20 +466,22 @@ const AddContactModal = ({
   );
 };
 
-const downloadAvatar = async (avatarUrl?: string) => {
+export default AddContactModal;
+
+const downloadImage = async (url?: string) => {
   let image: Image | undefined = undefined;
-  if (avatarUrl) {
+  if (url) {
     try {
-      const hash = createHash(avatarUrl);
-      const avatar = new File(Paths.cache.uri + hash);
-      if (!avatar.exists) {
-        await File.downloadFileAsync(avatarUrl, avatar);
+      const hash = createHash(url);
+      const file = new File(Paths.cache.uri + hash);
+      if (!file.exists) {
+        await File.downloadFileAsync(url, file);
       }
 
       image = {
         width: 720,
         height: 720,
-        uri: avatar.uri,
+        uri: file.uri,
       };
     } catch (e) {
       console.warn('error downloading avatar', e);
@@ -542,64 +494,48 @@ const downloadAvatar = async (avatarUrl?: string) => {
 
 const buildContactFromContactCard = async (
   contactCard: ContactCard,
+  profileId: string,
   avatarUrl?: string,
+  logoUrl?: string,
   userName?: string,
 ) => {
-  const image = await downloadAvatar(avatarUrl);
+  const [avatar, logo] = await Promise.all([
+    downloadImage(avatarUrl),
+    downloadImage(logoUrl),
+  ]);
 
-  const birthdayDate = contactCard.birthday
-    ? new Date(contactCard.birthday.birthday)
-    : undefined;
-
-  const contact: Contact = {
-    contactType: 'person',
+  const contact: ContactType = {
     firstName: contactCard.firstName ?? '',
     lastName: contactCard.lastName ?? '',
-    name: `${contactCard.firstName ?? ''} ${contactCard.lastName ?? ''}`,
     company: contactCard.company ?? '',
-    jobTitle: contactCard.title ?? '',
+    title: contactCard.title ?? '',
     addresses: contactCard.addresses?.map(address => ({
-      label: address.label,
-      street: address.address,
+      label: stringToContactAddressLabelType(address.label),
+      address: address.address,
       isPrimary: address.label === 'Main',
     })),
     phoneNumbers: contactCard.phoneNumbers?.map(phone => ({
-      label:
-        Platform.OS === 'android' && phone.label !== 'Main'
-          ? phone.label.toLowerCase()
-          : phone.label,
+      label: stringToContactPhoneNumberLabelType(phone.label),
       number: phone.number,
       isPrimary: phone.label === 'Main',
     })),
     emails: contactCard.emails?.map(email => ({
-      label:
-        Platform.OS === 'android' && email.label !== 'Main'
-          ? email.label.toLowerCase()
-          : email.label,
-      email: email.address,
+      label: stringToContactEmailLabelType(email.label),
+      address: email.address,
       isPrimary: email.label === 'Main',
     })),
-    dates: birthdayDate
-      ? [
-          {
-            label: 'birthday',
-            year: birthdayDate?.getFullYear(),
-            month: birthdayDate?.getMonth(),
-            day: birthdayDate?.getDate(),
-          },
-        ]
-      : [],
-    socialProfiles:
+    birthday: contactCard.birthday?.birthday,
+    socials:
       contactCard?.socials?.map(social => ({
         label: social.label,
         url: social.url,
         service: social.label,
       })) ?? [],
-    urlAddresses: (userName
+    urls: (userName
       ? [
           {
             label: 'azzapp',
-            url: buildUserUrl(userName),
+            url: buildWebUrl(userName),
           },
         ]
       : []
@@ -612,18 +548,53 @@ const buildContactFromContactCard = async (
             : `https://${url.address}`,
       })) ?? [],
     ),
-    image,
-    imageAvailable: !!image,
+    avatar: {
+      uri: avatar?.uri,
+    },
+    logo: {
+      uri: logo?.uri,
+    },
+    profileId,
+    meetingDate: new Date(),
   };
 
   return { contact };
+};
+
+type AddContactModalProfilesSelectorProps = {
+  onSelectProfile: (profileId: string) => void;
+};
+
+const AddContactModalProfilesSelector = ({
+  onSelectProfile,
+}: AddContactModalProfilesSelectorProps) => {
+  const { currentUser } =
+    useLazyLoadQuery<AddContactModalProfilesSelectorQuery>(
+      graphql`
+        query AddContactModalProfilesSelectorQuery {
+          currentUser {
+            profiles {
+              ...ProfilesSelector_profiles
+            }
+          }
+        }
+      `,
+      {},
+    );
+
+  return (
+    <ProfilesSelector
+      profiles={currentUser?.profiles ?? null}
+      onSelectProfile={onSelectProfile}
+    />
+  );
 };
 
 const buildContact = async (
   contactCardData: string,
   additionalContactData: WebCardRoute['params']['additionalContactData'],
   userName?: string,
-) => {
+): Promise<ContactType> => {
   const {
     profileId,
     firstName,
@@ -636,77 +607,65 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  const image = await downloadAvatar(additionalContactData?.avatarUrl);
+  const image = await downloadImage(additionalContactData?.avatarUrl);
 
-  const birthdayDate = birthday ? new Date(birthday) : undefined;
-
-  const contact: Contact = {
+  const contact: ContactType = {
     id: profileId,
-    contactType: 'person',
-    firstName: firstName ?? '',
-    lastName: lastName ?? '',
-    name: `${firstName ?? ''} ${lastName ?? ''}`,
-    company: company ?? '',
-    jobTitle: title ?? '',
+    firstName,
+    lastName,
+    company,
+    title,
     addresses: addresses.map(address => ({
-      label: address[0],
-      street: address[1],
-      isPrimary: address[0] === 'Main',
+      label: stringToContactAddressLabelType(address[0]),
+      address: address[1],
     })),
-    phoneNumbers: phoneNumbers.map(phone => ({
-      label:
+    phoneNumbers: phoneNumbers.map(phone => {
+      const label = stringToContactPhoneNumberLabelType(
         Platform.OS === 'android' && phone[0] !== 'Main'
           ? phone[0].toLowerCase()
           : phone[0],
-      number: phone[1],
-      isPrimary: phone[0] === 'Main',
-    })),
+      );
+      return {
+        label,
+        number: phone[1],
+      };
+    }),
     emails: emails.map(email => ({
-      label:
+      label: stringToContactEmailLabelType(
         Platform.OS === 'android' && email[0] !== 'Main'
           ? email[0].toLowerCase()
           : email[0],
-      email: email[1],
-      isPrimary: email[0] === 'Main',
+      ),
+      address: email[1],
     })),
-    dates: birthdayDate
-      ? [
-          {
-            label: 'birthday',
-            year: birthdayDate?.getFullYear(),
-            month: birthdayDate?.getMonth(),
-            day: birthdayDate?.getDate(),
-          },
-        ]
-      : [],
-    socialProfiles:
+    birthday,
+    socials:
       additionalContactData?.socials?.map(social => ({
         label: social.label,
         url: social.url,
-        id: `${profileId}-${social.label}`,
-        service: social.label,
       })) ?? [],
-    urlAddresses: (userName
+    urls: (userName
       ? [
           {
-            label: 'azzapp',
-            url: buildUserUrl(userName),
+            url: buildWebUrl(userName),
           },
         ]
       : []
     ).concat(
       additionalContactData?.urls?.map(url => ({
-        label: '',
         url:
           !url.address || url.address.toLocaleLowerCase().startsWith('http')
             ? url.address
             : `https://${url.address}`,
       })) ?? [],
     ),
-    image,
-    imageAvailable: !!image,
+    avatar: {
+      uri: image?.uri,
+    },
+    profileId,
+    meetingDate: new Date(),
   };
-  return { contact, profileId };
+  return contact;
 };
 
 const styles = StyleSheet.create({
@@ -748,5 +707,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default AddContactModal;

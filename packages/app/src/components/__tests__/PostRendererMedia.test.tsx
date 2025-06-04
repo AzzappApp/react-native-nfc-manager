@@ -32,24 +32,26 @@ const renderPost = (props?: Partial<PostRendererMediaProps>) => {
     const data = useLazyLoadQuery<PostRendererMediaTestQuery>(
       graphql`
         query PostRendererMediaTestQuery @relay_test_operation {
-          post: node(id: "test-post") {
-            id
-            ...PostRendererMediaFragment_post
+          node(id: "test-post") {
+            ... on Post @alias(as: "post") {
+              id
+              ...PostRendererMediaFragment_post
+            }
           }
         }
       `,
       {},
     );
 
-    return (
+    return data.node?.post ? (
       <PostRendererMedia
-        post={data.post!}
+        post={data.node.post}
         width={30}
         style={{ marginTop: 10 }}
         initialTime={0}
         {...props}
       />
-    );
+    ) : null;
   };
   return render(
     <RelayEnvironmentProvider environment={environement}>

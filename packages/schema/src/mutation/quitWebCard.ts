@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { markWebCardAsDeleted, removeProfile, transaction } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
@@ -10,17 +10,15 @@ import type { MutationResolvers } from '#/__generated__/types';
 
 type Mutation = MutationResolvers['quitWebCard'];
 
-const quitWebCard: Mutation = async (_, params) => {
+const quitWebCard: Mutation = async (_, params, context) => {
   const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
-
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
   const profile = await profileByWebCardIdAndUserIdLoader.load({
     webCardId,
-    userId,
+    userId: user.id,
   });
 
   if (!profile) {
@@ -30,16 +28,16 @@ const quitWebCard: Mutation = async (_, params) => {
   const webCard = await webCardLoader.load(webCardId);
   if (profile?.profileRole === 'owner') {
     await transaction(async () => {
-      await markWebCardAsDeleted(profile.webCardId, userId);
-      await updateMonthlySubscription(userId);
+      await markWebCardAsDeleted(profile.webCardId, user.id);
+      await updateMonthlySubscription(user.id, context.apiEndpoint);
     });
     if (webCard?.userName) {
       invalidateWebCard(webCard.userName);
     }
   } else {
     await transaction(async () => {
-      await removeProfile(profile.id, userId);
-      await updateMonthlySubscription(userId);
+      await removeProfile(profile.id, user.id);
+      await updateMonthlySubscription(user.id, context.apiEndpoint);
     });
   }
 

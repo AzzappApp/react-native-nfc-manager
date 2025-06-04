@@ -19,17 +19,19 @@ import {
   getContactCountWithWebcardId,
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
-import { buildCoverAvatarUrl } from '@azzapp/service/mediaServices';
-import { getPreviewVideoForModule } from '@azzapp/shared/cloudinaryHelpers';
+import {
+  buildCoverAvatarUrl,
+  getPreviewVideoForModule,
+} from '@azzapp/service/mediaServices/mediaServices';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   subscriptionsForUserLoader,
   cardModuleByWebCardLoader,
   followingsLoader,
   profileByWebCardIdAndUserIdLoader,
-  webCardCategoryLoader,
   webCardOwnerLoader,
   webCardStatisticsLoader,
 } from '#loaders';
@@ -39,7 +41,6 @@ import {
   cursorToDate,
   emptyConnection,
 } from '#helpers/connectionsHelpers';
-import { labelResolver } from '#helpers/localeHelpers';
 import {
   getWebCardProfile,
   hasWebCardProfileRight,
@@ -49,10 +50,8 @@ import fromGlobalIdWithType, {
   idResolver,
   maybeFromGlobalIdWithType,
 } from '#helpers/relayIdHelpers';
-import type {
-  WebCardCategoryResolvers,
-  WebCardResolvers,
-} from '#/__generated__/types';
+import { isWebcardPremium } from '#helpers/subscriptionHelpers';
+import type { WebCardResolvers } from '#/__generated__/types';
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
   id: idResolver('WebCard'),
@@ -158,11 +157,8 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   // TODO: should it be protected?
   webCardKind: webCard => webCard.webCardKind,
   // TODO: should it be protected?
-  webCardCategory: async webCard => {
-    return webCard.webCardCategoryId
-      ? webCardCategoryLoader.load(webCard.webCardCategoryId)
-      : null;
-  },
+  // deprecated, shall be removed
+  webCardCategory: () => null,
   // TODO: should it be protected?
   companyActivity: () => {
     // deprecated, shall be removed
@@ -223,18 +219,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return false;
     }
-    const owner = await webCardOwnerLoader.load(webCard.id);
-    //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
-    //Got a bug where the subscription is canceled however still active in the result set
-    const subscriptions = owner
-      ? await subscriptionsForUserLoader.load(owner.id)
-      : null;
-    const lastSubscription = subscriptions?.[0];
-    return !!(
-      lastSubscription &&
-      (lastSubscription.status === 'active' ||
-        lastSubscription.endAt > new Date())
-    );
+    return isWebcardPremium(webCard);
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
@@ -502,6 +487,13 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
           assetKind: 'logo',
         }
       : null,
+  banner: async webCard =>
+    webCard.bannerId && (await hasWebCardProfileRight(webCard.id))
+      ? {
+          media: webCard.bannerId,
+          assetKind: 'banner',
+        }
+      : null,
   coverTemplateTypes: async (webCard, args) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return emptyConnection;
@@ -555,17 +547,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   coverIsLogoPredefined: async webCard => webCard.coverIsLogoPredefined,
 };
 
-export const WebCardCategory: WebCardCategoryResolvers = {
-  id: idResolver('WebCardCategory'),
-  label: labelResolver,
-  medias: webCardCategory => webCardCategory.medias,
-  companyActivities: () => {
-    // deprecated, shall be removed
-    return [];
-  },
-};
-
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );

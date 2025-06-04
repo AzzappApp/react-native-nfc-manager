@@ -1,4 +1,4 @@
-import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
+import { getCloudinaryAssetURL } from '@azzapp/service/mediaServices/imageHelpers';
 import type { ModuleBackgroundResolvers } from '#__generated__/types';
 
 export const ModuleBackground: ModuleBackgroundResolvers = {

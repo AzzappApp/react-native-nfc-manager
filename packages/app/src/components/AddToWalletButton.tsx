@@ -1,20 +1,14 @@
-import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { Image } from 'expo-image';
-import { useCallback, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import {
   ActivityIndicator,
   Platform,
   useColorScheme,
   View,
 } from 'react-native';
-import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
-import { fromByteArray } from 'react-native-quick-base64';
-import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
-import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
+import { useGenerateLoadingPass } from '#hooks/useGenerateLoadingPass';
 import PressableNative from '../ui/PressableNative';
 import Text from '../ui/Text';
 import type { ColorSchemeName, ViewStyle } from 'react-native';
@@ -32,68 +26,14 @@ const AddToWalletButton = ({
   style,
   appearance,
 }: Props) => {
-  const intl = useIntl();
-  const [loadingPass, setLoadingPass] = useState(false);
   const scheme = useColorScheme();
   const colorScheme = appearance || scheme;
   const styles = useStyleSheet(styleSheet, colorScheme);
 
-  const generateLoadingPass = useCallback(async () => {
-    try {
-      setLoadingPass(true);
-
-      if (Platform.OS === 'ios') {
-        const pass = await getAppleWalletPass({
-          contactCardAccessId,
-          key: publicKey,
-          locale: intl.locale,
-        });
-
-        const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
-
-        await addPass(base64Pass);
-      } else if (Platform.OS === 'android') {
-        const pass = await getGoogleWalletPass({
-          contactCardAccessId,
-          key: publicKey,
-          locale: intl.locale,
-        });
-
-        await addPassJWT(pass.token);
-      }
-      logEvent('add_pass_wallet');
-    } catch {
-      Toast.show({
-        text1: intl.formatMessage({
-          defaultMessage: 'Error',
-          description: 'Error toast title',
-        }),
-        text2: Platform.select({
-          ios: intl.formatMessage(
-            {
-              defaultMessage:
-                'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
-              description:
-                'Error toast message when adding pass to Apple Wallet',
-            },
-            { azzappA: <Text variant="azzapp">a</Text> },
-          ) as unknown as string,
-          android: intl.formatMessage(
-            {
-              defaultMessage:
-                'Oops, ContactCard{azzappA} could not add pass to Google Wallet',
-              description:
-                'Error toast message when adding pass to Google Wallet',
-            },
-            { azzappA: <Text variant="azzapp">a</Text> },
-          ) as unknown as string,
-        }),
-        type: 'error',
-      });
-    } finally {
-      setLoadingPass(false);
-    }
-  }, [contactCardAccessId, publicKey, intl]);
+  const [generateLoadingPass, loadingPass] = useGenerateLoadingPass({
+    contactCardAccessId,
+    publicKey,
+  });
 
   return (
     <>
@@ -127,12 +67,17 @@ const AddToWalletButton = ({
         </View>
       )}
       {Platform.OS === 'android' && (
-        <View>
+        <View
+          style={[
+            styles.googleWalletButtonContainer,
+            styles.googleWalletButton,
+          ]}
+        >
           <PressableNative
             testID="add-to-wallet-button"
             disabled={loadingPass}
             onPress={generateLoadingPass}
-            ripple={{
+            android_ripple={{
               foreground: true,
               borderless: false,
               color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
@@ -184,7 +129,6 @@ const styleSheet = createStyleSheet(appearance => ({
   addToWalletButtonText: {
     color: appearance === 'light' ? colors.white : colors.black,
   },
-
   googleWalletLogo: {
     height: 47,
     overflow: 'visible',
@@ -193,6 +137,10 @@ const styleSheet = createStyleSheet(appearance => ({
     aspectRatio: 283 / 50, // derived from google wallet logo svg
     height: 47,
     alignSelf: 'center',
+  },
+  googleWalletButtonContainer: {
+    overflow: 'hidden',
+    borderRadius: 40,
   },
   googleWalletLoadingContainer: {
     position: 'absolute',

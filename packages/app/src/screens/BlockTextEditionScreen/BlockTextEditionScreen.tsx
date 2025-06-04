@@ -204,7 +204,7 @@ const BlockTextEditionScreen = ({
               kind
               visible
               variant
-              ...BlockTextEditionScreen_module
+              ...BlockTextEditionScreen_module @alias(as: "blockText")
             }
           }
         }

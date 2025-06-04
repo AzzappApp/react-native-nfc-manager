@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -33,8 +33,8 @@ import type { ForwardedRef } from 'react';
 
 const TitleTextModuleWebCardEditionScreenQuery = graphql`
   query TitleTextModuleWebCardEditionScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         webCard {
           ...withCardModule_webCard
           cardModules {
@@ -43,6 +43,7 @@ const TitleTextModuleWebCardEditionScreenQuery = graphql`
             # module: cardModule(moduleId: $moduleId) {
             id
             ...TitleTextModuleWebCardEditionScreen_module
+              @alias(as: "innerModule")
           }
         }
       }
@@ -123,6 +124,7 @@ const TitleTextModuleWebCardEditionScreen = (
               visible
               variant
               ...TitleTextModuleWebCardEditionScreen_module
+                @alias(as: "titleTextModule")
             }
           }
         }

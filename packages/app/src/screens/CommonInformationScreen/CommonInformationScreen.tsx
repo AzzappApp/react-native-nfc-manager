@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useState } from 'react';
-import { Controller, useController, useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
-import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import {
   useRouter,
   ScreenModal,
@@ -17,7 +17,11 @@ import {
 } from '#components/NativeRouter';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { prepareLogoForUpload } from '#helpers/imageHelpers';
+import {
+  prepareBannerForUpload,
+  prepareLogoForUpload,
+} from '#helpers/imageHelpers';
+import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
@@ -27,6 +31,7 @@ import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditCompanyLogo from '#screens/ContactCardEditScreen/ContactCardEditCompanyLogo';
+import ContactCardEditSignatureBanner from '#screens/ContactCardEditScreen/ContactCardEditSignatureBanner';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -46,7 +51,6 @@ import {
 } from './CommonInformationSchema';
 import CommonInformationSocials from './CommonInformationSocials';
 import CommonInformationUrls from './CommonInformationUrls';
-import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CommonInformationScreenQuery } from '#relayArtifacts/CommonInformationScreenQuery.graphql';
@@ -62,6 +66,12 @@ const commonInformationScreenQuery = graphql`
         logo {
           id
           uri(width: 180, pixelRatio: $pixelRatio)
+        }
+        banner {
+          id
+          uri(width: 220, pixelRatio: $pixelRatio)
+          width
+          height
         }
         isPremium
         commonInformation {
@@ -133,27 +143,9 @@ export const CommonInformationScreen = ({
             local: false,
           }
         : null,
+      banner: webCard?.banner,
     },
   });
-
-  const { field } = useController({
-    control,
-    name: 'logo',
-  });
-
-  const [showImagePicker, setShowImagePicker] = useState(false);
-
-  const onImagePickerFinished = useCallback(
-    async ({ uri }: ImagePickerResult) => {
-      field.onChange({
-        local: true,
-        id: uri,
-        uri,
-      });
-      setShowImagePicker(false);
-    },
-    [field],
-  );
 
   const [commit] = useMutation(graphql`
     mutation CommonInformationScreenMutation(
@@ -167,6 +159,12 @@ export const CommonInformationScreen = ({
           logo {
             id
             uri(width: 180, pixelRatio: $pixelRatio)
+          }
+          banner {
+            id
+            uri(width: 220, pixelRatio: $pixelRatio)
+            width
+            height
           }
           isPremium
           commonInformation {
@@ -200,23 +198,56 @@ export const CommonInformationScreen = ({
     useState<Observable<number> | null>(null);
 
   const submit = handleSubmit(
-    async ({ logo, ...data }) => {
-      let logoId: string | null = logo?.id ?? null;
+    async ({ logo, banner, ...data }) => {
+      const uploads = [];
 
       if (logo?.local && logo.uri) {
+        const { file, uploadURL, uploadParameters } =
+          await prepareLogoForUpload(logo.uri);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      if (banner?.local && banner.uri) {
         try {
           const { file, uploadURL, uploadParameters } =
-            await prepareLogoForUpload(logo.uri);
-          const { progress: uploadProgress, promise: uploadPromise } =
-            uploadMedia(file, uploadURL, uploadParameters);
-          setProgressIndicator(
-            uploadProgress.map(({ loaded, total }) => loaded / total),
-          );
-          const { public_id } = await uploadPromise;
-          logoId = public_id;
-        } catch (error) {
-          Sentry.captureException(error);
+            await prepareBannerForUpload(banner.uri);
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } catch (e) {
+          Sentry.captureException(e);
         }
+      } else {
+        uploads.push(null);
+      }
+
+      const uploadsToDo = uploads.filter(val => val !== null);
+      if (uploadsToDo.length) {
+        setProgressIndicator(
+          combineMultiUploadProgresses(
+            uploadsToDo.map(upload => upload.progress),
+          ),
+        );
+      }
+
+      const [uploadedLogoId, uploadedBannerId] = await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(({ public_id }) => {
+            return public_id;
+          }),
+        ),
+      );
+
+      const logoId =
+        logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
+      const bannerId =
+        banner === null ? null : banner?.local ? uploadedBannerId : banner?.id;
+
+      if (logo?.local) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+      if (banner?.local) {
+        addLocalCachedMediaFile(bannerId, 'image', banner.uri);
       }
 
       commit({
@@ -239,6 +270,7 @@ export const CommonInformationScreen = ({
             addresses: data.addresses.filter(address => address.address),
             socials: data.socials.filter(social => social.url),
             logoId,
+            bannerId,
           },
           pixelRatio: CappedPixelRatio(),
         },
@@ -266,7 +298,7 @@ export const CommonInformationScreen = ({
 
   const router = useRouter();
 
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
 
   return (
     <Container
@@ -322,7 +354,7 @@ export const CommonInformationScreen = ({
         }
       />
       <FormDeleteFieldOverlay>
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           <View style={styles.container}>
             <Icon icon="lock_line" style={styles.icon} />
             <Text variant="xsmall" style={styles.description}>
@@ -367,6 +399,11 @@ export const CommonInformationScreen = ({
             isPremium={webCard?.isPremium}
             isUserContactCard
           />
+          <Separation small />
+          <ContactCardEditSignatureBanner
+            control={control}
+            isPremium={webCard?.isPremium}
+          />
           <Separation />
           <CommonInformationAddresses control={control} />
           <Separation />
@@ -380,17 +417,6 @@ export const CommonInformationScreen = ({
         </View>
       </FormDeleteFieldOverlay>
 
-      <ScreenModal
-        visible={showImagePicker}
-        onRequestDismiss={() => setShowImagePicker(false)}
-      >
-        <ImagePicker
-          onFinished={onImagePickerFinished}
-          onCancel={() => setShowImagePicker(false)}
-          steps={[SelectImageStep]}
-          kind="image"
-        />
-      </ScreenModal>
       <ScreenModal
         visible={!!progressIndicator}
         gestureEnabled={false}

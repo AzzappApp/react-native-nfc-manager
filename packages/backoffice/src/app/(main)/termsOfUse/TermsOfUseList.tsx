@@ -2,7 +2,7 @@
 
 import { Box, Typography } from '@mui/material';
 import DataGrid from '#components/DataGrid';
-import type { TermsOfUse } from '@azzapp/data/src/schema';
+import type { TermsOfUse } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type TermsOfUseListProps = {

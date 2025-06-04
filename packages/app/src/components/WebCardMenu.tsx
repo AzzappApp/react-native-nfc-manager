@@ -2,13 +2,13 @@ import * as Sentry from '@sentry/react-native';
 import { Paths, File, Directory } from 'expo-file-system/next';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Share, Platform, Alert, StyleSheet } from 'react-native';
+import { View, Share, Alert, StyleSheet } from 'react-native';
 import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import useQuitWebCard from '#hooks/useQuitWebCard';
@@ -101,16 +101,8 @@ const WebCardMenu = ({
       return;
     }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
-    const url = buildUserUrl(webCard.userName);
-    let message = intl.formatMessage({
-      defaultMessage: 'Check out this azzapp WebCard: ',
-      description:
-        'Profile WebCardMenu, message use when sharing the contact card',
-    });
-    if (Platform.OS === 'android') {
-      // for android we need to add the message to the share
-      message = `${message} ${url}`;
-    }
+    const url = buildWebUrl(webCard.userName);
+
     try {
       await Share.share(
         {
@@ -119,8 +111,7 @@ const WebCardMenu = ({
             description:
               'Profile WebCardMenu, message use when sharing the contact card',
           }),
-          message,
-          url,
+          message: url,
         },
         {
           dialogTitle: intl.formatMessage({

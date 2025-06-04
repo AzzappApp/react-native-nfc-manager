@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { forwardRef } from 'react';
 import { FormattedMessage } from 'react-intl';
+import env from '#env';
 import { Button, Modal, type ModalProps } from '#ui';
 import dlIos from '#assets/images/icon_iOS.png';
 import dlAndroid from '#assets/images/icon_Play_Store.png';
@@ -55,7 +56,7 @@ const DownloadAppModal = forwardRef(
           </span>
           <div className={styles.footerButtons}>
             <Button.Link
-              href={process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP}
+              href={env.NEXT_PUBLIC_DOWNLOAD_IOS_APP}
               className={styles.footerButton}
             >
               <Image src={dlIos} alt="ios logo" width={24} />
@@ -66,7 +67,7 @@ const DownloadAppModal = forwardRef(
               />
             </Button.Link>
             <Button.Link
-              href={process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP}
+              href={env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP}
               className={styles.footerButton}
             >
               <Image src={dlAndroid} alt="android logo" width={24} />

@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import ConditionalWrapper from '#components/ConditionalWrapper';
 import FormLabel from '../FormLabel/FormLabel';
+import Input from '../Input';
 import styles from './FormInput.css';
 
 type FormInputProps = InputHTMLAttributes<HTMLInputElement> &
@@ -24,7 +25,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>((props, ref) => {
         </FormLabel>
       )}
     >
-      <input {...others} className={classnames} ref={ref} />
+      <Input {...others} inputClassName={classnames} ref={ref} />
     </ConditionalWrapper>
   );
 });

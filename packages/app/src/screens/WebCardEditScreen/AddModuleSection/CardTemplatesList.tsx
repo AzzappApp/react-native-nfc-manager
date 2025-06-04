@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Alert,
@@ -14,6 +14,7 @@ import CardTemplate from '#components/CardTemplate';
 import { useRouter } from '#components/NativeRouter';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useCardTemplates from '#hooks/useCardTemplates';
+import useEffectOnce from '#hooks/useEffectOnce';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -57,7 +58,7 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
     useState<CardTemplateItem | null>(null);
 
   const [
-    templateTypesByWebCardCategory,
+    templateTypes,
     selectedCardTemplateType,
     templates,
     onSelectSection,
@@ -67,10 +68,9 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
 
   const selectedIndexRef = useRef(0);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setSelectedTemplate(templates[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onScroll = useCallback(
     ({
@@ -208,7 +208,7 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
       <SelectSection
         nativeID="activities"
         accessibilityLabelledBy="activitiesLabel"
-        sections={templateTypesByWebCardCategory}
+        sections={templateTypes}
         inputLabel={selectedCardTemplateType?.title}
         selectedItemKey={selectedCardTemplateType?.id}
         keyExtractor={keyExtractor}

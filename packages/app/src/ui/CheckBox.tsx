@@ -61,6 +61,7 @@ const CheckBox = ({
       accessibilityState={{ checked: status !== 'none' }}
       activeOpacity={1}
       accessibilityLabel={accessibilityLabel}
+      android_ripple={{}}
     >
       <>
         <Svg

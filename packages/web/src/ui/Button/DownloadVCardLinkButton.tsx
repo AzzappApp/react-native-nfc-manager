@@ -3,6 +3,7 @@
 import { saveAs } from 'file-saver';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import env from '#env';
 import IosAddContactInfoModal from '#components/IosAddContactInfoModal';
 import LinkButton from './LinkButton';
 import type { ModalActions } from '#ui/Modal';
@@ -18,9 +19,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
   const { download, href, userName, onClick, ...others } = props;
 
   const [isDownloadSupported, setIsDownloadSupported] = useState(false);
-  const [compressedContactCard, setCompressedContactCard] = useState<
-    string | null
-  >(null);
+
   const searchParams = useSearchParams();
 
   const iosInformationModal = useRef<ModalActions>(null);
@@ -36,12 +35,6 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
     ) {
       setIsDownloadSupported(true);
     }
-
-    const compressedContactCardInUrl = searchParams.get('c');
-    if (!compressedContactCardInUrl) {
-      return;
-    }
-    setCompressedContactCard(compressedContactCardInUrl);
   }, [searchParams]);
 
   const handleDownload = useCallback(
@@ -58,7 +51,8 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
         return;
       }
 
-      if (!compressedContactCard) {
+      const dataWithKey = searchParams.get('k');
+      if (!dataWithKey) {
         onClick?.(e);
         return;
       }
@@ -66,7 +60,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
       const blob = new Blob(
         [
           btoa(
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
+            `${env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?k=${dataWithKey}.vcf&u=${userName}`,
           ),
         ],
         {
@@ -77,14 +71,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
       saveAs(blob, download ?? 'azzapp-contact.vcf');
       onClick?.(e);
     },
-    [
-      compressedContactCard,
-      download,
-      href,
-      isDownloadSupported,
-      onClick,
-      userName,
-    ],
+    [searchParams, download, href, isDownloadSupported, onClick, userName],
   );
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

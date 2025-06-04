@@ -5,10 +5,11 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import TextInput from '#ui/TextInput';
+import TextInputWithEllipsizeMode from '#ui/TextInputWithEllipsizeMode';
 import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
-const ContactCardEditField = <TFieldValues extends FieldValues>({
+const ContactEditField = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   keyboardType,
@@ -23,6 +24,9 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   autoComplete = 'off',
   isPremium,
   requiresPremium,
+  returnKeyType,
+  multiline,
+  ellipsize,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -33,13 +37,19 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
+  onChangeValue?: (value: string) => void;
   errorMessage?: string;
   trim?: boolean;
   autoComplete?: TextInputProps['autoComplete'];
   isPremium?: boolean | null;
   requiresPremium?: boolean;
+  returnKeyType?: TextInputProps['returnKeyType'];
+  multiline?: boolean;
+  ellipsize?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
+
+  const Input = ellipsize ? TextInputWithEllipsizeMode : TextInput;
 
   return (
     <Controller
@@ -57,12 +67,12 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           deleteField={deleteField}
           errorMessage={error ? (errorMessage ?? error.message) : undefined}
         >
-          <TextInput
-            value={value as string}
+          <Input
+            value={value}
             onChangeText={trim ? value => onChange(value.trim()) : onChange}
             style={styles.input}
             numberOfLines={4}
-            multiline
+            multiline={multiline}
             keyboardType={keyboardType}
             clearButtonMode="while-editing"
             testID="contact-card-edit-modal-field"
@@ -72,6 +82,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             onBlur={onBlur}
             autoFocus={isDirty}
             autoComplete={autoComplete}
+            returnKeyType={returnKeyType}
           />
           {requiresPremium && (
             <PremiumIndicator
@@ -89,4 +100,4 @@ const stylesheet = createStyleSheet(appearance => ({
   ...buildContactStyleSheet(appearance),
 }));
 
-export default ContactCardEditField;
+export default ContactEditField;

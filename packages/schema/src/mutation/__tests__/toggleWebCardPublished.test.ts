@@ -8,10 +8,10 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import toggleWebCardPublished from '../toggleWebCardPublished';
 
 // Mock dependencies
@@ -26,10 +26,6 @@ jest.mock('@azzapp/data', () => ({
 jest.mock('#externals', () => ({
   invalidatePost: jest.fn(),
   invalidateWebCard: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -83,7 +79,7 @@ describe('toggleWebCardPublished Mutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue(mockOwner);
     (getProfileByUserAndWebCard as jest.Mock).mockResolvedValue(mockProfile);
@@ -92,8 +88,7 @@ describe('toggleWebCardPublished Mutation', () => {
   });
 
   test('should throw INVALID_REQUEST if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
-
+    mockUser();
     await expect(
       toggleWebCardPublished(
         {},
@@ -148,17 +143,21 @@ describe('toggleWebCardPublished Mutation', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-1', {
-      webCardIsPublished: true,
-      action: 'UPDATE_WEBCARD_PUBLICATION',
-      webCardIsMultiUser: true,
-      webCardKind: 'business',
-      alreadyPublished: 1,
-      addedSeats: 2,
-      ownerContactCardHasCompanyName: true,
-      ownerContactCardHasUrl: true,
-      ownerContactCardHasLogo: true,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'owner-1',
+      {
+        webCardIsPublished: true,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: true,
+        webCardKind: 'business',
+        alreadyPublished: 1,
+        addedSeats: 2,
+        ownerContactCardHasCompanyName: true,
+        ownerContactCardHasUrl: true,
+        ownerContactCardHasLogo: true,
+      },
+      mockContext.apiEndpoint,
+    );
   });
 
   test('should update webCard and invalidate cache on publish', async () => {

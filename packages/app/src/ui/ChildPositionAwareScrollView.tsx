@@ -53,7 +53,9 @@ const ChildPositionAwareScrollView = (
 ) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollViewContentRef = useRef<View>(null);
-  const scrollViewChildRefs = useRef<{ [id: string]: RefObject<View> }>({});
+  const scrollViewChildRefs = useRef<{ [id: string]: RefObject<View | null> }>(
+    {},
+  );
   const scrollPositionRef = useRef<number>(0);
 
   const scrollViewChildRef = useCallback((id: string) => {

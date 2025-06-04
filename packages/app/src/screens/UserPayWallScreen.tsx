@@ -23,6 +23,7 @@ import {
   extractSeatsFromSubscriptionId,
   getSubscriptionChangeStatus,
 } from '@azzapp/shared/subscriptionHelpers';
+import env from '#env';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -51,8 +52,8 @@ import type {
 const TERMS_OF_SERVICE =
   Platform.OS === 'ios'
     ? 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
-    : process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+    : env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
 
 const userPayWallScreenQuery = graphql`
@@ -142,11 +143,6 @@ const UserPayWallScreen = ({
           Platform.OS === 'ios')));
 
   useEffect(() => {
-    console.log(
-      'wiating',
-      shouldWaitDatabase,
-      currentSubscription?.subscriptionId === waitedSubscriptionId,
-    );
     if (
       shouldWaitDatabase &&
       currentSubscription?.subscriptionId === waitedSubscriptionId
@@ -393,9 +389,9 @@ const UserPayWallScreen = ({
             colors={['rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.95)']}
             locations={[0, 1]}
             style={{
+              top: 0,
               height: height - BOTTOM_HEIGHT + 130,
               width,
-
               position: 'absolute',
             }}
             pointerEvents="none"
@@ -750,7 +746,25 @@ const OfferItem = ({
         />
       </Text>
       <View>
-        <Text variant="button" appearance="light">
+        {period === 'year' && (
+          <Text variant="button" appearance="light">
+            <FormattedNumber
+              value={offer.product.price / 12}
+              style="currency"
+              currency={offer.product.currencyCode}
+            />
+            <FormattedMessage
+              defaultMessage=" / month"
+              description="MultiUser Paywall Screen - number of seat offer per month"
+            />
+          </Text>
+        )}
+
+        <Text
+          variant={period === 'year' ? 'smallbold' : 'button'}
+          style={period === 'year' && styles.yearlyPricing}
+          appearance="light"
+        >
           <FormattedNumber
             value={offer.product.price}
             style="currency"
@@ -768,20 +782,6 @@ const OfferItem = ({
             />
           )}
         </Text>
-
-        {period === 'year' && (
-          <Text variant="smallbold" style={styles.yearlyPricing}>
-            <FormattedNumber
-              value={offer.product.price / 12}
-              style="currency"
-              currency={offer.product.currencyCode}
-            />
-            <FormattedMessage
-              defaultMessage=" / month"
-              description="MultiUser Paywall Screen - number of seat offer per month"
-            />
-          </Text>
-        )}
       </View>
     </PressableOpacity>
   );
@@ -833,7 +833,6 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     justifyContent: 'space-between',
     flex: 1,
-
     marginBottom: 10,
   },
   selectionItem: {

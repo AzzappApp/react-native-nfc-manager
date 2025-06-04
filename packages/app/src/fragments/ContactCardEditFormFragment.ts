@@ -35,6 +35,12 @@ export const contactCardFormFragment = graphql`
         id
         uri: uri(width: 180, pixelRatio: $pixelRatio)
       }
+      banner {
+        id
+        uri: uri(width: 220, pixelRatio: $pixelRatio)
+        width
+        height
+      }
     }
     contactCard {
       firstName
@@ -71,6 +77,12 @@ export const contactCardFormFragment = graphql`
     logo {
       id
       uri: uri(width: 180, pixelRatio: $pixelRatio)
+    }
+    banner {
+      id
+      uri: uri(width: 220, pixelRatio: $pixelRatio)
+      width
+      height
     }
   }
 `;

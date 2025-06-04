@@ -7,6 +7,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
+import env from '#env';
 import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
@@ -15,12 +16,12 @@ import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );
 
 const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
-  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '2',
+  env.USERNAME_REDIRECTION_AVAILABILITY_DAY,
   10,
 );
 

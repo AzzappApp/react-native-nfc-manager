@@ -2,15 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { parse } from '@lepirlouit/vcard-parser';
 import * as Sentry from '@sentry/react-native';
 import { File } from 'expo-file-system/next';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Keyboard, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useMutation } from 'react-relay';
+import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import {
@@ -18,8 +19,12 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
-
-import { getAuthState } from '#helpers/authStore';
+import ProfilesSelector from '#components/ProfilesSelector';
+import {
+  addContactUpdater,
+  contactSchema,
+  type contactFormValues,
+} from '#helpers/contactHelpers';
 import {
   getVCardAddresses,
   getVCardBirthday,
@@ -45,30 +50,38 @@ import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useCurrentLocation } from '#hooks/useLocation';
+import { getOrCreateQrCodeKey } from '#hooks/useQRCodeKey';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCreateForm from './ContactCreateForm';
-import { contactSchema, type ContactFormValues } from './ContactSchema';
-import type {
-  NativeScreenProps,
-  ScreenOptions,
-} from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCreateScreenMutation } from '#relayArtifacts/ContactCreateScreenMutation.graphql';
+import type { ContactCreateScreenQuery } from '#relayArtifacts/ContactCreateScreenQuery.graphql';
 import type { ContactCreateRoute } from '#routes';
 import type { vCard } from '@lepirlouit/vcard-parser';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ContactCreateScreen = ({
+  preloadedQuery,
   route: { params },
-}: NativeScreenProps<ContactCreateRoute>) => {
+}: RelayScreenProps<ContactCreateRoute, ContactCreateScreenQuery>) => {
+  const { currentUser } = usePreloadedQuery(
+    contactCreateScreenQuery,
+    preloadedQuery,
+  );
   const styles = useStyleSheet(stylesheet);
 
   const [notifyError, setNotifyError] = useState(false);
@@ -76,27 +89,30 @@ const ContactCreateScreen = ({
     useState<Observable<number> | null>(null);
 
   const currentLocation = useCurrentLocation();
-  const { location, address } = currentLocation || {};
+  const { location, address } = currentLocation?.value || {};
 
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(
       $profileId: ID!
-      $contact: AddContactInput!
+      $contact: ContactInput!
       $notify: Boolean!
       $scanUsed: Boolean!
-      $location: LocationInput
-      $address: AddressInput
+      $qrCodeKey: String
     ) {
-      addContact(
+      createContact(
         profileId: $profileId
         input: $contact
         notify: $notify
         scanUsed: $scanUsed
-        location: $location
-        address: $address
+        withShareBack: false
+        qrCodeKey: $qrCodeKey
       ) {
         contact {
           id
+          ...ContactActionModal_contact
+          ...ContactsHorizontalList_contacts
+          ...ContactDetailsBody_contact
+          ...ContactsListItem_contact
         }
       }
     }
@@ -104,46 +120,31 @@ const ContactCreateScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
-  const profileId = getAuthState().profileInfos?.profileId;
+
+  const [notify, toggleNotify] = useToggle(true);
+  const [scanUsed, setScan] = useBoolean(false);
+  const [showProfilesSelector, openProfilesSelector, closeProfilesSelector] =
+    useBoolean(false);
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting, isValid, isDirty },
+    getValues,
     setValue,
-  } = useForm<ContactFormValues>({
+  } = useForm<contactFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      notify: true,
+      meetingDate: new Date(),
     },
   });
 
-  const submit = () => {
-    setNotifyError(false);
-    Keyboard.dismiss();
-    handleSubmit(async ({ avatar, logo, ...data }) => {
-      if (!profileId) {
-        return;
-      }
-      if (data.notify && data.emails.length <= 0) {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not save your contact. Please add email or uncheck the box.',
-            description:
-              'Error toast message when saving contact card without email and box checked',
-          }),
-          onHide: () => {
-            setNotifyError(true);
-          },
-        });
-
-        return;
-      }
-
+  const [isSaving, setIsSaving] = useState(false);
+  const saveContact = useCallback(
+    async ({ avatar, logo, ...data }: contactFormValues, profileId: string) => {
+      setIsSaving(true);
       const uploads = [];
 
       if (avatar?.local && avatar.uri) {
@@ -200,19 +201,34 @@ const ContactCreateScreen = ({
       }
 
       if (logoUri) {
-        //  addLocalCachedMediaFile(logoId, 'image', logoUri);
+        addLocalCachedMediaFile(logoId, 'image', logoUri);
       }
 
+      const profile = currentUser?.profiles?.find(
+        profile => profile.id === profileId,
+      );
+      if (!profile) {
+        // Should never happen, but just in case
+        return;
+      }
+
+      const qrCodeKey = await getOrCreateQrCodeKey(profile);
       commit({
         variables: {
           profileId,
-          scanUsed: data.scanUsed,
-          notify: data.notify,
+          scanUsed,
+          notify,
+          qrCodeKey,
           contact: {
             avatarId,
             logoId,
             emails: data.emails?.length
-              ? data.emails.filter(email => email.address)
+              ? data.emails
+                  .filter(email => email.address)
+                  .map(email => ({
+                    address: email.address,
+                    label: email.label,
+                  }))
               : [],
             phoneNumbers: data.phoneNumbers?.length
               ? data.phoneNumbers
@@ -225,42 +241,65 @@ const ContactCreateScreen = ({
                     return { label: phoneNumber.label, number };
                   })
               : [],
-            urls: data.urls,
-            addresses: data.addresses,
-            socials: data.socials,
+            urls: data.urls.map(url => ({
+              url: url.url,
+            })),
+            addresses: data.addresses.map(address => ({
+              address: address.address,
+              label: address.label,
+            })),
+            socials: data.socials.map(social => ({
+              url: social.url,
+              label: social.label,
+            })),
             company: data.company || '',
-            firstname: data.firstName || '',
-            lastname: data.lastName || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
             title: data.title || '',
             birthday: data.birthday?.birthday || '',
-            withShareBack: false,
+            note: data.note || '',
+            location: location
+              ? {
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                }
+              : null,
+            meetingPlace: address
+              ? {
+                  country: address.country,
+                  city: address.city,
+                  subregion: address.subregion,
+                  region: address.region,
+                }
+              : null,
+            meetingDate: (data.meetingDate
+              ? new Date(data.meetingDate)
+              : new Date()
+            ).toISOString(),
           },
-          location: location
-            ? {
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              }
-            : null,
-          address: address
-            ? {
-                country: address.country,
-                city: address.city,
-                subregion: address.subregion,
-                region: address.region,
-              }
-            : null,
         },
-        onCompleted: () => {
-          router.back();
+        onCompleted: data => {
+          if (data.createContact?.contact.id) {
+            router.replace({
+              route: 'CONTACT_DETAILS',
+              params: {
+                contactId: data.createContact.contact.id,
+                overlay: 'tooltipVisible',
+              },
+            });
+          }
+          setIsSaving(false);
         },
         updater: (store, response) => {
-          if (response && response.addContact && profileId) {
-            const profile = store.get(profileId);
-            const nbContacts = profile?.getValue('nbContacts');
-
-            if (typeof nbContacts === 'number') {
-              profile?.setValue(nbContacts + 1, 'nbContacts');
+          if (response && response.createContact) {
+            const user = store.getRoot().getLinkedRecord('currentUser');
+            const newContact = store
+              .getRootField('createContact')
+              ?.getLinkedRecord('contact');
+            if (!user || !newContact) {
+              return;
             }
+            addContactUpdater(store, user, newContact);
           }
         },
         onError: e => {
@@ -274,14 +313,94 @@ const ContactCreateScreen = ({
                 'Error toast message when saving contact card failed',
             }) as unknown as string,
           });
+          setIsSaving(false);
           router.back();
         },
       });
+    },
+    [
+      address,
+      commit,
+      currentUser?.profiles,
+      intl,
+      location,
+      notify,
+      router,
+      scanUsed,
+    ],
+  );
+
+  const submit = useCallback(() => {
+    setNotifyError(false);
+    Keyboard.dismiss();
+    handleSubmit(async data => {
+      if (notify) {
+        // No Email
+        if (data.emails.length <= 0) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact. Please add email or uncheck the box.',
+              description:
+                'Error toast message when saving contact card without email and box checked',
+            }),
+          });
+          setNotifyError(true);
+          return;
+        }
+        // No Valid Email
+        if (
+          data.emails.findIndex(email => isValidEmail(email.address)) === -1
+        ) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact. Please add a valid email or uncheck the box.',
+              description:
+                'Error toast message when saving contact card without valid email and box checked',
+            }),
+          });
+          setNotifyError(true);
+          return;
+        }
+      }
+      if (!currentUser?.profiles?.length) {
+        // Should never happen, but just in case
+        return;
+      } else if (currentUser?.profiles?.length === 1) {
+        await saveContact(data, currentUser.profiles[0].id!);
+      } else {
+        openProfilesSelector();
+      }
     })();
-  };
+  }, [
+    currentUser?.profiles,
+    handleSubmit,
+    intl,
+    notify,
+    openProfilesSelector,
+    saveContact,
+  ]);
+
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    null,
+  );
+  const onSelectProfile = useCallback((profileId: string) => {
+    setSelectedProfileId(profileId);
+  }, []);
+
+  const onProfileSelected = useCallback(() => {
+    if (!selectedProfileId) {
+      return;
+    }
+    saveContact(getValues(), selectedProfileId);
+    closeProfilesSelector();
+  }, [closeProfilesSelector, getValues, saveContact, selectedProfileId]);
 
   useEffect(() => {
-    return Toast.hide;
+    return () => Toast.hide();
   }, []);
 
   const [scanImage, setScanImage] = useState<{
@@ -317,7 +436,6 @@ const ContactCreateScreen = ({
         phoneNumber => {
           return {
             ...extractPhoneNumberDetails(phoneNumber.phone),
-            selected: true,
             label: phoneNumber.label,
           };
         },
@@ -403,7 +521,7 @@ const ContactCreateScreen = ({
       setScanImage(image);
       setValue('firstName', data?.firstName);
       setValue('lastName', data?.lastName);
-      setValue('scanUsed', true);
+      setScan();
       if (data?.title) {
         setValue('title', capitalize(data?.title));
       } else {
@@ -413,7 +531,7 @@ const ContactCreateScreen = ({
       const formattedEmails = data?.emails
         ?.map((email: string) => {
           if (email) {
-            return { address: email, selected: true, label: 'Work' };
+            return { address: email, label: 'Work' };
           }
           return null;
         })
@@ -428,7 +546,6 @@ const ContactCreateScreen = ({
           if (phoneNumber) {
             return {
               ...extractPhoneNumberDetails(phoneNumber),
-              selected: true,
               label: 'Work',
             };
           }
@@ -456,7 +573,7 @@ const ContactCreateScreen = ({
 
       const formattedAdress = data?.addresses
         ?.map(add => {
-          return { address: add, selected: true, label: 'Work' };
+          return { address: add, label: 'Work' };
         })
         .filter(n => n != null);
 
@@ -466,7 +583,7 @@ const ContactCreateScreen = ({
         setValue('addresses', []);
       }
     },
-    [setValue],
+    [setScan, setValue],
   );
 
   const [showScanner, openScanner, closeScanner] = useBoolean(
@@ -488,66 +605,114 @@ const ContactCreateScreen = ({
   const { top } = useScreenInsets();
 
   return (
-    <>
-      <Container style={[styles.container, { paddingTop: top }]}>
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Create Contact',
-            description: 'Create Contact Card Modal title',
-          })}
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              onPress={router.back}
-              style={styles.leftArrowIcon}
-            />
-          }
-          rightElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'Create contact modal save button label',
-              })}
-              testID="save-contact-card"
-              loading={isSubmitting || loading}
-              onPress={submit}
-              variant="primary"
-              style={styles.headerButton}
-              disabled={!isValid}
-            />
-          }
-        />
-        <ScanMyPaperBusinessCard
-          onPress={openScannerView}
-          style={styles.scanButton}
-        />
-        <ContactCreateForm
-          control={control}
-          scanImage={scanImage}
-          notifyError={notifyError}
-        />
-        <ScreenModal
-          visible={!!progressIndicator}
-          gestureEnabled={false}
-          onRequestDismiss={preventModalDismiss}
-        >
-          {progressIndicator && (
-            <UploadProgressModal progressIndicator={progressIndicator} />
-          )}
-        </ScreenModal>
-
-        {showScanner && (
-          <View style={StyleSheet.absoluteFill}>
-            <ContactCardDetector
-              close={closeScanner}
-              extractData={loadFormFromScan}
-              extractVCardData={loadFormFromVCard}
-              closeContainer={closeScannerView}
-            />
-          </View>
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Create Contact',
+          description: 'Create Contact Card Modal title',
+        })}
+        leftElement={
+          <IconButton
+            icon="close"
+            onPress={router.back}
+            style={styles.leftArrowIcon}
+            disabled={showProfilesSelector}
+          />
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Create contact modal save button label',
+            })}
+            testID="save-contact-card"
+            loading={isSubmitting || loading || isSaving}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+            disabled={!isValid || showProfilesSelector}
+          />
+        }
+      />
+      <ScanMyPaperBusinessCard
+        onPress={openScannerView}
+        style={styles.scanButton}
+        label={intl.formatMessage({
+          defaultMessage: 'Scan a Card, Badge, email signature...',
+          description:
+            'ContactCreateScreen - Scan a Card, Badge, email signature buttonlabel',
+        })}
+      />
+      <ContactCreateForm
+        control={control}
+        scanImage={scanImage}
+        notifyError={notifyError}
+        notify={notify}
+        toggleNotify={toggleNotify}
+      />
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
         )}
-      </Container>
-    </>
+      </ScreenModal>
+
+      {showScanner && (
+        <View style={StyleSheet.absoluteFill}>
+          <ContactCardDetector
+            close={closeScanner}
+            extractData={loadFormFromScan}
+            extractVCardData={loadFormFromVCard}
+            closeContainer={closeScannerView}
+          />
+        </View>
+      )}
+      <BottomSheetModal
+        visible={showProfilesSelector}
+        onDismiss={closeProfilesSelector}
+        lazy
+        enableContentPanningGesture={false}
+      >
+        <Container style={styles.profilesSelectorContainer}>
+          <Text variant="large" style={styles.profilesSelectorTitle}>
+            <FormattedMessage
+              defaultMessage="Select a destination for this new Contact"
+              description="ContactCreateScreen - profile selector title"
+            />
+          </Text>
+          <ProfilesSelector
+            profiles={currentUser?.profiles ?? null}
+            onSelectProfile={onSelectProfile}
+          />
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Add to my contacts',
+              description: 'ContactCreateScreen - profile selector save button',
+            })}
+            variant="primary"
+            onPress={onProfileSelected}
+          />
+
+          <PressableNative
+            onPress={closeProfilesSelector}
+            style={styles.profilesSelectorCancelButton}
+          >
+            <Text
+              variant="medium"
+              style={styles.profilesSelectorCancelButtonLabel}
+            >
+              <FormattedMessage
+                defaultMessage="Cancel"
+                description="ContactCreateScreen - profile selector cancel button"
+              />
+            </Text>
+          </PressableNative>
+        </Container>
+      </BottomSheetModal>
+    </Container>
   );
 };
 
@@ -581,10 +746,38 @@ const stylesheet = createStyleSheet(appearance => ({
     borderWidth: 0,
   },
   scanButton: { marginHorizontal: 20, marginVertical: 10 },
+  profilesSelectorContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+    gap: 20,
+  },
+  profilesSelectorTitle: {
+    textAlign: 'center',
+  },
+  profilesSelectorCancelButton: {
+    alignSelf: 'center',
+  },
+  profilesSelectorCancelButtonLabel: {
+    color: appearance === 'dark' ? colors.grey700 : colors.grey200,
+  },
 }));
 
-ContactCreateScreen.getScreenOptions = (): ScreenOptions => ({
-  stackAnimation: 'slide_from_bottom',
-});
+const contactCreateScreenQuery = graphql`
+  query ContactCreateScreenQuery {
+    currentUser {
+      profiles {
+        id
+        ...ProfilesSelector_profiles
+        ...useQRCodeKey_profile
+      }
+    }
+  }
+`;
 
-export default ContactCreateScreen;
+export default relayScreen(ContactCreateScreen, {
+  query: contactCreateScreenQuery,
+  getScreenOptions: () => ({
+    stackAnimation: 'slide_from_bottom',
+  }),
+  profileBound: false,
+});

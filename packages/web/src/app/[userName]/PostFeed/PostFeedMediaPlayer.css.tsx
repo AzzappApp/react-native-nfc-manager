@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, textSmallBold } from '#app/[userName]/theme.css';
+import { MediaQuery, textSmallBold } from '#app/theme.css';
 
 const postMedia = style({
   transition: 'all 0.3s ease-out',

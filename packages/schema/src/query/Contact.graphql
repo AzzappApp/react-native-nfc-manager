@@ -1,27 +1,124 @@
 """
 Represent a Contact
 """
-type Contact {
+type Contact implements Node {
   id: ID!
   ownerProfile: Profile
   contactProfile: Profile
+  displayedAvatar: DisplayedAvatar
   avatar: Media
   firstName: String!
   lastName: String!
   company: String!
   title: String!
-  createdAt: DateTime!
   type: String!
   birthday: String
   phoneNumbers: [ContactPhoneNumber!]!
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
-  webCard: WebCard
+  webCard: WebCard @deprecated(reason: "Use profile webCard instead")
   socials: [ContactSocial!]
   urls: [ContactUrl!]
   deleted: Boolean
   logo: Media
   meetingPlace: Address
+  meetingDate: DateTime
+  note: String
+  enrichment: ContactEnrichment
+  enrichmentStatus: EnrichmentStatus
+}
+
+type DisplayedAvatar {
+  source: Media
+  isEnrichment: Boolean
+}
+
+enum AvatarKind {
+  pending
+  running
+  completed
+  failed
+  canceled
+}
+
+enum EnrichmentStatus {
+  pending
+  running
+  completed
+  failed
+  canceled
+}
+
+type EnrichedContactFields {
+  avatar: Media
+  firstName: String
+  lastName: String
+  company: String
+  title: String
+  type: String
+  birthday: String
+  phoneNumbers: [ContactPhoneNumber!]
+  emails: [ContactEmail!]
+  addresses: [ContactAddress!]
+  webCard: WebCard
+  socials: [ContactSocial!]
+  urls: [ContactUrl!]
+  deleted: Boolean
+  logo: Media
+}
+
+type ContactEnrichment {
+  id: ID!
+  fields: EnrichedContactFields
+  publicProfile: PublicProfile
+  approved: Boolean
+}
+
+type Position {
+  company: String
+  summary: String
+  title: String
+  startDate: String
+  endDate: String
+  logo: Media
+}
+
+type Education {
+  startDate: String
+  endDate: String
+  school: String
+  logo: Media
+  summary: String
+}
+
+type PublicProfile {
+  headline: String
+  summary: String
+  interests: [Interest!]
+  skills: [Skill!]
+  positions: [Position!]
+  education: [Education!]
+  location: PublicProfileLocation
+}
+
+type PublicProfileLocation {
+  country: PublicProfileCountry!
+  city: String
+}
+
+type PublicProfileCountry {
+  name: String!
+  code: String
+}
+
+type Interest {
+  name: String!
+  icon: String
+}
+
+type Skill {
+  name: String!
+  icon: String
 }
 
 type Address {

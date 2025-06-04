@@ -3,13 +3,7 @@
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import { intlErrorHandler } from '#helpers/i18nHelpers';
-
-export type ClientWrapperProps = {
-  children: IntlProvider['props']['children'];
-  locale?: string | null;
-  messages: Record<string, string>;
-};
+import { intlErrorHandler } from '@azzapp/service/i18nServices';
 
 const ClientWrapper = ({ children, locale, messages }: ClientWrapperProps) => {
   return (
@@ -23,4 +17,11 @@ const ClientWrapper = ({ children, locale, messages }: ClientWrapperProps) => {
     </IntlProvider>
   );
 };
+
+export type ClientWrapperProps = {
+  children: IntlProvider['props']['children'];
+  locale?: string | null;
+  messages: Record<string, string>;
+};
+
 export default ClientWrapper;

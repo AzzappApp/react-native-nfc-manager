@@ -1,23 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
-import {
-  CodeField,
-  Cursor,
-  useBlurOnFulfill,
-  useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+import { Platform, StyleSheet, View } from 'react-native';
+
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import * as z from 'zod';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import { logSignUp } from '#helpers/analytics';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { keyboardDismiss } from '#helpers/keyboardHelper';
 import { confirmRegistration } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -25,6 +19,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
 import type { ConfirmRegistrationRoute } from '#routes';
 
 const CELL_COUNT = 6;
@@ -36,7 +31,6 @@ const codeFieldSchema = z.object({
 const ConfirmRegistrationScreen = ({
   route: { params },
 }: NativeScreenProps<ConfirmRegistrationRoute>) => {
-  const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
   const insets = useScreenInsets();
   const router = useRouter();
@@ -51,20 +45,12 @@ const ConfirmRegistrationScreen = ({
     control,
     handleSubmit,
     formState: { isSubmitting, isValid },
-    setValue,
   } = useForm({
     defaultValues: {
       code: '',
     },
     resolver: zodResolver(codeFieldSchema),
     reValidateMode: 'onChange',
-  });
-
-  const currentCode = useWatch({ control, name: 'code' });
-  const ref = useBlurOnFulfill({ value: currentCode, cellCount: CELL_COUNT });
-
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    setValue: (text: string) => setValue('code', text),
   });
 
   const onSubmit = handleSubmit(async ({ code }: { code: string }) => {
@@ -94,6 +80,7 @@ const ConfirmRegistrationScreen = ({
       console.error(e);
       Toast.show({
         type: 'error',
+        position: 'top',
         text1: isEmail
           ? intl.formatMessage({
               defaultMessage: 'Error while confirming your email.',
@@ -115,7 +102,7 @@ const ConfirmRegistrationScreen = ({
 
   return (
     <Container style={styles.flex}>
-      <View onTouchStart={keyboardDismiss} style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
         <View style={styles.inner}>
           <View style={styles.logoContainer}>
             <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
@@ -164,13 +151,9 @@ const ConfirmRegistrationScreen = ({
             control={control}
             name="code"
             render={({ field: { value, onChange } }) => (
-              <CodeField
-                ref={ref}
-                {...props}
+              <TextInput
                 value={value}
                 onChangeText={onChange}
-                cellCount={CELL_COUNT}
-                rootStyle={styles.codeFieldRoot}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete={Platform.select({
@@ -178,18 +161,10 @@ const ConfirmRegistrationScreen = ({
                   default: 'one-time-code' as const,
                 })}
                 caretHidden={value !== ''}
-                textInputStyle={styles.textInputStyle}
-                renderCell={({ index, symbol, isFocused }) => (
-                  <View
-                    key={index}
-                    style={[styles.cell, isFocused && styles.focusCell]}
-                    onLayout={getCellOnLayoutHandler(index)}
-                  >
-                    <Text variant="large">
-                      {symbol || (isFocused ? <Cursor /> : null)}
-                    </Text>
-                  </View>
-                )}
+                style={styles.textInputStyle}
+                returnKeyType="send"
+                onSubmitEditing={onSubmit}
+                autoFocus
               />
             )}
           />
@@ -209,33 +184,33 @@ const ConfirmRegistrationScreen = ({
             loading={isSubmitting}
           />
         </View>
-      </View>
-
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={navigateToSignup}>
-          <Text style={styles.back} variant="medium">
-            <FormattedMessage
-              defaultMessage="Back to Sign Up"
-              description="ConfirmRegistrationScreen - Back to Sign Up bottom screen link"
-            />
-          </Text>
-        </PressableNative>
-      </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingBottom: insets.bottom,
+          }}
+        >
+          <PressableNative onPress={navigateToSignup}>
+            <Text style={styles.back} variant="medium">
+              <FormattedMessage
+                defaultMessage="Back to Sign Up"
+                description="ConfirmRegistrationScreen - Back to Sign Up bottom screen link"
+              />
+            </Text>
+          </PressableNative>
+        </View>
+      </KeyboardAvoidingView>
     </Container>
   );
 };
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   inner: {
-    height: 300,
     rowGap: 20,
+    flex: 1,
+    justifyContent: 'center',
   },
   textForgotExplain: {
     color: colors.grey400,
@@ -254,9 +229,8 @@ const styleSheet = createStyleSheet(appearance => ({
   button: { marginHorizontal: 20 },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItem: 'center',
-    marginBottom: 100,
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 15,
   },
   logoContainer: {
@@ -265,28 +239,8 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   logo: { width: 64, height: 64 },
   back: { color: colors.grey200 },
-  codeFieldRoot: {
-    paddingHorizontal: 12,
-  },
-  cell: {
-    width: 47,
-    height: 47,
-    lineHeight: 38,
-    fontSize: 24,
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderWidth: 1,
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderRadius: 12,
-    color: appearance === 'light' ? colors.black : colors.grey400,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  focusCell: {
-    borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
-  },
-  textInputStyle: {
-    marginStart: 30,
-  },
-}));
+
+  textInputStyle: { marginHorizontal: 20 },
+});
 
 export default ConfirmRegistrationScreen;

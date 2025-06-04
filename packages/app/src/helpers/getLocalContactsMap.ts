@@ -1,7 +1,4 @@
-import {
-  Fields,
-  getContactsAsync as expoGetContactsAsync,
-} from 'expo-contacts';
+import { getContactsAsync as expoGetContactsAsync } from 'expo-contacts';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import type {
   Contact,
@@ -9,13 +6,6 @@ import type {
   ContactResponse,
   SocialProfile,
 } from 'expo-contacts';
-
-export const getLocalContactsMap = async () => {
-  const { data } = await expoGetContactsAsync({
-    fields: [Fields.Emails, Fields.PhoneNumbers, Fields.ID],
-  });
-  return data;
-};
 
 const sanitizeSocialProfileUrl = (url?: string) => {
   if (!url) return url;
@@ -33,7 +23,7 @@ const sanitizeSocialProfileLabel = (
     if (label && label === social.label.toLowerCase()) {
       return true;
     }
-    if (socialProfile.url?.includes(social.mask)) {
+    if (social.mask && socialProfile.url?.includes(social.mask)) {
       return true;
     }
     return false;

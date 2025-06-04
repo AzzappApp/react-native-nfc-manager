@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import Purchases from 'react-native-purchases';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
+import ERRORS from '@azzapp/shared/errors';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
@@ -81,15 +82,31 @@ const AccountDetailsEmailForm = ({
           issuer,
         },
       });
-    } catch (e) {
-      console.error(e);
-      setError('root.server', {
-        message: intl.formatMessage({
-          defaultMessage: 'Unknown error - Please retry',
-          description:
-            'Account Details Screen - Error Unknown error - Please retry',
-        }),
-      });
+    } catch (error) {
+      console.error(error);
+
+      if (
+        error &&
+        typeof error == 'object' &&
+        'message' in error &&
+        error.message === ERRORS.EMAIL_NOT_VALID
+      ) {
+        setError('email', {
+          message: intl.formatMessage({
+            defaultMessage: 'Please enter a valid email address',
+            description:
+              'Account Details Screen - Error Please enter a valid email address',
+          }),
+        });
+      } else {
+        setError('root.server', {
+          message: intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description:
+              'Account Details Screen - Error Unknown error - Please retry',
+          }),
+        });
+      }
     }
   };
 

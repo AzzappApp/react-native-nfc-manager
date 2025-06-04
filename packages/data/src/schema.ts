@@ -19,6 +19,8 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 // #region CardModule
@@ -404,7 +406,7 @@ export const PaymentTable = cols.table(
     amount: cols.int('amount').notNull(),
     taxes: cols.int('taxes').notNull(),
     currency: cols.defaultVarchar('currency').notNull().default('EUR'),
-    status: cols.enum('status', ['paid', 'failed']).notNull(),
+    status: cols.enum('status', ['paid', 'failed', 'refunded']).notNull(),
     paymentMeanId: cols.defaultVarchar('paymentMeanId').notNull(),
     rebillManagerId: cols.defaultVarchar('rebillManagerId'),
     transactionId: cols.defaultVarchar('transactionId'),
@@ -422,6 +424,11 @@ export const PaymentTable = cols.table(
     invoicePdfUrl: cols.defaultVarchar('invoiceUrl'),
     subscriptionId: cols.cuid('subscriptionId').notNull(),
     userId: cols.cuid('userId').notNull(),
+    refundedAt: cols.dateTime('refundedAt'),
+    refundedBy: cols.cuid('refundedBy'),
+    refundOrderId: cols.cuid('refundOrderId'),
+    transactionAlias: cols.text('transactionAlias'),
+    pspAccountId: cols.defaultVarchar('pspAccountId'),
   },
   table => {
     return {
@@ -547,6 +554,7 @@ export const ProfileTable = cols.table(
     promotedAsOwner: cols.boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),
     logoId: cols.mediaId('logoId'),
+    bannerId: cols.mediaId('bannerId'),
     /* Contact cards infos */
     contactCard: cols.json('contactCard').$type<ContactCard>(),
     contactCardIsPrivate: cols
@@ -568,14 +576,14 @@ export const ProfileTable = cols.table(
       .$onUpdate(() => new Date()),
 
     nbContactCardScans: cols.int('nbContactCardScans').default(0).notNull(),
+    nbContactsImportFromScan: cols
+      .int('nbContactsImportFromScan')
+      .default(0)
+      .notNull(),
     nbShareBacks: cols.int('nbShareBacks').default(0).notNull(),
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
-    lastContactViewAt: cols
-      .dateTime('lastContactViewAt')
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
     hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
   },
   table => {
@@ -604,6 +612,10 @@ export const ProfileStatisticTable = cols.table(
     day: cols.date('day').notNull(),
     contactCardScans: cols.int('contactCardScans').default(0).notNull(),
     shareBacks: cols.int('shareBacks').default(0).notNull(),
+    contactsImportFromScan: cols
+      .int('contactsImportFromScan')
+      .default(0)
+      .notNull(),
   },
   table => {
     return {
@@ -717,6 +729,12 @@ export const UserTable = cols.table(
       marketing: boolean;
       functional: boolean;
     }>(),
+    nbEnrichments: cols.int('nbEnrichments').default(0).notNull(),
+    freeEnrichments: cols.boolean('freeEnrichments').default(false).notNull(),
+    lastContactViewAt: cols
+      .dateTime('lastContactViewAt')
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
   },
   table => {
     return {
@@ -786,21 +804,7 @@ export const UserSubscriptionTable = cols.table(
 export type UserSubscription = InferSelectModel<typeof UserSubscriptionTable>;
 //#endregion
 
-// #region WebCardCategory
-export const WebCardCategoryTable = cols.table('WebCardCategory', {
-  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-  webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
-  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  medias: cols.json('medias').$type<string[]>().notNull(),
-  order: cols.int('order').notNull(),
-  enabled: cols.boolean('enabled').default(true).notNull(),
-});
-
-export type WebCardCategory = InferSelectModel<typeof WebCardCategoryTable>;
-//#endregion
-
 // #region WebCard
-
 export const WebCardTable = cols.table(
   'WebCard',
   {
@@ -812,10 +816,10 @@ export const WebCardTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
     webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
-    webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
     lastName: cols.defaultVarchar('lastName'),
     logoId: cols.mediaId('logoId'),
+    bannerId: cols.mediaId('bannerId'),
     commonInformation: cols
       .json('commonInformation')
       .$type<CommonInformation>(),
@@ -974,7 +978,7 @@ export const ContactTable = cols.table(
     urls: cols.json('urls').$type<Array<{ url: string }>>(),
     socials: cols
       .json('socials')
-      .$type<Array<{ url: string; label: string }>>(),
+      .$type<Array<{ url: string; label: SocialLinkId }>>(),
     logoId: cols.mediaId('logoId'),
     meetingLocation: cols.point('meetingLocation'),
     meetingPlace: cols.json('meetingPlace').$type<{
@@ -983,11 +987,23 @@ export const ContactTable = cols.table(
       region?: string | null;
       country?: string | null;
     }>(),
+    meetingDate: cols
+      .dateTime('meetingDate')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    note: cols.text(),
+    enrichmentStatus: cols.enum('enrichmentStatus', [
+      'pending',
+      'running',
+      'completed',
+      'failed',
+      'canceled',
+    ]),
   },
   table => {
     return {
       profilesKey: cols
-        .uniqueIndex('Contact_profiles_key')
+        .index('Contact_profiles_key')
         .on(table.ownerProfileId, table.contactProfileId),
     };
   },
@@ -1081,3 +1097,92 @@ export const ContactCardAccessTable = cols.table(
       .on(table.deviceId, table.profileId),
   }),
 );
+
+export type Position = {
+  company?: string | null;
+  summary?: string | null;
+  title?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  logoId?: string | null;
+  tempLogoId?: string | null;
+};
+
+export type Education = {
+  startDate?: string | null;
+  endDate?: string | null;
+  school?: string | null;
+  logoId?: string | null;
+  summary?: string | null;
+  tempLogoId?: string | null;
+};
+
+export type PublicProfile = {
+  headline?: string | null;
+  summary?: string | null;
+  interests?: string[] | null;
+  skills?: string[] | null;
+  positions?: Position[] | null;
+  education?: Education[] | null;
+  city?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  icons?: Record<string, string> | null;
+};
+
+export type EnrichedContactFields = Partial<
+  NullableFields<
+    Omit<
+      Contact,
+      | 'contactProfileId'
+      | 'createdAt'
+      | 'deleted'
+      | 'deletedAt'
+      | 'deletedBy'
+      | 'id'
+      | 'meetingDate'
+      | 'meetingLocation'
+      | 'meetingPlace'
+      | 'note'
+      | 'ownerProfileId'
+      | 'type'
+    >
+  >
+>;
+
+export type EnrichedContactHiddenFields = {
+  contact?:
+    | {
+        [K in keyof EnrichedContactFields]?: NonNullable<
+          EnrichedContactFields[K]
+        > extends any[]
+          ? boolean[] | null
+          : boolean | null;
+      }
+    | null;
+  profile?: boolean | null;
+};
+
+export const ContactEnrichmentTable = cols.table(
+  'ContactEnrichment',
+  {
+    id: cols.cuid('id').primaryKey().$defaultFn(createId),
+    contactId: cols.cuid('contactId').notNull(),
+    enrichedAt: cols
+      .dateTime('enrichedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    fields: cols.json('fields').$type<EnrichedContactFields>(),
+    publicProfile: cols.json('publicProfile').$type<PublicProfile>(),
+    approved: cols.boolean('approved'),
+    trace: cols.json('trace').$type<Record<string, string>>(),
+    hiddenFields: cols
+      .json('hiddenFields')
+      .$type<EnrichedContactHiddenFields>(),
+  },
+  table => ({
+    pk: cols.index('contactId_idx').on(table.contactId, table.enrichedAt),
+  }),
+);
+
+export type ContactEnrichment = InferSelectModel<typeof ContactEnrichmentTable>;

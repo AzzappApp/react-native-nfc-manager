@@ -6,9 +6,11 @@ import type { AppStateStatus } from 'react-native';
 
 let mockListener: ((status: AppStateStatus) => null) | null = null;
 jest.mock('react-native/Libraries/AppState/AppState', () => ({
-  currentState: 'active',
-  addEventListener(event: any, listener: any) {
-    mockListener = listener;
+  default: {
+    currentState: 'active',
+    addEventListener(event: any, listener: any) {
+      mockListener = listener;
+    },
   },
 }));
 

@@ -1,5 +1,5 @@
-import { cloneElement, useCallback, useContext, useEffect } from 'react';
-import { ReactRelayContext } from 'react-relay';
+import { cloneElement, useCallback, useEffect } from 'react';
+import { useRelayEnvironment } from 'react-relay';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useRouter } from './NativeRouter';
 import type { Route } from '#routes';
@@ -21,7 +21,10 @@ export type LinkProps<T extends Route> = T & {
    * the element that will be wrapped by the link.
    * it should be a react-native pressable component.
    */
-  children: ReactElement;
+  children: ReactElement<{
+    onPress?: (event?: GestureResponderEvent | PressableEvent) => void;
+    accessibilityRole: string;
+  }>;
 
   /**
    * The route key that will be used to prefetch the route.
@@ -59,11 +62,11 @@ const Link = <T extends Route>({
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
 
-  const context = useContext(ReactRelayContext);
+  const environment = useRelayEnvironment();
   useEffect(() => {
     let disposable: Disposable | null = null;
-    if (!disabled && prefetch && context?.environment) {
-      disposable = prefetchScreen(context.environment, {
+    if (!disabled && prefetch) {
+      disposable = prefetchScreen(environment, {
         route,
         params,
       } as Route);
@@ -71,7 +74,7 @@ const Link = <T extends Route>({
     return () => {
       disposable?.dispose();
     };
-  }, [prefetch, prefetchScreen, route, params, context, disabled]);
+  }, [prefetch, prefetchScreen, route, params, environment, disabled]);
 
   const onLinkPress = useCallback(
     (event?: GestureResponderEvent | PressableEvent) => {

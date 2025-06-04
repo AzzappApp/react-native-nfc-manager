@@ -36,15 +36,17 @@ import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 
 const query = graphql`
   query CoverTemplateSelectionScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ...CoverTemplateSelectionScreenBody_profile
-      ... on Profile {
-        webCard {
-          webCardKind
-          cardIsPublished
-          isPremium
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...CoverTemplateSelectionScreenBody_profile
+        ... on Profile {
+          webCard {
+            webCardKind
+            cardIsPublished
+            isPremium
+          }
+          invited
         }
-        invited
       }
     }
   }
@@ -62,10 +64,11 @@ const CoverTemplateSelectionScreen = ({
     router.back();
   }, [router]);
 
-  const { profile } = usePreloadedQuery<CoverTemplateSelectionScreenQuery>(
+  const { node } = usePreloadedQuery<CoverTemplateSelectionScreenQuery>(
     query,
     preloadedQuery,
   );
+  const profile = node?.profile;
 
   useEffect(() => {
     if (profile?.invited) {

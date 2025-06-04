@@ -3,8 +3,8 @@ import { GraphQLError } from 'graphql';
 import { getUserByEmail, getUserByPhoneNumber, updateUser } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { validateMailOrPhone } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { userLoader } from '#loaders';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import updateUserMutation from '../updateUser';
 
 // Mock dependencies
@@ -24,10 +24,6 @@ jest.mock('#externals', () => ({
   validateMailOrPhone: jest.fn(),
 }));
 
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
-}));
-
 jest.mock('#loaders', () => ({
   userLoader: {
     load: jest.fn(),
@@ -43,7 +39,7 @@ const mockContext: any = {};
 const mockInfo: any = {};
 
 describe('updateUserMutation', () => {
-  const mockUser = {
+  const mockedUser = {
     id: 'user-1',
     email: 'old@example.com',
     phoneNumber: '1234567890',
@@ -52,10 +48,11 @@ describe('updateUserMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-1');
   });
 
   test('should return null if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     const result = await updateUserMutation(
       {},
@@ -69,7 +66,7 @@ describe('updateUserMutation', () => {
   });
 
   test('should throw INVALID_REQUEST if user is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (userLoader.load as jest.Mock).mockResolvedValue(null);
 
     await expect(
@@ -78,8 +75,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should allow updating email if existingUser is deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (validateMailOrPhone as jest.Mock).mockResolvedValue(true);
     (getUserByEmail as jest.Mock).mockResolvedValue({
       id: 'user-2',
@@ -103,13 +100,13 @@ describe('updateUserMutation', () => {
       emailConfirmed: true,
     });
     expect(result).toEqual({
-      user: { ...mockUser, email: 'new@example.com', emailConfirmed: true },
+      user: { ...mockedUser, email: 'new@example.com', emailConfirmed: true },
     });
   });
 
   test('should allow updating phoneNumber if existingUser is deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (validateMailOrPhone as jest.Mock).mockResolvedValue(true);
     (getUserByPhoneNumber as jest.Mock).mockResolvedValue({
       id: 'user-2',
@@ -134,7 +131,7 @@ describe('updateUserMutation', () => {
     });
     expect(result).toEqual({
       user: {
-        ...mockUser,
+        ...mockedUser,
         phoneNumber: 'formatted-9876543210',
         phoneNumberConfirmed: true,
       },
@@ -142,8 +139,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should not throw EMAIL_ALREADY_EXISTS if existing user is deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (getUserByEmail as jest.Mock).mockResolvedValue({
       id: 'user-2',
       deleted: true,
@@ -157,7 +154,11 @@ describe('updateUserMutation', () => {
     );
 
     expect(result).toEqual({
-      user: { ...mockUser, email: 'deleted@example.com', emailConfirmed: true },
+      user: {
+        ...mockedUser,
+        email: 'deleted@example.com',
+        emailConfirmed: true,
+      },
     });
     expect(updateUser).toHaveBeenCalledWith('user-1', {
       email: 'deleted@example.com',
@@ -166,8 +167,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should not throw PHONENUMBER_ALREADY_EXISTS if existing user is deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (getUserByPhoneNumber as jest.Mock).mockResolvedValue({
       id: 'user-2',
       deleted: true,
@@ -182,7 +183,7 @@ describe('updateUserMutation', () => {
 
     expect(result).toEqual({
       user: {
-        ...mockUser,
+        ...mockedUser,
         phoneNumber: 'formatted-9876543210',
         phoneNumberConfirmed: true,
       },
@@ -194,8 +195,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should throw EMAIL_ALREADY_EXISTS if existing user is not deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (getUserByEmail as jest.Mock).mockResolvedValue({
       id: 'user-2',
       deleted: false,
@@ -212,8 +213,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should throw PHONENUMBER_ALREADY_EXISTS if existing user is not deleted', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (getUserByPhoneNumber as jest.Mock).mockResolvedValue({
       id: 'user-2',
       deleted: false,
@@ -230,8 +231,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should validate email token and update email', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (validateMailOrPhone as jest.Mock).mockResolvedValue(true);
     (getUserByEmail as jest.Mock).mockResolvedValue(null);
 
@@ -252,13 +253,13 @@ describe('updateUserMutation', () => {
       emailConfirmed: true,
     });
     expect(result).toEqual({
-      user: { ...mockUser, email: 'new@example.com', emailConfirmed: true },
+      user: { ...mockedUser, email: 'new@example.com', emailConfirmed: true },
     });
   });
 
   test('should remove email when set to null', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
 
     const result = await updateUserMutation(
       {},
@@ -268,12 +269,12 @@ describe('updateUserMutation', () => {
     );
 
     expect(updateUser).toHaveBeenCalledWith('user-1', { email: null });
-    expect(result).toEqual({ user: { ...mockUser, email: null } });
+    expect(result).toEqual({ user: { ...mockedUser, email: null } });
   });
 
   test('should validate phone number and update it', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (validateMailOrPhone as jest.Mock).mockResolvedValue(true);
     (getUserByPhoneNumber as jest.Mock).mockResolvedValue(null);
 
@@ -295,7 +296,7 @@ describe('updateUserMutation', () => {
     });
     expect(result).toEqual({
       user: {
-        ...mockUser,
+        ...mockedUser,
         phoneNumber: 'formatted-9876543210',
         phoneNumberConfirmed: true,
       },
@@ -303,8 +304,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should throw EMAIL_ALREADY_EXISTS if email is already taken', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (getUserByEmail as jest.Mock).mockResolvedValue({ id: 'user-2' });
 
     await expect(
@@ -318,8 +319,8 @@ describe('updateUserMutation', () => {
   });
 
   test('should update password if current password is correct', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (bcrypt.compareSync as jest.Mock).mockReturnValue(true);
 
     const result = await updateUserMutation(
@@ -333,13 +334,13 @@ describe('updateUserMutation', () => {
       password: 'hashed-password',
     });
     expect(result).toEqual({
-      user: { ...mockUser, password: 'hashed-password' },
+      user: { ...mockedUser, password: 'hashed-password' },
     });
   });
 
   test('should throw INVALID_CREDENTIALS if current password is incorrect', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
     (bcrypt.compareSync as jest.Mock).mockReturnValue(false);
 
     await expect(
@@ -353,9 +354,9 @@ describe('updateUserMutation', () => {
   });
 
   test('should not check current password when no password in database', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (userLoader.load as jest.Mock).mockResolvedValue({
-      ...mockUser,
+      ...mockedUser,
       password: null,
     });
     (bcrypt.compareSync as jest.Mock).mockReturnValue(false);
@@ -371,13 +372,13 @@ describe('updateUserMutation', () => {
       password: 'hashed-password',
     });
     expect(result).toEqual({
-      user: { ...mockUser, password: 'hashed-password' },
+      user: { ...mockedUser, password: 'hashed-password' },
     });
   });
 
   test('should throw INVALID_REQUEST if user would have no email or phone', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (userLoader.load as jest.Mock).mockResolvedValue(mockUser);
+    mockUser('user-1');
+    (userLoader.load as jest.Mock).mockResolvedValue(mockedUser);
 
     await expect(
       updateUserMutation(

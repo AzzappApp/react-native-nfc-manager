@@ -1,3 +1,5 @@
+import env from '#env';
+
 export enum DeviceType {
   IOS = 'IOS',
   ANDROID = 'ANDROID',
@@ -28,7 +30,7 @@ export const getDeviceType = () => {
 };
 
 export const isAppClipSupported = () => {
-  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
+  if (!env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
     return false;
   }
   const userAgent = navigator.userAgent.toLowerCase();

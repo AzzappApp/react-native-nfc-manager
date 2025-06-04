@@ -3,15 +3,10 @@ import {
   countDeletedWebCardProfiles,
   getWebCardPendingOwnerProfile,
 } from '@azzapp/data';
-import { getSessionInfos } from '#GraphQLContext';
 import { hasWebCardProfileRight } from '#helpers/permissionsHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import { WebCard } from '../WebCardResolvers'; // Adjust path if needed
 import type { WebCard as WebCardModel } from '@azzapp/data';
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
-  externalFunction: jest.fn(),
-}));
 
 jest.mock('#loaders', () => ({
   webCardOwnerLoader: {
@@ -20,6 +15,14 @@ jest.mock('#loaders', () => ({
   activeSubscriptionsForUserLoader: {
     load: jest.fn(),
   },
+}));
+
+jest.mock('@azzapp/service/mediaServices', () => ({
+  buildCoverImageUrl: jest.fn(),
+}));
+
+jest.mock('@azzapp/payment', () => ({
+  updateExistingSubscription: jest.fn(),
 }));
 
 jest.mock('#helpers/permissionsHelpers', () => ({
@@ -42,7 +45,6 @@ describe('WebCard Resolvers (with checks)', () => {
     lastUserNameUpdate: new Date(),
     userName: null,
     webCardKind: 'personal',
-    webCardCategoryId: null,
     firstName: null,
     lastName: null,
     logoId: null,
@@ -86,6 +88,7 @@ describe('WebCard Resolvers (with checks)', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
+    bannerId: null,
   };
 
   beforeEach(() => {
@@ -133,8 +136,7 @@ describe('WebCard Resolvers (with checks)', () => {
 
   test('should return null for cardIsPrivate if user lacks access', async () => {
     (hasWebCardProfileRight as jest.Mock).mockResolvedValue(false);
-    (getSessionInfos as jest.Mock).mockResolvedValue({ userId: 'test' });
-
+    mockUser('test');
     const result = await WebCard.cardIsPrivate?.(
       mockWebCard,
       {},

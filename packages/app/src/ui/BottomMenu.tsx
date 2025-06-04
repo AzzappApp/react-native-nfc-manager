@@ -14,6 +14,7 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { Icons } from './Icon';
+import type { ImageStyle } from 'expo-image';
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
@@ -27,7 +28,7 @@ export type BottomMenuItem = {
    *
    * @type {React.ReactNode}
    */
-  IconComponent?: React.ReactElement;
+  IconComponent?: React.ReactElement<{ style?: StyleProp<ImageStyle> }>;
   /** the label of the tab(use for accesibility also) */
   label: ReactNode;
   /**

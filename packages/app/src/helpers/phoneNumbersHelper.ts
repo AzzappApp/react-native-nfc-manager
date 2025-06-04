@@ -3,10 +3,39 @@ import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import * as z from 'zod';
 import type { CountryCode } from 'libphonenumber-js';
 
+export const enrichmentData = z.object({
+  fromEnrichment: z.boolean().nullable().optional(),
+  removedFromEnrichment: z.boolean().nullable().optional(),
+});
+
 export const phoneNumberSchema = z.object({
   label: z.string(),
   number: z.string(),
   countryCode: z.string().optional(),
+  ...enrichmentData.shape,
+});
+
+export const emailSchema = z.object({
+  label: z.string(),
+  address: z.string(),
+  ...enrichmentData.shape,
+});
+
+export const urlSchema = z.object({
+  url: z.string(),
+  ...enrichmentData.shape,
+});
+
+export const addressSchema = z.object({
+  label: z.string(),
+  address: z.string(),
+  ...enrichmentData.shape,
+});
+
+export const socialSchema = z.object({
+  url: z.string(),
+  label: z.string(),
+  ...enrichmentData.shape,
 });
 
 export type ContactCardPhoneNumber = z.infer<typeof phoneNumberSchema>;
@@ -38,9 +67,12 @@ export const parseContactCardPhoneNumber = (
   }
 };
 
-export const parsePhoneNumber = (phoneNumber: string) => {
+export const parsePhoneNumber = (
+  phoneNumber: string,
+  countryCode?: CountryCode,
+) => {
   try {
-    const number = parsePhoneNumberWithError(phoneNumber);
+    const number = parsePhoneNumberWithError(phoneNumber, countryCode);
     return number;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
@@ -67,7 +99,7 @@ export const getPhonenumberWithCountryCode = (
 
 export const extractPhoneNumberDetails = (
   phoneNumber: string,
-): { number: string; countryCode?: string | undefined } => {
+): { number: string; countryCode?: string } => {
   try {
     const parsedNumber = parsePhoneNumberWithError(phoneNumber);
     if (parsedNumber) {
@@ -76,8 +108,10 @@ export const extractPhoneNumberDetails = (
         number: parsedNumber.nationalNumber.replace(/\D/g, ''),
       };
     }
-    return { number: phoneNumber.replace(/\D/g, '') };
-  } catch {
-    return { number: phoneNumber.replace(/\D/g, '') };
+  } catch (error) {
+    console.warn(`Failed to extract phone number details: ${error}`);
   }
+  return {
+    number: phoneNumber.replace(/\D/g, ''),
+  };
 };

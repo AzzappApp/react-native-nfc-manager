@@ -206,7 +206,7 @@ const CarouselEditionScreen = ({
               kind
               visible
               variant
-              ...CarouselEditionScreen_module
+              ...CarouselEditionScreen_module @alias(as: "carousel")
             }
           }
         }

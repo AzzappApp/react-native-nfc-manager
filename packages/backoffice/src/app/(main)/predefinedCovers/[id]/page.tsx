@@ -3,14 +3,16 @@ import { getPredefinedCoverById } from '@azzapp/data';
 import PredefinedCoverForm from '../PredefinedCoverForm';
 
 type PredefinedCoverProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-const PredefinedCoverPage = async ({
-  params: { id },
-}: PredefinedCoverProps) => {
+const PredefinedCoverPage = async (props: PredefinedCoverProps) => {
+  const params = await props.params;
+
+  const { id } = params;
+
   const predefinedCover = await getPredefinedCoverById(id);
   if (!predefinedCover) {
     return notFound();

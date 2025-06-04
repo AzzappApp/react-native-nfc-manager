@@ -12,14 +12,14 @@ import {
 } from '@azzapp/data';
 
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { sendPushNotification, notifyUsers } from '#externals';
 import {
   webCardLoader,
   profileLoader,
   userLoader,
   webCardOwnerLoader,
 } from '#loaders';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import inviteUsersListMutation from '../inviteUsersList';
 
 jest.mock('@azzapp/data', () => ({
@@ -35,10 +35,6 @@ jest.mock('@azzapp/data', () => ({
   getProfilesByIds: jest.fn(),
   updateProfile: jest.fn(),
   createId: jest.fn(() => 'new-id'),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -71,7 +67,9 @@ jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
 }));
 
-const mockContext: any = {};
+const mockContext: any = {
+  intl: { formatMessage: jest.fn(({ defaultMessage }) => defaultMessage) },
+};
 const mockInfo: any = {};
 
 describe('inviteUsersListMutation', () => {
@@ -93,7 +91,7 @@ describe('inviteUsersListMutation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue(mockOwner);
@@ -246,7 +244,7 @@ describe('inviteUsersListMutation', () => {
   });
 
   test('should throw UNAUTHORIZED if no session', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       inviteUsersListMutation(

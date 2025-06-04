@@ -5,11 +5,11 @@ import { parseWithZod } from '@conform-to/zod';
 import {
   createCoverTemplate,
   updateCoverTemplate,
-  checkMedias,
   referencesMedias,
   transaction,
   getCoverTemplateById,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';

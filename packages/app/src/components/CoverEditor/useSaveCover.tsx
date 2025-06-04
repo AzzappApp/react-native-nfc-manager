@@ -14,7 +14,7 @@ import {
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/coverHelpers';
 import { onChangeWebCard } from '#helpers/authStore';
 import {
   createRandomFileName,

@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import {
@@ -103,6 +103,42 @@ export const getProfileByUserAndWebCard = async (
       ),
     )
     .then(res => res[0] ?? null);
+
+/**
+ * find a list of profiles by their userId and webCardId
+ *
+ * @returns The profile if found, otherwise null
+ */
+export const getProfilesByUserAndWebCards = async (
+  userWebCardTuples: Array<[userId: string, webCardId: string]>,
+): Promise<Array<Profile | null>> => {
+  return db()
+    .select()
+    .from(ProfileTable)
+    .where(
+      or(
+        ...userWebCardTuples.map(([userId, webCardId]) =>
+          and(
+            eq(ProfileTable.userId, userId),
+            eq(ProfileTable.webCardId, webCardId),
+          ),
+        ),
+      ),
+    )
+    .then(res => {
+      const map = new Map<string, Profile>();
+      res.forEach(profile => {
+        const key = `${profile.userId}-${profile.webCardId}`;
+        if (!map.has(key)) {
+          map.set(key, profile);
+        }
+      });
+      return userWebCardTuples.map(([userId, webCardId]) => {
+        const key = `${userId}-${webCardId}`;
+        return map.get(key) ?? null;
+      });
+    });
+};
 
 /**
  * Retrieves the list of profiles associated to a user
@@ -243,6 +279,20 @@ export const incrementContactCardTotalScans = async (profileId: string) => {
     .update(ProfileTable)
     .set({
       nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
+    })
+    .where(eq(ProfileTable.id, profileId));
+};
+
+/**
+ * Increment the number of contact card scans for a profile
+ *
+ * @param profileId - The id of the profile
+ */
+export const incrementContactsImportFromScan = async (profileId: string) => {
+  await db()
+    .update(ProfileTable)
+    .set({
+      nbContactsImportFromScan: sql`${ProfileTable.nbContactsImportFromScan} + 1`,
     })
     .where(eq(ProfileTable.id, profileId));
 };
@@ -481,7 +531,6 @@ export const getSharedWebCardRelation = async (
         eq(ProfileTable.userId, viewerId),
         inArray(TargetProfile.userId, targetUserIds as string[]),
         eq(ProfileTable.deleted, false),
-        eq(TargetProfile.deleted, false),
       ),
     );
 
@@ -511,26 +560,28 @@ export const getSharedWebCardRelation = async (
 };
 
 /**
- * Delete all profiles associated to a web card except the owner
+ * Get the total number of new contacts for a user since their last view
  *
- * @param webCardId - The id of the web card
+ * @param userId - The user's ID
+ * @returns The total number of new contacts
  */
-export const getNbNewContactsPerOwner = async (profileIds: string[]) => {
+export const getNbNewContactsForUser = async (
+  userId: string,
+): Promise<number> => {
   const res = await db()
-    .select({
-      ownerProfileId: ContactTable.ownerProfileId,
-      count: count(),
-    })
+    .select({ count: count() })
     .from(ContactTable)
-    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id)) // Join on profile ID
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
     .where(
       and(
-        inArray(ProfileTable.id, [...new Set(profileIds)]), // Ensure we filter only relevant profiles
+        eq(UserTable.id, userId),
+        eq(ContactTable.type, 'shareback'),
         eq(ContactTable.deleted, false),
-        gt(ContactTable.createdAt, ProfileTable.lastContactViewAt), // Compare createdAt with profile's last view date
+        gt(ContactTable.createdAt, UserTable.lastContactViewAt), // Compare createdAt with user's last view date
       ),
     )
-    .groupBy(ContactTable.ownerProfileId);
+    .then(rows => rows[0].count);
 
   return res;
 };

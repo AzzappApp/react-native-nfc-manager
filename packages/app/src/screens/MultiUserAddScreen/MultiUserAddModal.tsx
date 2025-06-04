@@ -25,6 +25,7 @@ import { getAuthState } from '#helpers/authStore';
 import { CardPhoneLabels } from '#helpers/contactHelpers';
 import {
   prepareAvatarForUpload,
+  prepareBannerForUpload,
   prepareLogoForUpload,
 } from '#helpers/imageHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
@@ -38,12 +39,12 @@ import {
   parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import { baseUserDetailsSchema } from '#screens/MultiUserDetailsScreen/MultiUserDetailsSchema';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
@@ -57,7 +58,7 @@ import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 
-const multiUserAddFormSchema = baseUserDetailsSchema.extend({
+export const multiUserAddFormSchema = baseUserDetailsSchema.extend({
   selectedContact: z
     .object({
       countryCodeOrEmail: z.string(),
@@ -136,6 +137,12 @@ const MultiUserAddModal = (
           uri: uri(width: 180, pixelRatio: $pixelRatio)
           id
         }
+        banner {
+          id
+          uri: uri(width: 220, pixelRatio: $pixelRatio)
+          width
+          height
+        }
       }
     `,
     props.webCard,
@@ -177,6 +184,7 @@ const MultiUserAddModal = (
     defaultValues: {
       role: 'user',
       logo: webCard?.logo,
+      banner: webCard?.banner,
     },
     mode: 'onSubmit',
   });
@@ -290,6 +298,7 @@ const MultiUserAddModal = (
               };
             }),
             logo: webCard?.logo,
+            banner: webCard?.banner,
           },
           { keepDirty: true },
         );
@@ -304,6 +313,7 @@ const MultiUserAddModal = (
             value: contact,
           },
           logo: webCard?.logo,
+          banner: webCard?.banner,
         });
         setIsManual(isManual);
         setContact(undefined);
@@ -349,7 +359,7 @@ const MultiUserAddModal = (
 
       const uploads = [];
 
-      const { avatar, logo, ...data } = value;
+      const { avatar, logo, banner, ...data } = value;
 
       let avatarUri = avatar?.uri;
       if (avatar?.local && avatarUri) {
@@ -364,7 +374,6 @@ const MultiUserAddModal = (
             );
           }
         }
-
         const { file, uploadURL, uploadParameters } =
           await prepareAvatarForUpload(avatarUri);
 
@@ -386,14 +395,24 @@ const MultiUserAddModal = (
       } else {
         uploads.push(null);
       }
+
+      if (banner?.local && banner.uri) {
+        const { file, uploadURL, uploadParameters } =
+          await prepareBannerForUpload(banner.uri);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
       try {
-        const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-          uploads.map(upload =>
-            upload?.promise.then(({ public_id }) => {
-              return public_id;
-            }),
-          ),
-        );
+        const [uploadedAvatarId, uploadedLogoId, uploadedBannerId] =
+          await Promise.all(
+            uploads.map(upload =>
+              upload?.promise.then(({ public_id }) => {
+                return public_id;
+              }),
+            ),
+          );
 
         const avatarId =
           avatar === null
@@ -403,6 +422,12 @@ const MultiUserAddModal = (
               : avatar?.id;
         const logoId =
           logo === null ? null : logo?.local ? uploadedLogoId : null;
+        const bannerId =
+          banner === null
+            ? null
+            : banner?.local
+              ? uploadedBannerId
+              : banner?.id;
 
         const {
           selectedContact,
@@ -427,7 +452,7 @@ const MultiUserAddModal = (
           selectedContact.countryCodeOrEmail !== 'email'
             ? parsePhoneNumberWithError(
                 selectedContact.value,
-                selectedContact.countryCodeOrEmail,
+                selectedContact.countryCodeOrEmail as CountryCode,
               ).formatInternational()
             : undefined;
 
@@ -455,6 +480,7 @@ const MultiUserAddModal = (
             socials,
             avatarId,
             logoId,
+            bannerId,
             addresses,
           },
         };
@@ -465,6 +491,10 @@ const MultiUserAddModal = (
 
         if (logoUri) {
           addLocalCachedMediaFile(logoId, 'image', logoUri);
+        }
+
+        if (banner?.local && bannerId && banner?.uri) {
+          addLocalCachedMediaFile(bannerId, 'image', banner.uri);
         }
 
         commit({
@@ -588,48 +618,47 @@ const MultiUserAddModal = (
     },
   );
 
+  const { top } = useScreenInsets();
   return (
     <ScreenModal
       visible={visible}
       animationType="slide"
       onRequestDismiss={onClose}
     >
-      <Container style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <Header
-            middleElement={
-              <Text variant="large" style={styles.name}>
-                {firstName} {lastName}
-              </Text>
-            }
-            leftElement={
-              <Button
-                variant="secondary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'MultiUserAddModal - Cancel button label',
-                })}
-                onPress={onClose}
-              />
-            }
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'MultiUserAddModal - Save button label',
-                })}
-                onPress={submit}
-                loading={isSubmitting || saving}
-              />
-            }
-          />
-          <ContactCardEditForm
-            webCard={webCard}
-            control={control as unknown as Control<ContactCardFormValues>}
-          >
-            <MultiUserAddForm contacts={contacts} control={control} />
-          </ContactCardEditForm>
-        </SafeAreaView>
+      <Container style={{ flex: 1, paddingTop: top }}>
+        <Header
+          middleElement={
+            <Text variant="large" style={styles.name}>
+              {firstName} {lastName}
+            </Text>
+          }
+          leftElement={
+            <Button
+              variant="secondary"
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'MultiUserAddModal - Cancel button label',
+              })}
+              onPress={onClose}
+            />
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'MultiUserAddModal - Save button label',
+              })}
+              onPress={submit}
+              loading={isSubmitting || saving}
+            />
+          }
+        />
+        <ContactCardEditForm
+          webCard={webCard}
+          control={control as unknown as Control<ContactCardFormValues>}
+        >
+          <MultiUserAddForm contacts={contacts} control={control} />
+        </ContactCardEditForm>
         {isSubmitting || saving ? (
           /* Used to prevent user from interacting with the screen while saving */
           <View style={StyleSheet.absoluteFill} />

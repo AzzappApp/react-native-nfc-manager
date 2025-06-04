@@ -11,8 +11,8 @@ import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
+import AccountHeader from '#components/AccountHeader';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import CoverRenderer from '#components/CoverRenderer';
 import MultiUserDescription from '#components/MultiUserDescription';
 import {
   useRouter,
@@ -26,6 +26,7 @@ import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -34,12 +35,11 @@ import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
-import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import SearchBar from '#ui/SearchBar';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
+import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
 import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
@@ -69,7 +69,7 @@ const multiUserScreenQuery = graphql`
         webCard {
           id
           isMultiUser
-          ...CoverRenderer_webCard
+          ...AccountHeader_webCard
           nbProfiles
           ...MultiUserScreenUserList_webCard
           subscription {
@@ -81,6 +81,7 @@ const multiUserScreenQuery = graphql`
           }
           requiresSubscription
           isPremium
+          ...AccountHeader_webCard
         }
       }
     }
@@ -352,104 +353,92 @@ const MultiUserScreen = ({
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const [searching, setSearchMode, removeSearchMode] = useBoolean(false);
 
+  const { top } = useScreenInsets();
+
+  const contentContainerStyle = useMemo(
+    () => ({ flex: 1, paddingTop: transferOwnerMode ? top : 0 }),
+    [top, transferOwnerMode],
+  );
+
   if (!profile) {
     return null;
   }
 
   return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        {transferOwnerMode ? (
-          <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Transfer Ownership',
-              description:
-                'MultiUserScreen - Multi user Transfer Ownership header title',
-            })}
-            leftElement={
-              <CancelHeaderButton
-                onPress={toggleTransferOwnerMode}
-                disabled={savingTransferOwner}
-              />
-            }
-            rightElement={
-              <HeaderButton
-                variant="primary"
-                disabled={!selectedProfileId || savingTransferOwner}
-                label={intl.formatMessage({
-                  defaultMessage: 'Transfer',
-                  description:
-                    'MultiUser Screen - Transfer owner header button label',
-                })}
-                onPress={transferOwnership}
-              />
-            }
-          />
-        ) : (
-          <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Multi user',
-              description: 'MultiUserScreen - Multi user title',
-            })}
-            rightElement={
-              <PressableNative
-                onPress={router.back}
-                accessibilityRole="link"
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Go back',
-                  description: 'Go back button in multi user header',
-                })}
-              >
-                <CoverRenderer
-                  webCard={profile?.webCard}
-                  width={COVER_WIDTH}
-                  style={{ marginBottom: -1 }}
+    <Container style={contentContainerStyle}>
+      {transferOwnerMode ? (
+        <Header
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Transfer Ownership',
+            description:
+              'MultiUserScreen - Multi user Transfer Ownership header title',
+          })}
+          leftElement={
+            <CancelHeaderButton
+              onPress={toggleTransferOwnerMode}
+              disabled={savingTransferOwner}
+            />
+          }
+          rightElement={
+            <HeaderButton
+              variant="primary"
+              disabled={!selectedProfileId || savingTransferOwner}
+              label={intl.formatMessage({
+                defaultMessage: 'Transfer',
+                description:
+                  'MultiUser Screen - Transfer owner header button label',
+              })}
+              onPress={transferOwnership}
+            />
+          }
+        />
+      ) : (
+        <AccountHeader
+          webCard={profile?.webCard}
+          title={intl.formatMessage({
+            defaultMessage: 'Multi user',
+            description: 'MultiUserScreen - Multi user title',
+          })}
+          leftIcon="close"
+        />
+      )}
+      <View
+        style={[
+          styles.content,
+          transferOwnerMode ? { paddingTop: 14 } : undefined,
+        ]}
+      >
+        {profile.webCard?.isMultiUser ? (
+          <>
+            <SearchBar
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Search for a user',
+                description: 'MultiScreen - search bar placeholder',
+              })}
+              onChangeText={setSearchValue}
+              value={searchValue}
+              onFocus={setSearchMode}
+              onBlur={removeSearchMode}
+              containerStyle={styles.searchBar}
+            />
+            <Suspense fallback={<LoadingView />}>
+              <MultiUserTransferOwnerContext.Provider value={contextValue}>
+                <MultiUserScreenUserList
+                  Header={ScrollableHeader}
+                  webCard={profile.webCard}
+                  searching={searching}
+                  searchValue={searchValue}
                 />
-              </PressableNative>
-            }
-            leftElement={
-              <IconButton
-                icon="arrow_left"
-                onPress={router.back}
-                iconSize={28}
-                variant="icon"
-              />
-            }
-          />
+              </MultiUserTransferOwnerContext.Provider>
+            </Suspense>
+          </>
+        ) : (
+          <>
+            {ScrollableHeader}
+            <MultiUserDescription />
+          </>
         )}
-        <View style={styles.content}>
-          {profile.webCard?.isMultiUser ? (
-            <>
-              <SearchBar
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Search for a user',
-                  description: 'MultiScreen - search bar placeholder',
-                })}
-                onChangeText={setSearchValue}
-                value={searchValue}
-                onFocus={setSearchMode}
-                onBlur={removeSearchMode}
-                containerStyle={styles.searchBar}
-              />
-              <Suspense fallback={<LoadingView />}>
-                <MultiUserTransferOwnerContext.Provider value={contextValue}>
-                  <MultiUserScreenUserList
-                    Header={ScrollableHeader}
-                    webCard={profile.webCard}
-                    searching={searching}
-                    searchValue={searchValue}
-                  />
-                </MultiUserTransferOwnerContext.Provider>
-              </Suspense>
-            </>
-          ) : (
-            <>
-              {ScrollableHeader}
-              <MultiUserDescription />
-            </>
-          )}
-        </View>
-      </SafeAreaView>
+      </View>
 
       <ScreenModal
         visible={confirmDeleteMultiUser}
@@ -507,8 +496,6 @@ const MultiUserScreen = ({
   );
 };
 
-const COVER_WIDTH = 29;
-
 const styleSheet = createStyleSheet(appearance => ({
   sharedIcon: {
     margin: 'auto',
@@ -519,6 +506,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: 10,
+    paddingTop: 0,
     flex: 1,
   },
   loaderContainer: {
@@ -576,7 +564,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(MultiUserScreen, {
+const MultiUserRelayScreen = relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
@@ -585,6 +573,12 @@ export default relayScreen(MultiUserScreen, {
   pollInterval: 30000,
   refreshOnFocus: true,
 });
+
+MultiUserRelayScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default MultiUserRelayScreen;
 
 type MultiUserTransferOwnerContextProps = {
   selectedProfileId: string | undefined;

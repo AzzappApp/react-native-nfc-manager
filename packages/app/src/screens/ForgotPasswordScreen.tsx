@@ -1,4 +1,4 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Keyboard, StyleSheet, View } from 'react-native';
@@ -54,7 +54,7 @@ const ForgotPasswordScreen = () => {
             credential:
               contact.countryCodeOrEmail === 'email'
                 ? contact.value
-                : parsePhoneNumber(
+                : parsePhoneNumberWithError(
                     contact.value,
                     contact.countryCodeOrEmail,
                   ).formatInternational(),
@@ -141,24 +141,24 @@ const ForgotPasswordScreen = () => {
               />
             </View>
           </View>
+          <View
+            style={{
+              bottom: insets.bottom,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <PressableNative onPress={onBack}>
+              <Text style={styles.back} variant="medium">
+                <FormattedMessage
+                  defaultMessage="Back to Log In"
+                  description="ForgotPasswordScreen - Back to Log In bottom screen link"
+                />
+              </Text>
+            </PressableNative>
+          </View>
         </KeyboardAvoidingView>
-      </View>
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={onBack}>
-          <Text style={styles.back} variant="medium">
-            <FormattedMessage
-              defaultMessage="Back to Log In"
-              description="ForgotPasswordScreen - Back to Log In bottom screen link"
-            />
-          </Text>
-        </PressableNative>
       </View>
     </Container>
   );

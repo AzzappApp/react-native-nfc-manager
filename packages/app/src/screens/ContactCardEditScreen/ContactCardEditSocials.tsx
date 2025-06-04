@@ -2,13 +2,13 @@ import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
-import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
 import {
-  contactEditStyleSheet,
-  useSocialLinkLabels,
-} from '#helpers/contactHelpers';
+  SOCIAL_NETWORK_LINKS,
+  SOCIAL_NETWORK_LINKS_LABELS,
+} from '@azzapp/shared/socialLinkHelpers';
+import { colors } from '#theme';
+import ContactCardEditField from '#components/ContactCard/ContactCardEditField';
+import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -29,19 +29,17 @@ const ContactCardEditModalSocials = ({
 
   const intl = useIntl();
 
-  const labelValues = useSocialLinkLabels();
-
   const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
       {fields.map((social, index) => (
         <Fragment key={social.id}>
-          <ContactCardEditModalField
+          <ContactCardEditField
             control={control}
             labelKey={`socials.${index}.label`}
             valueKey={`socials.${index}.url`}
-            labelValues={labelValues}
+            labelValues={SOCIAL_NETWORK_LINKS_LABELS}
             deleteField={() => remove(index)}
             keyboardType="default"
             placeholder={intl.formatMessage({
@@ -57,6 +55,8 @@ const ContactCardEditModalSocials = ({
                   )?.mask ?? '',
               });
             }}
+            returnKeyType="done"
+            ellipsize
           />
           <Separation small />
         </Fragment>

@@ -8,13 +8,8 @@ import {
   updateProfileForUserAndWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
-import {
-  profileLoader,
-  userLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import {
   updateMonthlySubscription,
   validateCurrentSubscription,
@@ -24,23 +19,21 @@ import type { MutationResolvers } from '#/__generated__/types';
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
   { profileId: gqlProfileId },
+  context,
 ) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
 
-  const [profile, user] = await Promise.all([
-    profileLoader.load(profileId),
-    userLoader.load(userId),
-  ]);
+  const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  if (!user || !profile?.promotedAsOwner) {
+  if (!profile?.promotedAsOwner) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -53,11 +46,15 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
 
   const webCardNbSeats = await getWebCardCountProfile(profile.webCardId);
 
-  await validateCurrentSubscription(user.id, {
-    webCardIsPublished: webCard.cardIsPublished,
-    action: 'UPDATE_MULTI_USER',
-    addedSeats: webCardNbSeats,
-  });
+  await validateCurrentSubscription(
+    user.id,
+    {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: webCardNbSeats,
+    },
+    context.apiEndpoint,
+  );
 
   try {
     const updatedProfile = await transaction(async () => {
@@ -65,7 +62,7 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
         await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
           profileRole: 'admin',
         });
-        await updateMonthlySubscription(owner.id);
+        await updateMonthlySubscription(owner.id, context.apiEndpoint);
       }
       await updateProfile(profileId, {
         profileRole: 'owner',

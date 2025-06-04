@@ -1,7 +1,7 @@
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-
 import Toast from 'react-native-toast-message';
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -15,6 +15,7 @@ import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import WebCardColorPicker, {
   WebCardColorDropDownPicker,
 } from '#components/WebCardColorPicker';
+import useBoolean from '#hooks/useBoolean';
 import ColorPreview from '#ui/ColorPreview';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
@@ -24,9 +25,11 @@ import TextInput from '#ui/TextInput';
 import TextInputWithEllipsizeMode from '#ui/TextInputWithEllipsizeMode';
 import type { SimpleButtonSettingsEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonSettingsEditionPanel_webCard.graphql';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
-import type { CountryCode } from 'libphonenumber-js';
+import type { CountryCode, PhoneNumber } from 'libphonenumber-js';
 import type { KeyboardType, ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
+
+type ActionType = CountryCode | 'email' | 'link';
 
 type SimpleButtonSettingsEditionPanelProps = ViewProps & {
   /**
@@ -118,6 +121,10 @@ const SimpleButtonSettingsEditionPanel = ({
   ...props
 }: SimpleButtonSettingsEditionPanelProps) => {
   const intl = useIntl();
+  const [isFocused, focus, unfocus] = useBoolean(false);
+  const [phoneNumber, setPhoneNumber] = useState<PhoneNumber | undefined>(
+    parsePhoneNumberFromString(actionLink, actionType as CountryCode),
+  );
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
   const webCard = useFragment(
@@ -210,12 +217,42 @@ const SimpleButtonSettingsEditionPanel = ({
 
   const onActionLinkTextInputChangeText = useCallback(
     (text: string) => {
-      onActionLinkChange(text.trim());
+      const phoneNumber = parsePhoneNumberFromString(
+        text.trim(),
+        actionType as CountryCode,
+      );
+      if (phoneNumber) {
+        onActionLinkChange(phoneNumber.number);
+      } else {
+        onActionLinkChange(text.trim());
+      }
+      setPhoneNumber(phoneNumber);
     },
-    [onActionLinkChange],
+    [actionType, onActionLinkChange],
+  );
+
+  const handleActionTypeChange = useCallback(
+    (actionType: ActionType) => {
+      const parsedNumber = parsePhoneNumberFromString(
+        phoneNumber?.nationalNumber || actionLink,
+        actionType as CountryCode,
+      );
+      if (parsedNumber) {
+        onActionLinkChange(parsedNumber.number);
+      }
+      setPhoneNumber(parsedNumber);
+      onActionTypeChange(actionType);
+    },
+    [
+      actionLink,
+      onActionLinkChange,
+      onActionTypeChange,
+      phoneNumber?.nationalNumber,
+    ],
   );
 
   const onBlur = useCallback(() => {
+    unfocus();
     if (!actionLink) {
       return;
     }
@@ -250,7 +287,7 @@ const SimpleButtonSettingsEditionPanel = ({
         }
         break;
     }
-  }, [actionLink, actionType, intl, onActionLinkChange]);
+  }, [actionLink, actionType, intl, onActionLinkChange, unfocus]);
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -283,10 +320,9 @@ const SimpleButtonSettingsEditionPanel = ({
                 description:
                   'Signup Form Connect with phone number section title in country selection list SimpleButton Settings edition',
               })}
-              value={actionType as CountryCode | 'email' | 'link'} //force type here, will not define country code is GraphQL
+              value={actionType as ActionType} //force type here, will not define country code is GraphQL
               options={SELECTORS}
-              onChange={onActionTypeChange}
-              style={styles.selectorsList}
+              onChange={handleActionTypeChange}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Select a calling code, email or an URL link',
                 description:
@@ -300,14 +336,24 @@ const SimpleButtonSettingsEditionPanel = ({
               })}
             />
             <TextInputWithEllipsizeMode
-              value={actionLink}
+              value={
+                isFocused && phoneNumber
+                  ? phoneNumber?.nationalNumber
+                  : actionLink
+              }
               onChangeText={onActionLinkTextInputChangeText}
               placeholder={getActionTypePlaceholder()}
               onBlur={onBlur}
+              onFocus={focus}
               style={{ flex: 1 }}
               autoCapitalize="none"
               keyboardType={keyboardType}
               enterKeyHint="done"
+              prefix={
+                isFocused && phoneNumber?.countryCallingCode
+                  ? `+${phoneNumber?.countryCallingCode}`
+                  : ''
+              }
             />
           </View>
           <View style={styles.buttonContainer}>
@@ -385,6 +431,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     width: '100%',
+    gap: 5,
   },
   buttonContainer: {
     alignItems: 'center',
@@ -397,8 +444,5 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
     marginBottom: 15,
-  },
-  selectorsList: {
-    marginRight: 5,
   },
 });

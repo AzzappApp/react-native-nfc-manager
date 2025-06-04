@@ -3,15 +3,14 @@ import latinize from 'latinize';
 import {
   getRedirectWebCardByUserName,
   getWebCardByUserName,
-  getWebCardCategories,
   getWebCardByUserNameWithRedirection,
   deleteRedirection,
   getWebCardById,
   getWebCardByUserNamePrefixWithRedirection,
   pickRandomPredefinedCover,
 } from '@azzapp/data';
-import { getSessionInfos } from '#GraphQLContext';
-import { userLoader } from '#loaders';
+import env from '#env';
+import { getSessionUser } from '#GraphQLContext';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
@@ -20,17 +19,15 @@ import type { QueryResolvers } from '#/__generated__/types';
 
 export const Query: QueryResolvers = {
   currentUser: async _root => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
-      return null;
-    }
-    return userLoader.load(userId);
+    const user = await getSessionUser();
+    return user || null;
   },
 
   node: (_, { id }) => fetchNode(id),
   nodes: (_, { ids }) => Promise.all(ids.map(id => fetchNode(id))),
 
-  webCardCategories: async () => getWebCardCategories(),
+  // FIXME shall be removed
+  webCardCategories: () => [],
 
   webCardParameters: () => ({
     //use a single source of truth for settings. Those settings can also be dependant on vip/premium status
@@ -123,6 +120,6 @@ export const Query: QueryResolvers = {
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
+  env.USERNAME_CHANGE_FREQUENCY_DAY,
   10,
 );

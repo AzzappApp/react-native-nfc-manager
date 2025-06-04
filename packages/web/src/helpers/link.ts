@@ -1,7 +1,7 @@
-export const generateShareProfileLink = (username: string) => {
-  return `${process.env.NEXT_PUBLIC_URL}${username}`;
-};
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
+
+export const generateShareProfileLink = buildWebUrl;
 
 export const generateSharePostLink = (username: string, postId: string) => {
-  return `${process.env.NEXT_PUBLIC_URL}${username}/post/${postId}`;
+  return `${buildWebUrl(username)}/post/${postId}`;
 };

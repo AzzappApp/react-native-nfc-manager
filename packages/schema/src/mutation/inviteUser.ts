@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   createId,
   createProfile,
   createUser,
@@ -13,21 +12,19 @@ import {
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
-import {
-  profileLoader,
-  userLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { notifyUsers } from '#externals';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
+import { sendMultiUserInvitationPushNotification } from '#helpers/notificationsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -36,13 +33,17 @@ import type { Profile } from '@azzapp/data';
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
+  context,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-  const { userId } = getSessionInfos();
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
   const { email, phoneNumber: rawPhoneNumber } = invited;
 
   const profile = await profileLoader.load(profileId);
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
@@ -75,22 +76,27 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   }
 
   const owner = await webCardOwnerLoader.load(profile.webCardId);
-  const user = await userLoader.load(userId);
   const webCard = await webCardLoader.load(profile.webCardId);
 
-  if (!owner || !user || !webCard) {
+  if (!owner || !webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(owner.id, {
-    webCardIsPublished: webCard.cardIsPublished,
-    action: 'UPDATE_MULTI_USER',
-    addedSeats: webCard.isMultiUser ? 1 : 2,
-  }); //add owner
+  await validateCurrentSubscription(
+    owner.id,
+    {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: webCard.isMultiUser ? 1 : 2,
+    },
+    context.apiEndpoint,
+  ); //add owner
 
   try {
-    const { avatarId, logoId } = invited.contactCard ?? {};
-    const addedMedia = [avatarId, logoId].filter(mediaId => mediaId != null);
+    const { avatarId, logoId, bannerId } = invited.contactCard ?? {};
+    const addedMedia = [avatarId, logoId, bannerId].filter(
+      mediaId => mediaId != null,
+    );
     await checkMedias(addedMedia);
 
     const { profile, existingUser } = await transaction(async () => {
@@ -148,8 +154,14 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         existingProfile = foundProfile;
       }
 
-      const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
-        invited.contactCard ?? {};
+      const {
+        displayedOnWebCard,
+        isPrivate,
+        avatarId,
+        logoId,
+        bannerId,
+        ...data
+      } = invited.contactCard ?? {};
 
       const creationDate = new Date();
 
@@ -158,15 +170,17 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         userId,
         avatarId: avatarId ?? null,
         logoId: logoId ?? null,
+        bannerId: bannerId ?? null,
         invited: true,
         invitedBy: profileId,
-        contactCard: data,
+        contactCard: { ...data, socials: filterSocialLink(data.socials) },
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole,
         lastContactCardUpdate: creationDate,
         nbContactCardScans: 0,
         nbShareBacks: 0,
+        nbContactsImportFromScan: 0,
         promotedAsOwner: false,
         createdAt: creationDate,
         inviteSent: !!sendInvite,
@@ -181,6 +195,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         [
           existingProfile?.avatarId ?? null,
           existingProfile?.logoId ?? null,
+          existingProfile?.bannerId ?? null,
         ].filter(mediaId => mediaId),
       );
 
@@ -207,16 +222,12 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     });
 
     if (existingUser) {
-      const locale = guessLocale(existingUser?.locale ?? user.locale);
       if (webCard.userName) {
-        await sendPushNotification(existingUser.id, {
-          notification: {
-            type: 'multiuser_invitation',
-          },
-          mediaId: webCard.coverMediaId,
-          localeParams: { userName: webCard.userName },
-          locale,
-        });
+        await sendMultiUserInvitationPushNotification(
+          existingUser,
+          webCard,
+          context.intl,
+        );
       }
     }
 

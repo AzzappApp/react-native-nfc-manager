@@ -1,12 +1,16 @@
 import { FlashList } from '@shopify/flash-list';
 import * as Contacts from 'expo-contacts';
+import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useDebounce } from 'use-debounce';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
+import { usePermissionContext } from '#helpers/PermissionContext';
+import { usePhoneContactBookPermission } from '#hooks/usePhoneContactBookPermission';
 import IconButton from '#ui/IconButton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -40,6 +44,8 @@ const MultiUserAddList = ({
 }: MultiUserAddListProps) => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
 
+  const [debouncedSearchValue] = useDebounce(searchValue, 300);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const pageOffset = useRef(0);
@@ -47,13 +53,23 @@ const MultiUserAddList = ({
   const loadNextPage = useRef(false);
   const hasNextPage = useRef(true);
 
+  const { contactPermission } = usePermissionContext();
+
+  const {
+    requestPhoneContactBookPermissionAndRedirectToSettingsAsync:
+      requestPhonebookPermissionAndRedirectToSettingsAsync,
+  } = usePhoneContactBookPermission();
+
   const loadContacts = useCallback(async () => {
     if (loadNextPage.current || !hasNextPage.current) return;
     loadNextPage.current = true;
-    setIsLoading(true);
+    const { status } =
+      contactPermission !== 'granted'
+        ? await requestPhonebookPermissionAndRedirectToSettingsAsync()
+        : { status: ContactPermissionStatus.GRANTED };
 
-    const { status } = await Contacts.requestPermissionsAsync();
-    if (status === 'granted') {
+    if (status === ContactPermissionStatus.GRANTED) {
+      setIsLoading(true);
       const { data, hasNextPage: hasNextPageValue } = await getContactsAsync({
         pageSize: PAGE_SIZE,
         pageOffset: pageOffset.current,
@@ -81,19 +97,20 @@ const MultiUserAddList = ({
         pageOffset.current += PAGE_SIZE;
       }
       hasNextPage.current = hasNextPageValue;
+      setIsLoading(false);
+      loadNextPage.current = false;
+    } else {
+      loadNextPage.current = false;
     }
-
-    setIsLoading(false);
-    loadNextPage.current = false;
-  }, []);
+  }, [contactPermission, requestPhonebookPermissionAndRedirectToSettingsAsync]);
 
   useEffect(() => {
     loadContacts();
   }, [loadContacts]);
 
   const contactData = useMemo(() => {
-    if (isNotFalsyString(searchValue)) {
-      const searchLower = searchValue!.toLowerCase();
+    if (isNotFalsyString(debouncedSearchValue)) {
+      const searchLower = debouncedSearchValue!.toLowerCase();
       return contacts.filter(contact => {
         return (
           (contact.name && contact.name.toLowerCase().includes(searchLower)) ||
@@ -116,16 +133,16 @@ const MultiUserAddList = ({
       });
     }
     return contacts;
-  }, [contacts, searchValue]);
+  }, [contacts, debouncedSearchValue]);
 
   useEffect(() => {
     if (
-      isNotFalsyString(searchValue) &&
+      isNotFalsyString(debouncedSearchValue) &&
       contactData.length < MIN_SEARCH_RESULTS
     ) {
       loadContacts();
     }
-  }, [contactData, loadContacts, searchValue]);
+  }, [contactData, loadContacts, debouncedSearchValue]);
 
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Contacts.Contact>) => {

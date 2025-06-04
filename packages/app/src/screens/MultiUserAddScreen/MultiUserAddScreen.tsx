@@ -22,9 +22,11 @@ import type * as Contacts from 'expo-contacts';
 
 const multiUserAddScreenQuery = graphql`
   query MultiUserAddScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      ...MultiUserAddModal_webCard
-      ...MultiUserAddScreen_webCard
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
+        ...MultiUserAddModal_webCard
+        ...MultiUserAddScreen_webCard
+      }
     }
   }
 `;
@@ -37,11 +39,8 @@ const MultiUserAddScreen = ({
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
 
-  const { webCard } = usePreloadedQuery(
-    multiUserAddScreenQuery,
-    preloadedQuery,
-  );
-
+  const { node } = usePreloadedQuery(multiUserAddScreenQuery, preloadedQuery);
+  const webCard = node?.webCard;
   const webCardData = useFragment(
     graphql`
       fragment MultiUserAddScreen_webCard on WebCard {

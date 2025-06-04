@@ -64,6 +64,7 @@ describe('networkHelpers', () => {
         ok: false,
         status: 500,
         statusText: 'Internal server error',
+        url: 'http://example.com',
         async json() {
           return { error: 'error' };
         },
@@ -80,6 +81,111 @@ describe('networkHelpers', () => {
       expect(error.message).toBe('Internal server error');
       expect(error.response).toBe(fakeResp);
       expect(error.data).toEqual({ error: 'error' });
+    });
+
+    test('should include all error details in the details field', async () => {
+      const fakeResp = {
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        url: 'http://example.com/api',
+        async json() {
+          return {
+            error: 'Resource not found',
+            message: 'The requested resource does not exist',
+            details: 'User ID 123 was not found in the database',
+          };
+        },
+      };
+      fetchMock.mockReturnValue(fakeResp);
+      let error: any;
+
+      try {
+        await fetchJSON('fake');
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(FetchError);
+      expect(error.message).toBe('The requested resource does not exist');
+      expect(error.details).toBe(
+        'Status: 404 Not Found\nURL: http://example.com/api\nError: Resource not found\nDetails: The requested resource does not exist\nAdditional Details: User ID 123 was not found in the database',
+      );
+    });
+
+    test('should handle non-object error data in details', async () => {
+      const fakeResp = {
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        url: 'http://example.com/api',
+        async json() {
+          return 'Invalid input format';
+        },
+      };
+      fetchMock.mockReturnValue(fakeResp);
+      let error: any;
+
+      try {
+        await fetchJSON('fake');
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(FetchError);
+      expect(error.message).toBe('Bad Request');
+      expect(error.details).toBe(
+        'Status: 400 Bad Request\nURL: http://example.com/api\nResponse: Invalid input format',
+      );
+    });
+
+    test('should handle error with minimal information', async () => {
+      const fakeResp = {
+        ok: false,
+        status: 500,
+        statusText: 'Server Error',
+        async json() {
+          return {};
+        },
+      };
+      fetchMock.mockReturnValue(fakeResp);
+      let error: any;
+
+      try {
+        await fetchJSON('fake');
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(FetchError);
+      expect(error.message).toBe('Server Error');
+      expect(error.details).toBe('Status: 500 Server Error');
+    });
+
+    test('should handle error with JSON parsing failure', async () => {
+      const fakeResp = {
+        ok: false,
+        status: 500,
+        statusText: 'Server Error',
+        url: 'http://example.com/api',
+        async json() {
+          throw new Error('Invalid JSON');
+        },
+      };
+      fetchMock.mockReturnValue(fakeResp);
+      let error: any;
+
+      try {
+        await fetchJSON('fake');
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(FetchError);
+      expect(error.message).toBe('Server Error');
+      expect(error.details).toBe(
+        'Status: 500 Server Error\nURL: http://example.com/api\nError: JSON_DECODING_ERROR\nAdditional Details: Invalid JSON',
+      );
     });
 
     test('should throw a timeout error if request timeout', async () => {
@@ -218,6 +324,9 @@ describe('networkHelpers', () => {
       await flushPromises();
       expect(error).toBeInstanceOf(FetchError);
       expect(error.message).toBe(ERRORS.JSON_DECODING_ERROR);
+      expect(error.details).toBe(
+        `Status: undefined undefined\nError: ${ERRORS.JSON_DECODING_ERROR}`,
+      );
       expect(error.data).toEqual({ error: ERRORS.JSON_DECODING_ERROR });
     });
   });

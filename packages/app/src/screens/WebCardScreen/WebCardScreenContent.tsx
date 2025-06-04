@@ -39,11 +39,11 @@ type WebCardScreenContentProps = {
   /**
    * A ref for the scroll view.
    */
-  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle | null>;
   /**
    * A ref for the WebCardEditScreen scroll view.
    */
-  editScrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  editScrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle | null>;
   /**
    * Wether the WebCardScreen is displayed from the creation screen.
    */

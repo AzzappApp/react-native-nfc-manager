@@ -21,19 +21,21 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '@azzapp/shared/colorsHelpers';
+import env from '#env';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
-import { cachedGetWebCardByUserName } from './dataAccess';
+import { cachedGetWebCardByUserName } from '../dataAccess';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
 type ProfilePageProps = {
-  params: {
+  params: Promise<{
     userName: string;
-  };
+  }>;
 };
 
-const ProfilePage = async ({ params }: ProfilePageProps) => {
+const ProfilePage = async (props: ProfilePageProps) => {
+  const params = await props.params;
   const userName = params.userName;
 
   const webCard = await cachedGetWebCardByUserName(userName);
@@ -61,7 +63,12 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     isAzzappPlus = subscriptions.length > 0;
   }
 
-  if (!webCard?.cardIsPublished) {
+  if (
+    !webCard?.cardIsPublished ||
+    webCard.deleted ||
+    owners.length === 0 ||
+    owners[0]?.deleted
+  ) {
     return notFound();
   }
 
@@ -180,9 +187,10 @@ export default ProfilePage;
 
 export const dynamic = 'force-static';
 
-export async function generateMetadata({
-  params,
-}: ProfilePageProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: ProfilePageProps,
+): Promise<Metadata> {
+  const params = await props.params;
   const webCard = await cachedGetWebCardByUserName(params.userName);
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`
@@ -197,6 +205,9 @@ export async function generateMetadata({
       twitter: {
         card: 'summary_large_image',
         images: `/api/og/${params.userName}${imageUrlOption}`,
+      },
+      itunes: {
+        appId: `${env.NEXT_PUBLIC_APPLE_ITUNES_APP_ID}`,
       },
     },
   });

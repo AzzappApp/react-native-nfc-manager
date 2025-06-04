@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, textButton, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, textButton, vars } from '#app/theme.css';
 
 const seeMore = style({
   width: '100%',

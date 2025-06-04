@@ -1,0 +1,8 @@
+{
+  "git": { "deploymentEnabled": false },
+  "regions": ["fra1", "iad1", "gru1"],
+  "crons": [
+    { "path": "/cron/cancelPayments", "schedule": "*/1 * * * *" },
+    { "path": "/cron/unpublishWebCards", "schedule": "*/3 * * * *" }
+  ]
+}

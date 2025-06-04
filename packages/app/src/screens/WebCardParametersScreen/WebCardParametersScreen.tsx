@@ -44,14 +44,14 @@ import type { ReactNode } from 'react';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
-    webCard: node(id: $webCardId) {
-      ...WebCardParametersScreen_webCard
-      ... on WebCard {
+    webCardNode: node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
         isPremium
+        ...WebCardParametersScreen_webCard
       }
     }
-    profile: node(id: $profileId) {
-      ... on Profile {
+    profileNode: node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         profileRole
       }
     }
@@ -65,15 +65,15 @@ const WebCardParametersScreen = ({
   preloadedQuery,
 }: RelayScreenProps<WebCardParametersRoute, WebCardParametersScreenQuery>) => {
   const {
-    webCard: webCardKey,
-    profile,
+    webCardNode,
+    profileNode,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
 
   const isWebCardOwner = useMemo(() => {
-    return profileIsOwner(profile?.profileRole);
-  }, [profile]);
+    return profileIsOwner(profileNode?.profile?.profileRole);
+  }, [profileNode?.profile?.profileRole]);
 
   const webCard = useFragment(
     graphql`
@@ -97,7 +97,7 @@ const WebCardParametersScreen = ({
         ...AccountHeader_webCard
       }
     `,
-    webCardKey as WebCardParametersScreen_webCard$key | null,
+    webCardNode?.webCard as WebCardParametersScreen_webCard$key | null,
   );
 
   const intl = useIntl();
@@ -129,7 +129,7 @@ const WebCardParametersScreen = ({
     webCard?.subscription?.issuer === 'web',
   );
 
-  const onChangeIsPublished = useCallback(
+  const togglePublish = useCallback(
     (published: boolean) => {
       if (!webCard) {
         return;
@@ -154,6 +154,49 @@ const WebCardParametersScreen = ({
       });
     },
     [commitToggleWebCardPublished, onError, webCard],
+  );
+
+  const onChangeIsPublished = useCallback(
+    (published: boolean) => {
+      if (!webCard) {
+        return;
+      }
+
+      if (published) {
+        togglePublish(true);
+      } else {
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Un-publish this WebCard?',
+            description: 'Un-publish alert - title',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              'Unpublishing this WebCard will make it invisible to other users, but all its content will remain intact. Links to the associated ContactCard — including any saved QR codes or email signatures — will stop working. You can alway re-publish your WebCard later, restoring its full functionality.',
+            description: 'Un-publish alert - description',
+          }),
+          [
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Un-publish',
+                description: 'Un-publish alert - accept button label',
+              }),
+              onPress: () => togglePublish(false),
+            },
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Un-publish alert - cancel button label',
+              }),
+            },
+          ],
+          {
+            cancelable: true,
+          },
+        );
+      }
+    },
+    [intl, togglePublish, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(

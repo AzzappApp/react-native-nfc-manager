@@ -1,7 +1,6 @@
 import { Suspense, useEffect } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { HomeIcon } from '#components/HomeIcon';
-import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useSaveOfflineVCard } from '#helpers/offlineVCard';
@@ -81,10 +80,6 @@ const HomeScreen = ({
 };
 
 const HomeScreenFallback = () => {
-  useEffect(() => {
-    setMainTabBarOpacity(0);
-  }, []);
-
   return <AzzappLogoLoader />;
 };
 

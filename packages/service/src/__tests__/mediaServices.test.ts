@@ -1,15 +1,15 @@
 import { getMediasByIds } from '@azzapp/data';
-import { buildAvatarUrl, buildCoverImageUrl } from '../mediaServices';
+import {
+  buildAvatarUrl,
+  buildBannerUrl,
+  buildCoverImageUrl,
+  buildLogoUrl,
+} from '../mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
   getMediasByIds: jest.fn(),
-}));
-
-jest.mock('@azzapp/shared/imagesHelpers', () => ({
-  CLOUDINARY_BASE_URL: 'https://res.cloudinary.com/demo',
-  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL: 10,
 }));
 
 const mockProfile: Profile = {
@@ -18,6 +18,7 @@ const mockProfile: Profile = {
   webCardId: 'webcard-789',
   avatarId: 'avatar-image-id',
   logoId: 'logo-image-id',
+  bannerId: 'banner-image-id',
   contactCard: {
     firstName: 'John',
     lastName: 'Doe',
@@ -34,6 +35,7 @@ const mockProfile: Profile = {
   createdAt: new Date(),
   lastContactCardUpdate: new Date(),
   nbContactCardScans: 0,
+  nbContactsImportFromScan: 0,
   nbShareBacks: 0,
   deleted: false,
   deletedAt: null,
@@ -54,13 +56,13 @@ const mockWebCard: WebCard = {
     emails: [{ label: 'Work', address: 'test@example.com' }],
   },
   logoId: null,
+  bannerId: null,
   createdAt: new Date(),
   deleted: false,
   deletedAt: null,
   deletedBy: null,
   lastUserNameUpdate: new Date(),
   webCardKind: 'personal',
-  webCardCategoryId: null,
   firstName: null,
   lastName: null,
   companyName: null,
@@ -105,14 +107,14 @@ describe('buildAvatarUrl', () => {
   test('should build avatar URL from profile avatarId', async () => {
     const url = await buildAvatarUrl(mockProfile, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/avatar-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/avatar-image-id.jpg',
     );
   });
 
   test('should fallback to logoId if avatarId is missing', async () => {
     const url = await buildAvatarUrl({ ...mockProfile, avatarId: null }, null);
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
     );
   });
 });
@@ -132,7 +134,7 @@ describe('buildCoverImageUrl', () => {
     });
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/image/upload/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -146,7 +148,7 @@ describe('buildCoverImageUrl', () => {
     });
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/video/upload/so_20p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/video/upload/so_20p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -159,7 +161,7 @@ describe('buildCoverImageUrl', () => {
     );
 
     expect(url).toBe(
-      'https://res.cloudinary.com/demo/video/upload/so_10p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
+      'https://res.cloudinary.com/azzapp-dev/video/upload/so_17p/c_fill,g_east,w_720,h_720,ar_1:1/cover-image-id.png',
     );
   });
 
@@ -170,5 +172,75 @@ describe('buildCoverImageUrl', () => {
     );
 
     expect(url).toBeUndefined();
+  });
+});
+
+describe('buildLogoUrl', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should build logo URL from profile logoId', async () => {
+    const url = await buildLogoUrl(mockProfile, null);
+    expect(url).toBe(
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/logo-image-id.jpg',
+    );
+  });
+
+  test('should build logo URL from webcard logoId if webcard is multiuser', async () => {
+    const url = await buildLogoUrl(
+      { ...mockProfile, logoId: null },
+      {
+        ...mockWebCard,
+        isMultiUser: true,
+        logoId: 'webcard-logo-image-id',
+      },
+    );
+    expect(url).toBe(
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_720/v1/webcard-logo-image-id.jpg',
+    );
+  });
+
+  test('should return logo null', async () => {
+    const url = await buildLogoUrl(
+      { ...mockProfile, logoId: null },
+      mockWebCard,
+    );
+    expect(url).toBeNull();
+  });
+});
+
+describe('buildBannerUrl', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should build banner URL from profile bannerId', async () => {
+    const url = await buildBannerUrl(mockProfile, null);
+    expect(url).toBe(
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_1200/v1/banner-image-id.jpg',
+    );
+  });
+
+  test('should build banner URL from webcard bannerId if webcard is multiuser', async () => {
+    const url = await buildBannerUrl(
+      { ...mockProfile, bannerId: null },
+      {
+        ...mockWebCard,
+        isMultiUser: true,
+        bannerId: 'webcard-banner-image-id',
+      },
+    );
+    expect(url).toBe(
+      'https://res.cloudinary.com/azzapp-dev/image/upload/c_fill,w_1200/v1/webcard-banner-image-id.jpg',
+    );
+  });
+
+  test('should return banner null', async () => {
+    const url = await buildBannerUrl(
+      { ...mockProfile, bannerId: null },
+      mockWebCard,
+    );
+    expect(url).toBeNull();
   });
 });

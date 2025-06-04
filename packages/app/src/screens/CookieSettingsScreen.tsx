@@ -227,12 +227,16 @@ const CookieSettingsScreen = ({
         <View style={styles.controlsContainer}>
           <View style={styles.cookieRow}>
             <View style={styles.cookieRowControl}>
-              <Text variant="large">{cookieDescriptions.necessary.title}</Text>
-              <IconButton
-                icon="information"
-                variant="icon"
-                onPress={() => onInformationPress('necessary')}
-              />
+              <View style={styles.cookieHeader}>
+                <Text variant="large">
+                  {cookieDescriptions.necessary.title}
+                </Text>
+                <IconButton
+                  icon="information"
+                  variant="icon"
+                  onPress={() => onInformationPress('necessary')}
+                />
+              </View>
             </View>
             <Text variant="smallbold" style={styles.alwaysActive}>
               <FormattedMessage
@@ -243,12 +247,16 @@ const CookieSettingsScreen = ({
           </View>
           <View style={styles.cookieRow}>
             <View style={styles.cookieRowControl}>
-              <Text variant="large">{cookieDescriptions.analytics.title}</Text>
-              <IconButton
-                icon="information"
-                variant="icon"
-                onPress={() => onInformationPress('analytics')}
-              />
+              <View style={styles.cookieHeader}>
+                <Text variant="large">
+                  {cookieDescriptions.analytics.title}
+                </Text>
+                <IconButton
+                  icon="information"
+                  variant="icon"
+                  onPress={() => onInformationPress('analytics')}
+                />
+              </View>
             </View>
             <Switch
               variant="large"
@@ -259,12 +267,14 @@ const CookieSettingsScreen = ({
         </View>
         {/* <View style={styles.cookieRow}>
           <View style={styles.cookieRowControl}>
-            <Text variant="large">{cookieDescriptions.marketing.title}</Text>
-            <IconButton
-              icon="information"
-              variant="icon"
-              onPress={() => onInformationPress('marketing')}
-            />
+            <View style={styles.cookieHeader}>
+              <Text variant="large">{cookieDescriptions.marketing.title}</Text>
+              <IconButton
+                icon="information"
+                variant="icon"
+                onPress={() => onInformationPress('marketing')}
+              />
+            </View>
           </View>
           <Switch
             variant="large"
@@ -274,12 +284,14 @@ const CookieSettingsScreen = ({
         </View> */}
         <View style={styles.cookieRow}>
           <View style={styles.cookieRowControl}>
-            <Text variant="large">{cookieDescriptions.functional.title}</Text>
-            <IconButton
-              icon="information"
-              variant="icon"
-              onPress={() => onInformationPress('functional')}
-            />
+            <View style={styles.cookieHeader}>
+              <Text variant="large">{cookieDescriptions.functional.title}</Text>
+              <IconButton
+                icon="information"
+                variant="icon"
+                onPress={() => onInformationPress('functional')}
+              />
+            </View>
           </View>
           <Switch
             variant="large"
@@ -359,6 +371,13 @@ const styles = StyleSheet.create({
   },
   cookieRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cookieHeader: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
+    paddingRight: 39,
     alignItems: 'center',
   },
   cookieRowControl: {

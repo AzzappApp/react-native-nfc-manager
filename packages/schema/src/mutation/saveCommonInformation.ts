@@ -1,12 +1,13 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   referencesMedias,
   transaction,
   updateWebCard,
   updateWebCardProfiles,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -14,8 +15,22 @@ import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
+const checkCommonInformationsUpdate = (data: Partial<WebCard>) => {
+  if (data.bannerId || data.logoId) {
+    return true;
+  }
+  if (data.commonInformation) {
+    return Object.entries(data.commonInformation).some(([, value]) =>
+      Array.isArray(value) ? value.length > 0 : !!value,
+    );
+  }
+};
+
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
-  async (_, { webCardId: gqlWebCardId, input: { logoId, ...data } }) => {
+  async (
+    _,
+    { webCardId: gqlWebCardId, input: { logoId, bannerId, socials, ...data } },
+  ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileAdminRight(webCardId);
 
@@ -25,14 +40,22 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    const updates: Partial<WebCard> = {
-      commonInformation: data,
+    let updates: Partial<WebCard> = {
+      commonInformation: { ...data, socials: filterSocialLink(socials) },
       logoId,
+      bannerId,
     };
+
+    if (checkCommonInformationsUpdate(updates) && !webCard.isMultiUser) {
+      updates = {
+        ...updates,
+        isMultiUser: true,
+      };
+    }
+
     try {
-      if (logoId) {
-        await checkMedias([logoId]);
-      }
+      const addedMedia = [logoId, bannerId].filter(mediaId => mediaId != null);
+      await checkMedias(addedMedia);
       await transaction(async () => {
         await updateWebCard(webCardId, updates);
 
@@ -40,7 +63,7 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
           lastContactCardUpdate: new Date(),
         });
 
-        await referencesMedias(logoId ? [logoId] : [], [webCard.logoId]);
+        await referencesMedias(addedMedia, [webCard.logoId, webCard.bannerId]);
       });
 
       await notifyRelatedWalletPasses(webCardId);

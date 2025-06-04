@@ -9,14 +9,13 @@ import {
 } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import MainTabBar from '#components/MainTabBar';
 import {
   RouterProvider,
   ScreensRenderer,
   useNativeRouter,
 } from '#components/NativeRouter';
 import { setAnalyticsConsent, setAnalyticsUserId } from '#helpers/analytics';
-import { hasBeenSignedIn } from '#helpers/authStore';
+import { getAuthState, hasBeenSignedIn } from '#helpers/authStore';
 import {
   addGlobalEventListener,
   GLOBAL_EVENT_HIGH_PRIORITY,
@@ -101,10 +100,6 @@ const LoginRouter = () => {
   );
 };
 
-const tabs = {
-  MAIN_TAB: MainTabBar,
-};
-
 /**
  * The main application component
  */
@@ -168,13 +163,23 @@ const MainRouter = () => {
     if (shakeAndShareOpened.current) {
       router.back();
     } else {
-      router.push({
-        route: 'SHAKE_AND_SHARE',
-      });
+      const currentRoute = router.getCurrentRoute();
+      const profileInfos = getAuthState().profileInfos;
+
+      if (
+        profileInfos?.profileId && // no webcard available
+        !profileInfos?.invited && // invitation not validated
+        !!profileInfos?.webCardUserName && // creation not finished
+        currentRoute?.route !== 'CONTACT_CARD_CREATE' // new contact card creation
+      ) {
+        router.push({
+          route: 'SHAKE_AND_SHARE',
+        });
+      }
     }
   }, [router]);
 
-  const resetCoolDown = useShakeDetector(toggleShakeShare);
+  useShakeDetector(toggleShakeShare);
 
   useEffect(() => {
     router.addRouteDidChangeListener(route => {
@@ -182,10 +187,9 @@ const MainRouter = () => {
         shakeAndShareOpened.current = true;
       } else if (shakeAndShareOpened.current) {
         shakeAndShareOpened.current = false;
-        resetCoolDown();
       }
     });
-  }, [resetCoolDown, router]);
+  }, [router]);
 
   return (
     <RouterProvider value={router}>
@@ -193,7 +197,6 @@ const MainRouter = () => {
         router={router}
         routerState={routerState}
         screens={screens}
-        tabs={tabs}
       />
     </RouterProvider>
   );

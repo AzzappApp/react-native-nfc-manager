@@ -62,7 +62,7 @@ const CameraControlPanel = ({
   );
   const [timer, setTimer] = useState<number | null>(null);
   const isRecording = recordingStartTime != null;
-  const recordingTimeout = useRef<any>();
+  const recordingTimeout = useRef<NodeJS.Timeout>(undefined);
 
   const startRecording = () => {
     onStartRecording();

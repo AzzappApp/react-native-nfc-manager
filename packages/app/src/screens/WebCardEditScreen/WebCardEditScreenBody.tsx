@@ -305,7 +305,7 @@ const WebCardEditScreenBody = (
 
   const [reorderPending, setReorderPending] = useState(false);
   const moduleOrderTimeoutRef = useRef<any>(null);
-  const optimisticUpdate = useRef<Disposable | null>();
+  const optimisticUpdate = useRef<Disposable | null>(null);
   const scheduleModuleOrderUpdate = useCallback(
     (modulesIds: string[]) => {
       if (moduleOrderTimeoutRef.current) {

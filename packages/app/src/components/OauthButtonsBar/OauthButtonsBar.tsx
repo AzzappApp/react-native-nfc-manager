@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, Platform, View } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import Toast from 'react-native-toast-message';
+import env from '#env';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -13,13 +14,13 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { appleSignin } from '#helpers/MobileWebAPI';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { AuthResponse } from '@azzapp/shared/WebAPI';
+import type { AuthResponse } from '#helpers/WebAPI';
 
 WebBrowser.maybeCompleteAuthSession();
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: process.env.APP_SCHEME ?? 'azzapp',
+  scheme: env.APP_SCHEME,
   path: 'login',
-  native: `${process.env.APP_SCHEME}://login`,
+  native: `${env.APP_SCHEME}://login`,
 });
 
 export type OauthButtonsBarProps = {
@@ -136,7 +137,7 @@ const OauthButtonsBar = ({
 
   const onOpenIdSignUp = useCallback(
     async (kind: 'google' | 'linkedin') => {
-      const authUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/signin/${kind}?platform=${Platform.OS}`;
+      const authUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/signin/${kind}?platform=${Platform.OS}`;
       const errorMessage =
         kind === 'google' ? googleErrorMessage : linkedinErrorMessage;
       const result = await WebBrowser.openAuthSessionAsync(
@@ -211,6 +212,12 @@ const OauthButtonsBar = ({
     [googleErrorMessage, linkedinErrorMessage, router],
   );
 
+  const androidRippleConfig = {
+    radius: 30,
+    color: 'rgba(0,0,0,0.2)',
+    foreground: true,
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
@@ -226,6 +233,7 @@ const OauthButtonsBar = ({
         )}
         <PressableNative
           style={styles.button}
+          android_ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('linkedin')}
         >
           <View style={styles.button}>
@@ -237,6 +245,7 @@ const OauthButtonsBar = ({
         </PressableNative>
         <PressableNative
           style={styles.button}
+          android_ripple={androidRippleConfig}
           onPress={() => onOpenIdSignUp('google')}
         >
           <View style={styles.button}>

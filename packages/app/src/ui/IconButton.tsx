@@ -3,10 +3,15 @@ import {
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import Icon from './Icon';
-import PressableOpacity from './PressableOpacity';
+import PressableNative from './PressableNative';
 import type { Icons } from './Icon';
 import type { PressableOpacityProps } from './PressableOpacity';
-import type { StyleProp, ImageStyle, ViewProps } from 'react-native';
+import type {
+  StyleProp,
+  ImageStyle,
+  ViewProps,
+  ColorSchemeName,
+} from 'react-native';
 
 export type IconButtonProps = Pick<
   PressableOpacityProps,
@@ -44,6 +49,8 @@ export type IconButtonProps = Pick<
      * @type {('border' | 'icon')}
      */
     variant?: 'border' | 'icon';
+
+    appearance?: ColorSchemeName;
   };
 
 const IconButton = ({
@@ -54,13 +61,13 @@ const IconButton = ({
   style,
   iconStyle,
   variant = 'border',
+  appearance,
   ...props
 }: IconButtonProps) => {
-  const styles = useVariantStyleSheet(computedStyle, variant);
+  const styles = useVariantStyleSheet(computedStyle, variant, appearance);
   const variantSize = size ? size : variant === 'border' ? 50 : iconSize;
   return (
-    // TODO unfortunately, we can't use PressableNative here because of the ripple effect, see : https://github.com/facebook/react-native/issues/34553
-    <PressableOpacity
+    <PressableNative
       {...props}
       accessibilityRole="button"
       onPress={onPress}
@@ -73,10 +80,18 @@ const IconButton = ({
         styles.button,
         style,
       ]}
+      android_ripple={{
+        borderless: true,
+      }}
       {...props}
     >
-      <Icon icon={icon} size={iconSize} style={iconStyle} />
-    </PressableOpacity>
+      <Icon
+        icon={icon}
+        size={iconSize}
+        style={iconStyle}
+        appearance={appearance}
+      />
+    </PressableNative>
   );
 };
 

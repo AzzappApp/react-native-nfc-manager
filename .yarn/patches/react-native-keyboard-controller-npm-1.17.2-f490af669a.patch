@@ -1,0 +1,69 @@
+diff --git a/android/src/main/java/com/reactnativekeyboardcontroller/extensions/ThemedReactContext.kt b/android/src/main/java/com/reactnativekeyboardcontroller/extensions/ThemedReactContext.kt
+index d9749898eff277d4e01f7f7cf84eb62146b0cc62..c01d6a506f2f897b83c0a8c7cb68758384119da2 100644
+--- a/android/src/main/java/com/reactnativekeyboardcontroller/extensions/ThemedReactContext.kt
++++ b/android/src/main/java/com/reactnativekeyboardcontroller/extensions/ThemedReactContext.kt
+@@ -2,6 +2,7 @@ package com.reactnativekeyboardcontroller.extensions
+ 
+ import android.content.Context
+ import android.os.Build
++import com.facebook.react.bridge.Arguments
+ import com.facebook.react.bridge.ReactContext
+ import com.facebook.react.bridge.WritableMap
+ import com.facebook.react.modules.core.DeviceEventManagerModule
+@@ -37,6 +38,25 @@ fun ThemedReactContext?.emitEvent(
+   Logger.i("ThemedReactContext", event)
+ }
+ 
++fun ThemedReactContext?.keepShadowNodesInSync(viewId: Int) {
++   // originally by viewId we should lookup all connected nodes
++   // and send them to JS
++   // but at the moment JS side broadcasts events to all ViewType
++   // instances, so we can send even empty array
++   val tags = intArrayOf(viewId)
++
++   val tagsArray = Arguments.createArray()
++   for (tag in tags) {
++     tagsArray.pushInt(tag)
++   }
++
++   // emit the event to JS to re-sync the trees
++   val onAnimationEndedData = Arguments.createMap()
++   onAnimationEndedData.putArray("tags", tagsArray)
++
++   this?.reactApplicationContext?.emitDeviceEvent("onUserDrivenAnimationEnded", onAnimationEndedData)
++}
++
+ val ThemedReactContext?.appearance: String
+   get() =
+     when {
+diff --git a/android/src/main/java/com/reactnativekeyboardcontroller/listeners/KeyboardAnimationCallback.kt b/android/src/main/java/com/reactnativekeyboardcontroller/listeners/KeyboardAnimationCallback.kt
+index 3ff4ed07bcb9fba553796b806ba5fa244f6ff305..92080b7f4e66160579d153b67008ded085660e48 100644
+--- a/android/src/main/java/com/reactnativekeyboardcontroller/listeners/KeyboardAnimationCallback.kt
++++ b/android/src/main/java/com/reactnativekeyboardcontroller/listeners/KeyboardAnimationCallback.kt
+@@ -20,6 +20,7 @@ import com.reactnativekeyboardcontroller.extensions.dispatchEvent
+ import com.reactnativekeyboardcontroller.extensions.dp
+ import com.reactnativekeyboardcontroller.extensions.emitEvent
+ import com.reactnativekeyboardcontroller.extensions.isKeyboardAnimation
++import com.reactnativekeyboardcontroller.extensions.keepShadowNodesInSync
+ import com.reactnativekeyboardcontroller.extensions.keyboardType
+ import com.reactnativekeyboardcontroller.interactive.InteractiveKeyboardProvider
+ import com.reactnativekeyboardcontroller.log.Logger
+@@ -327,6 +328,8 @@ class KeyboardAnimationCallback(
+ 
+         // reset to initial state
+         duration = 0
++
++        context.keepShadowNodesInSync(eventPropagationView.id)
+       }
+ 
+     if (isKeyboardInteractive) {
+@@ -400,6 +403,9 @@ class KeyboardAnimationCallback(
+         ),
+       )
+     }
++
++    context.keepShadowNodesInSync(eventPropagationView.id)
++
+     context.emitEvent("KeyboardController::keyboardDidShow", getEventParams(keyboardHeight))
+ 
+     this.persistentKeyboardHeight = keyboardHeight

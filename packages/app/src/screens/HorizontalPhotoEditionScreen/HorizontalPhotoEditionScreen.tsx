@@ -200,6 +200,7 @@ const HorizontalPhotoEditionScreen = ({
               visible
               variant
               ...HorizontalPhotoEditionScreen_module
+                @alias(as: "horizontalPhoto")
             }
           }
         }

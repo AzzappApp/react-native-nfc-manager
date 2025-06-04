@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmall, vars } from '#app/[userName]/theme.css';
+import { textSmall, vars } from '#app/theme.css';
 
 const content = style({
   position: 'relative',

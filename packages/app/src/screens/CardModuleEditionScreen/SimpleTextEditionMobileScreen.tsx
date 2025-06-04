@@ -28,7 +28,8 @@ const SimpleTextEditionMobileScreen = ({
   preloadedQuery,
   moduleKind,
 }: SimpleTextEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(SimpleTextQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(SimpleTextQuery, preloadedQuery);
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
@@ -36,9 +37,8 @@ const SimpleTextEditionMobileScreen = ({
   let module: SimpleTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(
-        module => module?.id === moduleId && module?.kind === moduleKind,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.simpleTextModule ?? null;
     if (!module) {
       // TODO
     }
@@ -55,14 +55,14 @@ const SimpleTextEditionMobileScreen = ({
 
 const SimpleTextQuery = graphql`
   query SimpleTextEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...SimpleTextEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
-            ...SimpleTextEditionScreen_module
+            ...SimpleTextEditionScreen_module @alias(as: "simpleTextModule")
           }
         }
       }

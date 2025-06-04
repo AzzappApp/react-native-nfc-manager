@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import { getProfileById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -23,10 +23,9 @@ const businessCardSchema = z.object({
 });
 
 export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
-  async (_parent, args) => {
-    const { userId } = getSessionInfos();
-
-    if (!userId) {
+  async (_parent, args, context) => {
+    const user = await getSessionUser();
+    if (!user) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     if (!args.config?.createContactCard) {
@@ -48,13 +47,21 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
         if (!ownerId) {
           throw new GraphQLError(ERRORS.INVALID_REQUEST);
         }
-        await validateCurrentSubscription(ownerId, {
-          action: 'USE_SCAN',
-        });
+        await validateCurrentSubscription(
+          ownerId,
+          {
+            action: 'USE_SCAN',
+          },
+          context.apiEndpoint,
+        );
       } else {
-        await validateCurrentSubscription(userId, {
-          action: 'USE_SCAN',
-        });
+        await validateCurrentSubscription(
+          user.id,
+          {
+            action: 'USE_SCAN',
+          },
+          context.apiEndpoint,
+        );
       }
     }
 

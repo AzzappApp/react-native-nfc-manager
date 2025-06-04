@@ -2,7 +2,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import {
   contactEditStyleSheet,
   useContactEmailLabels,
@@ -33,7 +33,7 @@ const CommonInformationEmails = ({
   return (
     <>
       {fields.map((email, index) => (
-        <ContactCardEditModalField
+        <ContactEditField
           key={email.id}
           control={control}
           labelKey={`emails.${index}.label`}
@@ -51,6 +51,7 @@ const CommonInformationEmails = ({
             description:
               'Edit Common Information - Error message when email is invalid',
           })}
+          returnKeyType="done"
         />
       ))}
       <View>

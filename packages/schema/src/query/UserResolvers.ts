@@ -7,7 +7,13 @@ import {
   getTotalMultiUser,
   getLastTermsOfUse,
   getSharedWebCardRelation,
+  getUserContacts,
+  getUserContactsGroupedByDate,
+  getUserContactsCount,
+  getUserContactsGroupedByLocation,
+  getNbNewContactsForUser,
 } from '@azzapp/data';
+import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   subscriptionsForUserLoader,
@@ -16,6 +22,11 @@ import {
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
+import {
+  cursorToDate,
+  dateToCursor,
+  emptyConnection,
+} from '#helpers/connectionsHelpers';
 import { createSessionDataLoader } from '#helpers/dataLoadersHelpers';
 import { type ProtectedResolver } from '#helpers/permissionsHelpers';
 import type { UserResolvers } from '#/__generated__/types';
@@ -93,6 +104,9 @@ export const User: ProtectedResolver<UserResolvers> = {
 
     return subscriptions[0] ?? null;
   },
+  nbNewContacts: async user => {
+    return getNbNewContactsForUser(user.id);
+  },
   isPremium: async user => {
     if (!isSameUser(user)) {
       return null;
@@ -159,5 +173,120 @@ export const User: ProtectedResolver<UserResolvers> = {
     }
 
     return true; // we don't have a way to check if the user has a password
+  },
+  nbEnrichments: async user => {
+    if (!isSameUser(user)) {
+      return {
+        total: 0,
+        max: parseInt(env.MAX_ENRICHMENTS_PER_USER, 10),
+      };
+    }
+
+    return {
+      total: user.nbEnrichments,
+      max: parseInt(env.MAX_ENRICHMENTS_PER_USER, 10),
+    };
+  },
+  nbContacts: async user => {
+    if (!isSameUser(user)) {
+      return 0;
+    }
+    return getUserContactsCount(user.id);
+  },
+  contacts: async (user, { after, first, search, orderBy, date, location }) => {
+    if (!isSameUser(user)) {
+      return emptyConnection;
+    }
+    const { hasMore, contactsWithCursor } = await getUserContacts(
+      user.id,
+      orderBy ?? 'name',
+      search,
+      location,
+      date,
+      after,
+      first ?? 50,
+    );
+    return {
+      edges: contactsWithCursor.map(({ contact, cursor }) => ({
+        node: contact,
+        cursor,
+      })),
+      pageInfo: {
+        hasNextPage: hasMore,
+        hasPreviousPage: false,
+        startCursor: contactsWithCursor[0]?.cursor,
+        endCursor:
+          contactsWithCursor[contactsWithCursor.length - 1]?.cursor ?? null,
+      },
+    };
+  },
+  contactsByDates: async (user, { after, first, nbContactsByDate, search }) => {
+    if (!isSameUser(user)) {
+      return emptyConnection;
+    }
+    const { hasMore, dates } = await getUserContactsGroupedByDate(
+      user.id,
+      search,
+      nbContactsByDate ?? 5,
+      after ? cursorToDate(after) : null,
+      first ?? 50,
+    );
+    const firstDate = dates.at(0)?.date;
+    const lastDate = dates.at(-1)?.date;
+    return {
+      edges: dates.map(({ date, nbContacts, contacts }) => ({
+        node: {
+          date,
+          nbContacts,
+          contacts,
+        },
+        cursor: dateToCursor(date),
+      })),
+      pageInfo: {
+        hasNextPage: hasMore,
+        hasPreviousPage: false,
+        startCursor: firstDate ? dateToCursor(firstDate) : null,
+        endCursor: lastDate ? dateToCursor(lastDate) : null,
+      },
+    };
+  },
+  contactsByLocation: async (
+    user,
+    { after, nbContactsByLocations, first, search },
+  ) => {
+    if (!isSameUser(user)) {
+      return emptyConnection;
+    }
+    if (after === '\uFFFF') {
+      // This should never happen null location are always at the end
+      return emptyConnection;
+    }
+    const { hasMore, locations } = await getUserContactsGroupedByLocation(
+      user.id,
+      search,
+      nbContactsByLocations ?? 5,
+      after ?? null,
+      first ?? 50,
+    );
+    return {
+      edges: locations.map(({ location, nbContacts, contacts }) => ({
+        node: {
+          location,
+          contacts,
+          nbContacts,
+        },
+        cursor: location ?? `\uFFFF`,
+      })),
+      pageInfo: {
+        hasNextPage: hasMore,
+        hasPreviousPage: false,
+        startCursor: locations.length
+          ? (locations[0].location ?? `\uFFFF`)
+          : null,
+        endCursor: locations.length
+          ? (locations[locations.length - 1].location ?? `\uFFFF`)
+          : null,
+      },
+    };
   },
 };

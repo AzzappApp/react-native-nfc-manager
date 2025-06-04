@@ -6,7 +6,7 @@ extend type Mutation {
     notify: Boolean
     location: LocationInput
     address: AddressInput
-  ): AddContactPayload
+  ): ContactPayload @deprecated(reason: "Use createContact instead")
 }
 
 input AddContactInput {
@@ -17,45 +17,12 @@ input AddContactInput {
   title: String!
   birthday: String
   avatarId: String
-  phoneNumbers: [AddContactPhoneNumberInput!]!
-  emails: [AddContactEmailInput!]!
-  addresses: [AddContactAddressInput!]!
+  phoneNumbers: [ContactPhoneNumberInput!]!
+  emails: [ContactEmailInput!]!
+  addresses: [ContactAddressInput!]!
   deviceId: String
   withShareBack: Boolean!
-  socials: [AddContactSocial!]
-  urls: [AddContactUrl!]
+  socials: [ContactSocialInput!]
+  urls: [ContactUrlInput!]
   logoId: String
-}
-
-input AddContactSocial {
-  url: String!
-  label: String!
-}
-
-input AddContactUrl {
-  url: String!
-}
-
-input AddContactPhoneNumberInput {
-  label: String!
-  number: String!
-}
-
-input AddContactEmailInput {
-  label: String!
-  address: String!
-}
-
-input AddContactAddressInput {
-  label: String!
-  address: String!
-}
-
-type AddContactPayload {
-  contact: Contact!
-}
-
-enum AddContactType {
-  contact
-  shareback
 }

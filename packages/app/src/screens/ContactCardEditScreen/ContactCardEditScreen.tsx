@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Sentry from '@sentry/react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -20,6 +20,7 @@ import {
 } from '#components/NativeRouter';
 import {
   prepareAvatarForUpload,
+  prepareBannerForUpload,
   prepareLogoForUpload,
 } from '#helpers/imageHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
@@ -29,11 +30,11 @@ import {
   parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import { contactCardFormFragment } from '../../fragments/ContactCardEditFormFragment';
@@ -73,6 +74,7 @@ const ContactCardEditScreen = ({
     contactCard,
     avatar,
     logo,
+    banner,
     webCard,
     id: profileId,
   } = useFragment(
@@ -112,31 +114,40 @@ const ContactCardEditScreen = ({
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
       logo: webCard?.isMultiUser ? webCard?.logo || logo : logo,
+      banner: webCard?.isMultiUser ? webCard?.banner || banner : banner,
     };
-  }, [avatar, contactCard, logo, webCard?.isMultiUser, webCard?.logo]);
+  }, [
+    avatar,
+    banner,
+    contactCard,
+    logo,
+    webCard?.banner,
+    webCard?.isMultiUser,
+    webCard?.logo,
+  ]);
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
-    reset,
   } = useForm<ContactCardFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
     resolver: zodResolver(contactCardSchema),
     defaultValues,
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
   });
-
-  useEffect(() => {
-    reset(defaultValues);
-  }, [defaultValues, reset]);
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
   const router = useRouter();
 
-  const submit = handleSubmit(async ({ avatar, logo, ...data }) => {
+  const submit = handleSubmit(async ({ avatar, logo, banner, ...data }) => {
     const uploads = [];
 
     if (avatar?.local && avatar.uri) {
@@ -160,6 +171,15 @@ const ContactCardEditScreen = ({
     } else {
       uploads.push(null);
     }
+
+    if (banner?.local && banner.uri) {
+      const { file, uploadURL, uploadParameters } =
+        await prepareBannerForUpload(banner.uri);
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
     const uploadsToDo = uploads.filter(val => val !== null);
     if (uploadsToDo.length) {
       setProgressIndicator(
@@ -169,24 +189,30 @@ const ContactCardEditScreen = ({
       );
     }
 
-    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-      uploads.map(upload =>
-        upload?.promise.then(({ public_id }) => {
-          return public_id;
-        }),
-      ),
-    );
+    const [uploadedAvatarId, uploadedLogoId, uploadedBannerId] =
+      await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(({ public_id }) => {
+            return public_id;
+          }),
+        ),
+      );
 
     const avatarId =
       avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
     const logoId =
       logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
+    const bannerId =
+      banner === null ? null : banner?.local ? uploadedBannerId : banner?.id;
 
     if (avatar?.local) {
       addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
     }
     if (logoUri) {
       addLocalCachedMediaFile(logoId, 'image', logoUri);
+    }
+    if (banner?.local) {
+      addLocalCachedMediaFile(bannerId, 'image', banner.uri);
     }
 
     commit({
@@ -210,6 +236,7 @@ const ContactCardEditScreen = ({
           socials: data.socials?.filter(social => social.url),
           avatarId,
           logoId: !webCard?.isMultiUser || !webCard?.logo ? logoId : undefined,
+          bannerId,
         },
         pixelRatio: CappedPixelRatio(),
       },
@@ -262,56 +289,55 @@ const ContactCardEditScreen = ({
     });
   });
 
+  const { top } = useScreenInsets();
   return (
-    <Container style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header
-          middleElement={intl.formatMessage(
-            {
-              defaultMessage: 'Edit Contact Card{azzappA}',
-              description: 'Edit Contact Card Modal title',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          )}
-          leftElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Cancel',
-                description: 'Edit contact card modal cancel button title',
-              })}
-              onPress={router.back}
-              variant="secondary"
-              style={styles.headerButton}
-            />
-          }
-          rightElement={
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'Edit contact card modal save button label',
-              })}
-              testID="save-contact-card"
-              loading={isSubmitting || loading}
-              onPress={submit}
-              variant="primary"
-              style={styles.headerButton}
-            />
-          }
-        />
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={intl.formatMessage(
+          {
+            defaultMessage: 'Edit Contact Card{azzappA}',
+            description: 'Edit Contact Card Modal title',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        )}
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit contact card modal cancel button title',
+            })}
+            onPress={router.back}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit contact card modal save button label',
+            })}
+            testID="save-contact-card"
+            loading={isSubmitting || loading}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+      />
 
-        <ContactCardEditForm webCard={webCard} control={control} />
-        <ScreenModal
-          visible={!!progressIndicator}
-          gestureEnabled={false}
-          onRequestDismiss={preventModalDismiss}
-        >
-          {progressIndicator && (
-            <UploadProgressModal progressIndicator={progressIndicator} />
-          )}
-        </ScreenModal>
-      </SafeAreaView>
+      <ContactCardEditForm webCard={webCard} control={control} />
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

@@ -8,7 +8,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -16,13 +16,13 @@ import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
-  async (_, { webCardId: gqlWebCardId, input: { published } }) => {
-    const { userId } = getSessionInfos();
+  async (_, { webCardId: gqlWebCardId, input: { published } }, context) => {
+    const user = await getSessionUser();
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileAdminRight(webCardId);
 
     const webCard = await webCardLoader.load(webCardId);
-    if (!webCard || !userId) {
+    if (!webCard || !user || !user.id) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
     if (webCard.cardIsPublished === published) {
@@ -48,28 +48,36 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     }
 
     if (webCard.isMultiUser) {
-      await validateCurrentSubscription(owner.id, {
-        webCardIsPublished: published,
-        action: 'UPDATE_WEBCARD_PUBLICATION',
-        webCardIsMultiUser: true,
-        webCardKind: webCard.webCardKind,
-        alreadyPublished: await getPublishedWebCardCount(owner.id),
-        addedSeats: await getWebCardCountProfile(webCardId),
-        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
-        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
-        ownerContactCardHasLogo: !!profile.logoId,
-      });
+      await validateCurrentSubscription(
+        owner.id,
+        {
+          webCardIsPublished: published,
+          action: 'UPDATE_WEBCARD_PUBLICATION',
+          webCardIsMultiUser: true,
+          webCardKind: webCard.webCardKind,
+          alreadyPublished: await getPublishedWebCardCount(owner.id),
+          addedSeats: await getWebCardCountProfile(webCardId),
+          ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+          ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+          ownerContactCardHasLogo: !!profile.logoId,
+        },
+        context.apiEndpoint,
+      );
     } else {
-      await validateCurrentSubscription(owner.id, {
-        webCardIsPublished: published,
-        action: 'UPDATE_WEBCARD_PUBLICATION',
-        webCardIsMultiUser: false,
-        webCardKind: webCard.webCardKind,
-        alreadyPublished: await getPublishedWebCardCount(owner.id),
-        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
-        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
-        ownerContactCardHasLogo: !!profile.logoId,
-      });
+      await validateCurrentSubscription(
+        owner.id,
+        {
+          webCardIsPublished: published,
+          action: 'UPDATE_WEBCARD_PUBLICATION',
+          webCardIsMultiUser: false,
+          webCardKind: webCard.webCardKind,
+          alreadyPublished: await getPublishedWebCardCount(owner.id),
+          ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+          ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+          ownerContactCardHasLogo: !!profile.logoId,
+        },
+        context.apiEndpoint,
+      );
     }
 
     const updates = {

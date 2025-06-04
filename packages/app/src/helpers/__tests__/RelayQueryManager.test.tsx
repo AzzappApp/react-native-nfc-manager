@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-native';
 import { loadQuery } from 'react-relay';
 import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';

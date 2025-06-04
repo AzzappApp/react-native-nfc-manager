@@ -2,7 +2,7 @@ const API_SERVER_TOKEN = process.env.API_SERVER_TOKEN;
 
 const TRANSLATION_APP_API_ENDPOINT = process.env.TRANSLATION_APP_API_ENDPOINT;
 
-const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM ?? 'development';
+const ENVIRONMENT = process.env.DEPLOYMENT_ENVIRONMENT ?? 'development';
 
 const purgeMessages = async () => {
   const webMessages = require(`../src/webMessages.json`);

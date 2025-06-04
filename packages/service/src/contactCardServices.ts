@@ -1,5 +1,5 @@
+import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { WebCard } from '@azzapp/data';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 export const mergeContactCardWithCommonInfos = (
   webCard: WebCard,

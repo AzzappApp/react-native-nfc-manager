@@ -2,13 +2,14 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Platform } from 'react-native';
 import { PopoverMode } from 'react-native-popover-view';
-import { Placement, Point } from 'react-native-popover-view/dist/Types';
+import { Placement, Point, Size } from 'react-native-popover-view/dist/Types';
 import {
   useTooltipContext,
   useTooltipDataContext,
 } from '#helpers/TooltipContext';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
+import type { Component, RefObject } from 'react';
 
 type TooltipPosition = {
   x: number;
@@ -68,23 +69,22 @@ const Tooltips = () => {
           Platform.OS === 'ios' ? PopoverMode.RN_MODAL : PopoverMode.JS_MODAL
         }
         offset={Platform.OS === 'ios' ? -10 : 30}
-        from={tooltips['profileLink']?.ref}
+        from={tooltips['profileLink']?.ref as RefObject<Component>}
         placement={Placement.TOP}
-        header={
+        description={
           <FormattedMessage
-            defaultMessage="Link to your WebCard{azzappA}"
+            defaultMessage="Link to your WebCard{azzappA} - Tap to copy"
             description="WebCard tooltip link"
             values={{
               azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
         }
-        description={
-          <FormattedMessage
-            defaultMessage="Tap to copy"
-            description="WebCard tooltip link description"
-          />
-        }
+        popoverStyle={{
+          width: 260,
+          borderRadius: 8,
+        }}
+        arrowSize={new Size(8, 6)}
         isVisible={tooltips['profileLink']?.visible}
         onRequestClose={onCloseToolTip}
         onPress={() => {
@@ -95,7 +95,7 @@ const Tooltips = () => {
       {tooltipCarouselPosition && (
         <Tooltip
           from={new Point(tooltipCarouselPosition.x, tooltipCarouselPosition.y)}
-          toolipWidth={157}
+          tooltipWidth={157}
           placement={Placement.LEFT}
           description={
             <FormattedMessage
@@ -114,7 +114,7 @@ Shared alone, it displays the profile without contact details."
       )}
       {tooltipBottomPosition && (
         <Tooltip
-          toolipWidth={352}
+          tooltipWidth={352}
           from={new Point(tooltipBottomPosition.x, tooltipBottomPosition.y)}
           placement={Placement.BOTTOM}
           description={
@@ -133,7 +133,7 @@ Get your QR code scanned to share both contact details and digital profile."
         />
       )}
       <Tooltip
-        from={tooltips['profileEdit']?.ref}
+        from={tooltips['profileEdit']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         offset={Platform.OS === 'ios' ? -10 : 30}
         header={
@@ -153,7 +153,7 @@ Get your QR code scanned to share both contact details and digital profile."
         onPress={onCloseToolTipEdit}
       />
       <Tooltip
-        from={tooltips['profileMulti']?.ref}
+        from={tooltips['profileMulti']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         offset={Platform.OS === 'ios' ? -10 : 30}
         header={

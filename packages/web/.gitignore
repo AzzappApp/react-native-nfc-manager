@@ -1,4 +1,4 @@
-src/persisted-query-map.json
 .vercel
-
 certificates
+# Sentry Config File
+.env.sentry-build-plugin

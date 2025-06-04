@@ -253,6 +253,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
               visible
               variant
               ...PhotoWithTextAndTitleEditionScreen_module
+                @alias(as: "photoWithTextAndTitle")
             }
           }
         }

@@ -1,21 +1,17 @@
 import { GraphQLError } from 'graphql';
-import { getUserById, updateUser } from '@azzapp/data';
+import { updateUser } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import type { MutationResolvers } from '#__generated__/types';
 
 const saveCookiePreferences: MutationResolvers['saveCookiePreferences'] =
   async (_, { input: cookiePreferences }) => {
-    const { userId } = getSessionInfos();
-    if (!userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-    const user = await getUserById(userId);
+    const user = await getSessionUser();
     if (!user) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
     try {
-      await updateUser(userId, {
+      await updateUser(user.id, {
         cookiePreferences,
       });
     } catch (e) {

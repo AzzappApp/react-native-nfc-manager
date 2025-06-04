@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { revalidatePath } from 'next/cache';
 import {
   createSubscription,
@@ -8,6 +9,7 @@ import {
   createId,
   getSubscriptionById,
   getUserSubscriptions,
+  updateUser,
 } from '@azzapp/data';
 import { endSubscription } from '@azzapp/payment';
 import type { UserSubscription } from '@azzapp/data';
@@ -69,5 +71,21 @@ export const toggleSubscriptionStatusAction = async (
           : undefined,
     });
   }
+  revalidatePath(`/users/${userId}`);
+};
+
+export const updateFreeEnrichments = async (
+  userId: string,
+  freeEnrichments: boolean,
+) => {
+  try {
+    await updateUser(userId, {
+      freeEnrichments,
+    });
+  } catch (e) {
+    Sentry.captureException(e);
+    throw e;
+  }
+
   revalidatePath(`/users/${userId}`);
 };

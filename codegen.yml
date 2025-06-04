@@ -18,7 +18,6 @@ generates:
       mappers:
         Profile: '@azzapp/data#Profile as ProfileModel'
         ModuleBackground: '@azzapp/data#ModuleBackground as ModuleBackgroundModel'
-        WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
         MediaImage: ../query/MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../query/MediaResolvers#MediaResolverBaseType as MediaVideoModel
         Post: '@azzapp/data#Post as PostModel'
@@ -55,11 +54,17 @@ generates:
         PaymentMean: '@azzapp/data#PaymentMean as PaymentMeanModel'
         Payment: '@azzapp/data#Payment as PaymentModel'
         Contact: '@azzapp/data#Contact as ContactModel'
+        EnrichedContactFields: '@azzapp/data#EnrichedContactFields as EnrichedContactFieldsModel'
+        ContactEnrichment: '@azzapp/data#ContactEnrichment as ContactEnrichmentModel'
+        PublicProfile: '@azzapp/data#PublicProfile as PublicProfileModel'
+        Position: '@azzapp/data#Position as PositionModel'
+        Education: '@azzapp/data#Education as EducationModel'
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:
         JSON: Record<string, unknown>
         ID: string
+        DateTime: Date
       contextType: '@azzapp/schema/GraphQLContext#GraphQLContext'
       makeResolverTypeCallable: true
       avoidOptionals: 

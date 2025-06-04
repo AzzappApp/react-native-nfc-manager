@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { colors } from '#theme';
 import type { ForwardedRef } from 'react';
@@ -7,34 +7,62 @@ import type {
   PressableAndroidRippleConfig,
   LayoutChangeEvent,
   View,
+  GestureResponderEvent,
 } from 'react-native';
+
+const TIMEOUT = 200;
 
 type PressableNativeProps = PressableProps & {
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;
   easing?: unknown;
-  ripple?: PressableAndroidRippleConfig;
+  android_ripple?: PressableAndroidRippleConfig;
+  onDoublePress?: () => void;
 };
 
 const PressableNative = (
-  { ripple, ...props }: PressableNativeProps,
+  { android_ripple, onDoublePress, ...props }: PressableNativeProps,
   ref: ForwardedRef<View>,
 ) => {
   const [width, setWidth] = useState(0);
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
+  const onPress = (e: GestureResponderEvent) => {
+    if (timer.current && onDoublePress) {
+      clearTimeout(timer.current);
+      timer.current = null;
+      onDoublePress();
+    } else if (onDoublePress) {
+      timer.current = setTimeout(() => {
+        timer.current = null;
+        props.onPress?.(e);
+      }, TIMEOUT);
+    } else {
+      props.onPress?.(e);
+    }
+  };
+
   const onLayout = (e: LayoutChangeEvent) => {
     setWidth(e.nativeEvent.layout.width);
   };
-  const androidRiple = ripple ?? { borderless: false, color: colors.grey400 };
-  if (!androidRiple.radius && androidRiple.borderless) {
-    androidRiple.radius = width / 2 + 2;
+  let androidRipple = android_ripple ?? {
+    borderless: false,
+    color: colors.grey400,
+  };
+  if (!androidRipple.radius && androidRipple.borderless) {
+    androidRipple = {
+      ...androidRipple,
+      radius: width / 2,
+    };
   }
   return (
     <Pressable
       ref={ref}
-      android_ripple={androidRiple}
+      android_ripple={androidRipple}
       onLayout={onLayout}
       {...props}
+      onPress={onPress}
     />
   );
 };

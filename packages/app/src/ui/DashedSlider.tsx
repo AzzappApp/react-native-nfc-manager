@@ -67,9 +67,9 @@ const DashedSlider = ({
 
   const panGesture = Gesture.Pan()
     .onBegin(() => {
-      animationOffsetValue.value = pan.value;
+      animationOffsetValue.set(pan.value);
       if (!hasBeenTouched.value) {
-        hasBeenTouched.value = true;
+        hasBeenTouched.set(true);
         if (onTouched) {
           runOnJS(onTouched)();
         }
@@ -82,14 +82,16 @@ const DashedSlider = ({
         max,
       );
 
-      pan.value = newValue;
+      pan.set(newValue);
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
-      pan.value = withTiming(clamped, {
-        duration: 50,
-        easing: Easing.out(Easing.exp),
-      });
+      pan.set(
+        withTiming(clamped, {
+          duration: 50,
+          easing: Easing.out(Easing.exp),
+        }),
+      );
     });
 
   const steps = range(min, max, step);

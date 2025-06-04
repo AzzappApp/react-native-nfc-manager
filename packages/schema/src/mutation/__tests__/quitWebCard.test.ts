@@ -2,10 +2,10 @@ import { GraphQLError } from 'graphql';
 import { markWebCardAsDeleted, removeProfile } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import quitWebCard from '../quitWebCard';
 
 // Mock dependencies
@@ -17,10 +17,6 @@ jest.mock('@azzapp/data', () => ({
 
 jest.mock('#externals', () => ({
   invalidateWebCard: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -65,7 +61,7 @@ describe('quitWebCard', () => {
   });
 
   test('should successfully quit a web card as owner (deletes web card)', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    mockUser('user-1');
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-456');
     (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue(
       mockProfileOwner,
@@ -80,14 +76,17 @@ describe('quitWebCard', () => {
     );
 
     expect(markWebCardAsDeleted).toHaveBeenCalledWith('webcard-456', 'user-1');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('user-1');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'user-1',
+      mockContext.apiEndpoint,
+    );
     expect(invalidateWebCard).toHaveBeenCalledWith('testWebCard');
 
     expect(result).toEqual({ webCardId: 'global-webcard-456' });
   });
 
   test('should successfully quit a web card as a non-owner (removes profile)', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-2' });
+    mockUser('user-2');
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-456');
     (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue(
       mockProfileUser,
@@ -102,14 +101,17 @@ describe('quitWebCard', () => {
     );
 
     expect(removeProfile).toHaveBeenCalledWith('profile-789', 'user-2');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('user-2');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'user-2',
+      mockContext.apiEndpoint,
+    );
     expect(invalidateWebCard).not.toHaveBeenCalled(); // Non-owner case doesn't invalidate the web card
 
     expect(result).toEqual({ webCardId: 'global-webcard-456' });
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       quitWebCard(
@@ -125,7 +127,7 @@ describe('quitWebCard', () => {
   });
 
   test('should throw PROFILE_DONT_EXISTS if profile is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-3' });
+    mockUser('user-3');
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-456');
     (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue(
       null,
@@ -145,7 +147,7 @@ describe('quitWebCard', () => {
   });
 
   test('should not invalidate the web card if the user is not the owner', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-3' });
+    mockUser('user-3');
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-456');
     (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue(
       mockProfileUser,

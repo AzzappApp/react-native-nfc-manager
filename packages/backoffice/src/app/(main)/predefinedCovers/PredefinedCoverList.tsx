@@ -8,7 +8,7 @@ import { type CoverPredefined } from '@azzapp/data';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
-} from '@azzapp/shared/imagesHelpers';
+} from '@azzapp/service/mediaServices/imageHelpers';
 import DataGrid from '#components/DataGrid';
 import { deletePredefinedCover } from './PredefinedCoverActions';
 import type { GridColDef } from '@mui/x-data-grid';

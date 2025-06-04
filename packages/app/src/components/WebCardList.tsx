@@ -6,6 +6,7 @@ import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -118,6 +119,7 @@ const WebCardList = ({
   );
 
   const styles = useStyleSheet(styleSheet);
+  const { bottom } = useScreenInsets();
 
   return (
     <FlatList
@@ -133,7 +135,7 @@ const WebCardList = ({
       style={style}
       getItemLayout={getItemLayout}
       ListEmptyComponent={ListEmptyComponent}
-      ListFooterComponent={<View style={styles.footer} />}
+      ListFooterComponent={<View style={{ paddingBottom: bottom }} />}
       renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
     />
   );
@@ -171,9 +173,5 @@ const styleSheet = createStyleSheet((appareance: ColorSchemeName) => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  footer: {
-    height: 10,
-    width: '100%',
   },
 }));

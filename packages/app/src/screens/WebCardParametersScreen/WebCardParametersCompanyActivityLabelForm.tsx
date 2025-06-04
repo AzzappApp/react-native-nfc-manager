@@ -45,13 +45,20 @@ const WebcardParametersCompanyActivityLabelForm = ({
     },
     mode: 'onSubmit',
     resolver: zodResolver(companyActivityLabelFormSchema),
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
   });
 
   useEffect(() => {
     if (visible) {
-      reset();
+      reset({
+        companyActivityLabel: webCard.companyActivityLabel ?? '',
+      });
     }
-  }, [reset, visible]);
+  }, [reset, visible, webCard.companyActivityLabel]);
 
   const intl = useIntl();
 
@@ -156,7 +163,7 @@ const WebcardParametersCompanyActivityLabelForm = ({
                 nativeID="companyActivityLabel"
                 accessibilityLabelledBy="companyActivityLabelLabel"
                 placeholder={intl.formatMessage({
-                  defaultMessage: 'Select a WebCard activity',
+                  defaultMessage: 'WebCard activity',
                   description:
                     'ProfileForm company ActivityLabel textinput placeholder',
                 })}

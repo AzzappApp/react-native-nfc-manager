@@ -14,11 +14,11 @@ import type { PostLikesRoute } from '#routes';
 
 const postLikesScreenQuery = graphql`
   query PostLikesScreenQuery($postId: ID!, $viewerWebCardId: ID!) {
-    post: node(id: $postId) {
-      ... on Post {
+    node(id: $postId) {
+      ... on Post @alias(as: "post") {
         counterReactions
+        ...PostLikesList_post @arguments(viewerWebCardId: $viewerWebCardId)
       }
-      ...PostLikesList_post @arguments(viewerWebCardId: $viewerWebCardId)
     }
   }
 `;
@@ -30,7 +30,8 @@ const PostLikesScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const { post } = usePreloadedQuery(postLikesScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(postLikesScreenQuery, preloadedQuery);
+  const post = node?.post;
 
   return (
     <Container

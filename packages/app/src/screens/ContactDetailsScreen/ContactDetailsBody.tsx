@@ -1,404 +1,1098 @@
-import { type Contact } from 'expo-contacts';
+import MaskedView from '@react-native-masked-view/masked-view';
 import { Image } from 'expo-image';
-import { useMemo } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import cloneDeep from 'lodash/cloneDeep';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, Platform, View } from 'react-native';
+import { Alert, useColorScheme, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { colors, shadow } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
-import ShareContact from '#helpers/ShareContact';
-import useScreenInsets from '#hooks/useScreenInsets';
-import Button from '#ui/Button';
-import Container from '#ui/Container';
-import Icon, { SocialIcon } from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { Icons } from '#ui/Icon';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
-type Props = {
-  details: ContactDetails;
+import { PopoverMode } from 'react-native-popover-view';
+import { Placement } from 'react-native-popover-view/dist/Types';
+import Toast from 'react-native-toast-message';
+import { graphql, useFragment, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
+import { ENABLE_DATA_ENRICHMENT } from '#Config';
+import { colors } from '#theme';
+import { useRouter } from '#components/NativeRouter';
+import { useShareContact } from '#helpers/contactHelpers';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
+import {
+  useTooltipContext,
+  useTooltipDataContext,
+} from '#helpers/TooltipContext';
+import useBoolean from '#hooks/useBoolean';
+import useRemoveContact from '#hooks/useRemoveContact';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
+import Container from '#ui/Container';
+import Icon from '#ui/Icon';
+import IconButton from '#ui/IconButton';
+import RoundedMenuComponent from '#ui/RoundedMenuComponent';
+import Text from '#ui/Text';
+import Tooltip from '#ui/Tooltip';
+import ContactDetailActionModal from './ContactDetailActionModal';
+import { ContactDetailAvatar } from './ContactDetailAvatar';
+import { ContactDetailEnrichOverlay } from './ContactDetailEnrichOverlay';
+import { ContactDetailFragmentAI } from './ContactDetailFragmentAI';
+import { ContactDetailFragmentContact } from './ContactDetailFragmentContact';
+import type { ContactDetailAvatar_webCard$key } from '#relayArtifacts/ContactDetailAvatar_webCard.graphql';
+import type {
+  ContactDetailsBody_contact$data,
+  ContactDetailsBody_contact$key,
+} from '#relayArtifacts/ContactDetailsBody_contact.graphql';
+import type { ContactDetailsBody_user$key } from '#relayArtifacts/ContactDetailsBody_user.graphql';
+
+import type { ContactDetailsRoute } from '#routes';
+import type { Component, RefObject } from 'react';
+
+export type ContactDetailEnrichState =
+  | 'idle'
+  | 'loading'
+  | 'maxEnrichmentReached'
+  | 'tooltipVisible'
+  | 'waitingApproval';
+
+const BLUR_GAP = 20;
+
+type ContactDetailsBodyProps = {
+  webCard: ContactDetailAvatar_webCard$key | null;
+  contactKey: ContactDetailsBody_contact$key | null;
+  currentUser: ContactDetailsBody_user$key | null;
   onClose: () => void;
   onSave: () => void;
+  refreshQuery?: () => void;
+  hasFocus?: boolean;
 };
 
-const ContactDetailItem = ({
-  onPress,
-  icon,
-  label,
-  content,
-  iconComponent,
-}: {
-  onPress?: () => void;
-  icon?: Icons;
-  label?: string;
-  content?: string;
-  iconComponent?: JSX.Element;
-}) => {
-  const styles = useStyleSheet(stylesheet);
+const AI_TOOLTIP = 'AI_TOOLTIP';
 
-  return (
-    <View style={styles.item}>
-      <PressableNative onPress={onPress} style={styles.pressable}>
-        <View style={styles.label}>
-          {iconComponent ? (
-            iconComponent
-          ) : icon ? (
-            <Icon icon={icon} />
-          ) : undefined}
-          <Text variant="smallbold">{label}</Text>
-        </View>
-        <Text numberOfLines={1} style={styles.itemText}>
-          {content}
-        </Text>
-      </PressableNative>
-    </View>
-  );
+export type HiddenFields = {
+  contact: {
+    firstName: boolean;
+    lastName: boolean;
+    company: boolean;
+    title: boolean;
+    birthday: boolean;
+    avatarId: boolean;
+    logoId: boolean;
+    phoneNumbers: boolean[];
+    emails: boolean[];
+    addresses: boolean[];
+    socials: boolean[];
+    urls: boolean[];
+  };
+  profile: boolean;
 };
 
-const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
-  const { bottom } = useScreenInsets();
+const ContactDetailsBody = ({
+  contactKey,
+  webCard: webCardKey,
+  onSave,
+  onClose,
+  refreshQuery,
+  hasFocus,
+  currentUser,
+}: ContactDetailsBodyProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
   const router = useRouter();
+  const onShare = useShareContact();
 
-  const date = useMemo(() => {
-    if (!details) {
-      return '';
+  const data = useFragment(
+    graphql`
+      fragment ContactDetailsBody_contact on Contact
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+      ) {
+        id
+        ...ContactDetailFragmentContact_contact
+        ...ContactDetailAvatar_contact
+        ...ContactDetailActionModal_contact
+        ...contactHelpersShareContactData_contact
+        enrichmentStatus
+        firstName
+        lastName
+        company
+        title
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+        }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+        }
+        enrichment {
+          id
+          approved
+          fields {
+            title
+            company
+            addresses {
+              address
+              label
+            }
+            avatar {
+              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+              id
+            }
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            socials {
+              label
+              url
+            }
+            urls {
+              url
+            }
+          }
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
+        }
+        contactProfile {
+          id
+          webCard {
+            id
+            cardIsPublished
+            userName
+            hasCover
+            coverMedia {
+              id
+              ... on MediaVideo {
+                webCardPreview: thumbnail(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+              ... on MediaImage {
+                webCardPreview: uri(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                )
+              }
+            }
+          }
+        }
+      }
+    `,
+    contactKey,
+  );
+
+  const userData = useFragment(
+    graphql`
+      fragment ContactDetailsBody_user on User {
+        ...ContactDetailEnrichOverlay_user
+      }
+    `,
+    currentUser,
+  );
+
+  const [isMoreVisible, showMore, hideMore] = useBoolean(false);
+  const enrichStatusToOverlayState = useCallback(
+    (data: ContactDetailsBody_contact$data) => {
+      return data?.enrichmentStatus === 'pending' ||
+        data?.enrichmentStatus === 'running'
+        ? 'loading'
+        : ((data?.enrichmentStatus === 'completed' ||
+              data?.enrichmentStatus === 'failed') &&
+              data?.enrichment?.approved !== null) ||
+            data?.enrichmentStatus === 'canceled'
+          ? 'idle'
+          : data?.enrichment?.approved === null
+            ? 'waitingApproval'
+            : 'idle';
+    },
+    [],
+  );
+
+  const initOverlayState = useCallback((): ContactDetailEnrichState => {
+    if (router.getCurrentRoute()?.route === 'CONTACT_DETAILS') {
+      const initialOverlayRoute = (
+        router.getCurrentRoute() as ContactDetailsRoute
+      ).params.overlay;
+      if (initialOverlayRoute) {
+        return initialOverlayRoute;
+      }
+    }
+    if (!data) return 'idle';
+    return enrichStatusToOverlayState(data);
+  }, [data, enrichStatusToOverlayState, router]);
+
+  const [overlayState, setOverlayState] = useState<ContactDetailEnrichState>(
+    () => initOverlayState(),
+  );
+
+  const getDefaultContactEnrichmentHiddenFields = useCallback(() => {
+    return {
+      contact: {
+        firstName: false,
+        lastName: false,
+        company: false,
+        title: false,
+        birthday: false,
+        avatarId: false,
+        phoneNumbers:
+          data?.enrichment?.fields?.phoneNumbers?.map(() => false) || [],
+        emails: data?.enrichment?.fields?.emails?.map(() => false) || [],
+        addresses: data?.enrichment?.fields?.addresses?.map(() => false) || [],
+        socials: data?.enrichment?.fields?.socials?.map(() => false) || [],
+        urls: data?.enrichment?.fields?.urls?.map(() => false) || [],
+        logoId: false,
+      },
+      profile: false,
+    };
+  }, [
+    data?.enrichment?.fields?.addresses,
+    data?.enrichment?.fields?.emails,
+    data?.enrichment?.fields?.phoneNumbers,
+    data?.enrichment?.fields?.socials,
+    data?.enrichment?.fields?.urls,
+  ]);
+
+  const [hiddenFields, setHiddenFields] = useState<HiddenFields>(
+    getDefaultContactEnrichmentHiddenFields,
+  );
+
+  useEffect(() => {
+    // the goal here is to refresh precomputed map when data?.enrichment changes
+    setHiddenFields(getDefaultContactEnrichmentHiddenFields());
+  }, [getDefaultContactEnrichmentHiddenFields, data?.enrichment]);
+
+  const [commit] = useMutation(graphql`
+    mutation ContactDetailsBodyMutation($contactId: ID!) {
+      enrichContact(contactId: $contactId) {
+        contact {
+          id
+          enrichmentStatus
+          enrichment {
+            approved
+          }
+        }
+      }
+    }
+  `);
+
+  const [commitStopEnrich] = useMutation(graphql`
+    mutation ContactDetailsBodyStopEnrichMutation($contactId: ID!) {
+      cancelEnrichContact(contactId: $contactId) {
+        contact {
+          id
+          enrichmentStatus
+        }
+      }
+    }
+  `);
+
+  const [commitApproval] = useMutation(graphql`
+    mutation ContactDetailsBodyEnrichmentMutation(
+      $contactEnrichmentId: ID!
+      $approved: Boolean!
+      $input: HiddenFieldInput
+      $pixelRatio: Float!
+    ) {
+      approveContactEnrichment(
+        contactEnrichmentId: $contactEnrichmentId
+        approved: $approved
+        input: $input
+      ) {
+        contactEnrichment {
+          id
+          approved
+          fields {
+            addresses {
+              address
+              label
+            }
+            avatar {
+              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+              id
+            }
+            birthday
+            company
+            title
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            socials {
+              label
+              url
+            }
+            urls {
+              url
+            }
+          }
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
+        }
+      }
+    }
+  `);
+
+  const [commitHiddenFields] = useMutation(graphql`
+    mutation ContactDetailsBodyHiddenFieldsMutation(
+      $contactEnrichmentId: ID!
+      $hiddenFields: HiddenFieldInput!
+    ) {
+      updateContactEnrichmentHiddenFields(
+        contactEnrichmentId: $contactEnrichmentId
+        input: $hiddenFields
+      ) {
+        contactEnrichment {
+          id
+          publicProfile {
+            ...ContactDetailFragmentAI_contact
+          }
+        }
+      }
+    }
+  `);
+
+  const onStopEnrich = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Stop enrichment?',
+        description: 'ContactDetails - Stop enrichment alert title',
+      }),
+      intl.formatMessage({
+        defaultMessage: 'To enrich again, you’ll need to make a new request.',
+        description: 'ContactDetails - Stop enrichment alert message',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'ContactDetails - Stop enrichment alert cancel',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Stop',
+            description:
+              'ContactDetails - Stop enrichment alert confirm stop enrichment',
+          }),
+          onPress: () => {
+            if (overlayState === 'loading') {
+              // ensure enrichment is still ongoing before trying to stop it
+              commitStopEnrich({
+                variables: {
+                  contactId: data?.id,
+                },
+              });
+            }
+          },
+        },
+      ],
+    );
+  }, [commitStopEnrich, data?.id, intl, overlayState]);
+
+  const onEnrich = useCallback(async () => {
+    hideMore();
+    commit({
+      variables: {
+        contactId: data?.id,
+      },
+      onCompleted: () => {
+        setOverlayState('loading');
+      },
+      updater: store => {
+        const currentUser = store.getRoot().getLinkedRecord('currentUser');
+        const nbEnrichments = currentUser?.getLinkedRecord('nbEnrichments');
+        if (nbEnrichments) {
+          const newNbEnrichments = nbEnrichments.getValue('total');
+          if (newNbEnrichments && typeof newNbEnrichments === 'number') {
+            nbEnrichments.setValue(newNbEnrichments + 1, 'total');
+          } else {
+            nbEnrichments.setValue(1, 'total');
+          }
+        }
+      },
+      onError: error => {
+        if (error.message === ERRORS.MAX_ENRICHMENTS_REACHED) {
+          setOverlayState('maxEnrichmentReached');
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Enrichment failure',
+              description:
+                'ContactDetailsScreen - Error message when enrichment start failed',
+            }),
+          });
+          setOverlayState('idle');
+        }
+      },
+    });
+  }, [commit, data?.id, hideMore, intl]);
+
+  const appearance = useColorScheme();
+
+  const { width: screenWidth } = useScreenDimensions();
+  const { top, bottom } = useScreenInsets();
+
+  const backgroundWidth = screenWidth + BLUR_GAP * 2;
+  const backgroundImageUrl = useMemo(() => {
+    if (data?.logo) {
+      if (data?.logo?.id) {
+        const localFile = getLocalCachedMediaFile(data?.logo.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      return data.logo.uri;
     }
 
-    const lowercase = new Date(details.createdAt).toLocaleDateString(
-      undefined,
-      {
-        dateStyle: 'long',
+    if (!hiddenFields.contact.avatarId && data?.enrichment?.fields?.avatar) {
+      if (data?.enrichment?.fields?.avatar.id) {
+        const localFile = getLocalCachedMediaFile(
+          data?.enrichment?.fields?.avatar.id,
+          'image',
+        );
+        if (localFile) {
+          return localFile;
+        }
+      }
+      return data?.enrichment?.fields?.avatar.uri;
+    }
+
+    if (data?.avatar) {
+      if (data?.avatar?.id) {
+        const localFile = getLocalCachedMediaFile(data.avatar.id, 'image');
+        if (localFile) {
+          return localFile;
+        }
+      }
+      if (data?.avatar?.uri) {
+        return data.avatar.uri;
+      }
+    }
+    const webCardPreview =
+      data?.contactProfile?.webCard &&
+      data?.contactProfile?.webCard?.coverMedia?.webCardPreview
+        ? {
+            id: data?.contactProfile?.webCard?.coverMedia?.id,
+            uri: data?.contactProfile?.webCard?.coverMedia?.webCardPreview,
+          }
+        : {};
+    if (webCardPreview?.id) {
+      const localFile = getLocalCachedMediaFile(webCardPreview.id, 'image');
+      if (localFile) {
+        return localFile;
+      }
+    }
+    return webCardPreview?.uri ?? undefined;
+  }, [
+    hiddenFields.contact.avatarId,
+    data?.enrichment?.fields?.avatar,
+    data?.logo,
+    data?.avatar,
+    data?.contactProfile?.webCard,
+  ]);
+
+  const removeContact = useRemoveContact({
+    onCompleted: () => {
+      hideMore();
+      router.back();
+    },
+    onError: () => {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Contact removal failure',
+          description:
+            'ContactDetailsScreen - Error message when remove contact failed',
+        }),
+      });
+    },
+  });
+
+  const onRemoveContacts = useCallback(() => {
+    if (!data?.id) {
+      return;
+    }
+    removeContact([data?.id]);
+  }, [data?.id, removeContact]);
+
+  const onEditContact = useCallback(() => {
+    hideMore();
+    if (data?.id) {
+      router.push({
+        route: 'CONTACT_EDIT',
+        params: {
+          contactId: data.id,
+        },
+      });
+    }
+  }, [data?.id, hideMore, router]);
+
+  const [subView, setSubView] = useState<'AI' | 'contact'>('contact');
+
+  useEffect(() => {
+    if (data && overlayState !== 'tooltipVisible') {
+      setOverlayState(enrichStatusToOverlayState(data));
+    }
+
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, enrichStatusToOverlayState]);
+
+  useEffect(() => {
+    if (hasFocus && overlayState === 'loading') {
+      const itv = setInterval(() => {
+        refreshQuery?.();
+      }, 10000);
+      return () => {
+        clearInterval(itv);
+      };
+    }
+  }, [refreshQuery, hasFocus, overlayState]);
+
+  const onValidateEnrichment = useCallback(() => {
+    commitApproval({
+      variables: {
+        contactEnrichmentId: data?.enrichment?.id,
+        approved: true,
+        input: hiddenFields,
+        pixelRatio: CappedPixelRatio(),
       },
-    );
+      onCompleted: () => {
+        setOverlayState('idle');
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Enrichment validation failure',
+            description:
+              'ContactDetailsScreen - Error message when enrichment validation failed',
+          }),
+        });
+      },
+    });
+  }, [commitApproval, data?.enrichment?.id, hiddenFields, intl]);
 
-    return lowercase
-      .split(' ')
-      .map(section => section[0].toUpperCase() + section.substring(1))
-      .join(' ');
-  }, [details]);
+  const onRefuseEnrichment = useCallback(() => {
+    commitApproval({
+      variables: {
+        contactEnrichmentId: data?.enrichment?.id,
+        approved: false,
+        pixelRatio: CappedPixelRatio(),
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Enrichment failure',
+            description:
+              'ContactDetailsScreen - Error message when enrichment failed',
+          }),
+        });
+      },
+    });
+  }, [commitApproval, data?.enrichment?.id, intl]);
 
-  const avatar = details?.image?.uri;
+  const onRemoveField = useCallback((field: string, index?: number) => {
+    setHiddenFields(prev => {
+      if (!field || !(field in prev.contact)) {
+        return prev;
+      }
+      const newField = cloneDeep(prev);
+      const fieldValue = field as keyof (typeof newField)['contact'];
 
-  const birthday = details.dates?.find(date => date.label === 'birthday');
+      if (index === undefined) {
+        if (
+          fieldValue === 'avatarId' ||
+          fieldValue === 'birthday' ||
+          fieldValue === 'company' ||
+          fieldValue === 'firstName' ||
+          fieldValue === 'lastName' ||
+          fieldValue === 'title'
+        ) {
+          newField.contact[fieldValue] = true;
+        }
+      } else if (Array.isArray(newField.contact[fieldValue])) {
+        if (
+          (fieldValue === 'phoneNumbers' ||
+            fieldValue === 'emails' ||
+            fieldValue === 'addresses' ||
+            fieldValue === 'socials' ||
+            fieldValue === 'urls') &&
+          Array.isArray(prev.contact[fieldValue]) &&
+          newField.contact[fieldValue].length > index
+        ) {
+          newField.contact[fieldValue][index] = true;
+        }
+      } else {
+        console.error('setting incorrect field', fieldValue);
+      }
+      return newField;
+    });
+  }, []);
 
-  const onShare = async () => ShareContact(details);
+  const onRemoveProfile = useCallback(() => {
+    if (data?.enrichment?.approved) {
+      setSubView('contact');
+      commitHiddenFields({
+        variables: {
+          contactEnrichmentId: data?.enrichment?.id,
+          hiddenFields: {
+            profile: true,
+          },
+        },
+        optimisticUpdater: store => {
+          const contact = store.get(data?.id);
+          if (contact) {
+            const enrichment = contact.getLinkedRecord('enrichment');
+            if (enrichment) {
+              enrichment.setValue(null, 'publicProfile');
+            }
+          }
+        },
+        updater: store => {
+          const contact = store.get(data?.id);
+          if (contact) {
+            const enrichment = contact.getLinkedRecord('enrichment');
+            if (enrichment) {
+              enrichment.setValue(null, 'publicProfile');
+            }
+          }
+        },
+      });
+    } else {
+      setHiddenFields(prev => {
+        const newField = cloneDeep(prev);
+        newField.profile = true;
+        return newField;
+      });
+    }
+  }, [
+    commitHiddenFields,
+    data?.enrichment?.approved,
+    data?.enrichment?.id,
+    data?.id,
+  ]);
+
+  const { openTooltips, closeTooltips, registerTooltip, unregisterTooltip } =
+    useTooltipContext();
+  const aiButtonRef = useRef<View>(null);
+  const { tooltips } = useTooltipDataContext();
+
+  useEffect(() => {
+    registerTooltip(AI_TOOLTIP, {
+      ref: aiButtonRef,
+    });
+    return () => {
+      unregisterTooltip(AI_TOOLTIP);
+    };
+  }, [registerTooltip, unregisterTooltip]);
+
+  const onCloseToolTipEnrich = useCallback(() => {
+    closeTooltips([AI_TOOLTIP]);
+  }, [closeTooltips]);
+  useEffect(() => {
+    if (
+      data?.enrichment?.approved === null &&
+      data?.enrichmentStatus === 'completed'
+    ) {
+      openTooltips([AI_TOOLTIP]);
+    }
+  }, [data?.enrichment?.approved, data?.enrichmentStatus, openTooltips]);
 
   return (
     <Container style={styles.container}>
-      <PressableNative style={styles.close} onPress={onClose}>
-        <Icon icon="close" size={24} />
-      </PressableNative>
-      <PressableNative style={styles.share} onPress={onShare}>
-        <Icon icon="share" size={24} style={styles.shareIcon} />
-      </PressableNative>
-      <View style={styles.content}>
-        <View style={styles.avatarContainer}>
-          <View style={[styles.avatar, styles.avatarWrapper]}>
-            {avatar ? (
-              <Image source={avatar} style={styles.avatar} />
-            ) : details.webCard ? (
-              <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
-            ) : (
-              <Text style={styles.initials}>
-                {details.firstName?.substring(0, 1)}
-                {details.lastName?.substring(0, 1)}
-                {!details.firstName &&
-                  !details.lastName &&
-                  details.company?.substring(0, 1)}
-              </Text>
-            )}
-          </View>
-        </View>
-        <Text variant="large" style={styles.name}>
-          {details.firstName} {details.lastName}
-        </Text>
-        {details.company && (
-          <Text style={styles.company}>{details.company}</Text>
-        )}
-        {details.jobTitle && <Text style={styles.job}>{details.jobTitle}</Text>}
-        <View style={styles.saveContainer}>
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: "Save to my phone's contacts",
-              description: 'ContactDetailsModal - Button to save contact',
-            })}
-            style={styles.save}
-            onPress={onSave}
+      {ENABLE_DATA_ENRICHMENT && (
+        <ContactDetailEnrichOverlay
+          onEnrich={onEnrich}
+          onStopEnrich={onStopEnrich}
+          state={overlayState}
+          onValidateEnrichment={onValidateEnrichment}
+          onRefuseEnrichment={onRefuseEnrichment}
+          currentUserKey={userData || null}
+          setOverlayState={setOverlayState}
+        />
+      )}
+      {backgroundImageUrl ? (
+        <View
+          style={[styles.avatarBackgroundContainer, { width: backgroundWidth }]}
+        >
+          <Image
+            source={backgroundImageUrl}
+            style={styles.flex}
+            blurRadius={8.2}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={[
+              appearance === 'dark' ? 'transparent' : 'rgba(255, 255, 255, 0)',
+              appearance === 'dark' ? colors.black : colors.white,
+            ]}
+            start={{ x: 0, y: 0.1 }}
+            end={{ x: 0, y: 1 }}
+            style={[
+              styles.avatarBackgroundGradient,
+              { width: backgroundWidth },
+            ]}
           />
         </View>
+      ) : undefined}
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            {
-              paddingBottom: bottom + HEADER,
-            },
-            styles.scroll,
-          ]}
-        >
-          {details.phoneNumbers?.map((phoneNumber, index) => (
-            <ContactDetailItem
-              key={'phone' + index + '' + phoneNumber.number}
-              onPress={() => {
-                Linking.openURL(`tel:${phoneNumber.number}`);
-              }}
-              icon="mobile"
-              label={phoneNumber.label}
-              content={phoneNumber.number}
-            />
-          ))}
-          {details.emails?.map((email, index) => (
-            <ContactDetailItem
-              key={'email' + index + '' + email.email}
-              onPress={() => {
-                Linking.openURL(`mailto:${email.email}`);
-              }}
-              icon="mail_line"
-              label={email.label}
-              content={email.email}
-            />
-          ))}
-          {birthday && (
-            <ContactDetailItem
-              key="birthday"
-              onPress={async () => {
-                openCalendar(
-                  `${birthday.year}-${birthday.month + 1}-${birthday.day}`,
-                );
-              }}
-              icon="calendar"
-              label={intl.formatMessage({
-                defaultMessage: 'Birthday',
-                description: 'ContactDetailsBody - Title for birthday',
-              })}
-              content={new Date(
-                birthday.year ?? 0,
-                birthday.month,
-                birthday.day,
-              ).toLocaleDateString(undefined, {
-                year: birthday.year ? 'numeric' : undefined,
-                month: 'long',
-                day: 'numeric',
-              })}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scroll,
+          {
+            paddingTop: top,
+            paddingBottom:
+              bottom + 100 + (overlayState === 'waitingApproval' ? 145 : 0),
+          },
+        ]}
+      >
+        <View style={styles.content}>
+          <IconButton
+            icon="close"
+            size={24}
+            disabled={
+              data?.enrichmentStatus === 'running' ||
+              data?.enrichmentStatus === 'pending'
+            }
+            variant="icon"
+            style={styles.close}
+            onPress={onClose}
+          />
+          <IconButton
+            icon="share"
+            size={24}
+            disabled={
+              overlayState === 'loading' || overlayState === 'waitingApproval'
+            }
+            variant="icon"
+            style={styles.share}
+            onPress={() => onShare(data)}
+          />
+          <ContactDetailAvatar
+            state={overlayState}
+            isHiddenField={hiddenFields.contact.avatarId}
+            onRemoveField={() => onRemoveField('avatarId')}
+            webCard={webCardKey}
+            contactKey={data}
+          />
+          <Text variant="large" style={styles.name}>
+            {`${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim()}
+          </Text>
+          <DisposableText
+            text={data?.company}
+            enrichedText={
+              hiddenFields.contact.company
+                ? undefined
+                : data?.enrichment?.fields?.company
+            }
+            onRemove={() => onRemoveField('company')}
+            state={overlayState}
+          />
+          <DisposableText
+            text={data?.title}
+            enrichedText={
+              hiddenFields.contact.title
+                ? undefined
+                : data?.enrichment?.fields?.title
+            }
+            onRemove={() => onRemoveField('title')}
+            state={overlayState}
+          />
+
+          <Tooltip
+            mode={PopoverMode.RN_MODAL}
+            tooltipWidth={192}
+            from={tooltips[AI_TOOLTIP]?.ref as RefObject<Component>}
+            placement={Placement.TOP}
+            isVisible={tooltips[AI_TOOLTIP]?.visible}
+            onRequestClose={onCloseToolTipEnrich}
+            onPress={onCloseToolTipEnrich}
+            header={intl.formatMessage({
+              defaultMessage: 'Check the profile',
+              description:
+                'ContactDetailsModal - Tooltip header for AI profile',
+            })}
+            description={intl.formatMessage({
+              defaultMessage:
+                'azzapp AI not only enrichies contact information, it also generate a profile',
+              description:
+                'ContactDetailsModal - Tooltip content for AI profile',
+            })}
+          />
+          {ENABLE_DATA_ENRICHMENT && (
+            <View style={styles.saveContainer}>
+              <MenuItem
+                onSelect={() => setSubView('contact')}
+                label={intl.formatMessage({
+                  defaultMessage: 'Contact',
+                  description:
+                    'ContactDetailsModal - Button to switch to contact view',
+                })}
+                selected={subView === 'contact'}
+                overlayState={overlayState}
+              />
+              <MenuItem
+                containerRef={aiButtonRef}
+                onSelect={() => {
+                  closeTooltips([AI_TOOLTIP]);
+                  setSubView('AI');
+                }}
+                label={intl.formatMessage({
+                  defaultMessage: 'Profile',
+                  description:
+                    'ContactDetailsModal - Button to switch to AI profile view',
+                })}
+                selected={subView === 'AI'}
+                overlayState={overlayState}
+              />
+            </View>
+          )}
+
+          {subView === 'contact' && (
+            <ContactDetailFragmentContact
+              showMore={showMore}
+              hiddenFields={hiddenFields}
+              onSave={onSave}
+              state={overlayState}
+              onRemoveField={onRemoveField}
+              contact={data}
             />
           )}
-          {details.urlAddresses?.map((urlAddress, index) => (
-            <ContactDetailItem
-              key={'url' + index + '' + urlAddress.url}
-              onPress={async () => {
-                if (urlAddress.url) {
-                  const route = await matchUrlWithRoute(urlAddress.url);
-                  if (route) {
-                    // will close the contact detail modal
-                    onClose();
-                    // move to route deeplink
-                    router?.push(route);
-                    return;
-                  }
-                  Linking.openURL(
-                    urlAddress.url.startsWith('http')
-                      ? urlAddress.url
-                      : `https://${urlAddress.url}`,
-                  );
-                }
-              }}
-              icon="link"
-              label={
-                urlAddress.label ||
-                intl.formatMessage({
-                  defaultMessage: 'Url',
-                  description:
-                    'ContactDetailsBody - Title for item URL with empty label',
-                })
+          {subView === 'AI' && (
+            <ContactDetailFragmentAI
+              contact={
+                hiddenFields.profile ? null : data?.enrichment?.publicProfile
               }
-              content={urlAddress.url}
+              onRemoveProfile={onRemoveProfile}
+              approved={data?.enrichment?.approved}
             />
-          ))}
-          {details.addresses?.map((address, index) => (
-            <ContactDetailItem
-              key={'street' + index + '' + address.street}
-              onPress={async () => {
-                const url = Platform.select({
-                  ios: `maps:0,0?q=${address.street}`,
-                  android: `geo:0,0?q=${address.street}`,
-                });
-
-                if (url) {
-                  Linking.openURL(url);
-                } else {
-                  console.warn(`${address.street} is not an adress`);
-                }
-              }}
-              icon="location"
-              label={address.label}
-              content={address.street}
-            />
-          ))}
-          {details.socialProfiles?.map((social, index) => (
-            <ContactDetailItem
-              key={'social' + index + '' + social.url}
-              onPress={() => {
-                if (social.url) {
-                  Linking.openURL(getSocialUrl(social.url));
-                }
-              }}
-              iconComponent={
-                <SocialIcon
-                  icon={social.label as SocialLinkId}
-                  style={styles.social}
-                />
-              }
-              label={social.label}
-              content={social.url}
-            />
-          ))}
-          <ContactDetailItem
-            key="scanDate"
-            icon="calendar"
-            label={intl.formatMessage({
-              defaultMessage: 'Date of Contact',
-              description: 'ContactDetailsModal - Label for date item',
-            })}
-            content={date}
-          />
-        </ScrollView>
-      </View>
+          )}
+        </View>
+      </ScrollView>
+      {data ? (
+        <ContactDetailActionModal
+          visible={isMoreVisible}
+          close={hideMore}
+          onRemoveContacts={onRemoveContacts}
+          onSaveContact={onSave}
+          contact={data}
+          onEdit={onEditContact}
+          onEnrich={onEnrich}
+        />
+      ) : undefined}
     </Container>
   );
 };
 
-const openCalendar = (date: string) => {
-  const birthDate = new Date(date).setFullYear(new Date().getFullYear());
-  if (Platform.OS === 'ios') {
-    const from = new Date('2001-01-01').getTime() / 1000;
-    const seconds = Math.floor(birthDate / 1000) - from;
-    Linking.openURL('calshow:' + seconds);
-  } else if (Platform.OS === 'android') {
-    Linking.openURL('content://com.android.calendar/time/' + birthDate);
-  }
+const MenuItem = ({
+  onSelect,
+  label,
+  selected,
+  overlayState,
+  containerRef,
+}: {
+  onSelect: () => void;
+  label: string;
+  selected: boolean;
+  overlayState: ContactDetailEnrichState;
+  containerRef?: React.RefObject<View | null>;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  return (
+    <RoundedMenuComponent
+      containerRef={containerRef}
+      selected={selected}
+      label={label}
+      id="contact"
+      onSelect={onSelect}
+      style={styles.roundButton}
+      textStyle={styles.roundButtonTextStyle}
+      selectedTextStyle={styles.roundButtonSelectedTextStyle}
+      selectedStyle={styles.roundButtonSelectedStyle}
+      rightElement={
+        overlayState === 'waitingApproval' ? (
+          <Icon
+            icon="filters_ai_light"
+            size={24}
+            style={styles.menuAiIndicator}
+          />
+        ) : undefined
+      }
+    />
+  );
 };
 
-const getSocialUrl = (url: string) =>
-  url.startsWith('http') ? url : `https://${url}`;
+const DisposableText = ({
+  text,
+  enrichedText,
+  onRemove,
+  state,
+}: {
+  text?: string | null;
+  enrichedText?: string | null;
+  onRemove: () => void;
+  state: ContactDetailEnrichState;
+}) => {
+  const styles = useStyleSheet(stylesheet);
 
-const AVATAR_WIDTH = 112;
+  if (!text && !enrichedText) return null;
+
+  if (state === 'waitingApproval' && enrichedText) {
+    return (
+      <View style={styles.textContainer}>
+        <Text style={styles.invisible}>{enrichedText}</Text>
+        <MaskedView
+          style={styles.textMaskStyle}
+          maskElement={<Text style={styles.flex}>{enrichedText}</Text>}
+        >
+          <LinearGradient
+            // Button Linear Gradient
+            colors={['#B02EFB', '#0B4693', '#0B4693', '#23CFCC']}
+            locations={[0, 0.05, 0.9, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.87, y: 0.87 }}
+            style={styles.flex}
+          />
+        </MaskedView>
+        <IconButton
+          size={14}
+          iconSize={12}
+          icon="close"
+          onPress={onRemove}
+          style={styles.textIconStyle}
+        />
+      </View>
+    );
+  }
+  return <Text style={styles.company}>{enrichedText || text}</Text>;
+};
 
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     position: 'relative',
-    backgroundColor: appearance === 'dark' ? colors.grey1000 : 'white',
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    overflow: 'visible',
   },
   close: {
     position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 10,
+    left: 30,
+    width: 44,
+    height: 44,
+    borderRadius: 38,
+    justifyContent: 'center',
+    backgroundColor: appearance === 'dark' ? '#0000003F' : '#FFFFFF3F',
+    opacity: 0.75,
   },
   share: {
     position: 'absolute',
-    top: 20,
-    right: 20,
+    top: 10,
+    right: 30,
+    width: 44,
+    height: 44,
+    borderRadius: 38,
+    justifyContent: 'center',
+    backgroundColor: appearance === 'dark' ? '#0000003F' : '#FFFFFF3F',
   },
-  shareIcon: { transform: [{ rotateZ: '30deg' }] },
   name: {
     marginTop: 20,
-  },
-  pressable: {
-    width: '100%',
-    height: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
   },
   content: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 20,
+    overflow: 'visible',
+    paddingHorizontal: 20,
   },
   company: {
     marginTop: 5,
+    textAlign: 'center',
   },
   job: {
     marginTop: 5,
     color: colors.grey400,
   },
   saveContainer: {
-    paddingHorizontal: 20,
-    width: '100%',
-    marginBottom: 10,
-  },
-  save: {
-    marginTop: 20,
-    width: '100%',
-  },
-  item: {
-    width: '100%',
-    height: 52,
-    ...shadow({ appearance, direction: 'center' }),
-    marginTop: 20,
-    padding: 14,
-    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
-    borderRadius: 12,
-  },
-  itemText: {
-    flex: 1,
-    textAlign: 'right',
-  },
-  label: {
     flexDirection: 'row',
-    alignItems: 'center',
+    width: '100%',
+    paddingBottom: 10,
+    marginTop: 20,
     gap: 5,
   },
-  avatarContainer: Platform.OS === 'ios' && {
-    borderRadius: AVATAR_WIDTH / 2,
-    ...shadow({ appearance, direction: 'bottom' }),
+  avatarBackgroundContainer: {
+    top: -BLUR_GAP,
+    left: -BLUR_GAP,
+    position: 'absolute',
+    height: 387,
   },
-  avatarWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    ...shadow({ appearance, direction: 'bottom' }),
-    backgroundColor: 'white',
+  flex: {
+    flex: 1,
   },
-  avatar: {
-    width: AVATAR_WIDTH,
-    height: AVATAR_WIDTH,
-    borderRadius: AVATAR_WIDTH / 2,
-    borderWidth: 4,
-    borderColor: appearance === 'dark' ? colors.black : colors.white,
-    overflow: 'visible',
-    backgroundColor: colors.grey50,
+  avatarBackgroundGradient: {
+    position: 'absolute',
+    height: 387,
   },
   scroll: {
-    paddingHorizontal: 20,
+    overflow: 'visible',
   },
-  initials: {
-    color: colors.grey300,
-    fontSize: 50,
-    fontWeight: 500,
-    lineHeight: 60,
-    textTransform: 'uppercase',
+  menuAiIndicator: {
+    position: 'absolute',
+    right: 10,
+    tintColor: undefined,
   },
-  social: {
-    width: 24,
-    height: 24,
+  textIconStyle: {
+    position: 'absolute',
+    right: -19,
+    top: 2,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
+  roundButton: {
+    flex: 1,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    borderWidth: 1,
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
+  },
+  roundButtonTextStyle: {
+    color: appearance === 'dark' ? colors.white : colors.black,
+  },
+  roundButtonSelectedTextStyle: {
+    color: appearance === 'dark' ? colors.black : colors.white,
+  },
+  roundButtonSelectedStyle: {
+    backgroundColor: appearance === 'dark' ? colors.white : colors.black,
+  },
+  invisible: { opacity: 0 },
+  textMaskStyle: {
+    flexDirection: 'row',
+    gap: 5,
+    position: 'absolute',
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: { flexDirection: 'row', gap: 5, marginTop: 5 },
 }));
-
-const HEADER = 300;
-
-export type ContactDetails = Contact & {
-  createdAt: Date;
-  profileId?: string;
-  webCard?: CoverRenderer_webCard$key | null;
-};
 
 export default ContactDetailsBody;

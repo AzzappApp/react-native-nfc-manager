@@ -9,13 +9,13 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 type CardTemplatePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const CardTemplatePage = async (props: CardTemplatePageProps) => {
-  const { params } = props;
+  const params = await props.params;
 
   const [cardStyles, template, allCardTemplateTypes] = await Promise.all([
     getAllCardStyles(),

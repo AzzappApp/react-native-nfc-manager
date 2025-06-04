@@ -77,17 +77,21 @@ const PressableBackground = (
   });
 
   const onPressIn = useCallback(() => {
-    pressed.value = withTiming(1, {
-      duration: animationDuration,
-      easing,
-    });
+    pressed.set(
+      withTiming(1, {
+        duration: animationDuration,
+        easing,
+      }),
+    );
   }, [animationDuration, pressed, easing]);
 
   const onPressOut = useCallback(() => {
-    pressed.value = withTiming(0, {
-      duration: animationDuration,
-      easing,
-    });
+    pressed.set(
+      withTiming(0, {
+        duration: animationDuration,
+        easing,
+      }),
+    );
   }, [animationDuration, pressed, easing]);
 
   return (

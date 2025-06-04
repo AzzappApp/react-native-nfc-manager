@@ -18,7 +18,7 @@ jobs:
 
       - name: Purge translations
         env:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
         run: |

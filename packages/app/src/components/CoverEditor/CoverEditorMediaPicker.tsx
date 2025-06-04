@@ -287,19 +287,22 @@ const CoverEditorMediaPicker = ({
   ]);
 
   /** Helper funcrtion to re add uneditable media to the result */
-  const mapResultWithNonEditable = (inputMedia: Array<SourceMedia | null>) => {
-    let selectedMediaIdx = 0;
+  const mapResultWithNonEditable = useCallback(
+    (inputMedia: Array<SourceMedia | null>) => {
+      let selectedMediaIdx = 0;
 
-    return initialMediaUnfiltered?.map(media => {
-      if (!media || ('editable' in media && media.editable)) {
-        return inputMedia[selectedMediaIdx++];
-      } else {
-        return media;
-      }
-    });
-  };
+      return initialMediaUnfiltered?.map(media => {
+        if (!media || ('editable' in media && media.editable)) {
+          return inputMedia[selectedMediaIdx++];
+        } else {
+          return media;
+        }
+      });
+    },
+    [initialMediaUnfiltered],
+  );
 
-  const handleOnFinished = () => {
+  const handleOnFinished = useCallback(() => {
     // rebuild result data
     const resultMedia = multiSelection
       ? mapResultWithNonEditable(selectedMedias)
@@ -379,15 +382,24 @@ const CoverEditorMediaPicker = ({
       return;
     }
     onFinished(resultMedia?.filter(isDefined) || []);
-  };
+  }, [
+    durationsFixed,
+    handleDuplicateMedia,
+    initialMediaUnfiltered,
+    intl,
+    mapResultWithNonEditable,
+    maxMedias,
+    multiSelection,
+    onFinished,
+    selectedMedias,
+  ]);
 
   useEffect(() => {
     if (multiSelection && selectedMedias.length === 0) {
       // no editable media, let's finish now
       handleOnFinished();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onFinished, selectedMedias.length]);
+  }, [handleOnFinished, multiSelection, selectedMedias.length]);
 
   const mediasOrSlot: Array<SourceMedia | null> = durationsFixed
     ? Array.from(

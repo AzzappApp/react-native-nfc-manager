@@ -18,7 +18,7 @@ import {
   PostTable,
   ProfileTable,
   UserTable,
-  WebCardCategoryTable,
+  ContactTable,
 } from '../schema';
 import type {
   CardModule,
@@ -32,13 +32,13 @@ import type {
   Media,
   PostComment,
   Post,
-  WebCardCategory,
   Profile,
   WebCard,
   ModuleBackground,
   User,
   Payment,
   PaymentMean,
+  Contact,
   // A little bit of a hack to get the types to work from outside the package
   // warning : do not fix this import unless you check the types are still working
   // and are not transformed to any
@@ -50,13 +50,13 @@ export const ENTITIES = [
   'CardTemplate',
   'CardTemplateType',
   'ColorPalette',
+  'Contact',
   'CoverTemplate',
   'CoverTemplateType',
   'CoverTemplateTag',
   'Media',
   'PostComment',
   'Post',
-  'WebCardCategory',
   'Profile',
   'ModuleBackground',
   'User',
@@ -72,6 +72,7 @@ export type EntityToType<T extends Entity> = {
   CardStyle: CardStyle;
   CardTemplate: CardTemplate;
   CardTemplateType: CardTemplateType;
+  Contact: Contact;
   ColorPalette: ColorPalette;
   CoverTemplate: CoverTemplate;
   CoverTemplateType: CoverTemplateType;
@@ -79,7 +80,6 @@ export type EntityToType<T extends Entity> = {
   Media: Media;
   PostComment: PostComment;
   Post: Post;
-  WebCardCategory: WebCardCategory;
   Profile: Profile;
   WebCard: WebCard;
   ModuleBackground: ModuleBackground;
@@ -100,13 +100,13 @@ const entitiesTable = {
   Media: MediaTable,
   PostComment: PostCommentTable,
   Post: PostTable,
-  WebCardCategory: WebCardCategoryTable,
   Profile: ProfileTable,
   WebCard: WebCardTable,
   ModuleBackground: ModuleBackgroundTable,
   User: UserTable,
   Payment: PaymentTable,
   PaymentMean: PaymentMeanTable,
+  Contact: ContactTable,
 } as const;
 
 export const sortEntitiesByIds = <IDType, T extends { id: IDType }>(

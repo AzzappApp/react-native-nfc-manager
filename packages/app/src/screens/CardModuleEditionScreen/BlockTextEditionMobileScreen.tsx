@@ -1,5 +1,4 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_BLOCK_TEXT } from '@azzapp/shared/cardModuleHelpers';
 import BlockTextEditionScreen from '#screens/BlockTextEditionScreen';
 import type { BlockTextEditionMobileScreenQuery } from '#relayArtifacts/BlockTextEditionMobileScreenQuery.graphql';
 import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
@@ -24,7 +23,8 @@ const BlockTextEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: BlockTextEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
@@ -32,10 +32,8 @@ const BlockTextEditionMobileScreen = ({
   let module: BlockTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(
-        module =>
-          module?.id === moduleId && module?.kind === MODULE_KIND_BLOCK_TEXT,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module.id === moduleId)
+        ?.blockTextModule ?? null;
     if (!module) {
       // TODO
     }
@@ -46,14 +44,14 @@ const BlockTextEditionMobileScreen = ({
 
 const BlockTextQuery = graphql`
   query BlockTextEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...BlockTextEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
-            ...BlockTextEditionScreen_module
+            ...BlockTextEditionScreen_module @alias(as: "blockTextModule")
           }
         }
       }

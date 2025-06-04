@@ -1,10 +1,10 @@
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
-import { refreshTokens } from '@azzapp/shared/WebAPI';
 import { getTokens } from '#helpers/authStore';
 import fetchWithAuthTokens from '#helpers/fetchWithAuthTokens';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { refreshTokens } from '#helpers/WebAPI';
 
 jest.mock('#helpers/authStore', () => ({
   getTokens: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock('@azzapp/shared/networkHelpers', () => ({
   fetchJSON: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/WebAPI', () => ({
+jest.mock('#helpers/WebAPI', () => ({
   refreshTokens: jest.fn(),
 }));
 

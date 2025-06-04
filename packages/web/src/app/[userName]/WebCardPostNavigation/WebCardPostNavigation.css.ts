@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { MediaQuery, textLarge, textXXSmall } from '#app/[userName]/theme.css';
+import { MediaQuery, textLarge, textXXSmall } from '#app/theme.css';
 
 const navigation = style({
   width: '60px',

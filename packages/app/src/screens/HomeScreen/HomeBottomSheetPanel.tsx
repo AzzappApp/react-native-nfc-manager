@@ -13,7 +13,8 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { logEvent } from '#helpers/analytics';
@@ -192,16 +193,12 @@ const HomeBottomSheetPanel = ({
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
-      const url = buildUserUrl(profile?.webCard.userName);
-      let message = intl.formatMessage({
+      const url = buildWebUrl(profile?.webCard.userName);
+      const message = intl.formatMessage({
         defaultMessage: 'Check out this azzapp WebCard: ',
         description:
           'Profile WebcardModal, message use when sharing the contact card',
       });
-      if (Platform.OS === 'android') {
-        // for android we need to add the message to the share
-        message = `${message} ${url}`;
-      }
       try {
         await Share.share(
           {
@@ -210,8 +207,7 @@ const HomeBottomSheetPanel = ({
               description:
                 'Profile WebcardModal, message use when sharing the contact card',
             }),
-            message,
-            url,
+            message: `${message} ${url}`,
           },
           {
             dialogTitle: intl.formatMessage({
@@ -397,7 +393,7 @@ const HomeBottomSheetPanel = ({
             description: 'Help center us message in Home bottom sheet panel',
           }),
           onPress: () => {
-            Linking.openURL(process.env.FAQ || '');
+            Linking.openURL(env.FAQ);
           },
         },
         {

@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactCardEditField from '#components/ContactCard/ContactCardEditField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -16,9 +16,11 @@ import type { Control } from 'react-hook-form';
 const ContactCardEditModalUrls = ({
   control,
   isPremium,
+  offsetRef,
 }: {
   control: Control<ContactCardFormValues>;
   isPremium?: boolean | null;
+  offsetRef?: React.RefObject<number>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -33,7 +35,7 @@ const ContactCardEditModalUrls = ({
     <>
       {fields.map((url, index) => (
         <Fragment key={url.id}>
-          <ContactCardEditModalField
+          <ContactCardEditField
             control={control}
             valueKey={`urls.${index}.address`}
             deleteField={() => remove(index)}
@@ -52,6 +54,8 @@ const ContactCardEditModalUrls = ({
             trim
             isPremium={isPremium}
             requiresPremium
+            returnKeyType="done"
+            offsetRef={offsetRef}
           />
           <Separation small />
         </Fragment>

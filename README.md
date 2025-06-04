@@ -82,13 +82,6 @@ To run the react native application on android use the `run:android` script :
 ```sh
 yarn run:android
 ```
-
-Once you've modified the GraphQL API you should update the GraphQL schema of the application using the `update-graphql-schema` script :
-
-```sh
-yarn update-graphql-schema
-```
-
 To lint the application source code use the `lint` script
 
 ```sh

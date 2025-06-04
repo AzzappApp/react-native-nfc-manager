@@ -19,8 +19,15 @@ describe('phoneNumberHelper', () => {
       expect(phoneNumber?.nationalNumber).toEqual('612345678');
       expect(phoneNumber?.number).toEqual('+33612345678');
     });
+    test('parsePhoneNumber should return parsed number with specified countryCode', async () => {
+      const phoneNumber = await parsePhoneNumber('612345678', 'US');
+      expect(phoneNumber?.country).toEqual('US');
+      expect(phoneNumber?.countryCallingCode).toEqual('1');
+      expect(phoneNumber?.nationalNumber).toEqual('612345678');
+      expect(phoneNumber?.number).toEqual('+1612345678');
+    });
     test('parsePhoneNumber should return null for bad number', async () => {
-      const phoneNumber = await parsePhoneNumber('bad number');
+      const phoneNumber = await parsePhoneNumber('');
       expect(phoneNumber).toBeFalsy();
     });
   });

@@ -10,7 +10,7 @@ import type { ReactNode, RefObject } from 'react';
 import type { View } from 'react-native';
 
 type Tooltip = {
-  ref: RefObject<View>;
+  ref: RefObject<View | null>;
   onPress?: () => void;
   visible?: boolean;
 };

@@ -76,6 +76,7 @@ const HomeProfilesCarousel = (
   { user: userKey }: HomeProfilesCarouselProps,
   forwardedRef: ForwardedRef<CarouselSelectListHandle>,
 ) => {
+  'use no memo';
   const {
     onCurrentProfileIndexChange,
     currentIndexSharedValue,
@@ -168,8 +169,10 @@ const HomeProfilesCarousel = (
     } else {
       // profile has been removed,
       // scroll to previous available profile.
-      const newindex = selectedIndex - 2 > 0 ? selectedIndex - 2 : 0;
-      const profile = profiles?.[newindex];
+      const newIndex = selectedIndex - 1 > 0 ? selectedIndex - 1 : 0;
+      const profile = profiles?.[newIndex];
+
+      carouselRef.current?.scrollToIndex(newIndex + 1, true);
       if (profile) {
         onChangeWebCard({
           profileId: profile.id,
@@ -183,9 +186,10 @@ const HomeProfilesCarousel = (
       } else {
         onChangeWebCard(null);
       }
-      setSelectedIndex(newindex);
+      setSelectedIndex(newIndex);
     }
     // No need to refresh when index change. Here we handle only profiles list update
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profiles]);
 
@@ -252,7 +256,12 @@ const HomeProfilesCarousel = (
   return (
     <View
       ref={refCarousel}
-      style={[styles.container, { maxHeight: windowWidth / (2 * COVER_RATIO) }]}
+      style={[
+        styles.container,
+        {
+          maxHeight: windowWidth / (1.8 * COVER_RATIO),
+        },
+      ]}
     >
       <CarouselSelectList
         ref={carouselRef}
@@ -266,14 +275,15 @@ const HomeProfilesCarousel = (
         onSelectedIndexChange={onSelectedIndexChange}
         currentProfileIndexSharedValue={currentIndexSharedValue}
         initialScrollIndex={initialProfileIndex}
+        withAnimatedOpacity
       />
     </View>
   );
 };
 
-const SCALE_RATIO = 108 / 291;
+const SCALE_RATIO = 95 / 291;
 
-const MARGIN_VERTICAL = 15;
+const MARGIN_VERTICAL = 10;
 
 const keyExtractor = (item: { profile: ProfileType | null }, index: number) =>
   item.profile?.webCard?.id ?? `new_${index}`;
@@ -426,9 +436,8 @@ const ItemRenderComponent = ({
 
   const { coverUploadingData } = useCoverUpload();
 
-  const isPredefined =
-    coverUploadingData?.webCardId !== profile.webCard?.id &&
-    profile.webCard?.coverIsPredefined;
+  const coverIsUploading =
+    coverUploadingData?.webCardId === profile.webCard?.id;
 
   return (
     <>
@@ -467,7 +476,7 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            {isPredefined ? (
+            {!coverIsUploading && profile.webCard?.coverIsPredefined ? (
               <PressableScaleHighlight
                 style={containerStyle}
                 onLongPress={openWebcardModal}
@@ -491,7 +500,6 @@ const ItemRenderComponent = ({
                 onReadyForDisplay={onReady}
                 onError={onError}
                 onLongPress={openWebcardModal}
-                prefetch
               />
             )}
             {(profile.webCard?.coverIsPredefined ||
@@ -612,7 +620,7 @@ const CreateItemMemo = memo(CreateItem);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: MARGIN_VERTICAL,
+    paddingTop: MARGIN_VERTICAL,
   },
   carousel: {
     flex: 1,

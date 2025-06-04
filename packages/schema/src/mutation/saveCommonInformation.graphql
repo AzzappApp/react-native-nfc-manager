@@ -3,7 +3,7 @@ extend type Mutation {
   Mutation to save common information of a profile
   """
   saveCommonInformation(
-    webCardId: ID!,
+    webCardId: ID!
     input: SaveCommonInformationInput!
   ): SaveCommonInformationPayload!
 }
@@ -17,6 +17,7 @@ input SaveCommonInformationInput {
   birthday: ContactCardBirthdayInput
   socials: [ContactCardSocialInput!]
   logoId: String
+  bannerId: String
 }
 
 type SaveCommonInformationPayload {

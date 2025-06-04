@@ -42,7 +42,6 @@ const ProfileStatisticsChart = ({
   data,
   width,
   height,
-  visible = true,
   variant = 'dark',
 }: ProfileStatisticsChartProps) => {
   // For the moment we always display the last 30 days
@@ -55,11 +54,7 @@ const ProfileStatisticsChart = ({
   }, []);
   return (
     <View style={{ width, height }}>
-      {visible ? (
-        <BarChart variant={variant} data={data} width={width} height={height} />
-      ) : (
-        <View style={{ width, height }} />
-      )}
+      <BarChart variant={variant} data={data} width={width} height={height} />
       <BarChartLegend
         variant={variant}
         nbDates={NB_DAY_TO_DISPLAY}
@@ -188,18 +183,6 @@ const BarChartLegend = ({
 
 const CHART_BAR_SEPARATOR = 2;
 const NB_DATE_DISPLAYED = 6;
-
-export type StatsData = {
-  contactCardScans: number;
-  webCardViews: number;
-  shareBacks: number;
-  likes: number;
-};
-
-export type StatsDataGroup = {
-  day: string;
-  data: StatsData[];
-};
 
 const stylesheet = createVariantsStyleSheet(() => ({
   default: {

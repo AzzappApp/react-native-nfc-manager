@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  Alert,
   StyleSheet,
   View,
   useColorScheme,
@@ -205,33 +206,41 @@ const WebCardEditBlockContainer = ({
       Gesture.Pan()
         .activeOffsetX([-10, 10])
         .onStart(() => {
-          dragXStartValue.value = dragX.value;
-          panGestureActive.value = true;
+          dragXStartValue.set(dragX.value);
+          panGestureActive.set(true);
         })
         .enabled(displayEditionButtons && !selectionMode)
         .onChange(e => {
-          dragX.value = Math.min(
-            dragRightLimit,
-            Math.max(dragXStartValue.value + e.translationX, dragLeftLimit),
+          dragX.set(
+            Math.min(
+              dragRightLimit,
+              Math.max(dragXStartValue.value + e.translationX, dragLeftLimit),
+            ),
           );
         })
         .onEnd(() => {
           if (dragX.value > dragRightLimit / 2) {
-            dragX.value = withTiming(dragRightLimit, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(dragRightLimit, {
+                duration: 120,
+              }),
+            );
           } else if (dragX.value < dragLeftLimit / 2) {
-            dragX.value = withTiming(dragLeftLimit, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(dragLeftLimit, {
+                duration: 120,
+              }),
+            );
           } else {
-            dragX.value = withTiming(0, {
-              duration: 120,
-            });
+            dragX.set(
+              withTiming(0, {
+                duration: 120,
+              }),
+            );
           }
         })
         .onFinalize(() => {
-          panGestureActive.value = false;
+          panGestureActive.set(false);
         }),
     [
       displayEditionButtons,
@@ -250,13 +259,13 @@ const WebCardEditBlockContainer = ({
       Gesture.Tap()
         .enabled(activeSection === 'none')
         .onBegin(() => {
-          touchActive.value = withTiming(1);
+          touchActive.set(withTiming(1));
         })
         .onStart(() => {
           runOnJS(onModulePress)();
         })
         .onFinalize(() => {
-          touchActive.value = withTiming(0);
+          touchActive.set(withTiming(0));
         }),
     [activeSection, onModulePress, touchActive],
   );
@@ -318,7 +327,7 @@ const WebCardEditBlockContainer = ({
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const containerRef = useScrollViewChildRef(id);
-  const ref = useRef(null);
+  const ref = useRef<View>(null);
 
   useEffect(() => {
     if (id === 'cover') {
@@ -339,6 +348,37 @@ const WebCardEditBlockContainer = ({
       }
     };
   }, [id, registerTooltip, unregisterTooltip]);
+
+  const confirmDelete = () => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Delete this section',
+        description: 'Title of delete section Alert',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete this section? This action is irreversible',
+        description: 'description of delete section Alert',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete this section',
+            description: 'button of delete section Alert',
+          }),
+          onPress: onRemove,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete section Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
 
   return (
     <Animated.View
@@ -593,7 +633,7 @@ const WebCardEditBlockContainer = ({
               pointerEvents={activeSection !== 'right' ? 'none' : 'auto'}
             >
               <IconButton
-                onPress={onRemove}
+                onPress={confirmDelete}
                 disabled={activeSection !== 'right' || !canDelete}
                 icon="delete"
                 size={buttonSize}

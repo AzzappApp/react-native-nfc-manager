@@ -55,4 +55,14 @@ export const baseContactCardSchema = z.object({
     })
     .optional()
     .nullable(),
+  banner: z
+    .object({
+      uri: z.string(),
+      id: z.string().optional(),
+      local: z.boolean().optional(),
+      width: z.number().optional(),
+      height: z.number().optional(),
+    })
+    .optional()
+    .nullable(),
 });

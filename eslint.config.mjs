@@ -4,6 +4,8 @@ import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import formatjs from 'eslint-plugin-formatjs';
+import reactCompiler from 'eslint-plugin-react-compiler';
+import reactHooks from 'eslint-plugin-react-hooks';
 import reactNative from 'eslint-plugin-react-native';
 import globals from 'globals';
 
@@ -30,7 +32,10 @@ export default [
       'packages/schema/lib',
       'packages/payment/lib',
       'packages/service/lib',
+      'packages/enrichment/lib',
       'packages/app/fonts',
+      'packages/api/persistedQueries',
+      'packages/api/.next',
       'packages/web/.next',
       'packages/backoffice/.next',
       '**/trash',
@@ -43,10 +48,11 @@ export default [
       'plugin:import/typescript',
       'plugin:eslint-comments/recommended',
       'plugin:react/recommended',
-      'plugin:react-hooks/recommended',
       'plugin:prettier/recommended',
     ),
   ),
+  reactHooks.configs['recommended-latest'],
+  reactCompiler.configs.recommended,
   {
     plugins: {
       formatjs,
@@ -181,6 +187,7 @@ export default [
       'react/jsx-curly-brace-presence': 'warn',
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
+      'react-compiler/react-compiler': 0,
     },
   },
   ...fixupConfigRules(
@@ -257,6 +264,7 @@ export default [
     files: ['packages/app/**/*.ts', 'packages/app/**/*.tsx'],
     rules: {
       'formatjs/no-id': 'error',
+      'react-compiler/react-compiler': 'error',
     },
   },
 ];

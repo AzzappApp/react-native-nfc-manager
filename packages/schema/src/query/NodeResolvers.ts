@@ -1,16 +1,19 @@
 import { fromGlobalId } from 'graphql-relay';
+import { getSessionInfos } from '#GraphQLContext';
 import {
   cardStyleLoader,
   cardTemplateLoader,
   cardTemplateTypeLoader,
   colorPaletteLoader,
+  contactLoader,
   coverTemplateLoader,
   postCommentLoader,
   postLoader,
+  profileByWebCardIdAndUserIdLoader,
   profileLoader,
-  webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
+import { isProfileAdminRight } from '#helpers/permissionsHelpers';
 import type { NodeResolvers } from '#/__generated__/types';
 
 const cardStyleSymbol = Symbol('CardStyle');
@@ -22,6 +25,7 @@ const postSymbol = Symbol('Post');
 const postCommentSymbol = Symbol('PostComment');
 const profileSymbol = Symbol('Profile');
 const webCardSymbol = Symbol('WebCard');
+const contactSymbol = Symbol('Contact');
 const webCardCategorySymbol = Symbol('WebCardCategory');
 const companyActivitySymbol = Symbol('CompanyActivity');
 
@@ -68,11 +72,30 @@ export const fetchNode = async (gqlId: string): Promise<any> => {
       const webCard = await webCardLoader.load(id);
       return withTypeSymbol(webCard?.deleted ? null : webCard, webCardSymbol);
     }
-    case 'WebCardCategory':
-      return withTypeSymbol(
-        await webCardCategoryLoader.load(id),
-        webCardCategorySymbol,
-      );
+    case 'Contact': {
+      // retrieve loaded contact
+      const contact = await contactLoader.load(id);
+      // no contact found
+      if (!contact) return null;
+      // retrieve profile associated to the contact
+      const profile = await profileLoader.load(contact?.ownerProfileId);
+      if (!profile) return null;
+
+      const { userId: sessionUserId } = getSessionInfos();
+      if (sessionUserId && profile.userId !== sessionUserId) {
+        // The current profile is not the profile associated to the contact
+        // load the profile from the session
+        const profileSession = await profileByWebCardIdAndUserIdLoader.load({
+          userId: sessionUserId,
+          webCardId: profile.webCardId,
+        });
+        // The connect profile is not an admin
+        if (!isProfileAdminRight(profileSession)) {
+          return null;
+        }
+      }
+      return withTypeSymbol(contact, contactSymbol);
+    }
   }
   return null;
 };
@@ -113,6 +136,9 @@ const resolveNode = (value: any) => {
   }
   if (value[companyActivitySymbol]) {
     return 'CompanyActivity';
+  }
+  if (value[contactSymbol]) {
+    return 'Contact';
   }
   return null;
 };

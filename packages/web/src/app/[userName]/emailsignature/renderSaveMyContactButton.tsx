@@ -20,6 +20,7 @@ const renderSaveMyContactButton = ({
         line-height: 14px;
         font-size: 12px;
         font-family: Helvetica Neue;
+        white-space: nowrap;
         color: ${color};
       "
       href="${saveContactURL}"

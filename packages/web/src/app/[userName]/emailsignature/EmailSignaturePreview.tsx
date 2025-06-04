@@ -11,6 +11,7 @@ type EmailSignaturePreviewProps = {
   media: Media | null;
   profile: Profile;
   companyLogoUrl: string | null;
+  bannerUrl: string | null;
   saveContactMessage: string;
   saveContactURL: string;
 };
@@ -24,6 +25,7 @@ const EmailSignaturePreview = ({
   media,
   profile,
   companyLogoUrl,
+  bannerUrl,
   saveContactMessage,
   saveContactURL,
 }: EmailSignaturePreviewProps) => {
@@ -66,6 +68,7 @@ const EmailSignaturePreview = ({
             profile,
             webCard,
             companyLogoUrl,
+            bannerUrl,
             saveContactMessage,
             saveContactURL,
             isPreview: true,

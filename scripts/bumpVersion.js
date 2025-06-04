@@ -1,30 +1,41 @@
+const internal = require('../internal-version.json');
 const pkg = require('../package.json');
 const setWorkspaceVersions = require('./setWorkspaceVersions');
 
-const preReleaseKind = process.argv[2];
+const versionKind = process.argv[2];
 
-if (preReleaseKind && !preReleaseKind.match(/^[a-z]+$/)) {
+if (
+  !versionKind ||
+  (versionKind !== 'canary' &&
+    versionKind !== 'rc' &&
+    versionKind !== 'release')
+) {
   console.error('Please provide a valid pre-release kind');
   process.exit(1);
 }
 
-const version = pkg.version;
-const [, , preReleaseNumber] = version.match(/-([a-z]+)\.(\d+)$/) ?? [];
-const [major, minor, patch] = version.split('-')[0].split('.');
-const paddedMinor = minor.padStart(2, '0');
+// eslint-disable-next-line prefer-const
+let [major, minor, patch] = pkg.version.split('-')[0].split('.').map(Number);
+let internalVersion = Number(internal.version);
+const precedence = {
+  canary: 0,
+  rc: 1,
+  release: 2,
+};
 
-let nextVersion = '';
-let androidVersionCode = 0;
-
-if (preReleaseKind) {
-  const paddedPatch = patch.padStart(2, '0');
-  const nextPreReleaseNumber = (Number(preReleaseNumber ?? 0) + 1).toString();
-  nextVersion = `${major}.${minor}.${patch}-${preReleaseKind}.${nextPreReleaseNumber}`;
-  androidVersionCode = `${major}${paddedMinor}${paddedPatch}${nextPreReleaseNumber.padStart(3, '0')}`;
+const maxInternalVersion = versionKind === 'release' ? 9 : 999;
+if (versionKind === internal.kind) {
+  internalVersion += 1;
+  if (internalVersion > maxInternalVersion) {
+    internalVersion = 1;
+    patch += 1;
+  }
+} else if (precedence[versionKind] < precedence[internal.kind]) {
+  minor += 1;
+  patch = 0;
+  internalVersion = 1;
 } else {
-  const newPatch = Number(patch) + 1;
-  nextVersion = `${major}.${minor}.${newPatch}`;
-  androidVersionCode = `${major}${paddedMinor}${newPatch.toString().padStart(2, '0')}0`;
+  internalVersion = 1;
 }
 
-setWorkspaceVersions(nextVersion, androidVersionCode);
+setWorkspaceVersions(versionKind, major, minor, patch, internalVersion);

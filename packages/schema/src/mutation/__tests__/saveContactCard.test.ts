@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import {
   getContactCardAccessForProfile,
   getContactCardAccessWithHasGooglePass,
+  getMediasByIds,
   getPushTokens,
   referencesMedias,
   transaction,
@@ -9,10 +10,10 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import saveContactCard from '../saveContactCard';
 
 // Mock dependencies
@@ -26,15 +27,12 @@ jest.mock('@azzapp/data', () => ({
   updateProfile: jest.fn(),
   getContactCardAccessWithHasGooglePass: jest.fn(),
   getContactCardAccessForProfile: jest.fn(),
+  getMediasByIds: jest.fn(),
 }));
 
 jest.mock('#externals', () => ({
   notifyApplePassWallet: jest.fn(),
   notifyGooglePassWallet: jest.fn(),
-}));
-
-jest.mock('#GraphQLContext', () => ({
-  getSessionInfos: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -91,10 +89,11 @@ describe('saveContactCard', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUser('user-456');
   });
 
   test('should throw UNAUTHORIZED if user is not authenticated', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+    mockUser();
 
     await expect(
       saveContactCard(
@@ -110,7 +109,6 @@ describe('saveContactCard', () => {
   });
 
   test('should throw INVALID_REQUEST if profile is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(null);
 
     await expect(
@@ -127,7 +125,7 @@ describe('saveContactCard', () => {
   });
 
   test('should throw UNAUTHORIZED if profile does not belong to user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-999' });
+    mockUser('user-999');
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
 
     await expect(
@@ -144,7 +142,6 @@ describe('saveContactCard', () => {
   });
 
   test('should throw INVALID_REQUEST if webCard is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(null);
 
@@ -162,7 +159,6 @@ describe('saveContactCard', () => {
   });
 
   test('should validate subscription before updating', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getPushTokens as jest.Mock).mockResolvedValue([]);
@@ -170,6 +166,16 @@ describe('saveContactCard', () => {
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      {
+        id: 'new-avatar',
+        type: 'avatar',
+      },
+      {
+        id: 'new-logo',
+        type: 'logo',
+      },
+    ]);
 
     await saveContactCard(
       {},
@@ -185,17 +191,20 @@ describe('saveContactCard', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-123', {
-      action: 'UPDATE_CONTACT_CARD',
-      contactCardHasCompanyName: true,
-      webCardIsPublished: true,
-      contactCardHasUrl: false,
-      contactCardHasLogo: true,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'owner-123',
+      {
+        action: 'UPDATE_CONTACT_CARD',
+        contactCardHasCompanyName: true,
+        webCardIsPublished: true,
+        contactCardHasUrl: false,
+        contactCardHasLogo: true,
+      },
+      mockContext.apiEndpoint,
+    );
   });
 
   test('should update contact card and notify Apple & Google Wallet', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
@@ -233,7 +242,6 @@ describe('saveContactCard', () => {
   });
 
   test('should not notify Google Wallet if hasGooglePass is false', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       ...mockProfile,
       hasGooglePass: false,
@@ -243,6 +251,9 @@ describe('saveContactCard', () => {
     });
     (getContactCardAccessForProfile as jest.Mock).mockResolvedValue([]);
     (getContactCardAccessWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'new-avatar', type: 'avatar' },
+    ]);
 
     await saveContactCard(
       {},
@@ -258,7 +269,6 @@ describe('saveContactCard', () => {
   });
 
   test('should throw INTERNAL_SERVER_ERROR on transaction failure', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (transaction as jest.Mock).mockRejectedValue(
@@ -267,6 +277,9 @@ describe('saveContactCard', () => {
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
       id: 'owner-123',
     });
+    (getMediasByIds as jest.Mock).mockResolvedValue([
+      { id: 'new-avatar', type: 'avatar' },
+    ]);
 
     await expect(
       saveContactCard(
@@ -282,7 +295,6 @@ describe('saveContactCard', () => {
   });
 
   test('should throw INVALID_REQUEST if webCard owner is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     jest

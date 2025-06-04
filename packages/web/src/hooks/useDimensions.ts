@@ -5,7 +5,9 @@ type Dimensions = {
   height: number;
 };
 
-export const useDimensions = (targetRef: React.RefObject<HTMLDivElement>) => {
+export const useDimensions = (
+  targetRef: React.RefObject<HTMLDivElement | null>,
+) => {
   const getDimension = useCallback(() => {
     const dim = targetRef.current?.getBoundingClientRect().toJSON();
     return {

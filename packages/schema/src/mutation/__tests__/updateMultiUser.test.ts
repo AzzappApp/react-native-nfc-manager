@@ -48,7 +48,7 @@ jest.mock('#helpers/subscriptionHelpers', () => ({
 }));
 
 // Mock context and info
-const mockContext: any = {};
+const mockContext: any = { apiEndpoint: 'https://api.example.com' };
 const mockInfo: any = {};
 
 describe('updateMultiUser', () => {
@@ -82,10 +82,14 @@ describe('updateMultiUser', () => {
       'WebCard',
     );
     expect(checkWebCardOwnerProfile).toHaveBeenCalledWith('webcard-123');
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-1', {
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: 3,
-    });
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(
+      'owner-1',
+      {
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: 3,
+      },
+      mockContext.apiEndpoint,
+    );
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       isMultiUser: true,
     });
@@ -111,7 +115,10 @@ describe('updateMultiUser', () => {
     });
     expect(removeWebCardNonOwnerProfiles).toHaveBeenCalledWith('webcard-123');
     expect(invalidateWebCard).toHaveBeenCalledWith('testUser');
-    expect(updateMonthlySubscription).toHaveBeenCalledWith('owner-1');
+    expect(updateMonthlySubscription).toHaveBeenCalledWith(
+      'owner-1',
+      mockContext.apiEndpoint,
+    );
     expect(result).toEqual({ webCard: mockWebCard });
   });
 

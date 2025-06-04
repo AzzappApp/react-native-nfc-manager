@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmallMedium } from '#app/[userName]/theme.css';
+import { textSmallMedium } from '#app/theme.css';
 
 const label = style([
   {

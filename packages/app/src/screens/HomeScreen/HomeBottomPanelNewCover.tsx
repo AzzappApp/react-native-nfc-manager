@@ -7,13 +7,13 @@ import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
+import type { HomeBottomPanelMessage_user$data } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 const HomeBottomPanelNewCover = ({
   profile,
 }: {
-  profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
+  profile: ArrayItemType<HomeBottomPanelMessage_user$data['profiles']>;
 }) => {
   const intl = useIntl();
   const router = useRouter();

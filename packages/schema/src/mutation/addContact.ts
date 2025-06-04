@@ -2,9 +2,10 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 
 import {
-  checkMedias,
   createContact,
   getContactByProfiles,
+  incrementContactsImportFromScan,
+  incrementImportFromScan,
   incrementShareBacks,
   incrementShareBacksTotal,
   referencesMedias,
@@ -12,11 +13,13 @@ import {
   updateContact,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { checkMedias } from '@azzapp/service/mediaServices/index';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -25,16 +28,16 @@ import type { Contact, ContactRow } from '@azzapp/data';
 const addContact: MutationResolvers['addContact'] = async (
   _,
   { profileId: gqlProfileId, input, notify, scanUsed, location, address },
+  context,
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
   const profile = await profileLoader.load(profileId);
 
-  if (!profile || profile.userId !== userId) {
+  if (!profile || profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
   const webCard = await webCardLoader.load(profile.webCardId);
@@ -67,11 +70,14 @@ const addContact: MutationResolvers['addContact'] = async (
     title: input.title,
     deleted: false,
     urls: input.urls || null,
-    socials: input.socials || null,
+    socials: filterSocialLink(input.socials) || [],
     createdAt: new Date(),
     logoId: input.logoId ?? null,
     meetingLocation: location ?? null,
     meetingPlace: address ?? null,
+    note: '',
+    meetingDate: new Date(),
+    enrichmentStatus: null,
   };
 
   let contact: Contact;
@@ -94,9 +100,15 @@ const addContact: MutationResolvers['addContact'] = async (
   }
 
   if (scanUsed) {
-    await validateCurrentSubscription(userId, {
-      action: 'ADD_CONTACT_WITH_SCAN',
-    });
+    await validateCurrentSubscription(
+      user.id,
+      {
+        action: 'ADD_CONTACT_WITH_SCAN',
+      },
+      context.apiEndpoint,
+    );
+    await incrementContactsImportFromScan(profileId);
+    await incrementImportFromScan(profileId, true);
   }
 
   if (input.withShareBack && input.profileId) {
@@ -125,7 +137,7 @@ const addContact: MutationResolvers['addContact'] = async (
       profile.contactCard?.birthday?.birthday?.split('T')[0] ?? null;
 
     const urls = (
-      webCard?.userName ? [{ url: buildUserUrl(webCard.userName) }] : []
+      webCard?.userName ? [{ url: buildWebUrl(webCard.userName) }] : []
     ).concat(
       profile.contactCard?.urls?.map(url => ({
         url: url.address,
@@ -202,13 +214,23 @@ const addContact: MutationResolvers['addContact'] = async (
       const userToNotify = await userLoader.load(profileToNotify?.userId);
       if (userToNotify) {
         await sendPushNotification(userToNotify.id, {
-          notification: {
+          data: {
             type: 'shareBack',
             webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
           },
           mediaId: null,
           sound: 'default',
-          locale: guessLocale(userToNotify?.locale),
+          title: context.intl.formatMessage({
+            defaultMessage: 'Contact ShareBack',
+            id: '0j4O2Z',
+            description: 'Push Notification title for contact share back',
+          }),
+          body: context.intl.formatMessage({
+            defaultMessage: `Hello, You've received a new contact ShareBack.`,
+            id: 'rAeWtj',
+            description:
+              'Push Notification body message for contact share back',
+          }),
         });
       }
     }
@@ -225,8 +247,8 @@ const addContact: MutationResolvers['addContact'] = async (
       {
         profile,
         contact: {
-          firstname: input.firstname,
-          lastname: input.lastname,
+          firstName: input.firstname,
+          lastName: input.lastname,
         },
       },
     );

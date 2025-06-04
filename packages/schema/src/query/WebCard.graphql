@@ -17,7 +17,7 @@ type WebCard implements Node {
   """
   The user name of the profile
   """
-  lastUserNameUpdate: DateTime!
+  lastUserNameUpdate: DateTime
   """
   The kind of the webCard (business, personal)
   """
@@ -25,7 +25,8 @@ type WebCard implements Node {
   """
   The webCard category
   """
-  webCardCategory: WebCardCategory @deprecated(reason: "use companyActivityLabel")
+  webCardCategory: WebCardCategory
+    @deprecated(reason: "use companyActivityLabel")
   """
   The first name of the webCard, will only be set for personal webCard
   """
@@ -41,7 +42,8 @@ type WebCard implements Node {
   """
   The company activity of the webCard, will only be set for business webCard
   """
-  companyActivity: CompanyActivity @deprecated(reason: "use directly companyActivityLabel")
+  companyActivity: CompanyActivity
+    @deprecated(reason: "use directly companyActivityLabel")
 
   """
   The company activity Label of the webCard, will only be set for business webCard
@@ -83,7 +85,7 @@ type WebCard implements Node {
   coverIsPredefined: Boolean!
   """
   cover has not been configured yet
-  if coverIsLogoPredefined is true, coverMedia will contain only 1 predefined media with company logo 
+  if coverIsLogoPredefined is true, coverMedia will contain only 1 predefined media with company logo
   """
   coverIsLogoPredefined: Boolean!
   """
@@ -338,6 +340,10 @@ type WebCard implements Node {
   The webCard logo
   """
   logo: Media
+  """
+  The signature banner
+  """
+  banner: Media
   """
   The webCard requires subscription
   """

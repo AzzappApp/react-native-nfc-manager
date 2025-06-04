@@ -43,19 +43,26 @@ const WebcardParametersLastNameForm = ({
     defaultValues: {
       lastName: webCard.lastName ?? '',
     },
+    resetOptions: {
+      keepDefaultValues: false,
+      keepDirtyValues: false,
+      keepDirty: false,
+    },
     mode: 'onSubmit',
     resolver: zodResolver(lastNameFormSchema),
   });
 
   useEffect(() => {
     if (visible) {
-      reset();
+      reset({
+        lastName: webCard.lastName ?? '',
+      });
     }
-  }, [reset, visible]);
+  }, [reset, visible, webCard.lastName]);
 
   const intl = useIntl();
 
-  const [commitMutation] = useMutation(graphql`
+  const [commitMutation, isLoading] = useMutation(graphql`
     mutation WebCardParametersLastNameFormMutation(
       $webCardId: ID!
       $input: UpdateWebCardInput!
@@ -77,9 +84,7 @@ const WebcardParametersLastNameForm = ({
           lastName,
         },
       },
-      onCompleted: () => {
-        toggleBottomSheet();
-      },
+      onCompleted: toggleBottomSheet,
       onError: () => {
         setError('root.server', {
           message: intl.formatMessage({
@@ -123,8 +128,10 @@ const WebcardParametersLastNameForm = ({
         }
         rightElement={
           <Button
-            loading={isSubmitting}
-            disabled={isSubmitting || webCard.lastName === lastName}
+            loading={isSubmitting || isLoading}
+            disabled={
+              isSubmitting || isLoading || webCard.lastName === lastName
+            }
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit Webcard Name modal save button label',

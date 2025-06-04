@@ -128,7 +128,7 @@ const LineDividerEditionScreen = ({
               kind
               visible
               variant
-              ...LineDividerEditionScreen_module
+              ...LineDividerEditionScreen_module @alias(as: "lineDivider")
             }
           }
         }

@@ -2,10 +2,11 @@ import latinize from 'latinize';
 import {
   getWebCardById,
   getWebCardByUserNamePrefixWithRedirection,
-} from '@azzapp/data/src/queries/webCardQueries';
+} from '@azzapp/data';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
+import { mockUser } from '../../../__mocks__/mockGraphQLContext';
 import { Query } from '../QueryResolvers';
 
 jest.mock('@sentry/nextjs', () => ({
@@ -20,7 +21,7 @@ jest.mock('#helpers/permissionsHelpers', () => ({
   checkWebCardProfileAdminRight: jest.fn(),
 }));
 
-jest.mock('@azzapp/data/src/queries/webCardQueries', () => ({
+jest.mock('@azzapp/data', () => ({
   getWebCardById: jest.fn(),
   getWebCardByUserNamePrefixWithRedirection: jest.fn(),
 }));
@@ -35,6 +36,7 @@ describe('Query Resolvers ', () => {
   describe('getProposedUserName Resolver ', () => {
     beforeEach(() => {
       jest.clearAllMocks();
+      mockUser('user-1');
     });
 
     test('should return null if no webcard found', async () => {

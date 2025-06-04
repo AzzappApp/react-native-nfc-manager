@@ -1,23 +1,17 @@
 import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { FormattedMessage } from 'react-intl';
-import { View } from 'react-native';
-import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { StyleSheet, View } from 'react-native';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { PropsWithChildren } from 'react';
 
 const Row = ({ children }: PropsWithChildren) => {
-  const styles = useStyleSheet(styleSheet);
-
   return (
     <View style={styles.row}>
       <Image source={require('./assets/check.svg')} style={styles.check} />
-      <Text variant="medium" appearance="light" style={styles.rowText}>
-        {children}
-      </Text>
+      <Text variant="medium">{children}</Text>
     </View>
   );
 };
@@ -30,7 +24,6 @@ const MultiUserDescription = ({
   onClose?: () => void;
 }) => {
   const { width: screenWidth } = useScreenDimensions();
-  const styles = useStyleSheet(styleSheet);
 
   return (
     <View style={styles.container}>
@@ -88,7 +81,7 @@ const MultiUserDescription = ({
 
 export default MultiUserDescription;
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   container: {
     marginTop: 30,
     gap: 30,
@@ -117,7 +110,4 @@ const styleSheet = createStyleSheet(appearance => ({
     gap: 10,
     minWidth: 311,
   },
-  rowText: {
-    color: appearance === 'dark' ? colors.white : colors.black,
-  },
-}));
+});

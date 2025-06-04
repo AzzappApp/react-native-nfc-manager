@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { baseContactCardSchema } from '#helpers/contactCardHelpers';
 
 export const baseUserDetailsSchema = baseContactCardSchema.extend({
-  role: z.string(),
+  role: z.enum(['user', 'admin', 'owner', 'editor', '%future added value']),
 });
 
 export const multiUserDetailsSchema = baseUserDetailsSchema.extend({

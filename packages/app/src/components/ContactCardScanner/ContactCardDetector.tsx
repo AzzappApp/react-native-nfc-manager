@@ -41,6 +41,7 @@ import type {
   ContactCardDetectorMutation$data,
 } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { vCard } from '@lepirlouit/vcard-parser';
+import type { RefObject } from 'react';
 import type { Point } from 'react-native-vision-camera';
 
 const horizontal = require('./assets/orientation_horizontal.png');
@@ -118,6 +119,26 @@ const ContactCardDetector = ({
 
   const extractDataFromImage = useCallback(
     (picture: { base64: string; uri: string; aspectRatio: number }) => {
+      const networkLowSpeedTimeout = setTimeout(() => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Seems slow... please check your connection',
+            description:
+              'Warning toast message when extractVisitCardData is ongoing',
+          }),
+          autoHide: false,
+          props: {
+            showClose: true,
+          },
+        });
+      }, 10000);
+
+      const resetNetworkLowSpeedTimeout = () => {
+        Toast.hide();
+        clearTimeout(networkLowSpeedTimeout);
+      };
+
       const profileId = getAuthState().profileInfos?.profileId;
       commit({
         variables: {
@@ -125,6 +146,7 @@ const ContactCardDetector = ({
           config: { createContactCard, profileId },
         },
         onCompleted: data => {
+          resetNetworkLowSpeedTimeout();
           extractData(data.extractVisitCardData, {
             uri: picture.uri,
             aspectRatio: picture.aspectRatio,
@@ -133,6 +155,7 @@ const ContactCardDetector = ({
           closeLoading();
         },
         onError: e => {
+          resetNetworkLowSpeedTimeout();
           closeLoading();
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
             router.push({ route: 'USER_PAY_WALL' });
@@ -280,10 +303,10 @@ const ContactCardDetector = ({
 
   const onSelectImage = useCallback(
     (params: ImagePickerResult) => {
-      translateX.value = 0;
-      translateY.value = 0;
-      scale.value = 1;
-      rotation.value = 0;
+      translateX.set(0);
+      translateY.set(0);
+      scale.set(1);
+      rotation.set(0);
       //resize width and height to fit the screen dimension, portrait use height screen dimension, landscape use width screen dimension
       const imageSize =
         params.aspectRatio > 1
@@ -308,7 +331,7 @@ const ContactCardDetector = ({
   const extractDataFromGalleryMedia = useCallback(async () => {
     try {
       showLoading();
-      const image = await makeImageFromView(ref);
+      const image = await makeImageFromView(ref as RefObject<View>);
       if (image) {
         const pngData = image.encodeToBytes(3, 100);
         const base64Data = image.encodeToBase64(3, 100);

@@ -26,10 +26,17 @@ const HomeScreenPrefetcher = ({ user: userKey }: HomeScreenPrefetcherProps) => {
   );
 
   const prefetchRoute = usePrefetchRoute();
+
   const profilesRef = useRef(user.profiles);
   useEffect(() => {
     profilesRef.current = user.profiles;
   }, [user.profiles]);
+
+  useEffect(() => {
+    prefetchRoute(getRelayEnvironment(), {
+      route: 'CONTACTS',
+    });
+  }, [prefetchRoute]);
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {

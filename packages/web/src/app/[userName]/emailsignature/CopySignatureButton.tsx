@@ -12,6 +12,7 @@ type CopySignatureButtonProps = {
   profile: Profile;
   webCard: WebCard;
   companyLogoUrl: string | null;
+  bannerUrl: string | null;
   saveContactMessage: string;
   saveContactURL: string;
 };
@@ -21,6 +22,7 @@ const CopySignatureButton = ({
   profile,
   webCard,
   companyLogoUrl,
+  bannerUrl,
   saveContactMessage,
   saveContactURL,
 }: CopySignatureButtonProps) => {
@@ -33,6 +35,7 @@ const CopySignatureButton = ({
             profile,
             webCard,
             companyLogoUrl,
+            bannerUrl,
             saveContactMessage,
             saveContactURL,
           })

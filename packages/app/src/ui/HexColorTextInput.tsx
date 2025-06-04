@@ -58,7 +58,7 @@ const HexColorTextInput = ({
       setFocusedStyle({
         borderColor: colors.grey900,
       });
-      shouldHandleKeyboardEvents.value = true;
+      shouldHandleKeyboardEvents.set(true);
       if (onFocus) {
         onFocus(e);
       }
@@ -69,7 +69,7 @@ const HexColorTextInput = ({
   const onInputBlur = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       setFocusedStyle({});
-      shouldHandleKeyboardEvents.value = false;
+      shouldHandleKeyboardEvents.set(false);
       if (onBlur) {
         onBlur(e);
       }
@@ -81,7 +81,7 @@ const HexColorTextInput = ({
   useEffect(() => {
     return () => {
       // Reset the flag on unmount
-      shouldHandleKeyboardEvents.value = false;
+      shouldHandleKeyboardEvents.set(false);
     };
   }, [shouldHandleKeyboardEvents]);
   //#endregion

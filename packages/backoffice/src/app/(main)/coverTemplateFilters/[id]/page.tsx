@@ -8,18 +8,20 @@ import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translation
 import CoverTemplateTagForm from '../CoverTemplateTagsForm';
 
 type CoverTemplateTagPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     saved?: string;
-  };
+  }>;
 };
 
-const CoverTemplateTagPage = async ({
-  params: { id },
-  searchParams,
-}: CoverTemplateTagPageProps) => {
+const CoverTemplateTagPage = async (props: CoverTemplateTagPageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { id } = params;
+
   const coverTemplateTag = await getCoverTemplateTagById(id);
   if (!coverTemplateTag) {
     return notFound();

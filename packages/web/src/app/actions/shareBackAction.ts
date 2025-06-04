@@ -13,23 +13,25 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
+import { CONTACT_CARD_SIGNATURE_SECRET } from '@azzapp/service/contactCardSerializationServices';
+import { sendTemplateEmail } from '@azzapp/service/emailServices';
+import { sendPushNotification } from '@azzapp/service/notificationsHelpers';
+import {
+  getValuesFromSubmitData,
+  shareBackSignature,
+} from '@azzapp/service/shareBackHelper';
+import { sendTwilioSMS } from '@azzapp/service/twilioHelpers';
+import { buildVCardFileName } from '@azzapp/shared/contactCardHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
+import env from '#env';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
-import { sendPushNotification } from '#helpers/notificationsHelpers';
-import {
-  getValuesFromSubmitData,
-  shareBackSignature,
-  shareBackVCardFilename,
-} from '#helpers/shareBackHelper';
-import { sendTwilioSMS } from '#helpers/twilioHelpers';
-import type { VerifySignToken } from '#app/api/verifySign/route';
-import type { NewContact } from '@azzapp/data/src/schema';
+import type { NewContact } from '@azzapp/data';
+import type { VerifySignToken } from '@azzapp/service/signatureServices';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';
@@ -46,8 +48,6 @@ export type ShareBackFormData = FormData & {
   email: string;
 };
 
-const intl = getServerIntl();
-
 export const processShareBackSubmission = async (
   userId: string,
   webcardId: string,
@@ -55,13 +55,30 @@ export const processShareBackSubmission = async (
   prevState: unknown,
   formData: FormData,
 ): Promise<SubmissionResult | null | undefined> => {
-  headers();
+  await headers();
 
   const submission = parseWithZod(formData, {
     schema: ShareBackFormSchema,
   });
 
   try {
+    // get user data from userId
+    const user = await getUserById(userId);
+
+    if (!user) {
+      Sentry.captureException(
+        new Error(
+          `No user found to send the share back with userId: ${userId} from token: ${token}`,
+        ),
+      );
+
+      return submission.reply({
+        formErrors: ['Contact not found'],
+      });
+    }
+
+    const intl = getServerIntl(guessLocale(user?.locale));
+
     // decode token
     const decodedToken = jwtDecode<JwtPayload & VerifySignToken>(token);
     // verify expiration date
@@ -88,20 +105,6 @@ export const processShareBackSubmission = async (
             description: 'ShareBack - Error message for invalid submission',
           }),
         ],
-      });
-    }
-    // get user data from userId
-    const user = await getUserById(userId);
-
-    if (!user) {
-      Sentry.captureException(
-        new Error(
-          `No user found to send the share back with userId: ${userId} from token: ${token}`,
-        ),
-      );
-
-      return submission.reply({
-        formErrors: ['Contact not found'],
       });
     }
 
@@ -139,18 +142,20 @@ export const processShareBackSubmission = async (
       });
     }
 
-    let phone = submission.value.phone?.number || '';
+    let phone = submission.value.number || '';
+    const email = submission?.value?.email || '';
 
     try {
       const { number } = parsePhoneNumberWithError(
-        submission.value.phone?.number || '',
+        submission.value.number || '',
         {
-          defaultCountry: submission.value.phone?.countryCode as CountryCode,
+          defaultCountry: submission.value?.countryCode as CountryCode,
         },
       );
       phone = number;
     } catch (e) {
-      Sentry.captureException(e);
+      console.warn('fail to parse number', e);
+      phone = '';
     }
 
     const contactFormValue = {
@@ -160,27 +165,37 @@ export const processShareBackSubmission = async (
 
     await saveShareBack(profile.id, {
       ...submission.payload,
-      phoneNumbers: [{ label: 'Home', number: phone }],
-      emails: [{ label: 'Main', address: submission.payload.email }],
+      phoneNumbers:
+        phone.trim() !== '' ? [{ label: 'Home', number: phone }] : [],
+      emails: email.trim() !== '' ? [{ label: 'Main', address: email }] : [],
       meetingLocation: decodedToken.geolocation?.location,
       meetingPlace: decodedToken.geolocation?.address,
     } as NewContact);
 
     await sendPushNotification(profile.userId, {
-      notification: {
-        type: 'shareBack',
-        webCardId: toGlobalId('WebCard', profile.webCardId),
-      },
       mediaId: null,
       sound: 'default',
-      locale: guessLocale(user?.locale),
+      title: intl.formatMessage({
+        defaultMessage: 'Contact ShareBack',
+        id: '0j4O2Z',
+        description: 'Push Notification title for contact share back',
+      }),
+      body: intl.formatMessage({
+        defaultMessage: `Hello, You've received a new contact ShareBack.`,
+        id: 'rAeWtj',
+        description: 'Push Notification body message for contact share back',
+      }),
+      data: {
+        webCardId: toGlobalId('WebCard', profile.webCardId),
+        type: 'shareBack',
+      },
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {
       const shareBackContactDetails = getValuesFromSubmitData(contactFormValue);
 
       const signature = await shareBackSignature(
-        process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+        CONTACT_CARD_SIGNATURE_SECRET,
         shareBackContactDetails,
       );
 
@@ -188,7 +203,7 @@ export const processShareBackSubmission = async (
         JSON.stringify([shareBackContactDetails, signature]),
       );
 
-      const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
+      const shareBackContactVCardUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
 
       await sendTwilioSMS({
         body: intl.formatMessage({
@@ -203,7 +218,7 @@ export const processShareBackSubmission = async (
       const buildVCardContact =
         buildVCardFromShareBackContact(contactFormValue);
 
-      const vCardFileName = shareBackVCardFilename(submission.value);
+      const vCardFileName = buildVCardFileName('', submission.value);
 
       await sendTemplateEmail({
         templateId: 'd-edcdee049b6d468cadf3ce7098bf0fe2',
@@ -243,9 +258,7 @@ export const processShareBackSubmission = async (
       });
     }
 
-    return submission.reply({
-      formErrors: [],
-    });
+    return submission.reply();
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);

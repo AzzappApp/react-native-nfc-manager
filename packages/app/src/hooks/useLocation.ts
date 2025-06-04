@@ -3,14 +3,18 @@ import { useEffect, useState } from 'react';
 
 export const useCurrentLocation = () => {
   const [currentValue, setCurrentValue] = useState<{
-    location: Location.LocationObject;
-    address?: Location.LocationGeocodedAddress;
-  } | null>(null);
+    value: {
+      location: Location.LocationObject;
+      address?: Location.LocationGeocodedAddress;
+    } | null;
+    locationSearched: boolean;
+  }>({ value: null, locationSearched: false });
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        setCurrentValue({ value: null, locationSearched: true });
         return;
       }
 
@@ -28,18 +32,24 @@ export const useCurrentLocation = () => {
         address = await Location.reverseGeocodeAsync(currentLocation.coords);
         if (address.length > 0) {
           setCurrentValue({
-            location: currentLocation,
-            address: address[0],
+            value: {
+              location: currentLocation,
+              address: address[0],
+            },
+            locationSearched: true,
           });
           return;
         } else {
           setCurrentValue({
-            location: currentLocation,
+            value: {
+              location: currentLocation,
+            },
+            locationSearched: true,
           });
           return;
         }
       }
-      setCurrentValue(null);
+      setCurrentValue({ value: null, locationSearched: true });
     })();
   }, []);
 

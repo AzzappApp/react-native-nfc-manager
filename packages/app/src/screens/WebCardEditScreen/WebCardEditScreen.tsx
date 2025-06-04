@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -8,6 +8,7 @@ import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
+import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
@@ -55,7 +56,7 @@ type WebCardEditScreenProps = {
   fromCreation: boolean;
   editing: boolean;
   editTransition: DerivedValue<number>;
-  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle | null>;
   transitionInfos: Record<string, ModuleTransitionInfo> | null;
   onDone: () => void;
 };
@@ -157,13 +158,17 @@ const WebCardEditScreen = ({
     [router],
   );
 
+  const { coverUploadingData } = useCoverUpload();
   const onEditCover = useCallback(() => {
     //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
     Toast.hide();
+    if (coverUploadingData?.webCardId === webCard.id) {
+      return;
+    }
     router.push({
       route: 'COVER_EDITION',
     });
-  }, [router]);
+  }, [router, coverUploadingData?.webCardId, webCard.id]);
   // #endregion
 
   // #region Selection mode
@@ -212,6 +217,60 @@ const WebCardEditScreen = ({
     webCardBodyRef.current?.deleteSelectedModules();
     toggleSelectionMode();
   }, [toggleSelectionMode]);
+
+  const confirmDeleteSection = () => {
+    Alert.alert(
+      intl.formatMessage(
+        {
+          defaultMessage: `Delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }`,
+          description: 'Title of delete sections Alert',
+        },
+        {
+          count: nbSelectedModules,
+        },
+      ),
+      intl.formatMessage(
+        {
+          defaultMessage: `Are you sure you want to delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }? This action is irreversible.`,
+          description: 'description of delete sections Alert',
+        },
+        {
+          count: nbSelectedModules,
+        },
+      ),
+      [
+        {
+          text: intl.formatMessage(
+            {
+              defaultMessage: `Delete {count, plural,
+          =1 {this section}
+          other {these sections}
+        }`,
+              description: 'button of delete sections Alert',
+            },
+            {
+              count: nbSelectedModules,
+            },
+          ),
+          onPress: onDeleteSelectedModules,
+          style: 'destructive',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button of delete sections Alert',
+          }),
+          isPreferred: true,
+        },
+      ],
+    );
+  };
 
   const onDuplicateSelectedModules = useCallback(() => {
     webCardBodyRef.current?.duplicateSelectedModules();
@@ -273,7 +332,13 @@ const WebCardEditScreen = ({
   //#region Edit toast
   const intl = useIntl();
   const { bottom } = useScreenInsets();
+  const wasEditing = useRef(false);
   useEffect(() => {
+    if (editing === wasEditing.current) {
+      return;
+    }
+    wasEditing.current = editing;
+
     // ensure we display the toast only once
     const hasDisplayConfigureModuleToast =
       storage.getBoolean(MMKVS_HAS_DISPLAY_CONFIGURE_MODULE_TOAST) ?? false;
@@ -309,8 +374,13 @@ const WebCardEditScreen = ({
     return () => {
       Toast.hide();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing]);
+  }, [
+    bottom,
+    editing,
+    intl,
+    webCard?.cardIsPublished,
+    webCard?.cardModules?.length,
+  ]);
   //#endregion
 
   const { width: windowWidth } = useScreenDimensions();
@@ -405,7 +475,7 @@ const WebCardEditScreen = ({
             onRequestColorPicker={openWebCardColorPicker}
             onRequestWebCardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
-            onDelete={onDeleteSelectedModules}
+            onDelete={confirmDeleteSection}
             onDuplicate={onDuplicateSelectedModules}
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />

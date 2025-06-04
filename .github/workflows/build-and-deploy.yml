@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
-      
+
       - name: Put staging translations to production
         run: yarn i18n:merge
         if: github.ref == 'refs/heads/stable'
@@ -43,7 +43,7 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
@@ -61,7 +61,7 @@ jobs:
 
       - name: Bump version
         run: |
-          NEXT_VERSION=""
+          NEXT_VERSION="release"
           if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
             NEXT_VERSION="rc"
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
@@ -73,27 +73,19 @@ jobs:
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-      - name: Force rebuild the query-map.json
-        run: yarn relay:build --repersist
+      # This step is useless since it was already done in the build-app-dependencies step
+      # But we keep in case the app dependencies are not built in the future
+      - name: Build the persisted-query-map.json
+        run: yarn turbo run relay:build
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
 
       - name: Update persisted queries
         id: query-map-updated
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        run: yarn persist-queries
+        run: yarn turbo run persist-queries --filter=@azzapp/api
         # ADD this once we support multiple versions
         env:
           LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
-
-      - name: Git config
-        run: |
-          git config user.name "Azzapp Dev Bot"
-          git config user.email "azzapp-dev-bot@azzapp.com"
-      - name: Commit version bump
-        run: |
-          git add .
-          git commit -m "chore(ci): bump version [skip ci]"
-          git push origin $GITHUB_REF_NAME
 
       ############################################
       #
@@ -119,6 +111,8 @@ jobs:
               HAS_CHANGE="true"
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+          pwd
+          rm -fr drizzle && echo "drizzle deleted" || echo "failed to delete drizzle"
 
       - name: PlanetScale - Extract branch name
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
@@ -217,60 +211,47 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
         run: |
           pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --wait
-
+      
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
-      - name: Azzapp Web - Pull Vercel configuration
-        env:
-          VERCEL_PROJECT_ID: 'azzapp'
-        run: |
-          ENVIRONMENT="preview"
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ENVIRONMENT="production"
-          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            ADDITIONAL_ARGS="--git-branch=main"
-          fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Web - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp'
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+      - name: Deploy API to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/api'
+          vercel_project_id: 'azzapp-api'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Azzapp Backoffice - Pull Vercel configuration
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-backoffice'
-        run: |
-          ENVIRONMENT="preview"
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ENVIRONMENT="production"
-          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            ADDITIONAL_ARGS="--git-branch=main"
-          fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Backoffice - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: 'azzapp-backoffice'
+      - name: Deploy Web to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/web'
+          vercel_project_id: 'azzapp'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Backoffice to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          package: '@azzapp/backoffice'
+          vercel_project_id: 'azzapp-backoffice'
+          vercel_team_id: 'azzapp'
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+    
+      - name: Git config
         run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          rm -fr ./packages/web/.next
-          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          git config user.name "Azzapp Dev Bot"
+          git config user.email "azzapp-dev-bot@azzapp.com"
+
+      - name: Commit version bump
+        run: |
+          git add .
+          git commit -m "chore(ci): bump version [skip ci]"
+          git push origin $GITHUB_REF_NAME
+        
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native iOS application
@@ -293,20 +274,29 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
       - name: JavaScript build
         run: yarn build-app-dependencies
-
+      
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: packages/app
           bundler-cache: true
 
+      - name: Restore ipa
+        id: restore-ipa
+        uses: actions/cache/restore@v4
+        with:
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
+          key: ipa-${{ runner.os }}-${{ vars.IOS_SCHEME }}-${{ hashFiles(
+            'packages/app/ios/**/*',
+            'packages/app/native_modules/*/ios/**/*') }}
+
       - name: Cache CocoaPods
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: packages/app/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
@@ -321,13 +311,22 @@ jobs:
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
 
+      - name: Read application version
+        id: read_version
+        run: |
+          VERSION_NUMBER=$(jq -r '.version' package.json)
+          BUILD_NUMBER=$(jq -r '.version' internal-version.json)
+          echo "version=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+          echo "build=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+      
       - name: Build ios application
+        if: steps.restore-ipa.outputs.cache-hit != 'true'
         working-directory: packages/app
-        run: yarn build:ios
+        run: yarn build:ios:native
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
@@ -335,10 +334,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: 'azzapp'
           SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
@@ -353,6 +348,46 @@ jobs:
           AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
           WIDGET_APP_GROUP: ${{vars.WIDGET_APP_GROUP}}
           NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
+          VERSION_NUMBER: ${{ steps.read_version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.read_version.outputs.build }}
+
+      - name: Save ipa to cache
+        if: steps.restore-ipa.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
+          key: ${{ steps.restore-ipa.outputs.cache-primary-key }}
+
+      - name: inject react-native code and assets
+        working-directory: packages/app
+        run: yarn build:ios:js
+        env:
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
+          PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
+          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
+          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'azzapp'
+          SENTRY_PROJECT: 'azzapp-app'
+          IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
+          IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
+          IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+          APP_SCHEME: ${{ vars.APP_SCHEME }}
+          IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
+          IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
+          IOS_APPCLIP_SCHEME: ${{ vars.IOS_APPCLIP_SCHEME }}
+          IOS_CODE_SIGNING_IDENTITY: ${{ vars.IOS_CODE_SIGNING_IDENTITY }}
+          IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
+          IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
+          WIDGET_APP_GROUP: ${{vars.WIDGET_APP_GROUP}}
+          NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
+          VERSION_NUMBER: ${{ steps.read_version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.read_version.outputs.build }}
 
       - name: Upload ios artifact
         uses: actions/upload-artifact@v4
@@ -378,6 +413,7 @@ jobs:
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+
   buid-android:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native Android application
@@ -398,7 +434,7 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
           TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
@@ -441,23 +477,34 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Build android application
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('packages/app/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      
+      - name: Sync Native Version
+        working-directory: packages/app/
+        run: yarn sync-android-versions
+
+      - name: Build Android native application
+        working-directory: packages/app/
         run: yarn build:android
-        working-directory: packages/app
         env:
+          DEVELOPMENT_BUILD: ${{ github.ref_name != 'stable' }}
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
           SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
           SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: 'azzapp'
           SENTRY_PROJECT: 'azzapp-app'
-          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-          ABOUT: https://web.azzapp.com/company/about_us
-          FAQ: https://web.azzapp.com/company/faq
           APP_SCHEME: ${{ vars.APP_SCHEME }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
@@ -468,18 +515,24 @@ jobs:
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
           AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
           NEXT_PUBLIC_USER_MGMT_URL: ${{vars.NEXT_PUBLIC_USER_MGMT_URL}}
+          GRADLE_OPTS: "-Xmx8g -XX:MaxMetaspaceSize=2g"
+      
+      - name: Copy AAB
+        working-directory: packages/app
+        run: |
+          cp -R ./android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab azzapp.aab
 
       - name: Upload android artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
-          path: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: ./packages/app/azzapp.aab
 
       - name: Deploy android application
         run: bundle exec fastlane android deploy
         working-directory: packages/app
         env:
-          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
           ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
@@ -487,4 +540,4 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AAB_PATH: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          AAB_PATH: ${{ github.workspace }}/packages/app/azzapp.aab

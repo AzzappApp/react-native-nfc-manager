@@ -228,7 +228,7 @@ const SimpleButtonEditionScreen = ({
               kind
               visible
               variant
-              ...SimpleButtonEditionScreen_module
+              ...SimpleButtonEditionScreen_module @alias(as: "simpleButton")
             }
           }
         }

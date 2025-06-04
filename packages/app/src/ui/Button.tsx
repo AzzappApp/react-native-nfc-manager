@@ -18,7 +18,7 @@ import type {
 } from 'react-native';
 
 export type ButtonProps = PressableProps & {
-  label: ReactNode;
+  label?: ReactNode;
   variant?: 'little_round_inverted' | 'little_round' | 'primary' | 'secondary';
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
@@ -26,6 +26,7 @@ export type ButtonProps = PressableProps & {
   leftElement?: ReactNode;
   rightElement?: ReactNode;
   textStyle?: TextStyle;
+  loadingStyle?: StyleProp<ViewStyle>;
 };
 
 const Button = (
@@ -39,6 +40,7 @@ const Button = (
     leftElement,
     rightElement,
     textStyle,
+    loadingStyle,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -68,17 +70,19 @@ const Button = (
   const buttonProps = {
     accessibilityRole: 'button',
     children: loading ? (
-      <ActivityIndicator color={color} />
+      <ActivityIndicator style={loadingStyle} color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
         {leftElement}
-        <Text
-          variant="button"
-          style={[variantStyles.label, textStyle]}
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            variant="button"
+            style={[variantStyles.label, textStyle]}
+            numberOfLines={1}
+          >
+            {label}
+          </Text>
+        )}
         {rightElement}
       </View>
     ),
@@ -107,6 +111,10 @@ const Button = (
             style,
             disabled && variantStyles.disabled,
           ]}
+          android_ripple={{
+            foreground: true,
+            borderless: true,
+          }}
         />
       </View>
     );
@@ -140,7 +148,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       alignItems: 'center',
       borderRadius: 12,
       borderCurve: 'continuous',
-      paddingHorizontal: 20,
+      paddingHorizontal: 15,
       overflow: 'hidden',
     },
     labelContainer: {
@@ -187,7 +195,6 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       backgroundColor: 'transparent',
     },
     androidNoPadding: {
-      padding: 1, //for border
       overflow: 'hidden',
     },
   },

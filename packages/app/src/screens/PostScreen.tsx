@@ -35,11 +35,14 @@ import type { ForwardedRef } from 'react';
 
 const postScreenQuery = graphql`
   query PostScreenQuery($postId: ID!, $webCardId: ID!) {
-    post: node(id: $postId) {
-      id
-      ...PostList_posts
-        @arguments(includeAuthor: true, viewerWebCardId: $webCardId)
-      ...PostScreenFragment_relatedPosts @arguments(viewerWebCardId: $webCardId)
+    node(id: $postId) {
+      ... on Post @alias(as: "post") {
+        id
+        ...PostList_posts
+          @arguments(includeAuthor: true, viewerWebCardId: $webCardId)
+        ...PostScreenFragment_relatedPosts
+          @arguments(viewerWebCardId: $webCardId)
+      }
     }
   }
 `;
@@ -57,7 +60,8 @@ const PostScreen = ({
     router.back();
   };
 
-  const { post } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const post = node?.post;
 
   const ready = useDidAppear();
 

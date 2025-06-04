@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, {
@@ -22,6 +22,7 @@ import {
 } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -33,6 +34,7 @@ import ContactCardEditCompanyLogo from './ContactCardEditCompanyLogo';
 import ContactCardEditModalEmails from './ContactCardEditEmails';
 import ContactCardEditModalName from './ContactCardEditName';
 import ContactCardEditModalPhones from './ContactCardEditPhones';
+import ContactCardEditSignatureBanner from './ContactCardEditSignatureBanner';
 import ContactCardEditModalSocials from './ContactCardEditSocials';
 import ContactCardEditModalUrls from './ContactCardEditUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -64,19 +66,12 @@ const ContactCardEditForm = ({
     name: 'avatar',
   });
 
-  const { field: logoField } = useController({
-    control,
-    name: 'logo',
-  });
-
   const { field: companyField } = useController({
     control,
     name: 'company',
   });
 
-  const [imagePicker, setImagePicker] = useState<'avatar' | 'logo' | null>(
-    null,
-  );
+  const [imagePicker, setImagePicker] = useState<'avatar' | null>(null);
 
   const onImagePickerFinished = useCallback(
     async ({
@@ -105,35 +100,20 @@ const ContactCardEditForm = ({
           id: localPath,
           uri: localPath,
         });
-      } else {
-        const exportWidth = width;
-        const exportHeight = exportWidth / aspectRatio;
-        const localPath = await saveTransformedImageToFile({
-          uri,
-          resolution: { width: exportWidth, height: exportHeight },
-          format: mimeType,
-          quality: 95,
-          filter,
-          editionParameters,
-        });
-        logoField.onChange({
-          local: true,
-          id: localPath,
-          uri: localPath,
-        });
       }
 
       setImagePicker(null);
     },
-    [avatarField, imagePicker, logoField],
+    [avatarField, imagePicker],
   );
 
   const { commonInformation } = webCard ?? {};
+  const { bottom } = useScreenInsets();
 
   return (
     <>
       <FormDeleteFieldOverlay keyboardShouldPersistTaps="handled">
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           {children}
           <ContactCardEditModalAvatar
             control={control}
@@ -199,6 +179,12 @@ const ContactCardEditForm = ({
             isPremium={webCard?.isPremium}
             isUserContactCard
           />
+          <Separation small />
+          <ContactCardEditSignatureBanner
+            control={control}
+            canEditBanner={!webCard?.isMultiUser || !webCard?.banner}
+            isPremium={webCard?.isPremium}
+          />
           <Separation />
           {webCard?.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
@@ -236,7 +222,7 @@ const ContactCardEditForm = ({
                 </Text>
               </View>
               <Text variant="medium" style={{ flex: 1 }}>
-                {buildUserUrl(webCard?.userName || '')}
+                {buildWebUrl(webCard?.userName)}
               </Text>
             </View>
           )}

@@ -227,8 +227,8 @@ const SimpleTextEditionScreen = ({
               visible
               variant
               ...SimpleTextEditionScreen_module
-              ...SimpleTextRenderer_simpleTextModule
-              ...SimpleTextRenderer_simpleTitleModule
+              ...SimpleTextRenderer_simpleTextModule @alias(as: "simpleText")
+              ...SimpleTextRenderer_simpleTitleModule @alias(as: "simpleTitle")
             }
           }
         }

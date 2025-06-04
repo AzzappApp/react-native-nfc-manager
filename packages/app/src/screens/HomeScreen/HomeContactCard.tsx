@@ -1,39 +1,30 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
-import { getTextColor } from '@azzapp/shared/colorsHelpers';
-import { colors, shadow } from '#theme';
+import { shadow } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useQRCodeKey from '#hooks/useQRCodeKey';
-import FingerHint, {
-  FINGER_HINT_HEIGHT,
-  FINGER_HINT_WIDTH,
-} from '#ui/FingerHint';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 type HomeContactCardProps = ViewProps & {
   user: HomeContactCard_user$key;
-  contentContainerStyle?: ViewStyle;
-  width: number;
   height: number;
-  gap: number;
 };
+
+const GAP = 20;
 
 const HomeContactCard = ({
   user,
-  width,
   height,
-  gap,
   style,
-  contentContainerStyle,
   ...props
 }: HomeContactCardProps) => {
   const { profiles } = useFragment(
@@ -52,17 +43,19 @@ const HomeContactCard = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const { width } = useScreenDimensions();
+
   const { currentIndexSharedValue } = useHomeScreenContext();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          translateX: -(currentIndexSharedValue.value - 1) * (width + gap),
+          translateX: -(currentIndexSharedValue.value - 1) * (width + GAP),
         },
       ],
     };
-  }, [width, gap, currentIndexSharedValue]);
+  }, [width, GAP, currentIndexSharedValue]);
 
   return (
     <View
@@ -76,17 +69,13 @@ const HomeContactCard = ({
       ]}
       {...props}
     >
-      <Animated.View
-        style={[styles.contactCardList, contentContainerStyle, animatedStyle]}
-      >
+      <Animated.View style={[styles.contactCardList, animatedStyle]}>
         {profiles?.map((item, index) => (
           <ContactCardItemMemo
             key={item.webCard?.id}
             height={height}
-            width={width}
             item={item}
-            index={index}
-            position={index * (width + gap)}
+            position={index * (width + GAP)}
           />
         ))}
       </Animated.View>
@@ -98,15 +87,13 @@ export default memo(HomeContactCard);
 
 type ContactCardItemProps = {
   height: number;
-  width: number;
   position: number;
   item: HomeContactCard_profile$key;
-  index: number;
 };
 
 const ContactCardItem = ({
   height,
-  width,
+
   position,
   item,
 }: ContactCardItemProps) => {
@@ -134,17 +121,6 @@ const ContactCardItem = ({
     item,
   );
 
-  const qrCodeKey = useQRCodeKey(profile);
-
-  const showUpdateContactHint =
-    profile.lastContactCardUpdate <= profile.createdAt &&
-    profile.webCard?.cardIsPublished;
-
-  const readableColor = useMemo(
-    () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
-    [profile.webCard?.cardColors?.primary],
-  );
-
   const router = useRouter();
 
   const openContactCard = useCallback(() => {
@@ -154,9 +130,7 @@ const ContactCardItem = ({
   }, [router]);
 
   return (
-    <View
-      style={{ width, height, position: 'absolute', top: 0, left: position }}
-    >
+    <View style={{ height, position: 'absolute', top: 0, left: position }}>
       {profile.webCard?.cardIsPublished &&
         !profile.invited &&
         !profile.promotedAsOwner && (
@@ -169,23 +143,13 @@ const ContactCardItem = ({
             <TouchableOpacity onPress={openContactCard}>
               <ContactCard
                 profile={profile}
-                height={Math.min(height, height)}
+                height={height}
                 style={styles.card}
                 edit
-                qrCodeKey={qrCodeKey}
               />
             </TouchableOpacity>
           </View>
         )}
-      {showUpdateContactHint && (
-        <FingerHint
-          color={readableColor === colors.black ? 'dark' : 'light'}
-          style={{
-            top: (95 * height) / 100 - FINGER_HINT_HEIGHT / 2,
-            left: (78 * width) / 100 - FINGER_HINT_WIDTH / 2,
-          }}
-        />
-      )}
     </View>
   );
 };
@@ -195,6 +159,7 @@ const ContactCardItemMemo = memo(ContactCardItem);
 const styleSheet = createStyleSheet(appearance => ({
   contactCardList: {
     flex: 1,
+    marginLeft: 20,
   },
   card: {
     ...shadow({ appearance }),

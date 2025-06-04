@@ -4,7 +4,6 @@ import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import { logEvent } from '#helpers/analytics';
-import useContactCardAccess from '#hooks/useContactCardAccess';
 import LargeButton from '#ui/LargeButton';
 import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
 import type { ColorSchemeName, ViewStyle } from 'react-native';
@@ -16,11 +15,13 @@ export type ContactCardExportVcfProps = {
 const ContactCardExportVcf = ({
   profile: profileKey,
   publicKey,
+  contactCardAccessId,
   appearance,
   style,
 }: {
-  publicKey?: string;
-  profile: ContactCardExportVcf_card$key;
+  publicKey: string;
+  contactCardAccessId: string;
+  profile?: ContactCardExportVcf_card$key | null;
   appearance?: ColorSchemeName;
   style?: ViewStyle;
 }) => {
@@ -31,13 +32,13 @@ const ContactCardExportVcf = ({
           firstName
           lastName
         }
-        ...useContactCardAccess_profile
+        webCard {
+          userName
+        }
       }
     `,
     profileKey,
   );
-
-  const contactCardAccessData = useContactCardAccess(profile);
 
   const intl = useIntl();
   return (
@@ -47,20 +48,16 @@ const ContactCardExportVcf = ({
       onPress={async () => {
         const title =
           formatDisplayName(
-            profile.contactCard?.firstName,
-            profile.contactCard?.lastName,
+            profile?.contactCard?.firstName,
+            profile?.contactCard?.lastName,
           ) ?? '';
         try {
           logEvent('share_contact_card');
-          if (
-            contactCardAccessData?.webCard?.userName &&
-            publicKey &&
-            contactCardAccessData?.contactCardAccessId
-          ) {
+          if (profile?.webCard?.userName && publicKey && contactCardAccessId) {
             const contactCardUrl = buildUserUrlWithKey({
-              userName: contactCardAccessData.webCard.userName,
+              userName: profile.webCard.userName,
               key: publicKey,
-              contactCardAccessId: contactCardAccessData.contactCardAccessId,
+              contactCardAccessId,
             });
             await ShareCommand.open({
               title,

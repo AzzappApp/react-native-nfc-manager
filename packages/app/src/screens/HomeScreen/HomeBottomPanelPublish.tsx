@@ -14,12 +14,12 @@ import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
+import type { HomeBottomPanelMessage_user$data } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
 import type { HomeBottomPanelPublishMutation } from '#relayArtifacts/HomeBottomPanelPublishMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 type HomeBottomPanelPublishProps = {
-  profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
+  profile: ArrayItemType<HomeBottomPanelMessage_user$data['profiles']>;
 };
 
 const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {

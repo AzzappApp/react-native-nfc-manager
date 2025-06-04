@@ -16,9 +16,8 @@ import type { FollowingsScreenQuery } from '#relayArtifacts/FollowingsScreenQuer
 import type { FollowingsRoute } from '#routes';
 const followingsScreenQuery = graphql`
   query FollowingsScreenQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      id
-      ...FollowingsScreenList_webCard
+    node(id: $webCardId) {
+      ...FollowingsScreenList_webCard @alias(as: "webCard")
     }
   }
 `;
@@ -29,7 +28,8 @@ const FollowingsScreen = ({
   const router = useRouter();
   const intl = useIntl();
   const [searchValue, setSearchValue] = useState<string | undefined>('');
-  const { webCard } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+  const webCard = node?.webCard;
   const { top } = useScreenInsets();
   return (
     <Container style={[styles.container, { paddingTop: top }]}>
@@ -51,7 +51,10 @@ const FollowingsScreen = ({
         <SearchBar onChangeText={setSearchValue} value={searchValue} />
       </View>
       <Suspense fallback={<LoadingView />}>
-        <FollowingsScreenList webCard={webCard} searchValue={searchValue} />
+        <FollowingsScreenList
+          webCard={webCard ?? null}
+          searchValue={searchValue}
+        />
       </Suspense>
     </Container>
   );

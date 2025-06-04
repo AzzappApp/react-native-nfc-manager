@@ -21,10 +21,13 @@ const OfflineHeader = ({
 }: OfflineHeaderProps) => {
   const maxLength = useWindowDimensions().width / 13;
 
-  const animatedUserNames = useDerivedValue(
-    () => userNames.map(p => '/' + p),
-    [userNames],
-  );
+  const animatedUserNames = useDerivedValue(() => {
+    'worklet';
+    return userNames.map(p => {
+      'worklet';
+      return '/' + p;
+    });
+  }, [userNames]);
   const opacityStyle = useAnimatedStyle(() => {
     return {
       opacity:

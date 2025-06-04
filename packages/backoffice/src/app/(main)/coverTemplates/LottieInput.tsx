@@ -5,7 +5,7 @@ import {
 } from '@conform-to/react';
 import { Box, Button, Typography } from '@mui/material';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
+import { getCloudinaryAssetURL } from '@azzapp/service/mediaServices/imageHelpers';
 import LottiePlayer from '#components/LottiePlayer';
 
 type Props = {

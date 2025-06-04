@@ -7,18 +7,22 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { subscriptionsForUserLoader } from '#loaders';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
-const deleteUser: MutationResolvers['deleteUser'] = async () => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
+const deleteUser: MutationResolvers['deleteUser'] = async (
+  _,
+  _args,
+  context,
+) => {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   if (
-    (await subscriptionsForUserLoader.load(userId)).filter(
+    (await subscriptionsForUserLoader.load(user.id)).filter(
       sub => sub.subscriptionPlan !== 'web.lifetime' && sub.status === 'active',
     ).length > 0
   ) {
@@ -26,8 +30,8 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
   }
 
   try {
-    await markUserAsDeleted(userId, userId);
-    const userProfiles = await getUserProfilesWithWebCard(userId);
+    await markUserAsDeleted(user.id, user.id);
+    const userProfiles = await getUserProfilesWithWebCard(user.id);
     userProfiles.forEach(({ profile, webCard }) => {
       if (profile.profileRole === 'owner' && webCard.userName) {
         invalidateWebCard(webCard.userName);
@@ -45,7 +49,7 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     );
     if (owners.length > 0) {
       for (const owner of owners) {
-        await updateMonthlySubscription(owner.id);
+        await updateMonthlySubscription(owner.id, context.apiEndpoint);
       }
     }
   } catch (error) {
@@ -53,13 +57,13 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const user = await getUserById(userId);
+  const newUser = await getUserById(user.id);
 
-  if (!user) {
+  if (!newUser) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-
-  return user;
+  // FIXME shall delete FCM token ?
+  return newUser;
 };
 
 export default deleteUser;

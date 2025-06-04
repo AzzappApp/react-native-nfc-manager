@@ -7,7 +7,6 @@ import {
 } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DELETE_BUTTON_WIDTH } from '#helpers/contactHelpers';
 import type { LegacyRef, PropsWithChildren } from 'react';
 import type {
@@ -108,8 +107,6 @@ const FormDeleteFieldOverlay = (
     [state.rect],
   );
 
-  const { bottom } = useSafeAreaInsets();
-
   return (
     <FormDeleteContext.Provider
       value={{ ...state, openDeleteButton, closeDeleteButton }}
@@ -123,7 +120,6 @@ const FormDeleteFieldOverlay = (
         <View
           style={{
             pointerEvents: state.rect ? 'none' : 'auto',
-            paddingBottom: bottom,
           }}
         >
           {children}

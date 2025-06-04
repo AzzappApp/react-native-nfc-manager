@@ -1,9 +1,9 @@
 import { mergeContactCardWithCommonInfos } from '@azzapp/service/contactCardServices';
+import { getImageURLForSize } from '@azzapp/service/mediaServices/imageHelpers';
 import {
   getEmailSignatureTitleColor,
   colors,
 } from '@azzapp/shared/colorsHelpers';
-import { getRoundImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
 import type { Profile, WebCard } from '@azzapp/data';
@@ -12,6 +12,7 @@ const renderFullEmailSignature = ({
   webCard,
   profile,
   companyLogoUrl,
+  bannerUrl,
   saveContactMessage,
   saveContactURL,
   isPreview,
@@ -19,15 +20,17 @@ const renderFullEmailSignature = ({
   webCard: WebCard;
   profile: Profile;
   companyLogoUrl: string | null;
+  bannerUrl: string | null;
   saveContactMessage: string;
   saveContactURL?: string;
   isPreview?: boolean;
 }) => {
   const avatar = profile.avatarId
-    ? getRoundImageURLForSize({
+    ? getImageURLForSize({
         id: profile.avatarId,
         height: 120,
         width: 120,
+        radius: 100,
         format: 'png',
       })
     : null;
@@ -122,7 +125,7 @@ const renderFullEmailSignature = ({
             padding: 0;
             font-size: 12px;
             line-height: 14px;
-            font-weight: 400;
+            font-weight: 500;
             text-align: center;
             color: black;
             text-align: left;
@@ -170,6 +173,23 @@ const renderFullEmailSignature = ({
     `
     : '';
 
+  const bannerSection = bannerUrl
+    ? `
+      <tr>
+        <td colspan="2" style="padding: 0; padding-top:20px">
+          <img
+            width="100%"
+            style="
+              display: inline-block;
+              max-width: 600px;
+              object-fit: fill;"
+            src="${bannerUrl}"
+          />
+        </td>
+      </tr>
+    `
+    : '';
+
   return `
    <table
     border="0"
@@ -211,6 +231,7 @@ const renderFullEmailSignature = ({
           </table>
         </td>
       </tr>
+      ${bannerSection}
     </tbody>
   </table>`;
 };

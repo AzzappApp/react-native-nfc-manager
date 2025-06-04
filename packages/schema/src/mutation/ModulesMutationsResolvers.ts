@@ -4,7 +4,6 @@ import { z } from 'zod';
 import {
   getCardModulesByIds,
   type CardModule,
-  checkMedias,
   referencesMedias,
   updateCardModule,
   createCardModule,
@@ -12,6 +11,7 @@ import {
   getCardModuleNextPosition,
   updateWebCard,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import {
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,

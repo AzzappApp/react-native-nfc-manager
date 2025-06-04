@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactCardEditField from '#components/ContactCard/ContactCardEditField';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -36,7 +36,7 @@ const ContactCardEditModalAddresses = ({
     <>
       {fields.map((address, index) => (
         <Fragment key={address.id}>
-          <ContactCardEditModalField
+          <ContactCardEditField
             control={control}
             labelKey={`addresses.${index}.label`}
             valueKey={`addresses.${index}.address`}
@@ -47,6 +47,7 @@ const ContactCardEditModalAddresses = ({
               defaultMessage: 'Enter an adress',
               description: 'Placeholder for adress inside contact card',
             })}
+            multiline
           />
           <Separation small />
         </Fragment>

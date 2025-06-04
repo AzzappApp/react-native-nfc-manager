@@ -8,7 +8,7 @@ import type { ColorSchemeName } from 'react-native';
 
 type EmptyContentProps = {
   message: React.ReactElement;
-  description: React.ReactElement;
+  description?: React.ReactElement;
   colorScheme?: ColorSchemeName;
 };
 
@@ -25,13 +25,15 @@ const EmptyContent = ({
       <Text variant="xlarge" style={styles.message} appearance={colorScheme}>
         {message}
       </Text>
-      <Text
-        variant="medium"
-        style={styles.description}
-        appearance={colorScheme}
-      >
-        {description}
-      </Text>
+      {description && (
+        <Text
+          variant="medium"
+          style={styles.description}
+          appearance={colorScheme}
+        >
+          {description}
+        </Text>
+      )}
     </View>
   );
 };

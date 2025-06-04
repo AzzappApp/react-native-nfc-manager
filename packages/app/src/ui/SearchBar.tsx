@@ -67,7 +67,7 @@ const SearchBar = ({
 
   const onLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      containerWidth.value = e.nativeEvent.layout.width;
+      containerWidth.set(e.nativeEvent.layout.width);
     },
     [containerWidth],
   );
@@ -77,7 +77,7 @@ const SearchBar = ({
   const onButtonLayout = useCallback(
     (e: LayoutChangeEvent) => {
       if (!cancelButtonWidth.value) {
-        cancelButtonWidth.value = e.nativeEvent.layout.width;
+        cancelButtonWidth.set(e.nativeEvent.layout.width);
       }
     },
     [cancelButtonWidth],
@@ -95,7 +95,7 @@ const SearchBar = ({
   const onInputFocus = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       onFocus?.(e);
-      isFocused.value = withTiming(1, { duration: animationDuration }); // freezes on android
+      isFocused.set(withTiming(1, { duration: animationDuration })); // freezes on android
     },
     [animationDuration, isFocused, onFocus],
   );
@@ -103,7 +103,7 @@ const SearchBar = ({
   const onInputBlur = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       onBlur?.(e);
-      isFocused.value = withTiming(0, { duration: animationDuration }); // freezes on android
+      isFocused.set(withTiming(0, { duration: animationDuration })); // freezes on android
     },
     [animationDuration, isFocused, onBlur],
   );

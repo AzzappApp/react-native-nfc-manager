@@ -62,11 +62,11 @@ const PressableScaleHighlight = (
   const pressed = useSharedValue(0);
 
   const onPressIn = useCallback(() => {
-    pressed.value = withTiming(1, { duration: animationDuration, easing });
+    pressed.set(withTiming(1, { duration: animationDuration, easing }));
   }, [animationDuration, easing, pressed]);
 
   const onPressOut = useCallback(() => {
-    pressed.value = withTiming(0, { duration: animationDuration, easing });
+    pressed.set(withTiming(0, { duration: animationDuration, easing }));
   }, [animationDuration, easing, pressed]);
 
   const animatedStyle = useAnimatedStyle(() => {

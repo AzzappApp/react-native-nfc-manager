@@ -3,7 +3,8 @@ import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NativeModules, Platform } from 'react-native';
 import * as z from 'zod';
-import { deserializeGeolocation } from '@azzapp/shared/urlHelpers';
+import { buildWebUrl, deserializeGeolocation } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { logEvent } from './analytics';
 import { verifyQrCodeKey, verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -26,13 +27,9 @@ const FILE_PREFIX = 'file://';
 const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [
-  `${process.env.APP_SCHEME}://`,
-  process.env.NEXT_PUBLIC_URL,
-  'https://dev.azzapp.com',
-  'https://staging.azzapp.com',
-  'https://www.azzapp.com',
-  'https://azzapp.com',
-  // to support vcf sharing
+  `${env.APP_SCHEME}://`,
+  buildWebUrl(),
+  buildWebUrl('share'),
   ANDROID_CONTENT_PREFIX,
   FILE_PREFIX,
 ];
@@ -175,7 +172,8 @@ export const matchUrlWithRoute = async (
       let geolocation: Geolocation;
       try {
         [contactCardAccessId, key, geolocation] = JSON.parse(
-          decompressFromEncodedURIComponent(keyData),
+          decompressFromEncodedURIComponent(keyData) ||
+            atob(decodeURIComponent(keyData)),
         );
 
         let builtGeolocation;
@@ -197,6 +195,7 @@ export const matchUrlWithRoute = async (
             userName,
             contactCard: res.contactCard,
             avatarUrl: res.avatarUrl,
+            logoUrl: res.logoUrl,
             contactProfileId: res.profileId,
             geolocation: builtGeolocation,
           },

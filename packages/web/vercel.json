@@ -1,41 +1,14 @@
 {
-  "git": {
-    "deploymentEnabled": false
-  },
+  "git": { "deploymentEnabled": false },
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        }
-      ]
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
     }
   ],
   "regions": ["fra1", "iad1", "gru1"],
-  "crons": [
-    {
-      "path": "/api/cron/cancelPayments",
-      "schedule": "*/1 * * * *"
-    },
-    {
-      "path": "/api/cron/unpublishWebCards",
-      "schedule": "*/3 * * * *"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "https://web.azzapp.com/"
-    }
-  ],
+  "redirects": [{ "source": "/", "destination": "https://web.azzapp.com/" }],
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "api.dev.azzapp.com" }],
-      "destination": "https://dev.azzapp.com/api/$1"
-    },
     {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "api.staging.azzapp.com" }],

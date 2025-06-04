@@ -2,8 +2,8 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { sendGAEvent } from '@next/third-parties/google';
 import cx from 'classnames';
-import { useEffect, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useRef, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CheckRoundIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
@@ -13,6 +13,7 @@ import FormInput from '#ui/Form/FormInput';
 import PhoneInput from './PhoneInput';
 import { ShareBackFormSchema } from './shareBackFormSchema';
 import styles from './ShareBackModalForm.css';
+import type z from 'zod';
 
 type ShareBackModalContentProps = {
   token: string;
@@ -20,6 +21,8 @@ type ShareBackModalContentProps = {
   webcardId: string;
   onSuccess: () => void;
 };
+
+type ShareBackFormSchema = z.infer<typeof ShareBackFormSchema>;
 
 const ShareBackModalForm = (props: ShareBackModalContentProps) => {
   const { token, userId, webcardId, onSuccess } = props;
@@ -39,12 +42,12 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
     title: useRef<HTMLInputElement>(null),
   };
 
-  const [lastResult, action] = useFormState(
+  const [lastResult, action] = useActionState(
     shareBackActionWithUserIdAndToken,
     undefined,
   );
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<ShareBackFormSchema>({
     lastResult,
     onValidate({ formData }) {
       const isValid = parseWithZod(formData, {
@@ -53,7 +56,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
       return isValid;
     },
     shouldValidate: 'onSubmit',
-    shouldRevalidate: 'onSubmit',
+    shouldRevalidate: 'onInput',
   });
 
   useEffect(() => {
@@ -120,6 +123,9 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 }
               }}
               autoComplete="given-name"
+              value={
+                lastResult?.initialValue?.firstName?.toString() || undefined
+              }
             />
           </div>
 
@@ -146,11 +152,15 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 }
               }}
               autoComplete="family-name"
+              value={
+                lastResult?.initialValue?.lastName?.toString() || undefined
+              }
             />
           </div>
           <div className={styles.formField}>
             <PhoneInput
-              field={fields.phone}
+              number={fields.number}
+              countryCode={fields.countryCode}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your number',
@@ -171,6 +181,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 }
               }}
               autoComplete="tel"
+              lastResult={lastResult}
             />
           </div>
           <div className={styles.formField}>
@@ -197,6 +208,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               }}
               inputMode="email"
               autoComplete="email"
+              value={lastResult?.initialValue?.email?.toString() || undefined}
             />
           </div>
           <div className={styles.formField}>
@@ -222,6 +234,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 }
               }}
               autoComplete="organization"
+              value={lastResult?.initialValue?.company?.toString() || undefined}
             />
           </div>
           <div className={styles.formField}>
@@ -241,6 +254,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               })}
               ref={refs.title}
               autoComplete="organization-title"
+              value={lastResult?.initialValue?.title?.toString() || undefined}
             />
           </div>
         </div>

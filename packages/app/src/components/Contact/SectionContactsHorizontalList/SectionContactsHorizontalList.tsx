@@ -1,28 +1,44 @@
 import { useCallback } from 'react';
-import { FlatList, View } from 'react-native';
+import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ContactListEmptyComponent from '../ContactListEmptyComponent';
 import ContactsScreenSection from './ContactsHorizontalList';
-import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
+import type { ContactsHorizontalList_contacts$key } from '#relayArtifacts/ContactsHorizontalList_contacts.graphql';
 import type {
-  Contact,
-  PermissionStatus as ContactPermissionStatus,
-} from 'expo-contacts';
-import type { ListRenderItemInfo } from 'react-native';
+  ListRenderItemInfo,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ViewStyle,
+} from 'react-native';
 
 type Props = {
-  sections: Array<{ title: string; data: ContactType[] }>;
+  sections: Array<{
+    title: string;
+    count?: number;
+    onSeeAll?: () => void;
+    contacts: ContactsHorizontalList_contacts$key;
+  }>;
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onShowContact: (contact: ContactType) => void;
-  localContacts: Contact[];
-  contactsPermissionStatus: ContactPermissionStatus;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
-  listFooterComponent: JSX.Element;
-  onPressAll?: (title: string) => void;
+  onShowContact: (contactId: string) => void;
+  onShowContactAction: (arg: string[] | string) => void;
   showLocationInSubtitle?: boolean;
+  ListFooterComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollEventThrottle?: number;
+  contentContainerStyle?: ViewStyle;
 };
 
 const SectionContactsHorizontalList = ({
@@ -31,56 +47,56 @@ const SectionContactsHorizontalList = ({
   onRefresh,
   refreshing,
   onShowContact,
-  localContacts,
-  contactsPermissionStatus,
-  showContactAction,
-  listFooterComponent,
-  onPressAll,
+  onShowContactAction,
   showLocationInSubtitle,
+  onScroll,
+  ListFooterComponent,
+  ListHeaderComponent,
+  contentContainerStyle,
 }: Props) => {
-  const styles = useStyleSheet(stylesheet);
-
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<{ title: string; data: ContactType[] }>) => {
+    ({
+      item,
+    }: ListRenderItemInfo<{
+      title: string;
+      count?: number;
+      contacts: ContactsHorizontalList_contacts$key;
+      onSeeAll?: () => void;
+    }>) => {
       return (
         <ContactsScreenSection
-          data={item.data}
-          localContacts={localContacts}
+          contacts={item.contacts}
           onShowContact={onShowContact}
           title={item.title}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={showContactAction}
-          onPressAll={onPressAll}
+          onShowContactAction={onShowContactAction}
+          onSeeAll={item.onSeeAll}
+          count={item.count}
           showLocationInSubtitle={showLocationInSubtitle}
         />
       );
     },
-    [
-      showLocationInSubtitle,
-      contactsPermissionStatus,
-      localContacts,
-      onPressAll,
-      onShowContact,
-      showContactAction,
-    ],
+    [showLocationInSubtitle, onShowContact, onShowContactAction],
   );
 
   return (
-    <FlatList
+    <Animated.FlatList
       data={sections}
       keyExtractor={sectionKeyExtractor}
       renderItem={renderItem}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
       snapToAlignment="start"
       decelerationRate="fast"
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
-      ListFooterComponent={listFooterComponent}
+      ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
+      onScroll={onScroll}
+      contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
+      ListEmptyComponent={ContactListEmptyComponent}
     />
   );
 };
@@ -95,10 +111,6 @@ const RenderSectionSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  flex: { flex: 1 },
-  content: {
-    marginHorizontal: 10,
-  },
   separator: {
     height: 1,
     width: '100%',

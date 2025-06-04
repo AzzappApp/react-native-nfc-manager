@@ -16,12 +16,16 @@ export type SubscriptionWithProfilesCount = UserSubscription & {
 };
 
 type UserPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-const UserPage = async ({ params: { id } }: UserPageProps) => {
+const UserPage = async (props: UserPageProps) => {
+  const params = await props.params;
+
+  const { id } = params;
+
   const user = await getUserById(id);
   if (!user) {
     return notFound();
@@ -37,7 +41,7 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   );
 
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" sx={{ gap: 5 }}>
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
         <Link
           underline="hover"

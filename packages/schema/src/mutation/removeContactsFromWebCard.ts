@@ -6,7 +6,7 @@ import {
   removeContactsbyIds,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -21,12 +21,12 @@ const removeContactsFromWebCardMutation: Mutation = async (
   const contactIdsToRemove = input.contactIds.map(id =>
     fromGlobalIdWithType(id, 'Contact'),
   );
-  const { userId } = getSessionInfos();
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profile = await profileLoader.load(profileId);
-  if (profile?.userId !== userId) {
+  if (profile?.userId !== user.id) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
   const webcardIds = await getWebcardsFromContactIds(contactIdsToRemove);

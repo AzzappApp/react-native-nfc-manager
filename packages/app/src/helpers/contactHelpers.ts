@@ -1,11 +1,22 @@
 import * as Sentry from '@sentry/react-native';
-import { getContactByIdAsync } from 'expo-contacts';
+import { ContactTypes } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { MMKV } from 'react-native-mmkv';
+import { Platform } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
+import ShareCommand from 'react-native-share';
+import {
+  ConnectionHandler,
+  graphql,
+  readInlineData,
+  type RecordProxy,
+  type RecordSourceProxy,
+} from 'relay-runtime';
 import VCard from 'vcard-creator';
-import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import * as z from 'zod';
+import { isDefined } from '@azzapp/shared/isDefined';
+import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import {
   addressLabelToVCardLabel,
   emailLabelToVCardLabel,
@@ -13,18 +24,100 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import { prefixWithHttp, type ContactType } from './contactListHelpers';
+import {
+  addressSchema,
+  emailSchema,
+  phoneNumberSchema,
+  socialSchema,
+  urlSchema,
+} from '#helpers/phoneNumbersHelper';
+import { sanitizeFilePath } from './fileHelpers';
 import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
-import type { Contact } from 'expo-contacts';
+import { getRelayEnvironment } from './relayEnvironment';
+import type {
+  contactHelpersShareContactData_contact$data,
+  contactHelpersShareContactData_contact$key,
+} from '#relayArtifacts/contactHelpersShareContactData_contact.graphql';
+import type { useOnInviteContactDataQuery_contact$data } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
+import type { Contact as ExpoContact, Date as ExpoDate } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
+
+/**
+ * This file defines all types for contacts management
+ * Types shall be as close as possible from graphql information
+ */
+export type ContactAddressLabelType = 'Home' | 'Main' | 'Other' | 'Work';
+
+export type ContactAddressType = {
+  address: string;
+  label: ContactAddressLabelType;
+};
+
+export type ContactMediaType = {
+  id?: string | null;
+  uri?: string | null;
+};
+
+export type ContactEmailLabelType = 'Home' | 'Main' | 'Other' | 'Work';
+
+export type ContactEmailType = {
+  address: string;
+  label: ContactEmailLabelType;
+};
+
+export type ContactPhoneNumberLabelType =
+  | 'Fax'
+  | 'Home'
+  | 'Main'
+  | 'Mobile'
+  | 'Other'
+  | 'Work';
+
+export type ContactPhoneNumberType = {
+  number: string;
+  label: ContactPhoneNumberLabelType;
+};
+
+// TODO - add fixed label support for socials
+export type ContactSocialType = {
+  label: string;
+  url: string;
+};
+
+export type ContactUrlType = {
+  url: string;
+};
+
+export type ContactMeetingPlaceType = {
+  city: string | null;
+  country: string | null;
+  region: string | null;
+  subregion: string | null;
+};
+
+export type ContactType = {
+  id?: string;
+  addresses?: ContactAddressType[] | null;
+  avatar?: ContactMediaType | null;
+  birthday?: string | null;
+  company?: string;
+  emails?: ContactEmailType[] | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  logo?: ContactMediaType | null;
+  meetingPlace?: ContactMeetingPlaceType | null;
+  meetingDate: Date;
+  phoneNumbers?: ContactPhoneNumberType[] | null;
+  socials?: ContactSocialType[] | null;
+  title?: string | null;
+  urls?: ContactUrlType[] | null;
+  profileId?: string | null;
+  note?: string | null;
+};
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
 const MIN_FIELD_HEIGHT = 72;
-
-export const contactStorage = new MMKV({
-  id: 'contacts',
-});
 
 //TODO: if this updated color is validated after dev test
 // (respecting our color and not using pure black, using transparancy because the background behing have the right color)
@@ -227,102 +320,33 @@ export const useContactPhoneLabels = () => {
   return labelValues;
 };
 
-export const useSocialLinkLabels = () => {
-  const labelValues = useMemo(
-    () =>
-      SOCIAL_NETWORK_LINKS.map(socialLink => ({
-        key: socialLink.id as string,
-        value: socialLink.label,
-      })),
-    [],
-  );
-
-  return labelValues;
-};
-
-const formatDate = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two-digit month
-  const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
-
-  return `${year}-${month}-${day}`;
-};
-
-export const findLocalContact = async (
-  phoneNumbers: string[],
-  emails: string[],
-  localContacts: Contact[],
-  profileId?: string,
-): Promise<Contact | undefined> => {
-  if (profileId && contactStorage.contains(profileId)) {
-    const internalId = contactStorage.getString(profileId);
-    if (internalId) {
-      const contactByInternalId = await getContactByIdAsync(internalId);
-
-      if (contactByInternalId) {
-        //temporary patch: we have remarked that contacts are mixed, I think it's due to internal id that are reused by the OS
-        let hasCommonInfo = phoneNumbers?.find(phoneNumber =>
-          contactByInternalId.phoneNumbers?.some(ph => {
-            return ph.number === phoneNumber;
-          }),
-        );
-
-        hasCommonInfo =
-          hasCommonInfo ||
-          emails?.find(email =>
-            contactByInternalId.emails?.some(em => email === em.email),
-          );
-        if (hasCommonInfo) {
-          return contactByInternalId;
-        }
-      }
-    }
-  }
-
-  const localContact = localContacts?.find(localContact => {
-    const hasCommonPhoneNumber = phoneNumbers?.find(phoneNumber =>
-      localContact.phoneNumbers?.some(ph => {
-        return ph.number === phoneNumber;
-      }),
-    );
-
-    if (hasCommonPhoneNumber) return true;
-    const hasCommonEmails = emails?.find(email =>
-      localContact.emails?.some(em => email === em.email),
-    );
-    return hasCommonEmails;
-  });
-
-  return localContact;
-};
-
-export const buildVCardFromAzzappContact = async (contact: ContactType) => {
+export const buildVCard = async (
+  contact: contactHelpersShareContactData_contact$data,
+) => {
   const vCard = new VCard();
   vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
 
-  if (contact.title) {
-    vCard.addJobtitle(contact.title);
+  const title = contact.enrichment?.fields?.title || contact.title;
+  if (title) {
+    vCard.addJobtitle(title);
   }
 
-  let birthday = contact.birthday;
-  if (
-    !birthday &&
-    'dates' in contact &&
-    Array.isArray(contact.dates) &&
-    contact.dates.length
-  ) {
-    const birth = contact.dates?.find(date => date.label === 'birthday');
-    birthday = formatDate(new Date(birth.year ?? 0, birth.month, birth.day));
-  }
-
+  const birthday =
+    contact.enrichment?.fields?.birthday?.toString() ||
+    contact.birthday?.toString();
   if (birthday) {
-    vCard.addBirthday(birthday.toString());
+    vCard.addBirthday(birthday);
   }
-  if (contact.company) {
-    vCard.addCompany(contact.company);
+  const company = contact.enrichment?.fields?.company || contact.company;
+  if (company) {
+    vCard.addCompany(company);
   }
 
-  contact.phoneNumbers.forEach(number => {
+  const phoneNumbers = [
+    ...contact.phoneNumbers,
+    ...(contact.enrichment?.fields?.phoneNumbers ?? []),
+  ];
+  phoneNumbers.forEach(number => {
     if (number.number) {
       vCard.addPhoneNumber(
         `${number.number}`,
@@ -330,29 +354,37 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
       );
     }
   });
-
-  contact.emails.forEach(email => {
+  const emails = [
+    ...contact.emails,
+    ...(contact.enrichment?.fields?.emails ?? []),
+  ];
+  emails?.forEach(email => {
     if (email.address)
       vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
-    else if (
-      'email' in email &&
-      email.email &&
-      typeof email.email === 'string'
-    ) {
-      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
-    }
   });
 
-  contact.urls?.forEach(url => {
+  const urls = [
+    ...(contact.urls ?? []),
+    ...(contact.enrichment?.fields?.urls ?? []),
+  ];
+  urls?.forEach(url => {
     if (url.url) vCard.addURL(prefixWithHttp(url.url));
   });
 
-  contact.socials?.forEach(social => {
+  const socials = [
+    ...(contact.socials ?? []),
+    ...(contact.enrichment?.fields?.socials ?? []),
+  ];
+  socials?.forEach(social => {
     if (social.url)
       vCard.addSocial(prefixWithHttp(social.url), social.label || '');
   });
 
-  contact.addresses.forEach(addr => {
+  const addresses = [
+    ...(contact.addresses ?? []),
+    ...(contact.enrichment?.fields?.addresses ?? []),
+  ];
+  addresses?.forEach(addr => {
     if (addr.address) {
       vCard.addAddress(
         undefined,
@@ -367,26 +399,32 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
     }
   });
 
-  const contactImageUrl = contact.avatar?.uri || contact.logo?.uri;
-  const contactImageId = contact.avatar?.id || contact.logo?.id;
+  const contactImageUrl =
+    contact.enrichment?.fields?.avatar?.uri ||
+    contact.avatar?.uri ||
+    contact.enrichment?.fields?.logo?.uri ||
+    contact.logo?.uri;
+  const contactImageId =
+    contact.enrichment?.fields?.avatar?.id ||
+    contact.avatar?.id ||
+    contact.enrichment?.fields?.logo?.id ||
+    contact.logo?.id;
+
   if (contactImageId && contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
-      const existingFile = getLocalCachedMediaFile(contactImageId, 'image');
-      let file: File | undefined;
-      if (existingFile) {
-        file = new File(existingFile);
+      const file = new File(Paths.cache.uri + contactImageId);
+      if (!file.exists) {
+        await File.downloadFileAsync(contactImageUrl, file);
       }
-      if (!file || !file.exists) {
-        file = new File(existingFile ?? Paths.cache.uri + contactImageId);
-        if (!file.exists) {
-          await File.downloadFileAsync(contactImageUrl, file);
-        }
+
+      const image = await ImageCompressor.compress(file.uri, {
+        output: 'jpg',
+        quality: 0.7,
+      });
+      const imageFile = new File(image);
+      if (imageFile.exists) {
+        vCard.addPhoto(imageFile.base64(), 'jpeg');
       }
-      const image = file.base64();
-      if (image) {
-        vCard.addPhoto(image, 'png'); // requested avatars format
-      }
-      console.log(vCard.toString());
     } catch (e) {
       Sentry.captureException(e);
       console.error('download avatar failure', e);
@@ -395,75 +433,127 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   return vCard;
 };
 
-export const buildVCardFromExpoContact = async (contact: Contact) => {
-  const vCard = new VCard();
-  vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
-
-  if (contact.jobTitle) {
-    vCard.addJobtitle(contact.jobTitle);
-  }
-  if (contact.birthday && contact.birthday) {
-    vCard.addBirthday(contact.birthday.toString());
-  }
-  if (contact.company) {
-    vCard.addCompany(contact.company);
-  }
-
-  contact.phoneNumbers?.forEach(number => {
-    vCard.addPhoneNumber(
-      `${number.number}`,
-      phoneLabelToVCardLabel(number.label) || '',
-    );
-  });
-  contact.emails?.forEach(email => {
-    if (email.email)
-      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
-  });
-  contact.urlAddresses?.forEach(url => {
-    if (url.url) vCard.addURL(url.url);
-  });
-  contact.socialProfiles?.forEach(social => {
-    if (social.url) vCard.addSocial(social.url, social.label || '');
-  });
-  contact.addresses?.forEach(addr => {
-    let fullAdress = addr.street || '';
-    if (fullAdress.length) fullAdress += ' ';
-    fullAdress += addr.postalCode || '';
-    if (fullAdress.length) fullAdress += ' ';
-    fullAdress += addr.city || '';
-    if (fullAdress.length) fullAdress = fullAdress + ' ';
-    fullAdress += addr.country || '';
-
-    if (fullAdress.length)
-      vCard.addAddress(
-        undefined,
-        undefined,
-        fullAdress,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        addressLabelToVCardLabel(addr.label),
-      );
-  });
-  if (contact?.image?.uri) {
-    const file = new File(contact.image.uri);
-    const image = file.base64();
-
-    if (image) {
-      vCard.addPhoto(image);
+export const shareContactFragment_contact = graphql`
+  fragment contactHelpersShareContactData_contact on Contact
+  @inline
+  @argumentDefinitions(
+    pixelRatio: { type: "Float!", provider: "CappedPixelRatio.relayprovider" }
+  ) {
+    id
+    firstName
+    lastName
+    title
+    company
+    note
+    phoneNumbers {
+      number
+      label
+    }
+    emails {
+      label
+      address
+    }
+    urls {
+      url
+    }
+    addresses {
+      label
+      address
+    }
+    birthday
+    meetingDate
+    socials {
+      url
+      label
+    }
+    avatar {
+      uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    logo {
+      uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+      id
+    }
+    enrichment {
+      fields {
+        title
+        company
+        phoneNumbers {
+          label
+          number
+        }
+        emails {
+          address
+          label
+        }
+        urls {
+          url
+        }
+        addresses {
+          address
+          label
+        }
+        birthday
+        socials {
+          label
+          url
+        }
+        avatar {
+          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+          id
+        }
+      }
     }
   }
-  return vCard;
+`;
+
+export const useShareContact = () => {
+  return async (
+    contactData?: contactHelpersShareContactData_contact$key | null,
+  ) => {
+    if (!contactData) return;
+    const contact = readInlineData(shareContactFragment_contact, contactData);
+    const vCardData = await buildVCard(contact);
+
+    if (!vCardData) {
+      console.error('cannot generate VCard');
+      return;
+    }
+    const contactName =
+      `${contact?.firstName ?? ''} ${contact?.lastName ?? ''}`.trim();
+    const filePath =
+      Paths.cache.uri +
+      sanitizeFilePath(contactName.length ? contactName : 'contact') +
+      '.vcf';
+
+    let file;
+    try {
+      file = new File(filePath);
+      file.create();
+      // generate file
+      file.write(vCardData.toString());
+      // share the file
+      await ShareCommand.open({
+        url: filePath,
+        type: 'text/x-vcard',
+        failOnCancel: false,
+      });
+      // clean up file afterward
+      file.delete();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error(e);
+      file?.delete();
+    }
+  };
 };
 
 export const getFriendlyNameFromLocation = (
-  meetingPlace: {
-    readonly city: string | null;
-    readonly country: string | null;
-    readonly region: string | null;
-    readonly subregion: string | null;
-  } | null,
+  meetingPlace?: ContactMeetingPlaceType | null,
 ) => {
   return (
     meetingPlace?.city ||
@@ -471,4 +561,711 @@ export const getFriendlyNameFromLocation = (
     meetingPlace?.region ||
     meetingPlace?.country
   );
+};
+
+export const contactSchema = z
+  .object({
+    firstName: z.string().nullable().optional(),
+    lastName: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    company: z.string().nullable().optional(),
+    note: z.string().nullable().optional(),
+    phoneNumbers: z.array(phoneNumberSchema),
+    emails: z.array(emailSchema),
+    urls: z.array(urlSchema),
+    addresses: z.array(addressSchema),
+    // @todo need to change birthday behavior
+    birthday: z
+      .object({
+        birthday: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    meetingDate: z.date().optional(),
+    socials: z.array(socialSchema),
+    avatar: z
+      .object({
+        uri: z.string(),
+        id: z.string().optional(),
+        local: z.boolean().optional(),
+      })
+      .optional()
+      .nullable(),
+    logo: z
+      .object({
+        uri: z.string(),
+        id: z.string().optional(),
+        local: z.boolean().optional(),
+      })
+      .optional()
+      .nullable(),
+  })
+  .refine(
+    data => !!data.firstName || !!data.lastName || !!data.company,
+    'Either one of firstname or lastname or company name should be filled in.',
+  );
+
+export type contactFormValues = z.infer<typeof contactSchema>;
+
+const getContactsConnections = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  connectionName: string,
+  expectedType: string,
+) => {
+  const environment = getRelayEnvironment();
+  const source = environment.getStore().getSource();
+  const recordIds = source.getRecordIDs();
+  const userContactsConnectionId = ConnectionHandler.getConnectionID(
+    user.getDataID(),
+    connectionName,
+  );
+  return recordIds
+    .filter(recordId => recordId.startsWith(userContactsConnectionId))
+    .map(recordId => store.get(recordId))
+    .filter(isDefined)
+    .filter(record => record.getType() === expectedType);
+};
+
+const getContactsByDateConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contactsByDates',
+    'ContactsByDateConnection',
+  );
+};
+
+const getContactsByLocationConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contactsByLocation',
+    'ContactsByLocationConnection',
+  );
+};
+
+const getContactsByNameConnection = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+) => {
+  return getContactsConnections(
+    store,
+    user,
+    'currentUser_contacts',
+    'ContactConnection',
+  );
+};
+
+/**
+ * Extracts the variables part from a Relay connection cache ID.
+ * Supports strings, numbers, and booleans.
+ * Example: (nbContactsByDate:10,search:"A,B",active:true)
+ */
+export const extractRelayConnectionVariables = (
+  relayId: string,
+): Record<string, any> => {
+  // Extract the substring inside the last parentheses in the id
+  const match = relayId.match(/\((.*)\)$/);
+  if (!match) return {};
+
+  const varsString = match[1];
+  const variables: Record<string, any> = {};
+
+  // Parse each key:value, taking care of quoted values with commas inside
+  let i = 0;
+  while (i < varsString.length) {
+    // Parse key
+    let key = '';
+    while (i < varsString.length && varsString[i] !== ':') {
+      key += varsString[i++];
+    }
+    i++; // skip ':'
+    // Parse value
+    let value = '';
+    let inQuotes = false;
+    while (i < varsString.length && (inQuotes || varsString[i] !== ',')) {
+      if (varsString[i] === '"') {
+        inQuotes = !inQuotes;
+      }
+      value += varsString[i++];
+    }
+    if (varsString[i] === ',') i++; // skip ','
+
+    value = value.trim();
+
+    // Parse value as string, number, or boolean
+    let parsedValue: any;
+    if (value.startsWith('"') && value.endsWith('"')) {
+      parsedValue = value.slice(1, -1);
+    } else if (/^\d+$/.test(value)) {
+      parsedValue = Number(value);
+    } else if (value === 'true') {
+      parsedValue = true;
+    } else if (value === 'false') {
+      parsedValue = false;
+    } else {
+      parsedValue = value;
+    }
+    variables[key.trim()] = parsedValue;
+  }
+
+  return variables;
+};
+
+const contactMatchSearch = (contact: RecordProxy, search: string): boolean => {
+  search = search.toLowerCase();
+  const firstName = contact.getValue('firstName');
+  const lastName = contact.getValue('lastName');
+  const company = contact.getValue('company');
+  const webCardUserName = contact
+    .getLinkedRecord('webCard')
+    ?.getValue('userName');
+  return (
+    (typeof firstName === 'string' &&
+      firstName.toLowerCase().includes(search)) ||
+    (typeof lastName === 'string' && lastName.toLowerCase().includes(search)) ||
+    (typeof company === 'string' && company.toLowerCase().includes(search)) ||
+    (typeof webCardUserName === 'string' &&
+      webCardUserName.toLowerCase().includes(search))
+  );
+};
+
+export const addContactUpdater = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  newContact: RecordProxy,
+) => {
+  // Update currentUser nbContacts
+  const userNbContacts = user.getValue('nbContacts');
+  if (typeof userNbContacts === 'number') {
+    user.setValue(userNbContacts + 1, 'nbContacts');
+  }
+
+  // Update user by date connection
+
+  const userByDatesConnections = getContactsByDateConnection(store, user);
+  userByDatesConnections.forEach(userByDatesConnection => {
+    const variables = extractRelayConnectionVariables(
+      userByDatesConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
+    const meetingDate = newContact.getValue('meetingDate');
+    if (!meetingDate) {
+      return;
+    }
+    const date = new Date(meetingDate.toString());
+    const dateEdge = userByDatesConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const edgeDateStr = node.getValue('date');
+        if (typeof edgeDateStr !== 'string') {
+          return false;
+        }
+        const edgeDate = new Date(edgeDateStr);
+        return (
+          edgeDate.getUTCFullYear() === date.getUTCFullYear() &&
+          edgeDate.getUTCMonth() === date.getUTCMonth() &&
+          edgeDate.getUTCDate() === date.getUTCDate()
+        );
+      });
+    if (dateEdge) {
+      const dateEdgeNode = dateEdge.getLinkedRecord('node');
+      const nbContacts = dateEdgeNode?.getValue('nbContacts');
+      dateEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts + 1 : 1,
+        'nbContacts',
+      );
+      dateEdgeNode?.setLinkedRecords(
+        [newContact, ...(dateEdgeNode?.getLinkedRecords('contacts') ?? [])],
+        'contacts',
+      );
+    } else {
+      const createEdge = () => {
+        const node = store.create(
+          `${userByDatesConnection.getDataID()}_${user.getDataID()}_${date.toISOString()}`,
+          'ContactsByDate',
+        );
+        node.setValue(date.toISOString(), 'date');
+        node.setLinkedRecords([newContact], 'contacts');
+        node.setValue(1, 'nbContacts');
+        return ConnectionHandler.createEdge(
+          store,
+          userByDatesConnection,
+          node,
+          'ContactsByDateEdge',
+        );
+      };
+      const nextEdge = userByDatesConnection
+        .getLinkedRecords('edges')
+        ?.find(edge => {
+          const node = edge?.getLinkedRecord('node');
+          if (!node) {
+            return false;
+          }
+          const edgeDateStr = node.getValue('date');
+          if (typeof edgeDateStr !== 'string') {
+            return false;
+          }
+          const edgeDate = new Date(edgeDateStr);
+          return edgeDate < date;
+        });
+      if (nextEdge) {
+        ConnectionHandler.insertEdgeBefore(
+          userByDatesConnection,
+          createEdge(),
+          nextEdge.getValue('cursor') as string,
+        );
+      } else {
+        const pageInfo = userByDatesConnection.getLinkedRecord('pageInfo');
+        if (!pageInfo?.getValue('hasNextPage')) {
+          ConnectionHandler.insertEdgeAfter(
+            userByDatesConnection,
+            createEdge(),
+          );
+        }
+      }
+    }
+  });
+
+  // Update user by name connection
+  const userContactsConnections = getContactsByNameConnection(store, user);
+  userContactsConnections.forEach(userContactsConnection => {
+    const variables = extractRelayConnectionVariables(
+      userContactsConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
+    if (variables?.date) {
+      const date = new Date(variables.date);
+      const meetingDate = newContact.getValue('meetingDate');
+      if (meetingDate) {
+        const meetingDateObj = new Date(meetingDate.toString());
+        if (
+          date.getUTCFullYear() !== meetingDateObj.getUTCFullYear() ||
+          date.getUTCMonth() !== meetingDateObj.getUTCMonth() ||
+          date.getUTCDate() !== meetingDateObj.getUTCDate()
+        ) {
+          return;
+        }
+      }
+    }
+    if (variables?.location) {
+      const meetingPlace = newContact.getLinkedRecord('meetingPlace');
+      const location = getFriendlyNameFromLocation({
+        city: meetingPlace?.getValue('city') as string | null,
+        region: meetingPlace?.getValue('region') as string | null,
+        subregion: meetingPlace?.getValue('subregion') as string | null,
+        country: meetingPlace?.getValue('country') as string | null,
+      });
+      if (location !== variables.location) {
+        return;
+      }
+    }
+    const edge = ConnectionHandler.createEdge(
+      store,
+      userContactsConnection,
+      newContact,
+      'ContactEdge',
+    );
+
+    const getCursorForContact = (contact: RecordProxy): string =>
+      [
+        contact.getValue('lastName'),
+        contact.getValue('firstName'),
+        contact.getValue('company'),
+        contact
+          .getLinkedRecord('profile')
+          ?.getLinkedRecord('webCard')
+          ?.getValue('userName'),
+      ]
+        .filter(val => !!val)
+        .map(val => val!.toString().toLowerCase())
+        .join('\u0001');
+
+    const cursorCompare = getCursorForContact(newContact);
+    const prevRecordEdge = userContactsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const cursor = getCursorForContact(node);
+        return cursor > cursorCompare;
+      });
+
+    if (prevRecordEdge) {
+      ConnectionHandler.insertEdgeBefore(
+        userContactsConnection,
+        edge,
+        prevRecordEdge?.getValue('cursor') as string | undefined,
+      );
+    } else if (
+      !userContactsConnection
+        .getLinkedRecord('pageInfo')
+        ?.getValue('hasNextPage')
+    ) {
+      ConnectionHandler.insertEdgeAfter(userContactsConnection, edge);
+    }
+  });
+
+  // Update user by location connection
+  const userByLocationsConnections = getContactsByLocationConnection(
+    store,
+    user,
+  );
+  userByLocationsConnections.forEach(userByLocationsConnection => {
+    const variables = extractRelayConnectionVariables(
+      userByLocationsConnection.getDataID(),
+    );
+    if (
+      variables?.search &&
+      !contactMatchSearch(newContact, variables.search)
+    ) {
+      return;
+    }
+    const meetingPlace = newContact.getLinkedRecord('meetingPlace');
+    const location: string | null = meetingPlace
+      ? (getFriendlyNameFromLocation({
+          city: meetingPlace?.getValue('city') as string | null,
+          region: meetingPlace?.getValue('region') as string | null,
+          subregion: meetingPlace?.getValue('subregion') as string | null,
+          country: meetingPlace?.getValue('country') as string | null,
+        }) ?? null)
+      : null;
+
+    const locationEdge = userByLocationsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge => {
+        const node = edge?.getLinkedRecord('node');
+        if (!node) {
+          return false;
+        }
+        const locationName = node.getValue('location');
+        return (locationName ?? null) === location;
+      });
+
+    if (locationEdge) {
+      const locationEdgeNode = locationEdge.getLinkedRecord('node');
+      const nbContacts = locationEdgeNode?.getValue('nbContacts');
+      locationEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts + 1 : 1,
+        'nbContacts',
+      );
+      locationEdgeNode?.setLinkedRecords(
+        [newContact, ...(locationEdgeNode?.getLinkedRecords('contacts') ?? [])],
+        'contacts',
+      );
+    } else {
+      const createEdge = () => {
+        const node = store.create(
+          `${userByLocationsConnection.getDataID()}_${user.getDataID()}_${location}`,
+          'ContactsByLocation',
+        );
+        node.setValue(location, 'location');
+        node.setLinkedRecords([newContact], 'contacts');
+        node.setValue(1, 'nbContacts');
+        return ConnectionHandler.createEdge(
+          store,
+          userByLocationsConnection,
+          node,
+          'ContactsByLocationEdge',
+        );
+      };
+      const pageInfo = userByLocationsConnection.getLinkedRecord('pageInfo');
+      if (location) {
+        const nextEdge = userByLocationsConnection
+          .getLinkedRecords('edges')
+          ?.find(edge => {
+            const node = edge?.getLinkedRecord('node');
+            if (!node) {
+              return false;
+            }
+            const locationName = node.getValue('location');
+            if (typeof locationName !== 'string') {
+              //Every valid location is before the null one
+              return true;
+            }
+            return locationName > location;
+          });
+        if (nextEdge || !pageInfo?.getValue('hasNextPage')) {
+          ConnectionHandler.insertEdgeBefore(
+            userByLocationsConnection,
+            createEdge(),
+            nextEdge?.getValue('cursor') as string | undefined,
+          );
+        }
+      } else if (!pageInfo?.getValue('hasNextPage')) {
+        ConnectionHandler.insertEdgeAfter(
+          userByLocationsConnection,
+          createEdge(),
+        );
+      }
+    }
+  });
+};
+
+export const removeContactUpdater = (
+  store: RecordSourceProxy,
+  user: RecordProxy,
+  contactID: string,
+) => {
+  const deleteContact = store.get(contactID);
+  if (!deleteContact) {
+    return;
+  }
+  // Update currentUser nbContacts
+  const userNbContacts = user.getValue('nbContacts');
+  if (typeof userNbContacts === 'number') {
+    user.setValue(userNbContacts - 1, 'nbContacts');
+  }
+  // Update user by date connection
+  const userByDatesConnections = getContactsByDateConnection(store, user);
+  userByDatesConnections.forEach(userByDatesConnection => {
+    const dateEdge = userByDatesConnection
+      .getLinkedRecords('edges')
+      ?.find(edge =>
+        edge
+          ?.getLinkedRecord('node')
+          ?.getLinkedRecords('contacts')
+          ?.some(contact => contact.getDataID() === contactID),
+      );
+    if (dateEdge) {
+      const dateEdgeNode = dateEdge.getLinkedRecord('node');
+      const nbContacts = dateEdgeNode?.getValue('nbContacts');
+      dateEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts - 1 : 0,
+        'nbContacts',
+      );
+      const dateEdgeContacts =
+        dateEdgeNode
+          ?.getLinkedRecords('contacts')
+          ?.filter(contact => contact.getDataID() !== contactID) ?? [];
+
+      dateEdgeNode?.setLinkedRecords(dateEdgeContacts, 'contacts');
+    }
+  });
+
+  const userContactsConnections = getContactsByNameConnection(store, user);
+  userContactsConnections.forEach(userContactsConnection => {
+    ConnectionHandler.deleteNode(userContactsConnection, contactID);
+  });
+  // Update user by location connection
+  const userByLocationsConnections = getContactsByLocationConnection(
+    store,
+    user,
+  );
+  userByLocationsConnections.forEach(userByLocationsConnection => {
+    const locationEdge = userByLocationsConnection
+      .getLinkedRecords('edges')
+      ?.find(edge =>
+        edge
+          ?.getLinkedRecord('node')
+          ?.getLinkedRecords('contacts')
+          ?.some(contact => contact.getDataID() === contactID),
+      );
+
+    if (locationEdge) {
+      const locationEdgeNode = locationEdge.getLinkedRecord('node');
+      const nbContacts = locationEdgeNode?.getValue('nbContacts');
+      locationEdgeNode?.setValue(
+        typeof nbContacts === 'number' ? nbContacts - 1 : 0,
+        'nbContacts',
+      );
+      const locationEdgeContacts =
+        locationEdgeNode
+          ?.getLinkedRecords('contacts')
+          ?.filter(contact => contact.getDataID() !== contactID) ?? [];
+
+      locationEdgeNode?.setLinkedRecords(locationEdgeContacts, 'contacts');
+    }
+  });
+};
+
+export function prefixWithHttp(link: string): string;
+export function prefixWithHttp(link: undefined): undefined;
+export function prefixWithHttp(link: string | undefined): string | undefined;
+export function prefixWithHttp(link?: string): string | undefined {
+  if (!link || link.startsWith('http://') || link.startsWith('https://')) {
+    return link;
+  }
+  return `https://${link}`;
+}
+
+export const buildExpoContact = async (
+  contact: useOnInviteContactDataQuery_contact$data,
+): Promise<ExpoContact> => {
+  let birthday: ExpoDate | undefined = undefined;
+  const birth = contact?.enrichment?.fields?.birthday || contact?.birthday;
+  if (birth) {
+    const contactBirthday = new Date(birth);
+    birthday = {
+      label: 'birthday',
+      year: contactBirthday.getFullYear(),
+      month: contactBirthday.getMonth(),
+      day: contactBirthday.getDate(),
+    };
+  }
+
+  let avatar: File | undefined;
+  try {
+    const webCardPreview =
+      contact.contactProfile?.webCard?.cardIsPublished &&
+      contact?.contactProfile?.webCard?.coverMedia?.webCardPreview
+        ? {
+            id: contact?.contactProfile?.webCard?.coverMedia?.id,
+            uri: contact?.contactProfile?.webCard?.coverMedia?.webCardPreview,
+          }
+        : undefined;
+    const contactAvatar =
+      contact?.enrichment?.fields?.avatar ||
+      contact?.avatar ||
+      contact?.enrichment?.fields?.logo ||
+      contact?.logo ||
+      webCardPreview;
+    if (contactAvatar && contactAvatar.id) {
+      const existingFile = getLocalCachedMediaFile(contactAvatar.id, 'image');
+      if (existingFile) {
+        avatar = new File(existingFile);
+      }
+
+      if ((!avatar || !avatar.exists) && contactAvatar.uri) {
+        avatar = new File(Paths.cache.uri + contactAvatar.id);
+        if (!avatar.exists) {
+          await File.downloadFileAsync(contactAvatar.uri, avatar);
+        }
+      }
+    } else if (contactAvatar?.uri) {
+      // already in cache
+      avatar = new File(contactAvatar.uri);
+    }
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error('download avatar failure', e);
+  }
+  const image = avatar?.uri ? { uri: avatar.uri } : undefined;
+  const addresses = [
+    ...(contact.addresses ?? []),
+    ...(contact?.enrichment?.fields?.addresses ?? []),
+  ].map(({ address, label }) => ({
+    street: address,
+    label,
+  }));
+
+  const emails = [
+    ...(contact.emails ?? []),
+    ...(contact?.enrichment?.fields?.emails ?? []),
+  ].map(({ address, label }) => ({
+    email: address,
+    label,
+  }));
+  const phoneNumbers = [
+    ...(contact.phoneNumbers ?? []),
+    ...(contact?.enrichment?.fields?.phoneNumbers ?? []),
+  ].map(({ number, label }) => ({
+    number,
+    label: Platform.OS === 'android' && label === 'Fax' ? 'otherFax' : label,
+  }));
+  const urlAddresses = [
+    ...(contact.urls ?? []),
+    ...(contact?.enrichment?.fields?.urls ?? []),
+  ].map(({ url }) => ({
+    label: 'default',
+    url: prefixWithHttp(url),
+  }));
+  const socialProfiles = [
+    ...(contact.socials ?? []),
+    ...(contact?.enrichment?.fields?.socials ?? []),
+  ].map(({ url, label }) => ({
+    label,
+    url: prefixWithHttp(url),
+  }));
+
+  return {
+    contactType: ContactTypes.Person,
+    firstName: contact.firstName || undefined,
+    lastName: contact.lastName || undefined,
+    company:
+      contact.enrichment?.fields?.company || contact.company || undefined,
+    jobTitle: contact.enrichment?.fields?.title || contact.title || undefined,
+    name: formatDisplayName(contact.firstName, contact.lastName) || '',
+    birthday,
+    addresses,
+    emails,
+    image,
+    imageAvailable: !!image,
+    urlAddresses,
+    socialProfiles,
+    phoneNumbers,
+    note: contact.note || undefined,
+  };
+};
+
+export const stringToContactAddressLabelType = (
+  str: string,
+): ContactAddressLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
+};
+
+export const stringToContactEmailLabelType = (
+  str: string,
+): ContactEmailLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
+};
+
+export const stringToContactPhoneNumberLabelType = (
+  str: string,
+): ContactPhoneNumberLabelType => {
+  switch (str.toLowerCase()) {
+    case 'home':
+      return 'Home';
+    case 'main':
+      return 'Main';
+    case 'work':
+      return 'Work';
+    case 'fax':
+      return 'Fax';
+    case 'mobile':
+      return 'Mobile';
+    default:
+      return 'Other'; // Fallback to 'Other'
+  }
 };

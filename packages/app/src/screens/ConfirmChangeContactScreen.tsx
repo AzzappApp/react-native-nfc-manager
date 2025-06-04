@@ -1,21 +1,14 @@
 import { type GraphQLError } from 'graphql';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
-import {
-  CodeField,
-  Cursor,
-  useBlurOnFulfill,
-  useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+import { Platform, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { keyboardDismiss } from '#helpers/keyboardHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -23,6 +16,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
 import useUpdateUser from './AccountDetailsScreen/useUpdateUser';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ConfirmChangeContactScreenQuery } from '#relayArtifacts/ConfirmChangeContactScreenQuery.graphql';
@@ -53,17 +47,11 @@ const ConfirmRegistrationScreen = ({
 
   const currentUser = preloaded.currentUser;
 
-  const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
   const insets = useScreenInsets();
   const router = useRouter();
 
   const [code, setCode] = useState('');
-  const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    value: code,
-    setValue: setCode,
-  });
 
   const isEmail = isValidEmail(params.issuer);
 
@@ -140,6 +128,7 @@ const ConfirmRegistrationScreen = ({
         } else {
           Toast.show({
             type: 'error',
+            position: 'top',
             text1: isEmail
               ? intl.formatMessage({
                   defaultMessage: 'Error while confirming your email.',
@@ -165,7 +154,7 @@ const ConfirmRegistrationScreen = ({
 
   return (
     <Container style={styles.flex}>
-      <View onTouchStart={keyboardDismiss} style={styles.container}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <View style={styles.inner}>
           <View style={styles.logoContainer}>
             <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
@@ -210,32 +199,19 @@ const ConfirmRegistrationScreen = ({
             )}
           </View>
 
-          <CodeField
-            ref={ref}
-            {...props}
+          <TextInput
             value={code}
             onChangeText={setCode}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
             keyboardType="number-pad"
             textContentType="oneTimeCode"
             autoComplete={Platform.select({
               android: 'sms-otp' as const,
               default: 'one-time-code' as const,
             })}
-            caretHidden={code !== ''}
-            textInputStyle={styles.textInputStyle}
-            renderCell={({ index, symbol, isFocused }) => (
-              <View
-                key={index}
-                style={[styles.cell, isFocused && styles.focusCell]}
-                onLayout={getCellOnLayoutHandler(index)}
-              >
-                <Text variant="large">
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              </View>
-            )}
+            style={styles.textInputStyle}
+            returnKeyType="send"
+            onSubmitEditing={onSubmit}
+            autoFocus
           />
           <Button
             label={intl.formatMessage({
@@ -253,40 +229,41 @@ const ConfirmRegistrationScreen = ({
             loading={isLoading}
           />
         </View>
-      </View>
-      <View
-        style={{
-          bottom: insets.bottom,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <PressableNative onPress={router.back}>
-          <Text style={styles.back} variant="medium">
-            {isEmail ? (
-              <FormattedMessage
-                defaultMessage="Cancel edit email address"
-                description="ConfirmChangeContactScreen - Cancel email bottom screen link"
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Cancel edit phone number"
-                description="ConfirmChangeContactScreen - Cancel phone number bottom screen link"
-              />
-            )}
-          </Text>
-        </PressableNative>
-      </View>
+        <View
+          style={{
+            paddingBottom: insets.bottom,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <PressableNative onPress={router.back}>
+            <Text style={styles.back} variant="medium">
+              {isEmail ? (
+                <FormattedMessage
+                  defaultMessage="Cancel edit email address"
+                  description="ConfirmChangeContactScreen - Cancel email bottom screen link"
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Cancel edit phone number"
+                  description="ConfirmChangeContactScreen - Cancel phone number bottom screen link"
+                />
+              )}
+            </Text>
+          </PressableNative>
+        </View>
+      </KeyboardAvoidingView>
     </Container>
   );
 };
 const CELL_COUNT = 6;
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   inner: {
-    height: 300,
+    flex: 1,
     rowGap: 20,
+    justifyContent: 'center',
   },
   textForgotExplain: {
     color: colors.grey400,
@@ -306,8 +283,7 @@ const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItem: 'center',
-    marginBottom: 100,
+    alignItems: 'center',
     paddingHorizontal: 15,
   },
   logoContainer: {
@@ -316,29 +292,10 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   logo: { width: 64, height: 64 },
   back: { color: colors.grey200 },
-  codeFieldRoot: {
-    paddingHorizontal: 12,
-  },
-  cell: {
-    width: 47,
-    height: 47,
-    lineHeight: 38,
-    fontSize: 24,
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderWidth: 1,
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderRadius: 12,
-    color: appearance === 'light' ? colors.black : colors.grey400,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  focusCell: {
-    borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
-  },
   textInputStyle: {
-    marginStart: 30,
+    marginHorizontal: 20,
   },
-}));
+});
 
 export default relayScreen(ConfirmRegistrationScreen, {
   query: confirmChangeContactQuery,

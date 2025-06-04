@@ -1,6 +1,4 @@
 import { eq, inArray, sql, asc } from 'drizzle-orm';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import { db } from '../database';
 import { MediaTable } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -66,47 +64,6 @@ export const removeMedias = async (ids: string[]) => {
   await db().delete(MediaTable).where(inArray(MediaTable.id, ids));
 };
 
-// TODO : move this to a service
-/**
- * Check if medias have been registered in the database.
- * For medias that have never been registered, check their existance in cloudinary,
- * and update their information (width, height).
- *
- * > This function is should be used OUTSIDE of a transaction. since it will interact with cloudinary.
- * And might take some time to complete.
- *
- * @param ids
- */
-export const checkMedias = async (mediaIds: string[]) => {
-  const medias = await getMediasByIds(mediaIds);
-  const notFoundMediaIds = mediaIds.filter((_, index) => !medias[index]);
-  if (notFoundMediaIds.length > 0) {
-    throw new Error(`Medias not found: ${notFoundMediaIds.join(', ')}`);
-  }
-  const newMedias = medias.filter(media => media!.refCount === 0);
-  if (newMedias.length > 0) {
-    const cloudinaryMedias = await getMediaInfoByPublicIds(
-      newMedias.map(media => ({
-        publicId: media!.id,
-        kind: media!.kind,
-      })),
-    );
-
-    await Promise.all(
-      // TODO batch update
-      cloudinaryMedias.map(cloudinaryMedia =>
-        db()
-          .update(MediaTable)
-          .set({
-            width: cloudinaryMedia!.width,
-            height: cloudinaryMedia!.height,
-          })
-          .where(eq(MediaTable.id, cloudinaryMedia!.public_id)),
-      ),
-    );
-  }
-};
-
 /**
  * This function is used to when an entity whish to references a list of Media.
  * it will increase the ref count of the Media that are not already referenced by the entity,
@@ -122,9 +79,10 @@ export const referencesMedias = async (
   const newMediaIds = mediaIds.filter(
     mediaId => !previousMediaIds?.includes(mediaId),
   );
-  const removedMediaIds = convertToNonNullArray(previousMediaIds ?? []).filter(
-    mediaId => !mediaIds.includes(mediaId),
-  );
+  const removedMediaIds =
+    previousMediaIds
+      ?.filter(mediaId => mediaId && !mediaIds.includes(mediaId))
+      ?.filter(mediaId => mediaId !== null && mediaId !== undefined) ?? [];
 
   if (newMediaIds.length > 0) {
     await db()
@@ -148,4 +106,18 @@ export const getUnusedMedias = async (limit: number) => {
     .where(eq(MediaTable.refCount, 0))
     .orderBy(asc(MediaTable.createdAt))
     .limit(limit);
+};
+
+export const updateMediaSize = async (
+  mediaId: string,
+  width: number,
+  height: number,
+) => {
+  return db()
+    .update(MediaTable)
+    .set({
+      width,
+      height,
+    })
+    .where(eq(MediaTable.id, mediaId));
 };

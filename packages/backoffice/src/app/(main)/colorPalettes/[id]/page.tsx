@@ -3,18 +3,20 @@ import { getColorPaletteById } from '@azzapp/data';
 import ColorPaletteForm from '../ColorPaletteForm';
 
 type ColorPalettePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     saved?: string;
-  };
+  }>;
 };
 
-const ColorPalettePage = async ({
-  params: { id },
-  searchParams,
-}: ColorPalettePageProps) => {
+const ColorPalettePage = async (props: ColorPalettePageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { id } = params;
+
   const colorPalette = await getColorPaletteById(id);
   if (!colorPalette) {
     return notFound();

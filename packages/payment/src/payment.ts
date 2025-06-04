@@ -7,8 +7,11 @@ import {
   updatePayment,
   createId,
   getUserSubscriptions,
+  getPaymentById,
+  getUserById,
 } from '@azzapp/data';
 import { login } from '#authent';
+import env from '#env';
 import client from './client';
 import {
   calculateAmount,
@@ -80,6 +83,7 @@ export const createPaymentRequest = async ({
   customer,
   redirectUrlSuccess,
   redirectUrlCancel,
+  paymentCallBackUrl,
 }: {
   totalSeats: number;
   userId: string;
@@ -89,6 +93,7 @@ export const createPaymentRequest = async ({
   redirectUrlSuccess: string;
   redirectUrlCancel: string;
   customer: Customer;
+  paymentCallBackUrl: string;
 }) => {
   const ORDERID = createId();
 
@@ -128,7 +133,7 @@ export const createPaymentRequest = async ({
       userId,
       webCardId,
     }),
-    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    CALLBACKURL: paymentCallBackUrl,
     REDIRECTURLSUCCESS: redirectUrlSuccess,
     REDIRECTURLCANCEL: redirectUrlCancel,
     BILLINGADDRESS: customer.address,
@@ -230,12 +235,14 @@ export const createSubscriptionRequest = async ({
   userId,
   plan,
   customer,
+  subscriptionCallBackUrl,
 }: {
   paymentMean: PaymentMean;
   totalSeats: number;
   userId: string;
   plan: 'monthly' | 'yearly';
   customer: Customer;
+  subscriptionCallBackUrl: string;
 }) => {
   const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
@@ -274,7 +281,7 @@ export const createSubscriptionRequest = async ({
         clientPaymentRequestUlid: paymentMean.id,
         rebill_manager_fail_rule: generateRebillFailRule(),
         rebill_manager_external_reference: subscriptionId,
-        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
+        rebill_manager_callback_url: subscriptionCallBackUrl,
       },
     },
   );
@@ -330,12 +337,14 @@ export const createNewPaymentMean = async ({
   locale,
   redirectUrlSuccess,
   redirectUrlCancel,
+  paymentCallBackUrl,
 }: {
   userId: string;
   locale: string;
   customer: Customer;
   redirectUrlSuccess: string;
   redirectUrlCancel: string;
+  paymentCallBackUrl: string;
 }) => {
   const token = await login();
   const ORDERID = createId();
@@ -364,7 +373,7 @@ export const createNewPaymentMean = async ({
     }),
     REDIRECTURLSUCCESS: redirectUrlSuccess,
     REDIRECTURLCANCEL: redirectUrlCancel,
-    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    CALLBACKURL: paymentCallBackUrl,
     BILLINGADDRESS: customer.address,
     BILLINGCITY: customer.city,
     BILLINGPOSTALCODE: customer.zip,
@@ -430,15 +439,14 @@ export const generateInvoice = async (
 
   const invoiceBody = {
     clientPaymentRequestUlid: payment.paymentMeanId,
-    invoicingCompany: process.env.INVOICING_COMPANY ?? 'APPCORP',
-    invoicingEmail: process.env.INVOICING_EMAIL ?? 'contact@azzapp.com',
-    invoicingAddress1:
-      process.env.INVOICING_ADDRESS ?? '3-5 avenue des Citronniers',
+    invoicingCompany: env.INVOICING_COMPANY,
+    invoicingEmail: env.INVOICING_EMAIL,
+    invoicingAddress1: env.INVOICING_ADDRESS,
     invoicingAddress2: '',
-    invoicingCity: process.env.INVOICING_CITY ?? 'Monaco',
-    invoicingZip: process.env.INVOICING_ZIP ?? '98000',
-    invoicingCountry: process.env.INVOICING_COUNTRY ?? 'France',
-    invoicingVat: process.env.INVOICING_VAT ?? 'FR68923096283',
+    invoicingCity: env.INVOICING_CITY,
+    invoicingZip: env.INVOICING_ZIP,
+    invoicingCountry: env.INVOICING_COUNTRY,
+    invoicingVat: env.INVOICING_VAT,
     invoicedCompany: subscription.subscriberName ?? '',
     invoicedFirstname: '',
     invoicedLastname: '',
@@ -510,4 +518,81 @@ export const generateInvoice = async (
   });
 
   return result.data.invoicePdfPath;
+};
+
+export const refundPayment = async (paymentId: string, userId: string) => {
+  const payment = await getPaymentById(paymentId);
+
+  if (!payment) {
+    throw new Error('Payment not found');
+  }
+
+  const subscription = await getSubscriptionById(payment.subscriptionId);
+
+  if (!subscription) {
+    throw new Error('Subscription not found');
+  }
+
+  if (
+    payment.status !== 'paid' ||
+    !payment.transactionId ||
+    !payment.pspAccountId ||
+    !payment.transactionAlias
+  ) {
+    throw new Error('Payment not refundable');
+  }
+
+  const token = await login();
+
+  const orderId = createId();
+
+  const result = await client.POST(
+    '/api/client-payment-requests/refund-transaction',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        MULTIPSP_A_ULID: payment.pspAccountId,
+        MULTIPSP_C_ULID: payment.paymentMeanId,
+        TRANSACTIONID: payment.transactionId,
+        AMOUNT: `${payment.amount + payment.taxes}`,
+        CLIENTEMAIL:
+          subscription?.subscriberEmail ??
+          (await getUserById(payment.userId))?.email ??
+          '',
+        CLIENTIP: '127.0.0.1', //refund or rebill we put localhost according to Constantin
+        ALIAS: payment.transactionAlias,
+        ORDERID: orderId,
+        EXTRADATA: JSON.stringify({
+          refundedBy: payment.userId,
+        }),
+        REASON: `Refund requested by ${userId}`,
+      },
+    },
+  );
+
+  if (result.error) {
+    throw new Error('Refund failed', { cause: result.error });
+  }
+
+  const data = result.data;
+  let updates;
+  if (data?.MULTIPSP_UNIFIED_STATUS === 'OK') {
+    updates = {
+      status: 'refunded',
+      refundedBy: userId,
+      refundedAt: new Date(),
+      refundOrderId: orderId,
+    } as const;
+    await updatePayment(payment.id, updates);
+  } else {
+    throw new Error(
+      data?.MESSAGE ||
+        data?.MULTIPSP_UNIFIED_STATUS ||
+        'Refund failed, please contact support for more information',
+    );
+  }
+
+  return { ...payment, ...updates };
 };

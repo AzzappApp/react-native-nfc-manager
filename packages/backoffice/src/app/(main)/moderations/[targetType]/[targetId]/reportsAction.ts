@@ -12,7 +12,7 @@ import {
   getWebCardById,
   markPostAsDeleted,
 } from '@azzapp/data';
-import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
+import { AZZAPP_SERVER_HEADER, buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { getSession } from '#helpers/session';
 import type { ReportTargetType } from '@azzapp/data';
 
@@ -50,20 +50,17 @@ export const deleteRelatedItem = async (
               if (post) {
                 const webCard = await getWebCardById(post.webCardId);
                 if (webCard) {
-                  const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-                    {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
-                      },
-                      body: JSON.stringify({
-                        cards: [webCard.userName],
-                        posts: [{ userName: webCard.userName, id: post.id }],
-                      }),
+                  const res = await fetch(buildWebUrl('/api/revalidate'), {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
                     },
-                  );
+                    body: JSON.stringify({
+                      cards: [webCard.userName],
+                      posts: [{ userName: webCard.userName, id: post.id }],
+                    }),
+                  });
                   if (!res.ok) {
                     console.error('Error revalidating pages');
                   }
@@ -83,20 +80,17 @@ export const deleteRelatedItem = async (
             if (post) {
               const webCard = await getWebCardById(post.webCardId);
               if (webCard) {
-                await fetch(
-                  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
-                    },
-                    body: JSON.stringify({
-                      cards: [webCard.userName],
-                      posts: [{ userName: webCard.userName, id: post.id }],
-                    }),
+                await fetch(buildWebUrl('/api/revalidate'), {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
                   },
-                );
+                  body: JSON.stringify({
+                    cards: [webCard.userName],
+                    posts: [{ userName: webCard.userName, id: post.id }],
+                  }),
+                });
               }
             }
           } catch {
@@ -114,20 +108,17 @@ export const deleteRelatedItem = async (
             if (!webCard) {
               return;
             }
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
-                },
-                body: JSON.stringify({
-                  cards: [webCard.userName],
-                  posts: [],
-                }),
+            const res = await fetch(buildWebUrl('/api/revalidate'), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
               },
-            );
+              body: JSON.stringify({
+                cards: [webCard.userName],
+                posts: [],
+              }),
+            });
 
             if (!res.ok) {
               console.error('Error revalidating pages');

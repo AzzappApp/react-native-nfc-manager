@@ -17,7 +17,7 @@ fastlane_require 'dotenv'
 
 default_platform(:ios)
 
-IOS_SCHEME = ENV["IOS_SCHEME"]
+IOS_SCHEME = ENV["IOS_SCHEME"] || "azzapp-dev"
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
 CODE_SIGNING_IDENTITY = "iPhone Distribution: APPCORP (66D3U3GLN6)"
@@ -25,10 +25,10 @@ APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
 
 # Define configuration locally instead of github en variables(limit the number of variables)
-ios_widget_config = {
+ios_config = {
   'azzapp-dev' => {
     'app_ident' => 'com.azzapp.app-dev',
-    'app_id' => 'e2433eee-b782-4a3d-b91e-707551a5f4e9',
+    'app_id' => '55b2e933-6341-425b-aa1c-ae2844175199',
     'appclip_scheme' => 'ShareContactAppClip-dev',
     'appclip_ident' => 'com.azzapp.app-dev.Clip',
     'appclip_widget_id' => 'b93817b0-8552-49fa-b2b2-2ee49f75ac97',
@@ -58,116 +58,71 @@ ios_widget_config = {
   },
 }
 
+entitlements_files = {
+  "azzapp-dev" => "azzapp-devRelease.entitlements",
+  "azzapp-staging" => "azzapp-stagingRelease.entitlements",
+  "azzapp" => "azzapp/azzappRelease.entitlements"
+}
+
+clip_entitlements_files = {
+  "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
+  "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
+  "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
+}
+
+widget_entitlements_files = {
+  "azzapp-dev" => "azzappWidget/azzappWidgetExtension-dev.entitlements",
+  "azzapp-staging" => "azzappWidget/azzappWidgetExtension-staging.entitlements",
+  "azzapp" => "azzappWidget/azzappWidgetExtension.entitlements"
+}
+
 platform :ios do
   keychain_created = false
 
-  desc 'Build IOS application.'
+  ###########################
+  # Dynamic variables
+  ###########################
+  config             = ios_config[IOS_SCHEME]
+
+  app_ident          = config['app_ident']
+  clip_ident         = config['appclip_ident']
+  widget_ident       = config['widget_ident']
+
+  ios_appclip_scheme = config['appclip_scheme']
+  ios_widget_scheme  = config['widget_scheme']
+
+  profile_app_id     = config['app_id']
+  profile_clip_id    = config['appclip_widget_id']
+  profile_widget_id  = config['profile_widget_id']
+
+  archive_path       = './fastlane/builds/azzapp.xcarchive'
+
+  version_number = ENV['VERSION_NUMBER']
+  build_number   = ENV['BUILD_NUMBER']
+
+  cert_path         = './ios/certs/certificate.p12'
+  profile_app_path  = "./ios/certs/#{app_ident}.mobileprovision"
+  profile_clip_path = "./ios/certs/#{clip_ident}.mobileprovision"
+  profile_wid_path  = "./ios/certs/#{widget_ident}.mobileprovision"
+
+
+  desc 'Build iOS application native part.'
   lane :build do
-    # Force appclip bundle version to app bundle version (they must be the same)
-    # Define paths to Info.plist files
-    main_app_plist = "ios/azzapp/Info.plist"
-    app_clip_plist = "ios/ShareContactAppClip/Info.plist"
-    widget_config = ios_widget_config[IOS_SCHEME]
-    APP_IDENT = widget_config['app_ident']
-    APPCLIP_IDENT = widget_config['appclip_ident']
-    IOS_APPCLIP_SCHEME = widget_config['appclip_scheme']
-    PROFILE_ID = widget_config['app_id']
-    PROFILECLIP_ID = widget_config['appclip_widget_id']
-    IOS_WIDGET_SCHEME = widget_config['widget_scheme']
-    WIDGET_IDENT = widget_config['widget_ident']
-    PROFILEWIDGET_ID = widget_config['profile_widget_id']
-
-    # Get the version number from the main app's Info.plist
-    version_number = get_info_plist_value(
-      path: main_app_plist,
-      key: "CFBundleVersion"
-    )
-
-    # Get the build version from the main app's Info.plist
-    build_version = get_info_plist_value(
-      path: main_app_plist,
-      key: "CFBundleShortVersionString"
-    )
-
-    # Set the same version number for the App Clip's Info.plist (and future other extension)
-    set_info_plist_value(
-      path: app_clip_plist,
-      key: "CFBundleVersion",
-      value: version_number
-    )
-
-    # Set the same build version for the App Clip's Info.plist
-    set_info_plist_value(
-      path: app_clip_plist,
-      key: "CFBundleShortVersionString",
-      value: build_version
-    )
-
-    # Update the CURRENT_PROJECT_VERSION for the App Clip scheme in the project.pbxproj file (this is required for the App Clip to build)
-    update_project_version(
-      xcodeproj: "../ios/azzapp.xcodeproj",
-      target: IOS_APPCLIP_SCHEME,
-      version: version_number,
-      value: 'CURRENT_PROJECT_VERSION'
-    )
-
-    update_project_version(
-      xcodeproj: "../ios/azzapp.xcodeproj",
-      target: IOS_APPCLIP_SCHEME,
-      version: build_version,
-      value: 'MARKETING_VERSION'
-    )
-
+    ###########################
+    # Prepare keychain + provisioning profiles
+    ###########################
     keychain_created = true
-    create_keychain(
-      name: "CI",
-      password: "CI",
-      default_keychain: true,
-      unlock: true,
-      timeout: 0,
-      lock_when_sleeps: false
-    )
-    # Import certificate and provisioning profile
-    PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
-    PROFILE_CLIP_PATH = "./ios/certs/#{APPCLIP_IDENT}.mobileprovision"
-    PROFILE_WIDGET_PATH = "./ios/certs/#{WIDGET_IDENT}.mobileprovision"
-    CERTIFICATE_PATH = "./ios/certs/certificate.p12"
+    create_keychain(name: 'CI', password: 'CI', default_keychain: true, unlock: true, timeout: 0, lock_when_sleeps: false)
 
-    import_certificate(
-      keychain_name: "CI",
-      keychain_password: "CI",
-      certificate_path: CERTIFICATE_PATH,
-      certificate_password: P12_PASSWORD
-    )
+    import_certificate(keychain_name: 'CI', keychain_password: 'CI', certificate_path: cert_path, certificate_password: P12_PASSWORD)
 
-    install_provisioning_profile(path: PROFILE_PATH)
-    install_provisioning_profile(path: PROFILE_CLIP_PATH)
-    install_provisioning_profile(path: PROFILE_WIDGET_PATH)
+    install_provisioning_profile(path: profile_app_path)
+    install_provisioning_profile(path: profile_clip_path)
+    install_provisioning_profile(path: profile_wid_path)
 
-    # Update code signing settings
-    pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
-
-    backup_file(path: pbxprojPath)
-
-    entitlements_files = {
-      "azzapp-dev" => "azzapp-devRelease.entitlements",
-      "azzapp-staging" => "azzapp-stagingRelease.entitlements",
-      "azzapp" => "azzapp/azzappRelease.entitlements"
-    }
-
-    clip_entitlements_files = {
-      "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
-      "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
-      "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
-    }
-
-    widget_entitlements_files = {
-      "azzapp-dev" => "azzappWidget/azzappWidgetExtension-dev.entitlements",
-      "azzapp-staging" => "azzappWidget/azzappWidgetExtension-staging.entitlements",
-      "azzapp" => "azzappWidget/azzappWidgetExtension.entitlements"
-    }
-
-    # Determine the entitlements file based on the target
+    ############################
+    # Update pbxproj
+    ############################
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
@@ -179,22 +134,22 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
-      targets: [IOS_APPCLIP_SCHEME],
+      entitlements_file_path: clip_entitlements_files[ios_appclip_scheme],
+      targets: [ios_appclip_scheme],
       code_sign_identity: CODE_SIGNING_IDENTITY
     )
 
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: widget_entitlements_files[IOS_WIDGET_SCHEME],
-      targets: [IOS_WIDGET_SCHEME],
+      entitlements_file_path: widget_entitlements_files[ios_widget_scheme],
+      targets: [ios_widget_scheme],
       code_sign_identity: CODE_SIGNING_IDENTITY
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_PATH,
+      profile: profile_app_path,
       target_filter: IOS_SCHEME,
       code_signing_identity: CODE_SIGNING_IDENTITY,
       build_configuration: "Release"
@@ -202,21 +157,23 @@ platform :ios do
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_CLIP_PATH,
+      profile: profile_clip_path,
       code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: IOS_APPCLIP_SCHEME,
+      target_filter: ios_appclip_scheme,
       build_configuration: "Release"
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
-      profile: PROFILE_WIDGET_PATH,
+      profile: profile_wid_path,
       code_signing_identity: CODE_SIGNING_IDENTITY,
-      target_filter: IOS_WIDGET_SCHEME,
+      target_filter: ios_widget_scheme,
       build_configuration: "Release"
     )
 
-    # Build the application
+    ############################
+    # Build the ipa
+    ############################
     gym(
       scheme: IOS_SCHEME,
       workspace: "ios/azzapp.xcworkspace",
@@ -228,32 +185,139 @@ platform :ios do
         method: EXPORT_METHOD,
         signingStyle: "manual",
         provisioningProfiles: {
-          APP_IDENT => PROFILE_ID,
-          APPCLIP_IDENT => PROFILECLIP_ID,
-          WIDGET_IDENT => PROFILEWIDGET_ID
+          app_ident => profile_app_id,
+          clip_ident => profile_clip_id,
+          widget_ident => profile_widget_id
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
-        distributionBundleIdentifier: APP_IDENT
+        distributionBundleIdentifier: app_ident
       }
     )
+  end
 
-    restore_file(path: pbxprojPath)
+  desc 'Inject React Native and resign the app.'
+  lane :inject_react_native do
+    ###########################
+    # Prepare keychain + provisioning profiles
+    ###########################
+    keychain_created = true
+    create_keychain(name: 'CI', password: 'CI', default_keychain: true, unlock: true, timeout: 0, lock_when_sleeps: false)
 
-     # === SENTRY SOURCEMAP UPLOAD ===
+    import_certificate(keychain_name: 'CI', keychain_password: 'CI', certificate_path: cert_path, certificate_password: P12_PASSWORD)
 
-    # Génère les fichiers JS bundle + sourcemap
-    sh("npx react-native bundle \
+    install_provisioning_profile(path: profile_app_path)
+    install_provisioning_profile(path: profile_clip_path)
+    install_provisioning_profile(path: profile_wid_path)
+
+    ###########################
+    # Unzip IPA
+    ###########################
+    sh"unzip -o ./builds/#{IOS_SCHEME}.ipa -d ./builds/azzapp"
+
+    ###########################
+    # Update version number
+    ###########################
+    app_dir = "./builds/azzapp/Payload/#{IOS_SCHEME}.app"
+    app_clip_dir = "#{app_dir}/AppClips/#{ios_appclip_scheme}.app"
+    widget_dir = "#{app_dir}/PlugIns/#{ios_widget_scheme}.appex"
+    plists = [
+      "#{app_dir}/Info.plist",
+      "#{app_clip_dir}/Info.plist",
+      "#{widget_dir}/Info.plist",
+    ]
+
+    plists.each do |plist|
+      sh "
+        plutil -convert xml1 #{plist}
+        plutil -replace CFBundleShortVersionString -string #{version_number} #{plist}
+        plutil -replace CFBundleVersion -string #{build_number} #{plist}
+        plutil -convert binary1 #{plist}
+      "
+    end  
+
+
+    ###########################
+    # Resign the Widget and AppClip
+    ###########################
+    clip_entitlements = 
+      File.absolute_path(
+        "../ios/#{clip_entitlements_files[IOS_SCHEME]}"
+      )
+    widget_entitlements = 
+      File.absolute_path(
+        "../ios/#{widget_entitlements_files[IOS_SCHEME]}"
+      )
+
+    sh <<~BASH
+      set -e
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{clip_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{app_clip_dir}"
+
+      codesign -f -s "#{CODE_SIGNING_IDENTITY}" \
+        --entitlements "#{widget_entitlements}" \
+        --preserve-metadata=identifier,flags,runtime \
+        "#{widget_dir}"
+    BASH
+
+    ###########################
+    # Inject React Native
+    ###########################
+    absolute_app_dir = File.absolute_path(app_dir)
+    hermesc = File.absolute_path(
+      "../ios/Pods/hermes-engine/destroot/bin/hermesc"
+    )
+    build_dir = File.absolute_path('./builds')
+    sh <<~BASH
+      cd ..
+      
+      yarn react-native bundle \
+      --entry-file index.js \
       --platform ios \
       --dev false \
-      --entry-file index.js \
-      --bundle-output ./main.jsbundle \
-      --assets-dest ./assets \
-      --sourcemap-output ./main.jsbundle.map")
+      --reset-cache \
+      --bundle-output "#{build_dir}/main.jsbundle" \
+      --assets-dest "#{absolute_app_dir}" \
+      --minify false \
+      --sourcemap-output "#{build_dir}/main.jsbundle.map"
 
-    # Récupère les infos de version pour nommer la release
-    version = get_info_plist_value(path: main_app_plist, key: "CFBundleShortVersionString")
-    build = get_info_plist_value(path: main_app_plist, key: "CFBundleVersion")
-    release_name = "#{APP_IDENT}@#{version}+#{build}"
+      #{hermesc} -emit-binary -max-diagnostic-width=80 -O \
+        -output-source-map \
+        -out #{absolute_app_dir}/main.jsbundle \
+        "#{build_dir}/main.jsbundle"
+    
+      RN_PATH=$(node -e "console.log(require.resolve('react-native/package.json'))")
+      RN_PATH=$(dirname "$RN_PATH")
+
+      node $RN_PATH/scripts/compose-source-maps.js \
+        #{build_dir}/main.jsbundle.map \
+        #{absolute_app_dir}/main.jsbundle.map \
+        -o #{build_dir}/main.jsbundle.map
+    BASH
+
+    ###########################
+    # Recreate IPA
+    ###########################
+    sh "rm -rf ./builds/#{IOS_SCHEME}.ipa"
+    sh "cd ./builds/azzapp && zip -r #{IOS_SCHEME}.ipa ."
+    sh "mv ./builds/azzapp/#{IOS_SCHEME}.ipa ./builds/#{IOS_SCHEME}.ipa"
+
+    resign(
+      ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
+      signing_identity: CODE_SIGNING_IDENTITY,
+      provisioning_profile: {
+        app_ident => profile_app_path,
+        clip_ident => profile_clip_path,
+        widget_ident => profile_wid_path
+      },
+      use_app_entitlements: true,
+    )
+
+    ###########################
+    # SENTRY SOURCEMAP UPLOAD
+    ###########################
+    release_name = "#{version_number}"
 
     # Upload vers Sentry via le plugin officiel
     sentry_upload_sourcemap(
@@ -261,17 +325,17 @@ platform :ios do
       org_slug: ENV['SENTRY_ORG'],
       project_slug: ENV['SENTRY_PROJECT'],
       version: release_name,
-      app_identifier: APP_IDENT,
-      build: build,
-      dist: build,
-      sourcemap: ['main.jsbundle', 'main.jsbundle.map'],
+      app_identifier: app_ident,
+      build: build_number,
+      dist: build_number,
+      url_prefix: '~/',
+      sourcemap: ['./fastlane/builds/main.jsbundle', './fastlane/builds/main.jsbundle.map'],
       rewrite: true
     )
   end
 
+  desc 'Deploy iOS application to App Store.'
   lane :deploy do
-    widget_config = ios_widget_config[IOS_SCHEME]
-    APP_IDENT = widget_config['app_ident']
     api_key = app_store_connect_api_key(
       key_id: "2FWWXZWMHY",
       issuer_id: "913e1653-0bf1-4fd2-8c0d-0d93a6ff4418",
@@ -284,7 +348,7 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
       ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
-      app_identifier: APP_IDENT,
+      app_identifier: ios_config[IOS_SCHEME]['app_ident'],
       submit_beta_review: false,
       api_key: api_key
     )
@@ -311,18 +375,20 @@ platform :android do
   KEY_PASSWORD = ENV['ANDROID_KEY_PASSWORD']
   PLAY_CONFIG_PATH = ENV['PLAY_CONFIG_PATH']
   ANDROID_APP_IDENTIFIER = ENV['ANDROID_APP_IDENTIFIER']
-  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK']
+  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK'] || "development"
+  android_target = ANDROID_BUILD_TASK[0].upcase + ANDROID_BUILD_TASK[1..-1]
 
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
-    android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
-
+    flags = "--build-cache"
+    flags << " -PreactNativeArchitectures=arm64-v8a" if ENV["DEVELOPMENT_BUILD"] == "true"
     gradle(
-      task: ":app:bundle#{android_target}",
+      task: "app:bundle#{android_target}",
       build_type: "Release",
       project_dir: "./android",
       print_command_output: true,
       print_command: true,
+      flags: flags,
       properties: {
         "android.injected.signing.store.file" => KEYSTORE_PATH,
         "android.injected.signing.store.password" => KEYSTORE_PASSWORD,
@@ -330,13 +396,13 @@ platform :android do
         "android.injected.signing.key.password" => KEY_PASSWORD
       }
     )
-    puts "Test"
     puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
     puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
     puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
   end
-
+  
+  desc 'Deploy Android application to Play Store.'
   lane :deploy do
     AAB_PATH = ENV['AAB_PATH']
     puts "deploy"
@@ -372,8 +438,4 @@ def update_project_version(xcodeproj:, target:, version:, value:)
   end
 
   project.save
-end
-
-def capitalize_first_letter(string)
-  string[0].upcase + string[1..-1]
 end

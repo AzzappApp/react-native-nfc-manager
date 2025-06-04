@@ -12,8 +12,10 @@ import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultProfilesQuery = graphql`
   query SearchResultProfilesQuery($search: String!, $profileId: ID!) {
-    profile: node(id: $profileId) {
-      ...SearchResultProfiles_profile @arguments(search: $search)
+    node(id: $profileId) {
+      ...SearchResultProfiles_profile
+        @arguments(search: $search)
+        @alias(as: "profile")
     }
   }
 `;
@@ -58,7 +60,7 @@ const SearchResultProfiles = ({
         }
       }
     `,
-    preloadedQuery.profile,
+    preloadedQuery.node?.profile,
   );
 
   const users: CoverList_users$key = useMemo(() => {

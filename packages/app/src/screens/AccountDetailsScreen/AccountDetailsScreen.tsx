@@ -1,4 +1,3 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, View } from 'react-native';
@@ -8,6 +7,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { useDeleteNotifications } from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -206,7 +206,7 @@ const AccountDetailsScreen = ({
               }
             >
               {currentUser?.phoneNumber ? (
-                parsePhoneNumber(currentUser.phoneNumber).formatNational()
+                parsePhoneNumber(currentUser.phoneNumber)?.formatNational()
               ) : (
                 <FormattedMessage
                   defaultMessage="Add a phone number"

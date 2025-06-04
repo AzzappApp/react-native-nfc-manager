@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -35,8 +35,8 @@ import type { ForwardedRef } from 'react';
 
 const mediaTextModuleWebCardEditionScreenQuery = graphql`
   query MediaTextModuleWebCardEditionScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         webCard {
           ...withCardModule_webCard
           cardModules {
@@ -45,6 +45,7 @@ const mediaTextModuleWebCardEditionScreenQuery = graphql`
             # module: cardModule(moduleId: $moduleId) {
             id
             ...MediaTextModuleWebCardEditionScreen_module
+              @alias(as: "innerModule")
           }
         }
       }
@@ -154,6 +155,7 @@ const MediaTextModuleWebCardEditionScreen = (
               visible
               variant
               ...MediaTextModuleWebCardEditionScreen_module
+                @alias(as: "mediaTextModule")
             }
           }
         }

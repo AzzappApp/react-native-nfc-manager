@@ -1,4 +1,4 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -13,6 +13,7 @@ import {
   isValidEmail,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
+import env from '#env';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
@@ -109,7 +110,7 @@ const SignUpScreen = () => {
             hasAcceptedCommunications: communicationChecked === 'checked',
           });
         } else {
-          username = parsePhoneNumber(
+          username = parsePhoneNumberWithError(
             contact.value,
             contact.countryCodeOrEmail,
           ).formatInternational();
@@ -121,7 +122,7 @@ const SignUpScreen = () => {
           });
         }
         await setSharedWebCredentials(
-          process.env.APP_WEBSHARED_CREDENTIALS!,
+          env.APP_WEBSHARED_CREDENTIALS,
           username,
           password,
         ).catch(() => {});
@@ -154,23 +155,54 @@ const SignUpScreen = () => {
           });
         }
         setIsSubmitting(false);
-      } catch (error: any) {
-        setPhoneOrEmailError(
-          typeof error === 'object' &&
-            error &&
-            'message' in error &&
-            error.message === ERRORS.FORBIDDEN
-            ? intl.formatMessage({
-                defaultMessage:
-                  'Your account has been disabled. Please contact support.',
-                description:
-                  'Signup Screen - Error message when the account has been disabled',
-              })
-            : intl.formatMessage({
-                defaultMessage: 'Unknown error - Please retry',
-                description: 'Signup Screen - Error unknown',
-              }),
-        );
+      } catch (error) {
+        if (error && typeof error == 'object' && 'message' in error) {
+          switch (error.message) {
+            case ERRORS.EMAIL_NOT_VALID:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Please enter a valid email address',
+                  description:
+                    'Signup Screen - Error message for invalid email address',
+                }),
+              );
+              break;
+            case ERRORS.PHONENUMBER_NOT_VALID:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Please enter a valid phone number',
+                  description:
+                    'Signup Screen - Error message for invalid phone number',
+                }),
+              );
+              break;
+            case ERRORS.FORBIDDEN:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage:
+                    'Your account has been disabled. Please contact support.',
+                  description:
+                    'Signup Screen - Error message when the account has been disabled',
+                }),
+              );
+              break;
+
+            default:
+              setPhoneOrEmailError(
+                intl.formatMessage({
+                  defaultMessage: 'Unknown error - Please retry',
+                  description: 'Signup Screen - Error unknown',
+                }),
+              );
+          }
+        } else {
+          setPhoneOrEmailError(
+            intl.formatMessage({
+              defaultMessage: 'Unknown error - Please retry',
+              description: 'Signup Screen - Error unknown',
+            }),
+          );
+        }
 
         setIsSubmitting(false);
       }
@@ -219,12 +251,15 @@ const SignUpScreen = () => {
   const keyboardHeight = useKeyboardHeight();
   const keyboardAvoidAnimatedStyle = useAnimatedStyle(() => {
     return {
-      paddingBottom: keyboardHeight.value - insets.bottom + 16,
+      paddingBottom:
+        keyboardHeight.value -
+        insets.bottom +
+        (keyboardHeight.value && Platform.OS === 'ios' ? 80 : 16),
     };
   });
 
   return (
-    <View style={styles.root}>
+    <View style={styles.flex}>
       <View style={styles.background}>
         <LottieView
           source={require('../assets/sign/login_sign_up_asset.json')}
@@ -374,9 +409,6 @@ SignUpScreen.options = {
 
 const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },
-  root: {
-    flex: 1,
-  },
   background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   content: {
     flex: 1,
@@ -429,8 +461,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   button: {
     marginTop: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   footer: {
     marginTop: 10,

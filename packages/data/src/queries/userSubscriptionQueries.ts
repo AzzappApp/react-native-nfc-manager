@@ -12,6 +12,7 @@ import {
   like,
 } from 'drizzle-orm';
 import { db } from '../database';
+import env from '../env';
 import { createId } from '../helpers/createId';
 import { UserSubscriptionTable } from '../schema';
 import type { UserSubscription } from '../schema';
@@ -296,7 +297,7 @@ export const getSubscriptionsPaged = async ({
   };
 };
 
-const FREE_BETA_ANDROID_DATE_LIMIT = process.env.FREE_BETA_ANDROID_DATE_LIMIT;
+const FREE_BETA_ANDROID_DATE_LIMIT = env.FREE_BETA_ANDROID_DATE_LIMIT;
 
 export const createFreeSubscriptionForBetaAndroidPeriod = async (
   userId: string[],

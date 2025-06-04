@@ -1,7 +1,8 @@
-import client from '#client';
+import env from '#env';
+import client from './client';
 
-const name = process.env.PAYMENT_API_NAME ?? '';
-const password = process.env.PAYMENT_API_PASSWORD ?? '';
+const name = env.PAYMENT_API_NAME;
+const password = env.PAYMENT_API_PASSWORD;
 
 export const login = async () => {
   const resultToken = await client.POST('/api/login_check', {

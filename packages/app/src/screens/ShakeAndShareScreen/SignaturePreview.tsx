@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
+import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet, Text } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { isColorTooLight } from '@azzapp/shared/colorsHelpers';
+import { getEmailSignatureTitleColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
@@ -17,6 +18,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
     contactCard,
     avatar,
     logo: profileLogo,
+    banner: profileBanner,
   } = useFragment(
     graphql`
       fragment SignaturePreview_profile on Profile
@@ -46,6 +48,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             id
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
+          banner {
+            id
+            uri: uri(width: 220, pixelRatio: $pixelRatio)
+            aspectRatio
+          }
         }
         contactCard {
           firstName
@@ -67,6 +74,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           id
           uri: uri(width: 180, pixelRatio: $pixelRatio)
         }
+        banner {
+          id
+          uri: uri(width: 220, pixelRatio: $pixelRatio)
+          aspectRatio
+        }
       }
     `,
     profileKey,
@@ -86,6 +98,11 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
 
   const logo =
     webCard?.isMultiUser && webCard?.logo ? webCard?.logo : profileLogo;
+
+  const banner =
+    webCard?.isMultiUser && webCard?.banner ? webCard?.banner : profileBanner;
+
+  const titleColor = getEmailSignatureTitleColor(webCard?.cardColors?.primary);
 
   return (
     <>
@@ -111,10 +128,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           </Text>
           {contactCard?.title && (
             <Text
-              style={[
-                styles.titleText,
-                { color: webCard?.cardColors?.primary ?? colors.black },
-              ]}
+              style={[styles.titleText, { color: titleColor }]}
               allowFontScaling
               adjustsFontSizeToFit
               numberOfLines={1}
@@ -127,16 +141,15 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             style={[
               styles.saveButtonText,
               {
-                color:
-                  !webCard?.cardColors?.primary ||
-                  isColorTooLight(webCard?.cardColors?.primary)
-                    ? colors.black
-                    : webCard?.cardColors?.primary,
+                color: titleColor,
               },
             ]}
             numberOfLines={1}
           >
-            Save my contact
+            <FormattedMessage
+              defaultMessage="Save my contact"
+              description="Save my contact label in Signature preview of Share screen"
+            />
           </Text>
         </View>
         <View style={{ width: '50%', paddingLeft: 15 }}>
@@ -178,6 +191,13 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           )}
         </View>
       </View>
+      {banner?.uri && (
+        <Image
+          source={{ uri: banner.uri }}
+          style={[styles.bannerImage, { aspectRatio: banner.aspectRatio }]}
+          contentFit="fill"
+        />
+      )}
     </>
   );
 };
@@ -191,6 +211,10 @@ const styles = StyleSheet.create({
   logoImage: {
     marginTop: 15 * SCALE_RATIO,
     height: 60 * SCALE_RATIO,
+    width: '100%',
+  },
+  bannerImage: {
+    marginTop: 15 * SCALE_RATIO,
     width: '100%',
   },
   leftView: {
@@ -209,13 +233,14 @@ const styles = StyleSheet.create({
   displayNameText: {
     color: colors.black,
     fontFamily: 'Helvetica Neue Medium',
-    fontWeight: '700',
+    fontWeight: '500',
     fontSize: 16 * SCALE_RATIO,
     lineHeight: 20 * SCALE_RATIO,
     marginBottom: 5 * SCALE_RATIO,
   },
   titleText: {
     fontFamily: 'Helvetica Neue Medium',
+    fontWeight: '500',
     fontSize: 14 * SCALE_RATIO,
     lineHeight: 18 * SCALE_RATIO,
     marginBottom: 5 * SCALE_RATIO,
@@ -225,6 +250,7 @@ const styles = StyleSheet.create({
     fontSize: 12 * SCALE_RATIO,
     fontFamily: 'Helvetica Neue',
     marginBottom: 5 * SCALE_RATIO,
+    fontWeight: '400',
   },
   phoneMail: {
     color: colors.black,
@@ -236,7 +262,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 12 * SCALE_RATIO,
     fontFamily: 'Helvetica Neue',
-    fontWeight: 700,
+    fontWeight: '500',
     textAlign: 'left',
     textDecorationLine: 'underline',
     marginTop: 10,

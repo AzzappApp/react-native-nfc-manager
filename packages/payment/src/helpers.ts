@@ -1,19 +1,16 @@
 import ms from 'ms';
 import { sha256 } from '@azzapp/shared/crypto';
+import env from '#env';
 import { getTaxRate } from '#taxes';
 import type { UserSubscription } from '@azzapp/data';
 
 export type SubscriptionPlan = UserSubscription['subscriptionPlan'];
 
-export const MONTHLY_RECURRENCE = ms(
-  process.env.PAYMENT_MONTHLY_RECURRENCE ?? '30d',
-);
-export const YEARLY_RECURRENCE = ms(
-  process.env.PAYMENT_YEARLY_RECURRENCE ?? '365d',
-);
+export const MONTHLY_RECURRENCE = ms(env.PAYMENT_MONTHLY_RECURRENCE);
+export const YEARLY_RECURRENCE = ms(env.PAYMENT_YEARLY_RECURRENCE);
 
 export const REBILL_MANAGER_REBILL_DURATION =
-  process.env.NEXT_PUBLIC_PLATFORM === 'production'
+  env.NEXT_PUBLIC_PLATFORM === 'production'
     ? '0' // 0 means unlimited
     : `${60 * 24}`; // 1 day (in minutes) in test environments
 
@@ -89,7 +86,7 @@ export const generateRebillFailRule = () => {
 
 type Params = { [key: string]: any };
 
-const SIGNATURE_PASSWORD = process.env.PAYMENT_API_SECRET;
+const SIGNATURE_PASSWORD = env.PAYMENT_API_SECRET;
 
 export const signature = async (params: Params = {}): Promise<string> => {
   const stack: string[] = [];

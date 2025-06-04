@@ -1,10 +1,11 @@
-import { parsePhoneNumber, type CountryCode } from 'libphonenumber-js';
+import { type CountryCode } from 'libphonenumber-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { mergeRefs } from '#helpers/mergeRefs';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
 import PhoneInput from './PhoneInput';
@@ -51,11 +52,11 @@ const EmailOrPhoneInput = ({
       const localCountryCode = locales[0].countryCode;
 
       try {
-        const { country } = parsePhoneNumber(input.value);
+        const number = parsePhoneNumber(input.value);
 
-        if (country) {
+        if (number?.country) {
           onChange({
-            countryCodeOrEmail: country,
+            countryCodeOrEmail: number?.country,
             value: input.value,
           });
         } else {
@@ -127,7 +128,6 @@ const EmailOrPhoneInput = ({
         value={input.countryCodeOrEmail}
         options={SELECTORS}
         onChange={onChangeCode}
-        style={styles.countryCodeOrEmailButton}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Select a calling code or email',
           description:
@@ -204,8 +204,6 @@ const styles = StyleSheet.create({
   phoneOrEmailContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  countryCodeOrEmailButton: {
-    marginRight: 5,
+    gap: 5,
   },
 });

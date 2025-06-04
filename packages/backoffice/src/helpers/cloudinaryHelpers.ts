@@ -1,8 +1,8 @@
 'use server';
 
 import { createMedia, createId } from '@azzapp/data';
-import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { encodeMediaId } from '@azzapp/service/mediaServices/imageHelpers';
+import { createPresignedUpload } from '@azzapp/service/mediaServices/mediaServices';
 import { ADMIN } from '#roles';
 import getCurrentUser from '#helpers/getCurrentUser';
 import { currentUserHasRole } from '#helpers/roleHelpers';

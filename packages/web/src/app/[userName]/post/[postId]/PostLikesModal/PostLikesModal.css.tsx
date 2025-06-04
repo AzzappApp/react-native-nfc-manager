@@ -1,10 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import {
-  MediaQuery,
-  textLarge,
-  textLargeSemiBold,
-  vars,
-} from '#app/[userName]/theme.css';
+import { MediaQuery, textLarge, textLargeSemiBold, vars } from '#app/theme.css';
 
 const modal = style({
   paddingBottom: 0,

@@ -19,19 +19,20 @@ import useNotificationsEvent, {
 } from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useWidget from '#hooks/useWidget';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
+import { HomeBottomBar } from './HomeBottomBar';
 import HomeBottomPanel from './HomeBottomPanel';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
+import HomeProfileMenu from './HomeProfileMenu';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
+import type { PushNotificationData } from '@azzapp/shared/notificationHelpers';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
@@ -58,7 +59,11 @@ const HomeScreenContent = ({
             cardIsPublished
             userName
             coverIsPredefined
+            cardColors {
+              primary
+            }
           }
+          ...HomeProfileMenu_profile
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
         }
@@ -67,15 +72,18 @@ const HomeScreenContent = ({
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
-        ...HomeBottomPanel_user
+        ...HomeContactCard_user
+        ...HomeBottomPanelMessage_user
         ...HomeHeader_user
+        ...HomeBottomBar_user
+        ...HomeBottomBar_shareButton_user
       }
     `,
     userKey,
   );
 
   const onDeepLinkInApp = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       if (notification.type === 'multiuser_invitation') {
         refreshQuery?.();
       }
@@ -85,10 +93,8 @@ const HomeScreenContent = ({
 
   const router = useRouter();
 
-  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
-
   const redirectDeepLink = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       switch (notification.type) {
         case 'shareBack':
           router.push({
@@ -111,7 +117,7 @@ const HomeScreenContent = ({
   );
 
   const onDeepLinkOpenedApp = useCallback(
-    (notification: PushNotificationType) => {
+    (notification: PushNotificationData) => {
       if ('webCardId' in notification && user.profiles) {
         const webCardId = notification.webCardId;
         const newProfileIndex = user.profiles.findIndex(
@@ -141,8 +147,6 @@ const HomeScreenContent = ({
     },
     [redirectDeepLink, user.profiles],
   );
-
-  useEffect(() => clearTimeout(changeWebCardTimeout.current), []);
 
   const { notificationAuthorized, requestNotificationPermission } =
     useNotificationsManager();
@@ -198,16 +202,15 @@ const HomeScreenContent = ({
 
   // #endregion
   const insets = useScreenInsets();
+
   const homeContentContainerStyle = useMemo(
     () => [
       styles.container,
       {
         marginTop: insets.top + HOME_SCREEN_CONTENT_PADDING,
-        marginBottom:
-          insets.bottom + BOTTOM_MENU_HEIGHT + HOME_SCREEN_CONTENT_PADDING,
       },
     ],
-    [insets.bottom, insets.top],
+    [insets.top],
   );
 
   //#region widget
@@ -220,10 +223,12 @@ const HomeScreenContent = ({
       <View style={homeContentContainerStyle}>
         <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
-        <HomeProfilesCarousel ref={selectListRef} user={user} />
-        <Suspense>
-          <HomeBottomPanel user={user} />
-        </Suspense>
+        <View style={styles.viewCarrousel}>
+          <HomeProfilesCarousel ref={selectListRef} user={user} />
+        </View>
+        <HomeProfileMenu profile={currentProfile ?? null} />
+        <HomeBottomPanel user={user} />
+        <HomeBottomBar user={user} />
       </View>
       <Suspense>
         <HomeBottomSheetPanel
@@ -236,18 +241,33 @@ const HomeScreenContent = ({
       {currentProfile?.webCard && !currentProfile.webCard.userName && (
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
-      <Tooltips />
+      <View style={styles.tooltipContainer}>
+        <Tooltips />
+      </View>
     </View>
   );
 };
 //usage of memo tested with whyDidYouRender, reducing render due to context change
 export default memo(HomeScreenContent);
 
-export const HOME_SCREEN_CONTENT_PADDING = 15;
+export const HOME_SCREEN_CONTENT_PADDING = 5;
+
+const CAROUSEL_Z_INDEX = 5; // zIndex for the carousel to be above the background and below the bottom panel
 
 const styles = StyleSheet.create({
+  viewCarrousel: { flex: 1, zIndex: CAROUSEL_Z_INDEX },
   container: {
     flex: 1,
     justifyContent: 'space-around',
+  },
+  tooltipContainer: {
+    flex: 1,
+    position: 'absolute',
+    zIndex: CAROUSEL_Z_INDEX + 1,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    pointerEvents: 'box-none',
   },
 });

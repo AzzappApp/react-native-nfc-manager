@@ -1,6 +1,7 @@
 import { forwardRef, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
+import env from '#env';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
@@ -54,7 +55,7 @@ const CoverEditorToolbox = (
   );
 
   let exportCover: (() => void) | undefined = undefined;
-  if (process.env.DEPLOYMENT_ENVIRONMENT !== 'production') {
+  if (env.DEPLOYMENT_ENVIRONMENT !== 'production') {
     exportCover = () => {
       const { linksLayer, overlayLayers, textLayers } = coverEditorState;
 
@@ -126,7 +127,7 @@ const CoverEditorToolbox = (
             }
             onPress={showColorPicker}
           />
-          {process.env.DEPLOYMENT_ENVIRONMENT !== 'production' && (
+          {env.DEPLOYMENT_ENVIRONMENT !== 'production' && (
             <ToolBoxSection
               label="Export"
               icon="settings"

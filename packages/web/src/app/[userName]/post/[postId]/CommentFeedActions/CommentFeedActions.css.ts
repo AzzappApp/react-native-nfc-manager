@@ -1,10 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import {
-  MediaQuery,
-  textSmall,
-  textSmallBold,
-  vars,
-} from '#app/[userName]/theme.css';
+import { MediaQuery, textSmall, textSmallBold, vars } from '#app/theme.css';
 
 const wrapper = style({
   width: '100%',

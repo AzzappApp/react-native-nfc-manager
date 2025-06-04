@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { type ImageProps } from 'react-native';
+import { type ImageProps, type ColorSchemeName } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -7,6 +7,9 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 const icons = {
   get missing() {
     return require('./assets/missing.png');
+  },
+  get analytics() {
+    return require('./assets/analytics.png');
   },
   get about() {
     return require('./assets/about.png');
@@ -182,8 +185,14 @@ const icons = {
   get earth() {
     return require('./assets/earth.png');
   },
+  get earth_thin() {
+    return require('./assets/earth_thin.png');
+  },
   get edit() {
     return require('./assets/edit.png');
+  },
+  get education() {
+    return require('./assets/education.png');
   },
   get empty() {
     return require('./assets/empty.png');
@@ -196,6 +205,18 @@ const icons = {
   },
   get filters() {
     return require('./assets/filters.png');
+  },
+  get filters_ai_light() {
+    return require('./assets/filters_ai_light.png');
+  },
+  get filters_ai_dark() {
+    return require('./assets/filters_ai_light.png');
+  },
+  get enrich_dark() {
+    return require('./assets/enrich_dark.png');
+  },
+  get enrich_light() {
+    return require('./assets/enrich_light.png');
   },
   get fixed_ratio() {
     return require('./assets/fixed_ratio.png');
@@ -377,6 +398,9 @@ const icons = {
   get phone_full() {
     return require('./assets/phone_full.png');
   },
+  get professional() {
+    return require('./assets/professional.png');
+  },
   get reduce() {
     return require('./assets/reduce.png');
   },
@@ -449,8 +473,14 @@ const icons = {
   get share() {
     return require('./assets/share.png');
   },
+  get share_home() {
+    return require('./assets/share_home.png');
+  },
   get shared_webcard() {
     return require('./assets/shared_webcard.png');
+  },
+  get shared_webcard_thin() {
+    return require('./assets/shared_webcard_thin.png');
   },
   get share_main() {
     return require('./assets/share_main.png');
@@ -478,6 +508,9 @@ const icons = {
   },
   get tips() {
     return require('./assets/tips.png');
+  },
+  get tools() {
+    return require('./assets/tools.png');
   },
   get transition() {
     return require('./assets/transition.png');
@@ -545,10 +578,12 @@ export type Icons = keyof typeof icons;
 export type IconProps = Omit<ImageProps, 'source'> & {
   icon: Icons;
   size?: number;
+  appearance?: ColorSchemeName;
 };
 
-const Icon = ({ icon, size = 24, ...props }: IconProps) => {
-  const styles = useStyleSheet(styleSheet);
+const Icon = ({ icon, size = 24, appearance, ...props }: IconProps) => {
+  const styles = useStyleSheet(styleSheet, appearance);
+
   return (
     <Animated.Image
       {...props}

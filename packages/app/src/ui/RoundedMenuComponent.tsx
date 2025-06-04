@@ -1,9 +1,11 @@
 import { memo, useCallback } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { TextVariant } from './Text';
+import type { TextStyle, ViewStyle } from 'react-native';
 
 type Props = {
   selected?: boolean;
@@ -11,6 +13,12 @@ type Props = {
   label: string;
   onSelect?: (id: string | null) => void;
   textVariant?: TextVariant;
+  style?: ViewStyle | ViewStyle[];
+  selectedStyle?: ViewStyle | ViewStyle[];
+  textStyle?: TextStyle;
+  selectedTextStyle?: TextStyle | TextStyle[];
+  rightElement?: JSX.Element;
+  containerRef?: React.RefObject<View | null>;
 };
 
 const RoundedMenuComponent = ({
@@ -19,6 +27,12 @@ const RoundedMenuComponent = ({
   onSelect,
   id,
   textVariant = 'button',
+  style,
+  selectedStyle,
+  textStyle,
+  rightElement,
+  selectedTextStyle,
+  containerRef,
 }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -28,13 +42,34 @@ const RoundedMenuComponent = ({
     }
   }, [id, onSelect]);
 
+  const flattenStyle = StyleSheet.flatten(style);
+  const flattenSelectedStyle = selected
+    ? StyleSheet.flatten(selectedStyle)
+    : {};
+  const flattenSelectedTextStyle = selected
+    ? StyleSheet.flatten(selectedTextStyle)
+    : {};
+
   return (
-    <PressableNative
-      style={[styles.menu, selected && styles.menuSelected]}
-      onPress={onPress}
+    <View
+      ref={containerRef}
+      style={[
+        styles.menu,
+        selected && styles.menuSelected,
+        flattenStyle,
+        flattenSelectedStyle,
+      ]}
     >
-      <Text variant={textVariant}>{label}</Text>
-    </PressableNative>
+      <PressableNative style={styles.menuPressable} onPress={onPress}>
+        <Text
+          variant={textVariant}
+          style={[textStyle, flattenSelectedTextStyle]}
+        >
+          {label}
+        </Text>
+        {rightElement}
+      </PressableNative>
+    </View>
   );
 };
 //using memo because part of a list
@@ -42,16 +77,21 @@ export default memo(RoundedMenuComponent);
 
 const styleSheet = createStyleSheet(appearance => ({
   menu: {
-    height: 32,
+    overflow: 'hidden',
     borderRadius: 16,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    borderColor: appearance === 'light' ? colors.grey100 : colors.grey900,
     borderWidth: 1,
+    height: 32,
+  },
+  menuPressable: {
     borderStyle: 'solid',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    borderRadius: 16,
   },
   menuSelected: {
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey900,
   },
 }));

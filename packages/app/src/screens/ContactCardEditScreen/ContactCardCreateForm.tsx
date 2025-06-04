@@ -1,5 +1,5 @@
 import { ImageFormat } from '@shopify/react-native-skia';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useController, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -23,6 +23,7 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Separation from '#ui/Separation';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
@@ -41,13 +42,15 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardCreateForm_user$key } from '#relayArtifacts/ContactCardCreateForm_user.graphql';
 import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ReactNode } from 'react';
-import type { Control } from 'react-hook-form';
+import type { Control, UseFormSetValue } from 'react-hook-form';
+import type { LayoutChangeEvent } from 'react-native';
 
 type ContactCardCreateFormProps = {
   control: Control<ContactCardFormValues>;
   children?: ReactNode;
   footer?: ReactNode;
   user: ContactCardCreateForm_user$key | null;
+  setValue: UseFormSetValue<ContactCardFormValues>;
 };
 
 const ContactCardCreateForm = ({
@@ -55,6 +58,7 @@ const ContactCardCreateForm = ({
   children,
   footer,
   user: userKey,
+  setValue,
 }: ContactCardCreateFormProps) => {
   const user = useFragment(
     graphql`
@@ -132,10 +136,18 @@ const ContactCardCreateForm = ({
 
   const onPickerRequested = () => setImagePicker('avatar');
 
+  const { bottom } = useScreenInsets();
+
+  const offsetRef = useRef(0);
+
+  const onSubViewLayout = useCallback((event: LayoutChangeEvent) => {
+    offsetRef.current = event.nativeEvent.layout.y;
+  }, []);
+
   return (
     <>
       <FormDeleteFieldOverlay>
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           {children}
           <ContactCardEditModalAvatar
             control={control}
@@ -178,6 +190,12 @@ const ContactCardCreateForm = ({
                     Toast.hide();
                     const newValue =
                       value === 'business' ? 'personal' : 'business';
+                    if (newValue === 'personal') {
+                      logoField.onChange(null);
+                      setValue('company', null);
+                      setValue('companyActivityLabel', null);
+                      setValue('urls', []);
+                    }
                     onChange(newValue);
                   }}
                 />
@@ -185,7 +203,10 @@ const ContactCardCreateForm = ({
             )}
           />
           <Separation small />
-          <Animated.View style={businessCardOverlayStyle}>
+          <Animated.View
+            style={businessCardOverlayStyle}
+            onLayout={onSubViewLayout}
+          >
             <Controller
               control={control}
               name="company"
@@ -259,6 +280,7 @@ const ContactCardCreateForm = ({
             <ContactCardEditModalUrls
               control={control}
               isPremium //we consider that user will be premium when this field is accessible
+              offsetRef={offsetRef}
             />
           </Animated.View>
 

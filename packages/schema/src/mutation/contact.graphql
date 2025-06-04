@@ -1,0 +1,127 @@
+extend type Mutation {
+  saveContact(contactId: ID!, input: ContactInput!): Contact
+
+  createContact(
+    profileId: ID!
+    input: ContactInput!
+    scanUsed: Boolean
+    notify: Boolean
+    withShareBack: Boolean!
+    qrCodeKey: String
+  ): ContactPayload
+
+  removeContacts(
+    profileId: ID @deprecated(reason: "No longer used")
+    input: RemoveContactsInput!
+  ): RemoveContactPayload
+
+  enrichContact(contactId: ID!): ContactPayload
+
+  cancelEnrichContact(contactId: ID!): ContactPayload
+
+  updateContactEnrichmentHiddenFields(
+    contactEnrichmentId: ID!
+    input: HiddenFieldInput!
+  ): ContactEnrichmentPayload
+
+  """
+  Approves or rejects a contact enrichment request.
+  
+  Arguments:
+  - contactEnrichmentId: The unique identifier of the contact enrichment request to be approved or rejected.
+  - approved: A boolean indicating whether the request is approved (true) or rejected (false).
+  
+  Returns:
+  - The updated contact enrichment payload after the operation.
+  """
+  approveContactEnrichment(
+    contactEnrichmentId: ID!
+    approved: Boolean!
+    input: HiddenFieldInput
+  ): ContactEnrichmentPayload!
+}
+
+input ContactInput {
+  contactProfileId: ID
+  firstName: String
+  lastName: String
+  company: String
+  title: String
+  birthday: String
+  avatarId: String
+  phoneNumbers: [ContactPhoneNumberInput!]
+  emails: [ContactEmailInput!]
+  addresses: [ContactAddressInput!]
+  socials: [ContactSocialInput!]
+  urls: [ContactUrlInput!]
+  logoId: String
+  note: String
+  location: LocationInput
+  meetingPlace: AddressInput
+  meetingDate: DateTime
+}
+
+input ContactSocialInput {
+  url: String!
+  label: String!
+}
+
+input ContactUrlInput {
+  url: String!
+}
+
+input ContactPhoneNumberInput {
+  label: String!
+  number: String!
+}
+
+input ContactEmailInput {
+  label: String!
+  address: String!
+}
+
+input ContactAddressInput {
+  label: String!
+  address: String!
+}
+
+type ContactPayload {
+  contact: Contact!
+}
+
+type ContactEnrichmentPayload {
+  contactEnrichment: ContactEnrichment!
+}
+
+enum ContactType {
+  contact
+  shareback
+}
+
+input RemoveContactsInput {
+  contactIds: [ID!]!
+}
+
+type RemoveContactPayload {
+  removedContactIds: [ID!]!
+}
+
+input HiddenFieldInput {
+  contact: HiddenContactFieldsInput
+  profile: Boolean
+}
+
+input HiddenContactFieldsInput {
+  firstName: Boolean
+  lastName: Boolean
+  company: Boolean
+  title: Boolean
+  birthday: Boolean
+  avatarId: Boolean
+  phoneNumbers: [Boolean!]
+  emails: [Boolean!]
+  addresses: [Boolean!]
+  socials: [Boolean!]
+  urls: [Boolean!]
+  logoId: Boolean
+}

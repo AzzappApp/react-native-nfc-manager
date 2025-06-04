@@ -1,68 +1,40 @@
-import { ImageFormat } from '@shopify/react-native-skia';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Controller, useController } from 'react-hook-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useEffect, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Image, View } from 'react-native';
-import * as mime from 'react-native-mime-types';
-import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
+import ContactForm from '#components/Contact/ContactForm';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
-import ImagePicker, {
-  EditImageStep,
-  ImagePickerContactCardMediaWrapper,
-  SelectImageStepWithFrontCameraByDefault,
-} from '#components/ImagePicker';
-import { ScreenModal } from '#components/NativeRouter';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import ContactCardEditCompanyLogo from '#screens/ContactCardEditScreen/ContactCardEditCompanyLogo';
+import useScreenInsets from '#hooks/useScreenInsets';
 import CheckBox from '#ui/CheckBox';
-import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
-import ContactEditAddresses from './ContactEditAddresses';
-import ContactEditAvatar from './ContactEditAvatar';
-import ContactEditBirthday from './ContactEditBirthday';
-import ContactEditEmails from './ContactEditEmails';
-import ContactEditName from './ContactEditName';
-import ContactEditPhones from './ContactEditPhones';
-import ContactEditSocials from './ContactEditSocials';
-import ContactEditUrls from './ContactEditUrls';
-import type { ImagePickerResult } from '#components/ImagePicker';
-import type { CheckboxStatus } from '#ui/CheckBox';
-import type { ContactFormValues } from './ContactSchema';
+import type { contactFormValues } from '#helpers/contactHelpers';
 import type { Control } from 'react-hook-form';
 import type { ScrollView } from 'react-native';
 
 type ContactCreateFormProps = {
-  control: Control<ContactFormValues>;
+  control: Control<contactFormValues>;
   //not added in the formValue for the simple reason it is not save in the form, just informative data
   scanImage: {
     uri: string;
     aspectRatio: number;
   } | null;
   notifyError: boolean;
+  notify: boolean;
+  toggleNotify: () => void;
 };
 
 const ContactCreateForm = ({
   control,
   scanImage,
   notifyError,
+  notify,
+  toggleNotify,
 }: ContactCreateFormProps) => {
   const styles = useStyleSheet(styleSheet);
-  const intl = useIntl();
   const scrollRef = useRef<ScrollView>(null);
-
-  const { field: avatarField } = useController({
-    control,
-    name: 'avatar',
-  });
-  const { field: notifyField } = useController({
-    control,
-    name: 'notify',
-  });
 
   useEffect(() => {
     if (notifyError) {
@@ -73,62 +45,13 @@ const ContactCreateForm = ({
     }
   }, [notifyError]);
 
-  const [imagePicker, setImagePicker] = useState<'avatar' | null>(null);
-
-  const onImagePickerFinished = useCallback(
-    async ({
-      uri,
-      width,
-      editionParameters,
-      filter,
-      aspectRatio,
-    }: ImagePickerResult) => {
-      if (imagePicker === 'avatar') {
-        const mimeType =
-          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
-
-        const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
-        const exportHeight = exportWidth / aspectRatio;
-        const localPath = await saveTransformedImageToFile({
-          uri,
-          resolution: { width: exportWidth, height: exportHeight },
-          format: mimeType,
-          quality: 95,
-          filter,
-          editionParameters,
-        });
-        avatarField.onChange({
-          local: true,
-          id: localPath,
-          uri: localPath,
-        });
-      }
-      setImagePicker(null);
-    },
-    [avatarField, imagePicker],
-  );
-
-  const onCancel = () => {
-    setImagePicker(null);
-  };
-
-  const onPickerRequested = () => setImagePicker('avatar');
-
-  const handleSendChange = useCallback(
-    (value: CheckboxStatus) => {
-      if (value === 'checked') {
-        notifyField.onChange(true);
-      } else {
-        notifyField.onChange(false);
-      }
-    },
-    [notifyField],
-  );
   const { width } = useScreenDimensions();
+  const { bottom } = useScreenInsets();
+
   return (
     <>
       <FormDeleteFieldOverlay ref={scrollRef}>
-        <View style={styles.sectionsContainer}>
+        <View style={[styles.sectionsContainer, { paddingBottom: bottom }]}>
           {scanImage && (
             <View style={styles.imageContainer}>
               <View
@@ -156,77 +79,13 @@ const ContactCreateForm = ({
                   />
                 </Text>
               }
-              status={notifyField.value ? 'checked' : 'none'}
-              onValueChange={handleSendChange}
+              status={notify ? 'checked' : 'none'}
+              onValueChange={toggleNotify}
             />
           </View>
-          <ContactEditAvatar
-            control={control}
-            onPickerRequested={onPickerRequested}
-          />
-          <Separation small />
-          <ContactEditName control={control} />
-          <Separation />
-          <Controller
-            control={control}
-            name="company"
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold" style={styles.fieldTitle}>
-                  <FormattedMessage
-                    defaultMessage="Company"
-                    description="Company name field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? undefined}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a company name',
-                    description:
-                      'Placeholder for company name inside contact card',
-                  })}
-                  ref={ref}
-                />
-              </View>
-            )}
-          />
-
-          <Separation small />
-          <ContactCardEditCompanyLogo control={control} isPremium />
-          <Separation />
-          <ContactEditPhones control={control} />
-          <Separation />
-          <ContactEditEmails control={control} />
-          <Separation />
-          <ContactEditUrls control={control} />
-          <Separation />
-          <ContactEditAddresses control={control} />
-          <Separation />
-          <ContactEditBirthday control={control} />
-          <Separation />
-          <ContactEditSocials control={control} />
+          <ContactForm control={control} />
         </View>
       </FormDeleteFieldOverlay>
-
-      <ScreenModal
-        visible={imagePicker !== null}
-        animationType="slide"
-        onRequestDismiss={() => setImagePicker(null)}
-      >
-        <ImagePicker
-          kind="image"
-          forceAspectRatio={1}
-          TopPanelWrapper={ImagePickerContactCardMediaWrapper}
-          steps={[SelectImageStepWithFrontCameraByDefault, EditImageStep]}
-          onFinished={onImagePickerFinished}
-          onCancel={onCancel}
-          cameraButtonsLeftRightPosition={70}
-        />
-      </ScreenModal>
     </>
   );
 };

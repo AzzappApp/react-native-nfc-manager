@@ -1,6 +1,5 @@
 const { jest } = require('@jest/globals');
 const { Platform } = require('react-native');
-
 process.env.EXPO_OS = Platform.OS;
 
 //#region Expect Extensions
@@ -32,6 +31,11 @@ jest.mock('react-native-localize', () => require('react-native-localize/mock'));
 // React-native-permission
 jest.mock('react-native-permissions', () =>
   require('react-native-permissions/mock'),
+);
+
+// mock react-native-device-info
+jest.mock('react-native-device-info', () =>
+  require('react-native-device-info/jest/react-native-device-info-mock'),
 );
 
 // React Native Safe Area Context Mock
@@ -151,6 +155,19 @@ jest.mock('expo-image-manipulator', () => ({
 
 jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'mock://redirect'),
+}));
+
+jest.mock('react-native-compressor', () => ({
+  Image: {
+    compress: jest.fn(() => Promise.resolve('mocked_compressed_image')),
+    resize: jest.fn(() => Promise.resolve('mocked_resized_image')),
+  },
+}));
+
+jest.mock('react-native-share', () => ({
+  ShareCommand: {
+    open: jest.fn(),
+  },
 }));
 
 jest.mock('react-native-quick-crypto', () => ({

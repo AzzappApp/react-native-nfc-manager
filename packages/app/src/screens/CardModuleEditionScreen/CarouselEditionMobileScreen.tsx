@@ -23,7 +23,8 @@ const CarouselEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: CarouselEditionMobileScreenProps) => {
-  const { profile } = usePreloadedQuery(CarouselQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(CarouselQuery, preloadedQuery);
+  const profile = node?.profile;
   if (!profile) {
     return null;
   }
@@ -31,8 +32,8 @@ const CarouselEditionMobileScreen = ({
   let module: CarouselEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      profile?.webCard?.cardModules.find(module => module?.id === moduleId) ??
-      null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId)
+        ?.carouselModule ?? null;
     if (!module) {
       // TODO
     }
@@ -43,14 +44,14 @@ const CarouselEditionMobileScreen = ({
 
 const CarouselQuery = graphql`
   query CarouselEditionMobileScreenQuery($profileId: ID!) {
-    profile: node(id: $profileId) {
-      ... on Profile {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         ...CarouselEditionScreen_profile
         webCard {
           cardModules {
             id
             kind
-            ...CarouselEditionScreen_module
+            ...CarouselEditionScreen_module @alias(as: "carouselModule")
           }
         }
       }

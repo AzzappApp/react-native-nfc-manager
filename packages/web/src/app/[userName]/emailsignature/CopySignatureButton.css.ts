@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery } from '../theme.css';
+import { MediaQuery } from '../../theme.css';
 
 const button = style({
   width: 250,

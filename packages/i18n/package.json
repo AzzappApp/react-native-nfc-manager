@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "1.9.27-rc.1",
+  "version": "2.0.0",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
@@ -10,7 +10,7 @@
     "build:app": "formatjs compile-folder --format simple --ast src/app compiled/app",
     "build:web": "formatjs compile-folder --format simple --ast src/web compiled/web",
     "extract:app": "formatjs extract '../app/src/**/*.ts*' --out-file src/appMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
-    "extract:web": "formatjs extract '../web/src/**/*.ts*' '../schema/src/**/*.ts*' --out-file src/webMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
+    "extract:web": "formatjs extract '../web/src/**/*.ts*' '../api/src/**/*.ts*' '../schema/src/**/*.ts*' --out-file src/webMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
     "extract": "yarn extract:app && yarn extract:web",
     "pull": "node ./scripts/fetchMessages.js",
     "clean": "rm -rf node_modules && rm -rf compiled",

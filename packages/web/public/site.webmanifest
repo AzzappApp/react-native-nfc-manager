@@ -3,6 +3,11 @@
   "short_name": "Azzapp",
   "icons": [
     {
+       "src": "/android-chrome-144x144.png",
+       "sizes": "144x144",
+       "type": "image/png"
+     },
+    {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
@@ -20,7 +25,9 @@
   "related_applications": [
     {
       "platform": "play",
-      "id": "com.azzapp.app"
+      "id": "com.azzapp.app",
+      "url": "https://play.google.com/store/apps/details?id=com.azzapp.app"
     }
-  ]
+  ],
+  "start_url": "."
 }

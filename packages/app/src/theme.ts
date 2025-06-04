@@ -37,6 +37,9 @@ export const colors = {
   white: '#FFFFFF',
   black: '#0E1216',
   green: '#0FD59E',
+
+  // enrichment colors
+  tropicalAquaTone: '#23CFCC',
 };
 export const fontFamilies = {
   extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold' },
@@ -139,8 +142,8 @@ export const shadow = ({
                 : direction === 'center'
                   ? 0
                   : -height / 2,
-            blurRadius: '10',
-            spreadDistance: '0',
+            blurRadius: 10,
+            spreadDistance: 0,
             color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a ?? (appearance === 'dark' ? 0.4 : 0.2)})`,
           },
         ],

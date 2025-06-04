@@ -6,12 +6,13 @@ import {
   getLocalizationMessagesByKeys,
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
-  getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
   getUserSubscriptions,
   getContactCountPerOwner,
-  getNbNewContactsPerOwner,
+  getProfilesByUserAndWebCards,
+  getContactEnrichmentByContactId,
+  getContactEnrichmentsByContactIds,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -72,10 +73,6 @@ export const postLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('Post'),
 );
 
-export const webCardCategoryLoader = createDataLoader(
-  createEntitiesBatchLoadFunction('WebCardCategory'),
-);
-
 export const profileLoader = createSessionDataLoader(
   'ProfileLoader',
   createEntitiesBatchLoadFunction('Profile'),
@@ -84,6 +81,25 @@ export const profileLoader = createSessionDataLoader(
 export const webCardLoader = createSessionDataLoader(
   'WebCardLoader',
   createEntitiesBatchLoadFunction('WebCard'),
+);
+
+export const contactLoader = createSessionDataLoader(
+  'ContactLoader',
+  createEntitiesBatchLoadFunction('Contact'),
+);
+
+export const enrichmentByContactLoader = createSessionDataLoader(
+  'ContactEnrichmentLoader',
+  async (keys: readonly string[]) => {
+    if (keys.length === 0) {
+      return [];
+    }
+    if (keys.length === 1) {
+      const enrichment = await getContactEnrichmentByContactId(keys[0]);
+      return enrichment ? [enrichment] : [null];
+    }
+    return getContactEnrichmentsByContactIds(keys as string[]);
+  },
 );
 
 export const moduleBackgroundLoader = createDataLoader(
@@ -135,10 +151,14 @@ export const webCardOwnerLoader = createSessionDataLoader(
 
 export const profileByWebCardIdAndUserIdLoader = createSessionDataLoader(
   'ProfileByWebCardIdAndUserIdLoader',
-  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) =>
-    Promise.all(
-      keys.map(key => getProfileByUserAndWebCard(key.userId, key.webCardId)),
-    ),
+  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) => {
+    if (keys.length === 0) {
+      return [];
+    }
+    return getProfilesByUserAndWebCards(
+      keys.map(({ userId, webCardId }) => [userId, webCardId]),
+    );
+  },
   {
     cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
   },
@@ -272,20 +292,6 @@ export const contactCountForProfileLoader = createSessionDataLoader(
     }
 
     const contacts = await getContactCountPerOwner(keys as string[]);
-    return keys.map(
-      k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
-    );
-  },
-);
-
-export const newContactsCountForProfileLoader = createSessionDataLoader(
-  'newContactsCountForProfileLoader',
-  async (keys: readonly string[]) => {
-    if (keys.length === 0) {
-      return [];
-    }
-
-    const contacts = await getNbNewContactsPerOwner(keys as string[]);
     return keys.map(
       k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
     );

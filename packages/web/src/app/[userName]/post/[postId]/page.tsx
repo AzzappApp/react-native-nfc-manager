@@ -8,7 +8,7 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data';
-import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/coverHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -20,16 +20,14 @@ import type { SocialMetas } from '#helpers/seo';
 import type { Metadata } from 'next';
 
 type PostPageProps = {
-  params: {
+  params: Promise<{
     userName: string;
     postId: string;
-  };
+  }>;
 };
 
 const PostPage = async (props: PostPageProps) => {
-  const {
-    params: { userName, postId },
-  } = props;
+  const { userName, postId } = await props.params;
 
   const post = await getPostByIdWithMedia(postId);
 
@@ -124,9 +122,10 @@ const PostPage = async (props: PostPageProps) => {
   );
 };
 
-export async function generateMetadata({
-  params,
-}: PostPageProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: PostPageProps,
+): Promise<Metadata> {
+  const params = await props.params;
   const post = await getPostByIdWithMedia(params.postId);
 
   const metaData = {

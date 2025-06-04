@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import dlAndroid from '#assets/images/download_android.png';
 import dlIos from '#assets/images/download_ios.png';
-import { textMedium } from '../theme.css';
+import { textMedium } from '../../theme.css';
 
 const StoreLinks = () => (
   <>

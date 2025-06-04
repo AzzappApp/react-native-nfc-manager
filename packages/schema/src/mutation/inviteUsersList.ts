@@ -17,15 +17,12 @@ import {
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import { filterSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { notifyUsers, sendPushNotification } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
-import {
-  profileLoader,
-  userLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { notifyUsers } from '#externals';
+import { getSessionUser } from '#GraphQLContext';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
+import { sendMultiUserInvitationPushNotification } from '#helpers/notificationsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type {
@@ -38,22 +35,19 @@ import type { NewProfile, Profile } from '@azzapp/data';
 const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
+  context,
 ) => {
-  const { userId } = getSessionInfos();
-
-  if (!userId) {
+  const user = await getSessionUser();
+  if (!user) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  const user = await userLoader.load(userId);
-
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await profileLoader.load(profileId));
   if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  if (profile.userId !== userId) {
+  if (profile.userId !== user.id) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   if (!profileHasAdminRight(profile.profileRole)) {
@@ -185,12 +179,14 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         inviteSent: sendInvite ?? false,
         contactCard: {
           ...data,
+          socials: filterSocialLink(data.socials) ?? [],
           birthday: undefined,
         },
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole ?? 'user',
         nbContactCardScans: 0,
+        nbContactsImportFromScan: 0,
         nbShareBacks: 0,
         promotedAsOwner: false,
         createdAt,
@@ -230,12 +226,16 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await validateCurrentSubscription(owner.id, {
-      webCardIsPublished: webCard.cardIsPublished,
-      action: 'UPDATE_MULTI_USER',
-      addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
-      alreadyAdded: true,
-    }); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
+    await validateCurrentSubscription(
+      owner.id,
+      {
+        webCardIsPublished: webCard.cardIsPublished,
+        action: 'UPDATE_MULTI_USER',
+        addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
+        alreadyAdded: true,
+      },
+      context.apiEndpoint,
+    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });
@@ -257,14 +257,11 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       }
     }
     if (user && webCard.userName) {
-      await sendPushNotification(user.id, {
-        notification: {
-          type: 'multiuser_invitation',
-        },
-        mediaId: webCard.coverMediaId,
-        localeParams: { userName: webCard.userName },
-        locale: guessLocale(user?.locale),
-      });
+      await sendMultiUserInvitationPushNotification(
+        user,
+        webCard,
+        context.intl,
+      );
     }
   }
 

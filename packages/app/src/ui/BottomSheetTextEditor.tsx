@@ -37,12 +37,12 @@ const BottomSheetTextEditor = ({
   const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
 
   const onFocusInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    shouldHandleKeyboardEvents.value = true;
+    shouldHandleKeyboardEvents.set(true);
     onFocus?.(e);
   };
 
   const onBlurInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    shouldHandleKeyboardEvents.value = false;
+    shouldHandleKeyboardEvents.set(false);
     onBlur?.(e);
   };
 
@@ -50,7 +50,7 @@ const BottomSheetTextEditor = ({
   useEffect(() => {
     return () => {
       // Reset the flag on unmount
-      shouldHandleKeyboardEvents.value = false;
+      shouldHandleKeyboardEvents.set(false);
     };
   }, [shouldHandleKeyboardEvents]);
   //#endregion

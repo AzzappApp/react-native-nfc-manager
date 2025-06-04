@@ -44,6 +44,23 @@ module.exports = {
         idInterpolationPattern: '[sha1:contenthash:base64:6]',
       },
     ],
+    [
+      'react-compiler',
+      {
+        sources: filename => {
+          return (
+            !filename.endsWith('.test.tsx') &&
+            !filename.endsWith('.test.ts') &&
+            // a file in react/relay that breaks the build
+            !filename.includes('useUnsafeRef_DEPRECATED') &&
+            // @gorhom/bottom-sheet seems to be unsupported by react-compiler
+            !filename.includes('@gorhom/bottom-sheet')
+          );
+        },
+        enableReanimatedCheck: true,
+        target: '19',
+      },
+    ],
     'react-native-reanimated/plugin',
   ],
 };

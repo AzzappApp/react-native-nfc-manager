@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeModules, Platform } from 'react-native';
 import SharedGroupPreferences from 'react-native-shared-group-preferences';
@@ -8,6 +8,7 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
+import env from '#env';
 import { colors } from '#theme';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import { useAppState } from './useAppState';
@@ -24,7 +25,7 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 //TODO: android widget
 //const SharedStorage = NativeModules.SharedStorage;
 
-const group = process.env.WIDGET_APP_GROUP;
+const group = env.WIDGET_APP_GROUP;
 
 const { AZPWidgetKit } = NativeModules;
 

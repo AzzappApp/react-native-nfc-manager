@@ -3,7 +3,7 @@ const path = require('path');
 
 const TRANSLATION_APP_API_ENDPOINT = process.env.TRANSLATION_APP_API_ENDPOINT;
 const API_SERVER_TOKEN = process.env.API_SERVER_TOKEN;
-const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM;
+const ENVIRONMENT = process.env.DEPLOYMENT_ENVIRONMENT;
 
 // TODO duplicated from i18nConfig.ts but I don't want to import typescript in this script
 const SUPPORTED_LOCALES = ['en-US', 'fr', 'es', 'it', 'de'];

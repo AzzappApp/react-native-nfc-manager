@@ -1,10 +1,10 @@
 import { GraphQLError } from 'graphql';
 import {
-  checkMedias,
   transaction,
   updateWebCard,
   updateWebCardProfiles,
 } from '@azzapp/data';
+import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
@@ -14,11 +14,14 @@ import saveCommonInformation from '../saveCommonInformation';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
-  checkMedias: jest.fn(),
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateWebCard: jest.fn(),
   updateWebCardProfiles: jest.fn(),
+}));
+
+jest.mock('@azzapp/service/mediaServices/mediaServices', () => ({
+  checkMedias: jest.fn(),
 }));
 
 jest.mock('#helpers/webCardHelpers', () => ({
@@ -74,6 +77,7 @@ describe('saveCommonInformation', () => {
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       commonInformation: { company: 'New Company' },
       logoId: undefined,
+      isMultiUser: true,
     });
     expect(updateWebCardProfiles).toHaveBeenCalledWith('webcard-123', {
       lastContactCardUpdate: expect.any(Date),
@@ -84,6 +88,7 @@ describe('saveCommonInformation', () => {
         ...mockWebCard,
         commonInformation: { company: 'New Company' },
         logoId: undefined,
+        isMultiUser: true,
       },
     });
   });
@@ -158,7 +163,7 @@ describe('saveCommonInformation', () => {
     expect(notifyRelatedWalletPasses).not.toHaveBeenCalled();
   });
 
-  test('should not call checkMedias if no logo is provided', async () => {
+  test('should not call checkMedias if no logo and no banner is provided', async () => {
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (transaction as jest.Mock).mockResolvedValue(undefined);
@@ -173,6 +178,64 @@ describe('saveCommonInformation', () => {
       mockInfo,
     );
 
-    expect(checkMedias).not.toHaveBeenCalled();
+    expect(checkMedias).toHaveBeenCalledWith([]);
+  });
+
+  test('should call checkMedias with logoId ', async () => {
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (transaction as jest.Mock).mockResolvedValue(undefined);
+
+    await saveCommonInformation(
+      {},
+      {
+        webCardId: 'global-webcard-123',
+        input: { company: 'New Company', logoId: 'logoId' },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(checkMedias).toHaveBeenCalledWith(['logoId']);
+  });
+
+  test('should call checkMedias with bannerId ', async () => {
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (transaction as jest.Mock).mockResolvedValue(undefined);
+
+    await saveCommonInformation(
+      {},
+      {
+        webCardId: 'global-webcard-123',
+        input: { company: 'New Company', bannerId: 'bannerId' },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(checkMedias).toHaveBeenCalledWith(['bannerId']);
+  });
+
+  test('should call checkMedias with bannerId and logoId ', async () => {
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (transaction as jest.Mock).mockResolvedValue(undefined);
+
+    await saveCommonInformation(
+      {},
+      {
+        webCardId: 'global-webcard-123',
+        input: {
+          company: 'New Company',
+          logoId: 'logoId',
+          bannerId: 'bannerId',
+        },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(checkMedias).toHaveBeenCalledWith(['logoId', 'bannerId']);
   });
 });

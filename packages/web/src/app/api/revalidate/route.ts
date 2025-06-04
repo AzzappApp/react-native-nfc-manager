@@ -1,18 +1,18 @@
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
+import { checkServerAuth } from '@azzapp/service/serverAuthServices';
 import ERRORS from '@azzapp/shared/errors';
-import { withPluginsRoute } from '#helpers/queries';
-import { checkServerAuth } from '#helpers/tokens';
 
 const RevalidateSchema = z.object({
   cards: z.array(z.string()).nullable(),
   posts: z.array(z.object({ userName: z.string(), id: z.string() })).nullable(),
 });
 
-export const POST = withPluginsRoute(async (req: Request) => {
+export const POST = async (req: Request) => {
   try {
-    await checkServerAuth();
+    await checkServerAuth(await headers());
     const body = await req.json();
     const input = RevalidateSchema.parse(body);
 
@@ -40,6 +40,6 @@ export const POST = withPluginsRoute(async (req: Request) => {
       { status: 400 },
     );
   }
-});
+};
 
 export const runtime = 'nodejs';

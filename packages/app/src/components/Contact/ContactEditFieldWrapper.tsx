@@ -29,7 +29,7 @@ import type { PropsWithChildren } from 'react';
 import type { FieldValues, Control, FieldPath } from 'react-hook-form';
 import type { LayoutRectangle } from 'react-native';
 
-const ContactCardEditField = <TFieldValues extends FieldValues>({
+const ContactEditFieldWrapper = <TFieldValues extends FieldValues>({
   labelKey,
   deleteField,
   control,
@@ -78,11 +78,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
     }
   }, [deleteButtonRect, deleteField, deleteMode, deleted]);
 
-  // const callback = useCallback(() => {
-  //   'worklet';
-  //   runOnJS(closeDeleteButton)();
-  // }, [closeDeleteButton]);
-
   const watchable = labelKey
     ? {
         control,
@@ -110,7 +105,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   const useFlatList = expectedHeight > maxHeight;
 
   const onPressDelete = useCallback(() => {
-    deleteMode.value = !deleteMode.value;
+    deleteMode.set(!deleteMode.value);
     if (layout) {
       openDeleteButton(layout);
     }
@@ -150,7 +145,14 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               onPress={onPressDelete}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative style={styles.labelSelector} onPress={open}>
+              <PressableNative
+                style={styles.labelSelector}
+                android_ripple={{
+                  foreground: true,
+                  borderless: true,
+                }}
+                onPress={open}
+              >
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,
@@ -166,7 +168,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             pointerEvents="auto"
             onPress={deleteField}
           >
-            <Text variant="button" style={{ color: colors.white }}>
+            <Text variant="button" style={styles.deleteButtonText}>
               <FormattedMessage
                 defaultMessage="Delete"
                 description="Delete email or phone number"
@@ -175,12 +177,12 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           </PressableNative>
         </View>
         {errorMessage && (
-          <Text variant="error" style={{ paddingHorizontal: 20 }}>
+          <Text variant="error" style={styles.errorText}>
             {errorMessage}
           </Text>
         )}
       </Animated.View>
-      {labelKey && (
+      {labelKey && visible && (
         <BottomSheetModal
           visible={visible}
           onDismiss={close}
@@ -232,14 +234,16 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     backgroundColor: colors.red400,
   },
+  deleteButtonText: { color: colors.white },
   labelSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: 5,
   },
+  errorText: { paddingHorizontal: 20 },
   bottomSheetStyle: { padding: 16 },
   switch: { marginRight: -8 },
   ...buildContactStyleSheet(appearance),
 }));
 
-export default ContactCardEditField;
+export default ContactEditFieldWrapper;

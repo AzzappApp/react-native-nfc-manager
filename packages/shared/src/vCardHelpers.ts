@@ -1,6 +1,5 @@
 import VCard from 'vcard-creator';
-import { parseContactCard } from './contactCardHelpers';
-import { buildUserUrl } from './urlHelpers';
+import { buildWebUrl } from './urlHelpers';
 import type { CommonInformation, ContactCard } from './contactCardHelpers';
 
 /**
@@ -38,80 +37,6 @@ export type VCardAdditionnalData =
     })
   | null;
 
-export const buildVCardFromSerializedContact = async (
-  userName: string | null | undefined,
-  contactCardData: string,
-  additionalData?: VCardAdditionnalData,
-) => {
-  const contactCard = parseContactCard(contactCardData);
-
-  const vcard = new VCard();
-
-  vcard.addUID(contactCard.profileId);
-
-  vcard.addName(contactCard.lastName ?? '', contactCard.firstName ?? '');
-
-  vcard.addCompany(contactCard.company ?? '');
-
-  vcard.addJobtitle(contactCard.title ?? '');
-
-  if (additionalData?.avatar) {
-    vcard.addPhoto(additionalData.avatar.base64, additionalData.avatar.type);
-  }
-
-  contactCard.emails.forEach(email => {
-    vcard.addEmail(email[1], emailLabelToVCardLabel(email[0]));
-  });
-
-  contactCard.phoneNumbers.forEach(phone => {
-    vcard.addPhoneNumber(phone[1], phoneLabelToVCardLabel(phone[0]));
-  });
-
-  if (userName) {
-    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
-  }
-  additionalData?.urls?.forEach(url => {
-    vcard.addURL(url.address, '');
-  });
-
-  contactCard.addresses.forEach(address => {
-    const type = addressLabelToVCardLabel(address[0]);
-
-    vcard.addAddress(
-      address[0],
-      address[1].replace(/;/g, '\\;'),
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      type ?? address[0],
-    );
-  });
-
-  if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday)))
-    vcard.addBirthday(contactCard.birthday.split('T')[0]);
-
-  additionalData?.socials?.forEach(social => {
-    vcard.addSocial(
-      `https://${social.url.replace(/^https?:\/\//, '')}`,
-      social.label,
-    );
-  });
-
-  return {
-    vCard: vcard,
-    contact: {
-      profileId: contactCard.profileId,
-      webCardId: contactCard.webCardId,
-      lastName: contactCard.lastName,
-      firstName: contactCard.firstName,
-      company: contactCard.company,
-      title: contactCard.title,
-    },
-  };
-};
-
 export const buildVCardFromContactCard = async (
   userName: string | null | undefined,
   profileId: string,
@@ -141,7 +66,7 @@ export const buildVCardFromContactCard = async (
   });
 
   if (userName) {
-    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+    vcard.addURL(buildWebUrl(userName), 'type=azzapp WebCard');
   }
   contactCard?.urls?.forEach(url => {
     vcard.addURL(url.address, '');

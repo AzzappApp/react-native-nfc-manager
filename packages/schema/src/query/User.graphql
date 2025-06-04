@@ -67,8 +67,107 @@ type User {
   Returns true when user has filled a password
   """
   hasPassword: Boolean!
+
+  """
+  Returns the number of enrichments made by the user
+  """
+  nbEnrichments: EnrichmentData!
+
+  nbContacts: Int!
+  
+  """
+  the number of new contact unread since last contact view open
+  """
+  nbNewContacts: Int!
+
+  """
+  Returns the list of contacts of the user profiles
+  """
+  contacts(
+    """
+    An optional search filter to apply to the list of contacts
+    """
+    search: String
+    """
+    The location to filter the contacts by '\uffff' is used to obtain contacts without location
+    """
+    location: String
+    """
+    The date to filter the contacts by
+    """
+    date: DateTime
+    """
+    The sorting order of the contacts
+    default is by name
+    """
+    orderBy: ContactOrderBy
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): ContactConnection!
+
+  """
+  Returns the list of contacts for the user grouped by meeting date
+  """
+  contactsByDates(
+    """
+    An optional search filter to apply to the list of contacts
+    """
+    search: String
+    """
+    The number of contacts to load by location
+    @default(5)
+    """
+    nbContactsByDate: Int
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 20)
+  ): ContactsByDateConnection!
+
+  """
+  Returns the list of contacts for the user grouped by location
+  """
+  contactsByLocation(
+    """
+    An optional search filter to apply to the list of contacts
+    """
+    search: String
+    """
+    The number of contacts to load by location
+    @default(5)
+    """
+    nbContactsByLocations: Int
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 20)
+  ): ContactsByLocationConnection!
 }
 
+enum ContactOrderBy {
+  """
+  Order by name
+  """
+  name
+  """
+  Order by date
+  """
+  date
+}
 
 type UserContactData {
   """
@@ -89,7 +188,7 @@ type UserContactData {
   Returns the title of the user if retrieved during signup
   """
   email: String
-  
+
   """
   Returns the phone number of the user if retrieved during signup
   """
@@ -100,7 +199,6 @@ type UserContactData {
   """
   avatarUrl: String
 }
-
 
 """
 A Type representing a User Cookie Preferences
@@ -118,4 +216,106 @@ type CookiePreferences {
   Wether the user has accepted functional cookies
   """
   functional: Boolean!
+}
+
+"""
+A connection to a list of Profile.
+"""
+type ContactsByDateConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ContactsByDateEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type ContactsByDateEdge {
+  """
+  The item at the end of the edge
+  """
+  node: ContactsByDate!
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+type ContactsByDate {
+  """
+  The list of contacts
+  """
+  contacts: [Contact!]!
+
+  """
+  The number of contacts for the date
+  """
+  nbContacts: Int!
+
+  """
+  The date of the contact
+  """
+  date: DateTime!
+}
+
+type ContactsByLocationConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ContactsByLocationEdge!]!
+}
+
+"""
+An edge in a connection.
+"""
+type ContactsByLocationEdge {
+  """
+  The item at the end of the edge
+  """
+  node: ContactsByLocation!
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+type ContactsByLocation {
+  """
+  The partial list of contacts
+  """
+  contacts: [Contact!]!
+
+  """
+  The number of contacts for the location
+  """
+  nbContacts: Int!
+
+  """
+  The location of the contact, if any
+  """
+  location: String
+}
+
+type EnrichmentData {
+  """
+  The number of enrichments made by the user
+  """
+  total: Int!
+  """
+  The number of allowed enrichments
+  """
+  max: Int!
 }

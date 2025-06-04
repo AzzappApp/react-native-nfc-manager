@@ -16,7 +16,7 @@ import {
   getWebCardById,
   updateWebCard,
 } from '@azzapp/data';
-import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
+import { AZZAPP_SERVER_HEADER, buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { getSession } from '#helpers/session';
@@ -85,20 +85,17 @@ export const toggleUserActive = async (userId: string) => {
         await markUserAsActive(userId);
       }
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
-          },
-          body: JSON.stringify({
-            cards: ownerProfiles.map(({ webCard }) => webCard.userName),
-            posts: [],
-          }),
+      const res = await fetch(buildWebUrl('/api/revalidate'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
         },
-      );
+        body: JSON.stringify({
+          cards: ownerProfiles.map(({ webCard }) => webCard.userName),
+          posts: [],
+        }),
+      });
 
       if (!res.ok) {
         throw new Error(res.statusText, { cause: res });

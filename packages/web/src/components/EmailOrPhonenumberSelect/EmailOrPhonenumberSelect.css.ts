@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { vars } from '#app/[userName]/theme.css';
+import { vars } from '#app/theme.css';
 
 export const selectContainer = style({
   backgroundColor: vars.color.grey50,
@@ -8,7 +8,7 @@ export const selectContainer = style({
 });
 
 export const openedContainer = style({
-  minWidth: 250,
+  minWidth: 'min(255px, max(calc(60vw - 20px), 150px))',
   height: 400,
 });
 

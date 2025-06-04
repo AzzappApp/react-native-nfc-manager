@@ -7,6 +7,7 @@ import {
   formatDuration,
   formatDisplayName,
   isValidUrl,
+  formatPhoneNumberUri,
 } from '../stringHelpers';
 
 describe('stringHelper', () => {
@@ -164,5 +165,20 @@ describe('isValidUrl', () => {
     const url = 'ftp://www.example.com';
     const result = isValidUrl(url);
     expect(result).toBe(false);
+  });
+});
+
+describe('formatPhoneNumberUri', () => {
+  test('should return phone number uri from correct number', () => {
+    const uri = formatPhoneNumberUri('0612345678');
+    expect(uri).toBe('tel:0612345678');
+  });
+  test('should return phone number uri from bad number', () => {
+    const uri = formatPhoneNumberUri('bad number');
+    expect(uri).toBe('tel:bad number');
+  });
+  test('should return correct phone number uri with countryCode', () => {
+    const uri = formatPhoneNumberUri('0612345678', 'FR');
+    expect(uri).toBe('tel:+33612345678');
   });
 });

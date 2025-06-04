@@ -19,8 +19,8 @@ import {
   calculateLinksSize,
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
-
 import { colors, fontFamilies, shadow } from '#theme';
+import { isSocialLink } from '#components/CoverEditor/coverEditorTypes';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { HOME_ICON_COVER_WIDTH } from './constants';
@@ -382,18 +382,20 @@ const CoverRenderer = (
               zIndex: 1,
             }}
           >
-            {coverDynamicLinks.links.map(link => (
-              <SocialLinkRenderer
-                key={`${link.socialId}${link.position}`}
-                cardColors={cardColors}
-                color={coverDynamicLinks.color}
-                link={link}
-                shadow={coverDynamicLinks.shadow}
-                size={coverDynamicLinks.size}
-                viewWidth={width}
-                disabled={!large}
-              />
-            ))}
+            {coverDynamicLinks.links.map(link =>
+              isSocialLink(link) ? (
+                <SocialLinkRenderer
+                  key={`${link.socialId}${link.position}`}
+                  cardColors={cardColors}
+                  color={coverDynamicLinks.color}
+                  link={link}
+                  shadow={coverDynamicLinks.shadow}
+                  size={coverDynamicLinks.size}
+                  viewWidth={width}
+                  disabled={!large}
+                />
+              ) : null,
+            )}
           </View>
         )}
       </View>
@@ -410,7 +412,6 @@ const CoverRenderer = (
           <CoverRendererUploadingProgress />
         </View>
       )}
-      {/* )} */}
     </View>
   );
 };

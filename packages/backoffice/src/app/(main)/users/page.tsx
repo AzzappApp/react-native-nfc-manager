@@ -20,30 +20,31 @@ const sortsColumns = [
 export type SortField = (typeof sortsColumns)[number];
 
 type UsersPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     sort?: string;
     order?: string;
     s?: string;
     status?: string;
-  };
+  }>;
 };
 
-const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 0;
+const UsersPage = async (props: UsersPageProps) => {
+  const searchParams = await props.searchParams;
+  let page = searchParams?.page ? parseInt(searchParams?.page, 10) : 0;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
   const sortField =
-    searchParams.sort && sortsColumns.includes(searchParams.sort as any)
-      ? (searchParams.sort as SortField)
+    searchParams?.sort && sortsColumns.includes(searchParams?.sort as any)
+      ? (searchParams?.sort as SortField)
       : 'createdAt';
 
-  const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
-  const search = searchParams.s ?? null;
+  const sortOrder = searchParams?.order === 'asc' ? 'asc' : 'desc';
+  const search = searchParams?.s ?? null;
   const enabledFilter =
-    searchParams.status === 'Active'
+    searchParams?.status === 'Active'
       ? true
-      : searchParams.status === 'Suspended'
+      : searchParams?.status === 'Suspended'
         ? false
         : undefined;
   const { users, count } = await getUsersInfos({

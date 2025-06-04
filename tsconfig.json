@@ -1,7 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": { "noEmit": true },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.json",
+  ],
   "exclude": ["node_modules", "packages/**/*.*"],
   "ts-node": {
     // these options are overrides used only by ts-node

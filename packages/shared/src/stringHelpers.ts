@@ -1,4 +1,7 @@
-import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+import {
+  isValidPhoneNumber,
+  parsePhoneNumberWithError,
+} from 'libphonenumber-js';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import type { CountryCode } from 'libphonenumber-js';
@@ -111,7 +114,13 @@ export const isValidHex = (value: string, shortFormat?: boolean): boolean => {
  * @return {*}
  */
 export function formatPhoneNumber(phoneNumber: string) {
-  return parsePhoneNumber(phoneNumber).format('E.164').replace(/\s/g, '');
+  try {
+    const number = parsePhoneNumberWithError(phoneNumber);
+    return number.format('E.164').replace(/\s/g, '');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    return phoneNumber;
+  }
 }
 
 /**
@@ -122,9 +131,12 @@ export function formatPhoneNumber(phoneNumber: string) {
  * @param {string} phoneNumber
  * @return {*}
  */
-export function formatPhoneNumberUri(phoneNumber: string) {
+export function formatPhoneNumberUri(
+  phoneNumber: string,
+  countryCode?: CountryCode,
+) {
   try {
-    return parsePhoneNumber(phoneNumber).getURI();
+    return parsePhoneNumberWithError(phoneNumber, countryCode).getURI();
   } catch {
     return `tel:${phoneNumber}`;
   }

@@ -2,6 +2,7 @@ const path = require('path');
 const gitStream = require('git-spawned-stream');
 const semVer = require('semver');
 const taggedVersions = require('tagged-versions');
+const internal = require('../internal-version.json');
 const pkg = require('../package.json');
 
 const loadCommits = rev => {
@@ -74,8 +75,6 @@ const formatCommit = ({ scope, message, type }) => {
   }${formatCommitMessage(message)}`;
 };
 
-const BREAKING_CHANGE_PATTERN = /BREAKING CHANGE/g;
-
 /**
  * Find the most recent commit hash where the commit message starts with the given prefix.
  *
@@ -108,13 +107,22 @@ const findCommitByPrefix = prefix => {
 };
 
 module.exports = async function buildChangeLog(
-  prerelease = false,
-  majorInc = false,
+  nextVersion,
+  prerelease,
   group = true,
-  nextVersion = null,
   commitPrefix = null, // optionally override the commit range
 ) {
-  const currentVersion = pkg.version;
+  if (
+    !nextVersion ||
+    typeof nextVersion !== 'string' ||
+    typeof prerelease !== 'boolean'
+  ) {
+    console.error(
+      'Please provide a valid next version string and a boolean for prerelease.',
+    );
+    process.exit(1);
+  }
+  const currentVersion = `${pkg.version}-${internal.kind}.${internal.version}`;
   console.log('Checking previous versions...');
   const tags = (await taggedVersions.getList())
     .filter(
@@ -156,45 +164,6 @@ module.exports = async function buildChangeLog(
 
   console.log('Retrieving commits...');
   const commits = await loadCommits(rev);
-
-  if (nextVersion == null) {
-    console.log('Determining version and building change log...');
-    const increment = majorInc
-      ? 'major'
-      : commits.some(
-            c =>
-              BREAKING_CHANGE_PATTERN.test(c.title) ||
-              BREAKING_CHANGE_PATTERN.test(c.description),
-          )
-        ? 'minor'
-        : 'patch';
-
-    const lastReleasedVersion = lastTag ? lastTag.version : currentVersion;
-    let [major, minor, patch] = extractVersionNumber(lastReleasedVersion);
-    const [currentMajor, currentMinor, currentPatch] =
-      extractVersionNumber(currentVersion);
-
-    if (currentMajor > major || currentMinor > minor || currentPatch > patch) {
-      major = currentMajor;
-      minor = currentMinor;
-      patch = currentPatch;
-    }
-
-    switch (increment) {
-      case 'major':
-        nextVersion = `${major + 1}.0.0`;
-        break;
-      case 'minor':
-        nextVersion = `${major}.${minor + 1}.0`;
-        break;
-      default:
-        nextVersion = `${major}.${minor}.${patch + 1}`;
-        break;
-    }
-    if (prerelease) {
-      nextVersion = `${nextVersion}-rc.1`;
-    }
-  }
 
   const commitPattern = /^(\w+)(?:\(([\w\s]+)\))?: (.+)$/;
   let changeLog = '';
@@ -252,13 +221,5 @@ module.exports = async function buildChangeLog(
     ].join('\n\n');
   }
 
-  return {
-    nextVersion,
-    changeLog,
-  };
-};
-
-const extractVersionNumber = version => {
-  const [major, minor, patch] = version.split('-')[0].split('.');
-  return [Number(major), Number(minor), Number(patch)];
+  return changeLog;
 };

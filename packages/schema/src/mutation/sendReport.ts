@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { createReport, getReport } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionInfos } from '#GraphQLContext';
+import { getSessionUser } from '#GraphQLContext';
 import { postCommentLoader, postLoader, webCardLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { Post, PostComment, WebCard, NewReport } from '@azzapp/data';
@@ -12,8 +12,10 @@ const sendReport: MutationResolvers['sendReport'] = async (_, { id }) => {
 
   const targetType = getTargetType(type);
 
-  const { userId } = getSessionInfos();
-  if (!userId) throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  const user = await getSessionUser();
+  if (!user) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
   try {
     let target: Post | PostComment | WebCard | null;
     switch (type) {
@@ -33,7 +35,7 @@ const sendReport: MutationResolvers['sendReport'] = async (_, { id }) => {
     const report: NewReport = {
       targetId,
       targetType,
-      userId,
+      userId: user.id,
     };
 
     if (target?.deleted) {
@@ -50,11 +52,11 @@ const sendReport: MutationResolvers['sendReport'] = async (_, { id }) => {
       report: {
         targetId,
         targetType,
-        userId,
+        userId: user.id,
       },
     };
   } catch (e) {
-    const report = await getReport(targetId, userId, targetType);
+    const report = await getReport(targetId, user.id, targetType);
     if (report) {
       return {
         created: false,

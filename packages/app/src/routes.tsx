@@ -1,11 +1,11 @@
 import isEqual from 'lodash/isEqual';
 import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
+import type { ContactDetailEnrichState } from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
-import type { Contact } from 'expo-contacts';
 import type { LayoutRectangle } from 'react-native';
 
 export type AboutRoute = {
@@ -89,17 +89,16 @@ export type WebCardRoute = {
   params: {
     contactCard?: ContactCard | null;
     avatarUrl?: string;
+    logoUrl?: string;
     contactProfileId?: string;
     contactData?: string | null;
-    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
-      avatarUrl?: string;
-    };
   } & {
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
       avatarUrl?: string;
+      logoUrl?: string | null;
     };
     geolocation?: Geolocation | null;
     fromCreation?: boolean;
@@ -170,6 +169,16 @@ export type CardModuleEditionRoute = {
 
 export type FollowingsRoute = {
   route: 'FOLLOWINGS';
+  params?: never;
+};
+
+export type AnalyticsRoute = {
+  route: 'ANALYTICS';
+  params?: never;
+};
+
+export type ToolsRoute = {
+  route: 'TOOLS';
   params?: never;
 };
 
@@ -273,6 +282,13 @@ export type ContactCreateRoute = {
   };
 };
 
+export type ContactEditRoute = {
+  route: 'CONTACT_EDIT';
+  params: {
+    contactId: string;
+  };
+};
+
 export type MultiUserDetailRoute = {
   route: 'MULTI_USER_DETAIL';
   params: {
@@ -296,9 +312,9 @@ export type ContactsRoute = {
 
 export type ContactDetailsRoute = {
   route: 'CONTACT_DETAILS';
-  params: Contact & {
-    createdAt: Date;
-    profileId?: string;
+  params: {
+    contactId: string;
+    overlay?: ContactDetailEnrichState;
   };
 };
 
@@ -316,10 +332,17 @@ export type ModulePreviewRoute = {
   };
 };
 
-export type ContactByLocationRoute = {
+export type ContactsByLocationRoute = {
   route: 'CONTACTS_BY_LOCATION';
   params: {
-    location: string;
+    location: string | null;
+  };
+};
+
+export type ContactsByDateRoute = {
+  route: 'CONTACTS_BY_DATE';
+  params: {
+    date: string;
   };
 };
 
@@ -333,15 +356,18 @@ export type Route =
   | AcceptTermsRoute
   | AccountDetailsRoute
   | AddModuleSectionRoute
+  | AnalyticsRoute
   | CardModuleEditionRoute
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
-  | ContactByLocationRoute
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCreateRoute
   | ContactDetailsRoute
+  | ContactEditRoute
+  | ContactsByDateRoute
+  | ContactsByLocationRoute
   | ContactsRoute
   | CookieConsentRoute
   | CookieSettingsRoute
@@ -374,6 +400,7 @@ export type Route =
   | ShakeAndShareRoute
   | SignInRoute
   | SignUpRoute
+  | ToolsRoute
   | UserPayWallRoute
   | WebCardParametersRoute
   | WebCardRoute

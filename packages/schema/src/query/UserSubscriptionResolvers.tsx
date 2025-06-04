@@ -11,7 +11,6 @@ export const UserSubscription: UserSubscriptionResolvers = {
   id: idResolver('UserSubscription'),
   availableSeats: async userSubscription => {
     const { userId } = getSessionInfos();
-
     if (userId !== userSubscription.userId) {
       const existingProfiles = userId
         ? await getProfilesWhereUserBIsOwner(userId, userSubscription.userId)

@@ -12,11 +12,10 @@ import HomeBottomPanelNewCover from './HomeBottomPanelNewCover';
 import HomeBottomPanelPublish from './HomeBottomPanelPublish';
 import HomeBottomPanelTransferOwner from './HomeBottomPanelTransferOwner';
 import { useHomeScreenContext } from './HomeScreenContext';
-import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 import type {
-  HomeBottomPanelMessage_profiles$data,
-  HomeBottomPanelMessage_profiles$key,
-} from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
+  HomeBottomPanelMessage_user$data,
+  HomeBottomPanelMessage_user$key,
+} from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 export type MessageContentType =
@@ -26,46 +25,53 @@ export type MessageContentType =
   | 'transfer';
 
 type HomeBottomPanelMessageProps = {
-  user: HomeBottomPanelMessage_profiles$key;
-  userSubscription: HomeBottomPanel_user$data['userSubscription'];
+  user: HomeBottomPanelMessage_user$key;
 };
 const HomeBottomPanelMessage = ({
-  user,
-  userSubscription,
+  user: userKey,
 }: HomeBottomPanelMessageProps) => {
-  const profiles = useFragment(
+  const user = useFragment(
     graphql`
-      fragment HomeBottomPanelMessage_profiles on Profile @relay(plural: true) {
+      fragment HomeBottomPanelMessage_user on User {
         id
-        invited
-        invitedBy {
-          user {
-            email
-            phoneNumber
-          }
+        userSubscription {
+          issuer
         }
-        profileRole
-        promotedAsOwner
-        webCard {
-          userName
-          cardIsPublished
-          hasCover
-          owner {
-            email
-            phoneNumber
-          }
-          subscription {
-            issuer
-          }
-          requiresSubscription
-          isPremium
+        profiles {
           id
+          invited
+          invitedBy {
+            user {
+              email
+              phoneNumber
+            }
+          }
+          profileRole
+          promotedAsOwner
+          webCard {
+            userName
+            cardIsPublished
+            hasCover
+            owner {
+              email
+              phoneNumber
+            }
+            subscription {
+              issuer
+            }
+            requiresSubscription
+            isPremium
+            id
+            subscription {
+              issuer
+            }
+          }
         }
       }
     `,
-    user,
+    userKey,
   );
-
+  const { profiles } = user;
   const bottomContent = useMemo(() => {
     const res = profiles?.map(profile => {
       if (!profile) return null;
@@ -81,7 +87,7 @@ const HomeBottomPanelMessage = ({
         return null;
       }
     });
-    return [{ type: 'create' }, ...res] as MessageArrayType;
+    return [{ type: 'create' }, ...(res ?? [])] as MessageArrayType;
   }, [profiles]);
 
   return (
@@ -93,7 +99,7 @@ const HomeBottomPanelMessage = ({
             key={index}
             content={content}
             index={index}
-            userSubscription={userSubscription}
+            userSubscription={user.userSubscription}
           />
         );
       })}
@@ -106,7 +112,7 @@ export default memo(HomeBottomPanelMessage);
 type MessageItemProps = {
   content: ArrayItemType<MessageArrayType>;
   index: number;
-  userSubscription: HomeBottomPanel_user$data['userSubscription'];
+  userSubscription: HomeBottomPanelMessage_user$data['userSubscription'];
 };
 
 const MessageItemComponent = ({
@@ -169,7 +175,7 @@ const MessageItemComponent = ({
 const MessageItem = memo(MessageItemComponent);
 type MessageArrayType = Array<{
   type: MessageContentType;
-  profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
+  profile: ArrayItemType<HomeBottomPanelMessage_user$data['profiles']>;
 } | null>;
 
 const styles = StyleSheet.create({
