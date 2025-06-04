@@ -48,6 +48,7 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LargeButton from '#ui/LargeButton';
 import PressableNative from '#ui/PressableNative';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import IosAddLockScreenWidgetPopup from './IosAddLockScreenWidgetPopup';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -161,6 +162,14 @@ const ShakeAndShareScreen = ({
     currentUser?.email,
   );
 
+  const onPressEmailSignature = useCallback(() => {
+    // going back is mandatory for ios as share screen is a modal
+    router.back();
+    router.push({
+      route: 'CONTACT_CARD_EDIT',
+    });
+  }, [router]);
+
   const { width } = useScreenDimensions();
 
   return (
@@ -267,26 +276,30 @@ const ShakeAndShareScreen = ({
                   </Text>
                 </PressableNative>
               </View>
-              <Text
-                variant="xsmall"
-                style={{
-                  width: '100%',
-                  textAlign: 'center',
-                  color: colors.grey400,
-                  paddingVertical: 10,
-                }}
-              >
-                <FormattedMessage
-                  defaultMessage="Your smart email signature:"
-                  description="ConctactCardScreen - Your smart email signature"
-                />
-              </Text>
               {profile && (
-                <View style={styles.signaturePreview}>
-                  <View style={styles.viewShotBackgroundColor}>
-                    <SignaturePreview profile={profile} />
-                  </View>
-                </View>
+                <>
+                  <Text
+                    variant="xsmall"
+                    style={{
+                      width: '100%',
+                      textAlign: 'center',
+                      color: colors.grey400,
+                      paddingVertical: 10,
+                    }}
+                  >
+                    <FormattedMessage
+                      defaultMessage="Your smart email signature:"
+                      description="ConctactCardScreen - Your smart email signature"
+                    />
+                  </Text>
+                  <PressableOpacity onPress={onPressEmailSignature}>
+                    <View style={styles.signaturePreview}>
+                      <View style={styles.viewShotBackgroundColor}>
+                        <SignaturePreview profile={profile} />
+                      </View>
+                    </View>
+                  </PressableOpacity>
+                </>
               )}
             </View>
             <View style={styles.buttonContainer}>
