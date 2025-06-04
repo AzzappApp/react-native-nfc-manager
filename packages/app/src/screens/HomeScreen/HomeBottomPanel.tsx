@@ -83,10 +83,9 @@ const HomeBottomPanel = ({ user }: HomeBottomPanelProps) => {
   );
 
   //#endregion
-
   return (
     <View style={containerStyle} ref={ref}>
-      <View style={styles.informationPanel}>
+      <View style={[styles.informationPanel, { height: panelHeight }]}>
         <Suspense>
           <HomeBottomPanelMessage user={user} />
         </Suspense>
@@ -103,8 +102,11 @@ const HomeBottomPanel = ({ user }: HomeBottomPanelProps) => {
 
 const styles = StyleSheet.create({
   informationPanel: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -81,7 +81,7 @@ const HomeBottomPanelInvitation = ({
   );
 
   return (
-    <>
+    <View style={styles.viewContainer}>
       <Text variant="large" style={styles.message}>
         <FormattedMessage
           defaultMessage="Invitation"
@@ -135,13 +135,14 @@ const HomeBottomPanelInvitation = ({
           onPress={quitWebCard}
         />
       </View>
-    </>
+    </View>
   );
 };
 
 export default HomeBottomPanelInvitation;
 
 const styles = StyleSheet.create({
+  viewContainer: { justifyContent: 'space-between', alignItems: 'center' },
   informationText: {
     textAlign: 'center',
     color: colors.white,
