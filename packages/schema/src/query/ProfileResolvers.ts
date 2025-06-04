@@ -162,6 +162,40 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     }
     return user;
   },
+  displayedAvatar: async profile => {
+    const { userId } = getSessionInfos();
+    if (
+      profileIsAssociatedToCurrentUser(profile) ||
+      (await hasWebCardProfileRight(profile.webCardId)) ||
+      (userId &&
+        (await profileInUserContactLoader.load({
+          userId,
+          profileId: profile.id,
+        })))
+    ) {
+      const webcard = await webCardLoader.load(profile.webCardId);
+
+      if (profile.avatarId) {
+        return {
+          media: profile.avatarId,
+          assetKind: 'avatar',
+        };
+      }
+      if (profile.logoId || webcard?.logoId) {
+        return {
+          media: profile.logoId || webcard?.logoId || '',
+          assetKind: 'logo',
+        };
+      }
+      if (webcard?.coverMediaId) {
+        return {
+          media: webcard?.coverMediaId,
+          assetKind: 'cover',
+        };
+      }
+    }
+    return null;
+  },
   avatar: async profile => {
     const { userId } = getSessionInfos();
     if (

@@ -3,13 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
-import useImageFromContact from '#components/Contact/useImageFromContact';
 import CoverRenderer from '#components/CoverRenderer';
 import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar, { EnrichmentOverlay } from '../ContactAvatar';
+import useContactAvatar from '../useContactAvatar';
 import WhatsappButton from '../WhatsappButton';
 import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 import type { ContactsListItem_contact$key } from '#relayArtifacts/ContactsListItem_contact.graphql';
@@ -58,11 +58,13 @@ const ContactsListItem = ({
             ...CoverRenderer_webCard
           }
         }
-        ...useImageFromContact_contact
+        ...useContactAvatar_contact
       }
     `,
     contactKey,
   );
+
+  const avatarSource = useContactAvatar(contact);
 
   const onShow = useCallback(() => {
     onShowContact(contact.id);
@@ -71,8 +73,6 @@ const ContactsListItem = ({
   const onMore = useCallback(() => {
     onShowContactAction(contact.id);
   }, [contact, onShowContactAction]);
-
-  const avatarSource = useImageFromContact(contact);
 
   const webCard = contact.contactProfile?.webCard;
   const [firstName, lastName, name] = useMemo(() => {

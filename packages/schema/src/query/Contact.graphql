@@ -5,6 +5,7 @@ type Contact implements Node {
   id: ID!
   ownerProfile: Profile
   contactProfile: Profile
+  displayedAvatar: DisplayedAvatar
   avatar: Media
   firstName: String!
   lastName: String!
@@ -15,8 +16,7 @@ type Contact implements Node {
   phoneNumbers: [ContactPhoneNumber!]!
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
-  webCard: WebCard
-  @deprecated(reason: "Use profile webCard instead")
+  webCard: WebCard @deprecated(reason: "Use profile webCard instead")
   socials: [ContactSocial!]
   urls: [ContactUrl!]
   deleted: Boolean
@@ -26,6 +26,19 @@ type Contact implements Node {
   note: String
   enrichment: ContactEnrichment
   enrichmentStatus: EnrichmentStatus
+}
+
+type DisplayedAvatar {
+  source: Media
+  isEnrichment: Boolean
+}
+
+enum AvatarKind {
+  pending
+  running
+  completed
+  failed
+  canceled
 }
 
 enum EnrichmentStatus {

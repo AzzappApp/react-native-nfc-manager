@@ -1,13 +1,12 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useMemo } from 'react';
 import { View, Platform } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors, shadow } from '#theme';
+import useContactAvatar from '#components/Contact/useContactAvatar';
 import CoverRenderer from '#components/CoverRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { ContactDetailAvatar_contact$key } from '#relayArtifacts/ContactDetailAvatar_contact.graphql';
@@ -58,89 +57,33 @@ export const ContactDetailAvatar = ({
 
   const data = useFragment(
     graphql`
-      fragment ContactDetailAvatar_contact on Contact
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
+      fragment ContactDetailAvatar_contact on Contact {
         id
         firstName
         lastName
         company
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
-        }
         enrichment {
           fields {
             avatar {
               id
-              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
-            }
-            logo {
-              id
-              uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
             }
           }
         }
+        displayedAvatar {
+          isEnrichment
+        }
+        ...useContactAvatar_contact
       }
     `,
     contactKey,
   );
 
-  const avatarUrl = useMemo(() => {
-    if (!isHiddenField && data?.enrichment?.fields?.avatar) {
-      if (data.enrichment.fields.avatar.id) {
-        const localFile = getLocalCachedMediaFile(
-          data.enrichment?.fields?.avatar.id,
-          'image',
-        );
-        if (localFile) {
-          return localFile;
-        }
-      }
-      if (data.enrichment.fields.avatar.uri) {
-        return data.enrichment.fields.avatar.uri;
-      }
-    }
-    if (data?.avatar) {
-      if (data.avatar?.id) {
-        const localFile = getLocalCachedMediaFile(data.avatar.id, 'image');
-        if (localFile) {
-          return localFile;
-        }
-      }
-      if (data?.avatar?.uri) {
-        return data.avatar.uri;
-      }
-    }
-    if (data?.logo) {
-      if (data.logo?.id) {
-        const localFile = getLocalCachedMediaFile(data.logo.id, 'image');
-        if (localFile) {
-          return localFile;
-        }
-      }
-      return data.logo.uri;
-    }
-    return undefined;
-  }, [
-    isHiddenField,
-    data?.enrichment?.fields?.avatar,
-    data?.avatar,
-    data?.logo,
-  ]);
+  const avatarSource = useContactAvatar(data);
 
   const isAiAvatar =
     state === 'waitingApproval' &&
     !isHiddenField &&
-    data?.enrichment?.fields?.avatar;
+    data?.displayedAvatar?.isEnrichment;
 
   return (
     <View style={styles.avatarContainer}>
@@ -160,8 +103,8 @@ export const ContactDetailAvatar = ({
         </MaskedView>
       )}
       <View style={[styles.avatar, styles.avatarWrapper]}>
-        {avatarUrl ? (
-          <Image source={avatarUrl} style={styles.avatar} />
+        {avatarSource?.uri ? (
+          <Image source={avatarSource?.uri} style={styles.avatar} />
         ) : webCard ? (
           <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
         ) : (

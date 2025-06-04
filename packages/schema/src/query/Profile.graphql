@@ -34,6 +34,10 @@ type Profile implements Node {
   """
   profileRole: ProfileRole!
   """
+  The user avatar media displayed
+  """
+  displayedAvatar: Media
+  """
   The user avatar
   """
   avatar: Media
@@ -181,9 +185,7 @@ type Profile implements Node {
     The filter to apply
     """
     filterBy: SearchFilter
-  ): ContactConnection!
-  @deprecated(reason: "Does not fit the new design")
-
+  ): ContactConnection! @deprecated(reason: "Does not fit the new design")
 
   """
   Return a list of profiles that match the search query
@@ -398,4 +400,3 @@ input SearchFilter {
 enum FilterType {
   location
 }
-

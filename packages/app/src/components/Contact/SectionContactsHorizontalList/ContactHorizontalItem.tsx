@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import useImageFromContact from '#components/Contact/useImageFromContact';
 import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar, { EnrichmentOverlay } from '../ContactAvatar';
+import useContactAvatar from '../useContactAvatar';
 import type { ContactPhoneNumberType } from '#helpers/contactHelpers';
 import type { ContactHorizontalItem_contact$key } from '#relayArtifacts/ContactHorizontalItem_contact.graphql';
 
@@ -48,7 +48,7 @@ const ContactHorizontalItem = ({
             ...CoverRenderer_webCard
           }
         }
-        ...useImageFromContact_contact
+        ...useContactAvatar_contact
       }
     `,
     contactKey,
@@ -79,7 +79,7 @@ const ContactHorizontalItem = ({
     onShowContactAction(contact.id);
   }, [contact, onShowContactAction]);
 
-  const avatarSource = useImageFromContact(contact);
+  const avatarSource = useContactAvatar(contact);
 
   const enrichmentInProgress =
     contact.enrichmentStatus === 'running' ||

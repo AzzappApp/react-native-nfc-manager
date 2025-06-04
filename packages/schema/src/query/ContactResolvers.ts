@@ -103,6 +103,68 @@ export const ContactEnrichment: ContactEnrichmentResolvers = {
 
 export const Contact: ContactResolvers = {
   id: idResolver('Contact'),
+  displayedAvatar: async contact => {
+    let profile;
+    let enrichment;
+    let webCard;
+    if (contact.contactProfileId) {
+      profile = await profileLoader.load(contact.contactProfileId);
+    }
+    if (contact.enrichmentStatus && contact.enrichmentStatus !== 'failed') {
+      enrichment = await enrichmentByContactLoader.load(contact.id);
+    }
+    if (profile) {
+      webCard = await webCardLoader.load(profile.webCardId);
+    }
+
+    if (
+      profile?.avatarId ||
+      contact?.avatarId ||
+      enrichment?.fields?.avatarId
+    ) {
+      return {
+        source: {
+          media:
+            profile?.avatarId ||
+            contact?.avatarId ||
+            enrichment?.fields?.avatarId ||
+            '',
+          assetKind: 'avatar',
+        },
+        isEnrichment: !profile?.avatarId && !contact?.avatarId,
+      };
+    }
+    if (
+      profile?.logoId ||
+      webCard?.logoId ||
+      contact?.logoId ||
+      enrichment?.fields?.logoId
+    ) {
+      return {
+        source: {
+          media:
+            profile?.logoId ||
+            webCard?.logoId ||
+            contact?.logoId ||
+            enrichment?.fields?.logoId ||
+            '',
+          assetKind: 'logo',
+        },
+        isEnrichment: !profile?.logoId && !contact?.logoId && !webCard?.logoId,
+      };
+    }
+    if (webCard?.coverMediaId) {
+      return {
+        source: {
+          media: webCard?.coverMediaId,
+          assetKind: 'cover',
+        },
+        isEnrichment: false,
+      };
+    }
+
+    return null;
+  },
   avatar: contact => {
     return contact.avatarId
       ? {
