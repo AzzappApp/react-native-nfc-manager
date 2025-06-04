@@ -97,7 +97,8 @@ const ContactCreateScreen = ({
       $contact: ContactInput!
       $notify: Boolean!
       $scanUsed: Boolean!
-      $qrCodeKey: String
+      $publicKey: String
+      $contactCardAccessId: String
     ) {
       createContact(
         profileId: $profileId
@@ -105,7 +106,8 @@ const ContactCreateScreen = ({
         notify: $notify
         scanUsed: $scanUsed
         withShareBack: false
-        qrCodeKey: $qrCodeKey
+        publicKey: $publicKey
+        contactCardAccessId: $contactCardAccessId
       ) {
         contact {
           id
@@ -218,7 +220,8 @@ const ContactCreateScreen = ({
           profileId,
           scanUsed,
           notify,
-          qrCodeKey,
+          publicKey: qrCodeKey?.publicKey,
+          contactCardAccessId: qrCodeKey?.contactCardAccessId,
           contact: {
             avatarId,
             logoId,

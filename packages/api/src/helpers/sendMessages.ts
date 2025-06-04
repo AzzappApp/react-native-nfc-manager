@@ -21,7 +21,8 @@ type Parameters = {
     firstName?: string;
     lastName?: string;
   };
-  qrCodeKey?: string | null;
+  publicKey?: string | null;
+  contactCardAccessId?: string | null;
 };
 
 export const notifyUsers =
@@ -266,12 +267,14 @@ export const notifyUsers =
               );
 
               const coverUrl = `${apiEndpoint}/cover/${webCard.userName}?width=200&height=320&t=${webCard.updatedAt.getTime()}`;
-              const webCardUrl = parameters.qrCodeKey
-                ? buildUserUrlWithKey({
-                    userName: webCard.userName,
-                    key: parameters.qrCodeKey,
-                  })
-                : undefined;
+              const webCardUrl =
+                parameters.publicKey && parameters.contactCardAccessId
+                  ? buildUserUrlWithKey({
+                      userName: webCard.userName,
+                      key: parameters.publicKey,
+                      contactCardAccessId: parameters.contactCardAccessId,
+                    })
+                  : undefined;
 
               const vcardName =
                 formatDisplayName(

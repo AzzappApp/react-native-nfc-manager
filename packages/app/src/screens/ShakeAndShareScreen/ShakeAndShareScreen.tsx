@@ -373,43 +373,41 @@ const QRCode = ({
   const [contactCardSvg, setContactCardSvg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userName && contactCardAccessId && publicKey) {
-      toString(
-        buildUserUrlWithKey({
-          userName,
-          contactCardAccessId,
-          key: publicKey,
-          geolocation: {
-            location: location?.coords
-              ? {
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                }
-              : null,
-            address: address
-              ? {
-                  country: address.country,
-                  city: address.city,
-                  subregion: address.subregion,
-                  region: address.region,
-                }
-              : null,
-          },
-        }),
-        {
-          errorCorrectionLevel: 'L',
-          width: QR_CODE_WIDTH,
-          type: 'svg',
-          color: {
-            dark: '#000',
-            light: '#0000',
-          },
-          margin: 0,
+    toString(
+      buildUserUrlWithKey({
+        userName,
+        contactCardAccessId,
+        key: publicKey,
+        geolocation: {
+          location: location?.coords
+            ? {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }
+            : null,
+          address: address
+            ? {
+                country: address.country,
+                city: address.city,
+                subregion: address.subregion,
+                region: address.region,
+              }
+            : null,
         },
-      ).then(svg => {
-        setContactCardSvg(svg);
-      });
-    }
+      }),
+      {
+        errorCorrectionLevel: 'L',
+        width: QR_CODE_WIDTH,
+        type: 'svg',
+        color: {
+          dark: '#000',
+          light: '#0000',
+        },
+        margin: 0,
+      },
+    ).then(svg => {
+      setContactCardSvg(svg);
+    });
   }, [publicKey, location?.coords, address, userName, contactCardAccessId]);
 
   const svg = contactCardSvg ? Skia.SVG.MakeFromString(contactCardSvg) : null;

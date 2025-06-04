@@ -153,7 +153,7 @@ export const addOnPublicKeysChangeListener = (listener: () => void) => {
 
 export const getOrCreateQrCodeKey = async (
   profileKey?: useQRCodeKey_profile$key | null,
-): Promise<string | null> => {
+) => {
   const data = readProfileData(profileKey);
   const { contactCardAccessId, id } = data || {};
   if (!id) {
@@ -163,7 +163,7 @@ export const getOrCreateQrCodeKey = async (
   if (!publicKey || !contactCardAccessId) {
     const key = await generateQRCodeKey(id);
     encryptedQrCodeStorage.set(`${PUBLIC_KEY_STORAGE_KEY}:${id}`, key);
-    return key;
+    return { contactCardAccessId, publicKey: key };
   }
-  return publicKey;
+  return { contactCardAccessId, publicKey };
 };

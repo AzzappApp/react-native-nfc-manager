@@ -7,7 +7,8 @@ import type { MessageType } from '@azzapp/service/notificationsHelpers';
 type Parameters = {
   profile?: Profile;
   contact?: Partial<ContactInput>;
-  qrCodeKey?: string | null;
+  publicKey?: string | null;
+  contactCardAccessId?: string | null;
 };
 
 export const notifyUsers =
