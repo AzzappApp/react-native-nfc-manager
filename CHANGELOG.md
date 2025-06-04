@@ -1,3 +1,8 @@
+## 2.0.0-canary.75
+
+* **fix:**  - remove url from share on ios and keep only android strategy ([#9197](https://github.com/AzzappApp/azzapp/pull/9197))
+* **fix:**  - ensure header background color is white ([#9201](https://github.com/AzzappApp/azzapp/pull/9201))
+
 ## 2.0.0-canary.74
 
 * **fix:**  - add missing padding in contacts screen ([#9198](https://github.com/AzzappApp/azzapp/pull/9198))
