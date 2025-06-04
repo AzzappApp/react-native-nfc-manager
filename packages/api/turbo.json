@@ -49,6 +49,7 @@
         "LINKEDIN_CLIENT_ID",
         "LAST_SUPPORTED_APP_VERSION"
       ],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "dependsOn": ["^build"],
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]

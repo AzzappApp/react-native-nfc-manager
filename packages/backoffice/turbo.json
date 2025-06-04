@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "src/public/**"],
-      "outputs": [".next/**"]
+      "outputs": [".next/**"],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
     "typecheck": { "dependsOn": ["^build"] }
   }
