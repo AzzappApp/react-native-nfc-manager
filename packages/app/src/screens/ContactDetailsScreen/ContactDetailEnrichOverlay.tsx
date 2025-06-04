@@ -406,10 +406,10 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   iconContainerStyle: {
     borderRadius: 50,
+    backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
     ...shadow({
       appearance: 'light',
       direction: 'bottom',
-      forceOldShadow: true,
     }),
   },
   confirmationContainer: {
