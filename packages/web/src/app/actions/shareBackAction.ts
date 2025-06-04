@@ -154,7 +154,8 @@ export const processShareBackSubmission = async (
       );
       phone = number;
     } catch (e) {
-      Sentry.captureException(e);
+      console.warn('fail to parse number', e);
+      phone = '';
     }
 
     const contactFormValue = {
