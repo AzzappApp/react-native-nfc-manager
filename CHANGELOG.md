@@ -1,3 +1,7 @@
+## 2.0.0-rc.5
+
+* **fix:**  - url api staging ([#9224](https://github.com/AzzappApp/azzapp/pull/9224))
+
 ## 2.0.0-rc.4
 
 * **fix:**  - **contact:** [#9212](https://github.com/AzzappApp/azzapp/pull/9212) wrong url on contact creation ([#9214](https://github.com/AzzappApp/azzapp/pull/9214))
