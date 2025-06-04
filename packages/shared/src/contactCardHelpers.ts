@@ -58,6 +58,7 @@ export type ContactCard = {
     url: string;
     label: SocialLinkId;
   }> | null;
+  profileId?: string;
 };
 
 type ParsedContactCard = [
@@ -121,8 +122,7 @@ export const parseContactCardWithAdditionalData = (
 
   const [
     [
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      _profileId,
+      profileId,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _webCardId,
       firstName,
@@ -167,6 +167,7 @@ export const parseContactCardWithAdditionalData = (
     // Merge additional data
     urls: additionalData?.urls || null,
     socials: additionalData?.socials || null,
+    profileId,
   };
 };
 

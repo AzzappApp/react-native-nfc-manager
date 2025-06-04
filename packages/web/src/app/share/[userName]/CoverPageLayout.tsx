@@ -74,13 +74,16 @@ const CoverPageLayout = ({ webCard, media }: CoverPageLayoutProps) => {
 
           if (res.ok) {
             const additionalData = await res.json();
-            setContactCard(
-              parseContactCardWithAdditionalData(
-                contactCardData,
-                additionalData,
-              ),
+            const contact = parseContactCardWithAdditionalData(
+              contactCardData,
+              additionalData,
             );
-            setContactData(additionalData);
+
+            setContactCard(contact);
+            setContactData({
+              ...additionalData,
+              profileId: contact.profileId || '',
+            });
           }
         } catch (error) {
           Sentry.captureException(error);
