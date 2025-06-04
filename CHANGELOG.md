@@ -1,3 +1,7 @@
+## 2.0.0-rc.6
+
+
+
 ## 2.0.0-rc.5
 
 * **fix:**  - url api staging ([#9224](https://github.com/AzzappApp/azzapp/pull/9224))
