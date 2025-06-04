@@ -280,7 +280,7 @@ const ContactsScreen = ({
                             contentContainerStyle={{
                               paddingBottom:
                                 Platform.OS === 'android'
-                                  ? SEARCHBAR_HEIGHT
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
                                   : 0,
                             }}
                           />
@@ -300,7 +300,7 @@ const ContactsScreen = ({
                             contentContainerStyle={{
                               paddingBottom:
                                 Platform.OS === 'android'
-                                  ? SEARCHBAR_HEIGHT
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
                                   : 0,
                             }}
                           />
@@ -318,7 +318,7 @@ const ContactsScreen = ({
                             contentContainerStyle={{
                               paddingBottom:
                                 Platform.OS === 'android'
-                                  ? SEARCHBAR_HEIGHT
+                                  ? SEARCHBAR_HEIGHT + insets.bottom
                                   : 0,
                             }}
                           />
