@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '../database';
 import { ContactCardAccessTable, ProfileTable, UserTable } from '../schema';
 
@@ -25,6 +25,34 @@ export const getActiveContactCardAccess = async (
     .then(result => result.pop());
 };
 
+/**
+ *
+ * @param deviceId is the id of the device
+ * @param profileId is the id of the profile
+ * @returns found contact card access
+ */
+export const getActiveContactCardAccesses = async (
+  keys: Array<{ deviceId: string; profileId: string }>,
+) => {
+  if (keys.length === 0) {
+    return [];
+  }
+
+  const deviceIds = [...new Set(keys.map(key => key.deviceId))];
+  const profileIds = [...new Set(keys.map(key => key.profileId))];
+
+  return db()
+    .select()
+    .from(ContactCardAccessTable)
+    .where(
+      and(
+        inArray(ContactCardAccessTable.deviceId, deviceIds),
+        inArray(ContactCardAccessTable.profileId, profileIds),
+        eq(ContactCardAccessTable.isRevoked, false),
+      ),
+    );
+};
+
 export const getContactCardAccessById = async (id: string) => {
   return db()
     .select()
@@ -38,7 +66,7 @@ export const saveOrUpdateContactCardAccess = async (
   profileId: string,
   signature: string,
 ) => {
-  return db()
+  const inserted = await db()
     .insert(ContactCardAccessTable)
     .values({
       deviceId,
@@ -50,7 +78,27 @@ export const saveOrUpdateContactCardAccess = async (
         signature,
         createdAt: new Date(),
       },
-    });
+    })
+    .$returningId();
+
+  // If the insert was successful without conflict, it will return the id of the inserted
+  if (inserted.length > 0 && inserted[0]?.id) {
+    return inserted[0].id;
+  }
+
+  // If there was a conflict, we need to fetch the existing id
+  const existing = await db()
+    .select({ id: ContactCardAccessTable.id })
+    .from(ContactCardAccessTable)
+    .where(
+      and(
+        eq(ContactCardAccessTable.deviceId, deviceId),
+        eq(ContactCardAccessTable.profileId, profileId),
+      ),
+    )
+    .limit(1);
+
+  return existing[0].id;
 };
 
 export const updateContactCardAccessLastRead = async (id: string) => {

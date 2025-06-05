@@ -2,11 +2,10 @@ import { connectionFromArray, cursorToOffset } from 'graphql-relay';
 import {
   getPostCommentsByDate,
   getPostLikesWebCard,
-  getPostReaction,
   getWebCardPosts,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { webCardLoader } from '#loaders';
+import { postReactionsLoader, webCardLoader } from '#loaders';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
@@ -40,7 +39,10 @@ export const Post: PostResolvers = {
     }
     const webCardId = maybeFromGlobalIdWithType(gqlWebCardId, 'WebCard');
     const reaction = webCardId
-      ? await getPostReaction(webCardId, post.id, 'like')
+      ? await postReactionsLoader.load({
+          postId: post.id,
+          webCardId,
+        })
       : null;
     if (reaction) {
       return reaction.reactionKind;

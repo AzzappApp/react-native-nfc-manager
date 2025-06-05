@@ -29,7 +29,7 @@ const ToolsScreen = ({
 }: RelayScreenProps<ToolsRoute, ToolsScreenQuery>) => {
   const { node, currentUser } = usePreloadedQuery(toolsQuery, preloadedQuery);
 
-  const qrCodeKey = useQRCodeKey(node?.profile);
+  const qrCodeKey = useQRCodeKey();
 
   const [generateLoadingPass, loadingPass] = useGenerateLoadingPass(qrCodeKey);
 
@@ -667,7 +667,6 @@ const toolsQuery = graphql`
         webCard {
           id
         }
-        ...useQRCodeKey_profile
       }
     }
     currentUser {

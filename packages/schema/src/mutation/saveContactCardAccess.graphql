@@ -24,5 +24,9 @@ type SaveContactCardAccessPayload {
   """
   The concerned profile
   """
-  profile: Profile!
+  profile: Profile! @deprecated(reason: "Use `contactCardAccessId` instead")
+  """
+  The ID of the contact card access
+  """
+  contactCardAccessId: ID!
 }

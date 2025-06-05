@@ -15,12 +15,12 @@ import {
   searchWebCards,
   getCardTemplatesForWebCardKind,
   searchContacts,
-  getActiveContactCardAccess,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
+  contactCardAccessLoader,
   contactCountForProfileLoader,
   profileInUserContactLoader,
   profileLoader,
@@ -258,6 +258,8 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   invitedBy: async profile => {
     if (
       !profile.invitedBy ||
+      // When profile has accepted the invitation, no need to return this info
+      !profile.invited ||
       (!profileIsAssociatedToCurrentUser(profile) &&
         !(await hasWebCardProfileRight(profile.webCardId)))
     ) {
@@ -635,10 +637,10 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return null;
     }
 
-    const contactCardAccess = await getActiveContactCardAccess(
+    const contactCardAccess = await contactCardAccessLoader.load({
       deviceId,
-      profile.id,
-    );
+      profileId: profile.id,
+    });
 
     return contactCardAccess && !contactCardAccess.isRevoked
       ? contactCardAccess.id

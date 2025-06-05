@@ -110,9 +110,7 @@ const MainRouter = () => {
         currentUser {
           id
           hasAcceptedLastTermsOfUse
-          profiles {
-            id
-          }
+          hasProfiles
           cookiePreferences {
             analytics
             functional
@@ -126,7 +124,7 @@ const MainRouter = () => {
 
   const hasAcceptedLastTermsOfUse = !!currentUser?.hasAcceptedLastTermsOfUse;
   const hasAcceptedCookies = !!currentUser?.cookiePreferences;
-  const hasProfiles = !!currentUser?.profiles?.length;
+
   const initialRoutes = useMemo(() => {
     if (!hasAcceptedLastTermsOfUse) {
       return acceptTermsRoutes;
@@ -134,11 +132,11 @@ const MainRouter = () => {
     if (!hasAcceptedCookies) {
       return cookieConsentsRoutes;
     }
-    if (!hasProfiles) {
+    if (!currentUser?.hasProfiles) {
       return onboardIngRoutes;
     }
     return mainRoutes;
-  }, [hasAcceptedCookies, hasAcceptedLastTermsOfUse, hasProfiles]);
+  }, [currentUser?.hasProfiles, hasAcceptedCookies, hasAcceptedLastTermsOfUse]);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
 

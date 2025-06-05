@@ -13,6 +13,8 @@ import {
   getProfilesByUserAndWebCards,
   getContactEnrichmentByContactId,
   getContactEnrichmentsByContactIds,
+  getActiveContactCardAccesses,
+  getPostReactionsWebCard,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -145,7 +147,15 @@ export const profileStatisticsLoader = createSessionDataLoader(
 export const webCardOwnerLoader = createSessionDataLoader(
   'WebCardOwnerLoader',
   async (keys: readonly string[]) => {
-    return getWebCardsOwnerUsers(keys);
+    const users = await getWebCardsOwnerUsers(keys);
+
+    users.forEach(user => {
+      if (user) {
+        userLoader.prime(user.id, user);
+      }
+    }); // in some queries we read the user got from the webCard
+
+    return users;
   },
 );
 
@@ -294,6 +304,56 @@ export const contactCountForProfileLoader = createSessionDataLoader(
     const contacts = await getContactCountPerOwner(keys as string[]);
     return keys.map(
       k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
+    );
+  },
+);
+
+export const contactCardAccessLoader = createSessionDataLoader(
+  'ContactCardAccessLoader',
+  async (keys: ReadonlyArray<{ deviceId: string; profileId: string }>) => {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const contactCardAccesses = await getActiveContactCardAccesses(
+      keys as Array<{
+        deviceId: string;
+        profileId: string;
+      }>,
+    );
+
+    return keys.map(
+      key =>
+        contactCardAccesses.find(
+          c => c.deviceId === key.deviceId && c.profileId === key.profileId,
+        ) ?? null,
+    );
+  },
+  {
+    cacheKeyFn: key => `${key.deviceId}-${key.profileId}`,
+  },
+);
+
+export const postReactionsLoader = createSessionDataLoader(
+  'PostReactionsLoader',
+  async (keys: ReadonlyArray<{ postId: string; webCardId: string }>) => {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const reactions = await getPostReactionsWebCard(
+      keys as Array<{
+        postId: string;
+        webCardId: string;
+      }>,
+      'like',
+    );
+
+    return keys.map(
+      key =>
+        reactions.find(
+          r => r.postId === key.postId && r.webCardId === key.webCardId,
+        ) ?? null,
     );
   },
 );

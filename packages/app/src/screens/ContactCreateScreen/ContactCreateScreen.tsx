@@ -214,7 +214,7 @@ const ContactCreateScreen = ({
         return;
       }
 
-      const qrCodeKey = await getOrCreateQrCodeKey(profile);
+      const qrCodeKey = await getOrCreateQrCodeKey();
       commit({
         variables: {
           profileId,
@@ -771,7 +771,6 @@ const contactCreateScreenQuery = graphql`
       profiles {
         id
         ...ProfilesSelector_profiles
-        ...useQRCodeKey_profile
       }
     }
   }

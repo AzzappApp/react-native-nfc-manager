@@ -20,9 +20,13 @@ const saveContactCardAccess: MutationResolvers['saveContactCardAccess'] =
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
-    await saveOrUpdateContactCardAccess(deviceId, profileId, signature);
+    const savedContactCardId = await saveOrUpdateContactCardAccess(
+      deviceId,
+      profileId,
+      signature,
+    );
 
-    return { profile };
+    return { profile, contactCardAccessId: savedContactCardId };
   };
 
 export default saveContactCardAccess;
