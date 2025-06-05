@@ -1,8 +1,8 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
-  useSharedValue,
+  useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -32,22 +32,22 @@ const BottomSheetPopup = ({
   isAnimatedContent = false,
   fullScreen,
 }: BottomSheetPopupProps) => {
-  const progress = useSharedValue(0);
   const { height } = useScreenDimensions();
 
-  // Trigger the animation
-  useEffect(() => {
-    if (visible) {
-      progress.value = withTiming(1, { duration: animationDuration });
-    } else {
-      progress.value = withTiming(0, { duration: animationDuration });
-    }
-  }, [animationDuration, progress, visible]);
+  const animatedProgress = useDerivedValue(() =>
+    withTiming(visible ? 1 : 0, { duration: animationDuration }),
+  );
 
   const animatedStyle = useAnimatedStyle(() => {
-    return isAnimatedContent
-      ? { transform: [{ translateY: (1 - progress.value) * height }] }
-      : {};
+    if (!isAnimatedContent) return {};
+
+    return {
+      transform: [
+        {
+          translateY: (1 - animatedProgress.value) * height,
+        },
+      ],
+    };
   });
 
   return (
