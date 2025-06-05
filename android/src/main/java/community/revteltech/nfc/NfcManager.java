@@ -1472,7 +1472,26 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
 
     @ReactMethod
     public void isHceSupported(Promise promise) {
-        hceManager.isHceSupported(promise);
+        try {
+            Activity currentActivity = getCurrentActivity();
+            if (currentActivity == null) {
+                promise.reject("ERR_GET_ACTIVITY_FAIL", "Failed to get current activity");
+                return;
+            }
+
+            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(currentActivity);
+            if (nfcAdapter == null) {
+                promise.resolve(false);
+                return;
+            }
+
+            CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
+            ComponentName componentName = new ComponentName(currentActivity, HceService.class);
+            List<String> aidList = cardEmulation.getAidListForService(componentName, CardEmulation.CATEGORY_OTHER);
+            promise.resolve(aidList != null && !aidList.isEmpty());
+        } catch (Exception e) {
+            promise.reject("ERR_HCE_SUPPORT", e.getMessage());
+        }
     }
 
     @ReactMethod
