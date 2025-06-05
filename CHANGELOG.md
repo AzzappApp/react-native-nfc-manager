@@ -1,3 +1,7 @@
+## 2.1.0-canary.6
+
+* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
+
 ## 2.1.0-canary.5
 
 

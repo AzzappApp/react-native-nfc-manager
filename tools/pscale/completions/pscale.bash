@@ -4195,6 +4195,8 @@ _pscale_password_delete()
     flags_completion=()
 
     flags+=("--force")
+    flags+=("--name=")
+    two_word_flags+=("--name")
     flags+=("--api-token=")
     two_word_flags+=("--api-token")
     flags+=("--api-url=")
