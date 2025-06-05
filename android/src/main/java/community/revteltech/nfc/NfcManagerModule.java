@@ -74,18 +74,18 @@ public class NfcManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getRegisteredAids(Promise promise) {
-        hceManager.getRegisteredAids(promise);
+    public void setSimpleUrl(String url, Promise promise) {
+        hceManager.setSimpleUrl(url, promise);
     }
 
     @ReactMethod
-    public void registerAid(String aid, Promise promise) {
-        hceManager.registerAid(aid, promise);
+    public void setRichContent(String url, String title, String description, String imageUrl, Promise promise) {
+        hceManager.setRichContent(url, title, description, imageUrl, promise);
     }
 
     @ReactMethod
-    public void removeAid(String aid, Promise promise) {
-        hceManager.removeAid(aid, promise);
+    public void clearContent(Promise promise) {
+        hceManager.clearContent(promise);
     }
 
     @ReactMethod
