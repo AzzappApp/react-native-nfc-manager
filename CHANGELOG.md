@@ -1,3 +1,7 @@
+## 2.1.0-canary.8
+
+* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
+
 ## 2.1.0-canary.7
 
 * **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
