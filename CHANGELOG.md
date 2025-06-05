@@ -1,3 +1,7 @@
+## 2.0.0-rc.7
+
+* **fix:**  - display of country code ([#9225](https://github.com/AzzappApp/azzapp/pull/9225))
+
 ## 2.0.0-rc.6
 
 
