@@ -51,6 +51,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     alignSelf: 'center',
+    alignItems: 'center',
+    maxWidth: '100%',
+    paddingHorizontal: 10,
   },
   image: { width: 22, height: 16, borderRadius: 2 },
 });
