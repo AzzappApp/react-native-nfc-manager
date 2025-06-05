@@ -1,3 +1,7 @@
+## 2.0.0-rc.10
+
+
+
 ## 2.0.0-rc.9
 
 * **fix:**  - [#9227](https://github.com/AzzappApp/azzapp/pull/9227) wrong placement of header buttons ([#9228](https://github.com/AzzappApp/azzapp/pull/9228))
