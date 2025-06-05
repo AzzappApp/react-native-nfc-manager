@@ -66,7 +66,7 @@ export const saveOrUpdateContactCardAccess = async (
   profileId: string,
   signature: string,
 ) => {
-  const inserted = await db()
+  await db()
     .insert(ContactCardAccessTable)
     .values({
       deviceId,
@@ -78,15 +78,8 @@ export const saveOrUpdateContactCardAccess = async (
         signature,
         createdAt: new Date(),
       },
-    })
-    .$returningId();
+    });
 
-  // If the insert was successful without conflict, it will return the id of the inserted
-  if (inserted.length > 0 && inserted[0]?.id) {
-    return inserted[0].id;
-  }
-
-  // If there was a conflict, we need to fetch the existing id
   const existing = await db()
     .select({ id: ContactCardAccessTable.id })
     .from(ContactCardAccessTable)
