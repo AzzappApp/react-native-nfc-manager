@@ -1,9 +1,9 @@
-import {callNative} from './NativeNfcManager';
-import {NfcManagerBase} from './NfcManager';
-import {MifareClassicHandlerAndroid} from './NfcTech/MifareClassicHandlerAndroid';
-import {MifareUltralightHandlerAndroid} from './NfcTech/MifareUltralightHandlerAndroid';
-import {NdefFormatableHandlerAndroid} from './NfcTech/NdefFormatableHandlerAndroid';
-import {handleNativeException, buildNfcExceptionAndroid} from './NfcError';
+import { callNative } from './NativeNfcManager';
+import { NfcManagerBase } from './NfcManager';
+import { MifareClassicHandlerAndroid } from './NfcTech/MifareClassicHandlerAndroid';
+import { MifareUltralightHandlerAndroid } from './NfcTech/MifareUltralightHandlerAndroid';
+import { NdefFormatableHandlerAndroid } from './NfcTech/NdefFormatableHandlerAndroid';
+import { handleNativeException, buildNfcExceptionAndroid } from './NfcError';
 
 const NfcAdapter = {
   FLAG_READER_NFC_A: 0x1,
@@ -44,7 +44,7 @@ class NfcManagerAndroid extends NfcManagerBase {
   };
 
   cancelTechnologyRequest = async (options = {}) => {
-    const {throwOnError = false, delayMsAndroid = 1000} = options;
+    const { throwOnError = false, delayMsAndroid = 1000 } = options;
 
     try {
       await callNative('cancelTechnologyRequest');
@@ -95,6 +95,24 @@ class NfcManagerAndroid extends NfcManagerBase {
     handleNativeException(callNative('getMaxTransceiveLength'));
 
   // -------------------------------------
+  // HCE (Host Card Emulation) API
+  // -------------------------------------
+  isHceSupported = () =>
+    handleNativeException(callNative('isHceSupported'));
+
+  isHceEnabled = () =>
+    handleNativeException(callNative('isHceEnabled'));
+
+  setSimpleUrl = (url) =>
+    handleNativeException(callNative('setSimpleUrl', [url]));
+
+  setRichContent = (url, title, description, imageUrl) =>
+    handleNativeException(callNative('setRichContent', [url, title, description, imageUrl]));
+
+  clearContent = () =>
+    handleNativeException(callNative('clearContent'));
+
+  // -------------------------------------
   // (android) NfcTech.MifareClassic API
   // -------------------------------------
   get mifareClassicHandlerAndroid() {
@@ -133,4 +151,4 @@ class NfcManagerAndroid extends NfcManagerBase {
     handleNativeException(callNative('hasTagEventRegistration'));
 }
 
-export {NfcAdapter, NfcManagerAndroid};
+export { NfcAdapter, NfcManagerAndroid };

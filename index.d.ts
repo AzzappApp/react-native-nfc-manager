@@ -92,7 +92,10 @@ declare module 'react-native-nfc-manager' {
   }
 
   interface NdefHandler {
-    writeNdefMessage: (bytes: number[] , options?: { reconnectAfterWrite: boolean }) => Promise<void>;
+    writeNdefMessage: (
+      bytes: number[],
+      options?: {reconnectAfterWrite: boolean},
+    ) => Promise<void>;
     getNdefMessage: () => Promise<TagEvent | null>;
     makeReadOnly: () => Promise<void>;
     getNdefStatus: () => Promise<{
@@ -131,9 +134,7 @@ declare module 'react-native-nfc-manager' {
       block: ArrayLike<number>,
       data: number,
     ) => Promise<void>;
-    mifareClassicTransferBlock: (
-      block: ArrayLike<number>,
-    ) => Promise<void>;
+    mifareClassicTransferBlock: (block: ArrayLike<number>) => Promise<void>;
     mifareClassicGetSectorCount: () => Promise<number>;
     mifareClassicAuthenticateA: (
       sector: number,
@@ -154,14 +155,15 @@ declare module 'react-native-nfc-manager' {
   }
 
   interface NdefFormatableHandlerAndroid {
-    formatNdef: (bytes: number[], options?: { readOnly: boolean }) => Promise<void>;
+    formatNdef: (
+      bytes: number[],
+      options?: {readOnly: boolean},
+    ) => Promise<void>;
   }
 
   /** [iOS ONLY] */
   interface Iso15693HandlerIOS {
-    getSystemInfo: (
-      requestFloags: number,
-    ) => Promise<{
+    getSystemInfo: (requestFloags: number) => Promise<{
       dsfid: number;
       afi: number;
       blockSize: number;
@@ -291,22 +293,44 @@ declare module 'react-native-nfc-manager' {
     ndefFormatableHandlerAndroid: NdefFormatableHandlerAndroid;
 
     /**
-     * Check if the device supports Host Card Emulation (HCE)
+     * Check if HCE is supported on the device
      * @returns Promise<boolean>
      */
     isHceSupported(): Promise<boolean>;
 
     /**
-     * Check if Host Card Emulation (HCE) is enabled on the device
+     * Check if HCE is enabled on the device
      * @returns Promise<boolean>
      */
     isHceEnabled(): Promise<boolean>;
 
     /**
-     * Get the list of AIDs (Application IDs) registered for HCE
-     * @returns Promise<string[]>
+     * Set a simple URL to be shared via HCE
+     * @param url The URL to share
+     * @returns Promise<boolean>
      */
-    getHceAidList(): Promise<string[]>;
+    setSimpleUrl(url: string): Promise<boolean>;
+
+    /**
+     * Set rich content to be shared via HCE
+     * @param url The URL to share
+     * @param title The title of the content
+     * @param description The description of the content
+     * @param imageUrl The URL of the image to share
+     * @returns Promise<boolean>
+     */
+    setRichContent(
+      url: string,
+      title: string,
+      description: string,
+      imageUrl: string,
+    ): Promise<boolean>;
+
+    /**
+     * Clear the currently set HCE content
+     * @returns Promise<boolean>
+     */
+    clearContent(): Promise<boolean>;
   }
 
   const nfcManager: NfcManager;
@@ -436,7 +460,7 @@ declare module 'react-native-nfc-manager' {
       firstNdefInvalid: 204;
     };
     parse(errorString: string): number;
-  }
+  };
 
   export namespace NfcError {
     export class NfcErrorBase extends Error {}

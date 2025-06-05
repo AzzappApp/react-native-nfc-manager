@@ -1,6 +1,6 @@
 'use strict';
-import {Platform} from 'react-native';
-import {NativeNfcManager, callNative} from './NativeNfcManager';
+import { Platform } from 'react-native';
+import { NativeNfcManager, callNative } from './NativeNfcManager';
 import {
   NfcTech,
   NfcManagerBase,
@@ -11,7 +11,7 @@ import {
   Nfc15693ResponseFlagIOS,
   Iso15693HandlerIOS,
 } from './NfcTech/Iso15693HandlerIOS';
-import {handleNativeException} from './NfcError';
+import { handleNativeException } from './NfcError';
 
 class NfcManagerIOS extends NfcManagerBase {
   constructor() {
@@ -51,12 +51,12 @@ class NfcManagerIOS extends NfcManagerBase {
 
   restartTechnologyRequestIOS = async () => {
     return handleNativeException(
-        callNative('restartTechnologyRequest'),
+      callNative('restartTechnologyRequest'),
     );
   };
 
   cancelTechnologyRequest = async (options = {}) => {
-    const {throwOnError = false} = options;
+    const { throwOnError = false } = options;
     return handleNativeException(
       callNative('cancelTechnologyRequest'),
       !throwOnError,
@@ -91,9 +91,9 @@ class NfcManagerIOS extends NfcManagerBase {
       callNative('invalidateSessionWithError', [errorMessage]),
     );
 
-  isSessionAvailableIOS = async () => 
+  isSessionAvailableIOS = async () =>
     handleNativeException(callNative('isSessionAvailable'));
-  
+
   isTagSessionAvailableIOS = async () =>
     handleNativeException(callNative('isTagSessionAvailable'));
 
@@ -127,7 +127,7 @@ class NfcManagerIOS extends NfcManagerBase {
               if (err) {
                 reject(err);
               } else {
-                resolve({response, sw1, sw2});
+                resolve({ response, sw1, sw2 });
               }
             },
           );
@@ -141,7 +141,7 @@ class NfcManagerIOS extends NfcManagerBase {
             if (err) {
               reject(err);
             } else {
-              resolve({response, sw1, sw2});
+              resolve({ response, sw1, sw2 });
             }
           });
         }),
@@ -158,6 +158,22 @@ class NfcManagerIOS extends NfcManagerBase {
     }
     return this._iso15693HandlerIOS;
   }
+
+  // -------------------------------------
+  // HCE (Host Card Emulation) API - Not supported on iOS
+  // -------------------------------------
+  isHceSupported = () => Promise.resolve(false);
+
+  isHceEnabled = () => Promise.resolve(false);
+
+  setSimpleUrl = () =>
+    Promise.reject('HCE (Host Card Emulation) is not supported on iOS');
+
+  setRichContent = () =>
+    Promise.reject('HCE (Host Card Emulation) is not supported on iOS');
+
+  clearContent = () =>
+    Promise.reject('HCE (Host Card Emulation) is not supported on iOS');
 }
 
-export {NfcManagerIOS, Nfc15693RequestFlagIOS, Nfc15693ResponseFlagIOS};
+export { NfcManagerIOS, Nfc15693RequestFlagIOS, Nfc15693ResponseFlagIOS };
