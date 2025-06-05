@@ -1,3 +1,8 @@
+## 2.0.0-rc.9
+
+* **fix:**  - [#9227](https://github.com/AzzappApp/azzapp/pull/9227) wrong placement of header buttons ([#9228](https://github.com/AzzappApp/azzapp/pull/9228))
+* **fix:**  - **contact:** [#9226](https://github.com/AzzappApp/azzapp/pull/9226) properly update cache on refusing enrichment ([#9233](https://github.com/AzzappApp/azzapp/pull/9233))
+
 ## 2.0.0-rc.8
 
 * **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
