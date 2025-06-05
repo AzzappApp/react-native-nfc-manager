@@ -96,8 +96,8 @@ public class HceManager extends ReactContextBaseJavaModule {
         try {
             CardEmulation cardEmulation = CardEmulation.getInstance(mNfcAdapter);
             ComponentName componentName = new ComponentName(mReactContext, HceService.class);
-            boolean success = cardEmulation.setDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
-            promise.resolve(success);
+            boolean isEnabled = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
+            promise.resolve(isEnabled);
         } catch (Exception e) {
             promise.reject("ERR_SET_DEFAULT_SERVICE", e.getMessage());
         }

@@ -1487,8 +1487,8 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
 
             CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
             ComponentName componentName = new ComponentName(currentActivity, HceService.class);
-            List<String> aidList = cardEmulation.getAidListForService(componentName, CardEmulation.CATEGORY_OTHER);
-            promise.resolve(aidList != null && !aidList.isEmpty());
+            boolean isSupported = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
+            promise.resolve(isSupported);
         } catch (Exception e) {
             promise.reject("ERR_HCE_SUPPORT", e.getMessage());
         }
