@@ -152,13 +152,13 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     flexDirection: 'row',
     columnGap: 6,
-    width: 50,
     height: 47,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
   buttonContainer: {
     borderRadius: 12,
     overflow: 'hidden',
+    width: 50,
   },
   country: { width: 22, height: 16 },
   icon: {
