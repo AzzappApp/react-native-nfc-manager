@@ -3,7 +3,10 @@ package community.revteltech.nfc;
 import android.content.Intent;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
+import android.content.ComponentName;
+import android.nfc.cardemulation.CardEmulation;
 
 public class HceService extends HostApduService {
     private static final String TAG = "HceService";
