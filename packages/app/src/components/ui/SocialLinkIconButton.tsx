@@ -117,6 +117,7 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 20,
     width: 20,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey800,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   mainPressableStyle: {
     height: SOCIAL_LINK_ICON_BUTTON_HEIGHT,

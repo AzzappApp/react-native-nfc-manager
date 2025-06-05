@@ -184,6 +184,7 @@ const SocialLinksLinksEditionPanel = ({
           icon="add"
           onPress={onAddLink}
           disabled={maxLink > 0 && initialLinks.length >= maxLink}
+          style={styles.icon}
         />
       </View>
     </View>
@@ -202,6 +203,9 @@ const styleSheet = createStyleSheet(appearance => ({
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  icon: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   pressableSocialIcon: {
     paddingHorizontal: 5,
