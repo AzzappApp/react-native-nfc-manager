@@ -65,6 +65,9 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     private static final String ERR_API_NOT_SUPPORT = "unsupported tag api";
     private static final String ERR_GET_ACTIVITY_FAIL = "fail to get current activity";
     private static final String ERR_NO_NFC_SUPPORT = "no nfc support";
+    private final NfcManager nfcManager;
+    private final NfcAdapter nfcAdapter;
+    private final HceManager hceManager;
 
     static class WriteNdefRequest {
         NdefMessage message;
@@ -86,6 +89,9 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
         reactContext.addActivityEventListener(this);
         reactContext.addLifecycleEventListener(this);
         Log.d(LOG_TAG, "NfcManager created");
+        this.nfcManager = (NfcManager) reactContext.getSystemService(reactContext.NFC_SERVICE);
+        this.nfcAdapter = NfcAdapter.getDefaultAdapter(reactContext);
+        this.hceManager = new HceManager(reactContext);
     }
 
     @NonNull
@@ -1462,68 +1468,33 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     }
 
     @ReactMethod
-    public void isHceSupported(Callback callback) {
-        Log.d(LOG_TAG, "isHceSupported");
-        Activity currentActivity = getCurrentActivity();
-        if (currentActivity == null) {
-            callback.invoke(ERR_GET_ACTIVITY_FAIL);
-            return;
-        }
-
-        PackageManager pm = currentActivity.getPackageManager();
-        boolean hceSupported = pm.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION);
-        callback.invoke(null, hceSupported);
+    public void isHceSupported(Promise promise) {
+        hceManager.isHceSupported(promise);
     }
 
     @ReactMethod
-    public void isHceEnabled(Callback callback) {
-        Log.d(LOG_TAG, "isHceEnabled");
-        Activity currentActivity = getCurrentActivity();
-        if (currentActivity == null) {
-            callback.invoke(ERR_GET_ACTIVITY_FAIL);
-            return;
-        }
-
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-        if (nfcAdapter != null) {
-            boolean hceEnabled = nfcAdapter.isEnabled() && 
-                currentActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION);
-            callback.invoke(null, hceEnabled);
-        } else {
-            callback.invoke(null, false);
-        }
+    public void isHceEnabled(Promise promise) {
+        hceManager.isHceEnabled(promise);
     }
 
     @ReactMethod
-    public void getHceAidList(Callback callback) {
-        Log.d(LOG_TAG, "getHceAidList");
-        Activity currentActivity = getCurrentActivity();
-        if (currentActivity == null) {
-            callback.invoke(ERR_GET_ACTIVITY_FAIL);
-            return;
-        }
+    public void setSimpleUrl(String url, Promise promise) {
+        hceManager.setSimpleUrl(url, promise);
+    }
 
-        try {
-            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-            if (nfcAdapter != null) {
-                CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
-                ComponentName componentName = new ComponentName(currentActivity, HceService.class);
-                List<String> aidList = cardEmulation.getAidListForService(componentName, CardEmulation.CATEGORY_PAYMENT);
-                
-                WritableArray result = Arguments.createArray();
-                if (aidList != null) {
-                    for (String aid : aidList) {
-                        result.pushString(aid);
-                    }
-                }
-                callback.invoke(null, result);
-            } else {
-                callback.invoke(null, Arguments.createArray());
-            }
-        } catch (Exception ex) {
-            Log.d(LOG_TAG, "getHceAidList fail: " + ex);
-            callback.invoke(ex.toString());
-        }
+    @ReactMethod
+    public void setRichContent(String url, String title, String description, String imageUrl, Promise promise) {
+        hceManager.setRichContent(url, title, description, imageUrl, promise);
+    }
+
+    @ReactMethod
+    public void clearContent(Promise promise) {
+        hceManager.clearContent(promise);
+    }
+
+    @ReactMethod
+    public void setDefaultService(Promise promise) {
+        hceManager.setDefaultService(promise);
     }
 }
 

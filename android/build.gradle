@@ -15,6 +15,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
+	namespace "community.revteltech.nfc"
 	compileSdkVersion safeExtGet('compileSdkVersion', 33)
 
 	def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
