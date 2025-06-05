@@ -16,10 +16,12 @@ public class HceService extends HostApduService {
 
     private String simpleUrl;
     private String richData;
+    private LocalBroadcastManager broadcastManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        broadcastManager = LocalBroadcastManager.getInstance(this);
         Log.d(TAG, "HceService created");
     }
 
