@@ -68,9 +68,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     private static final String ERR_API_NOT_SUPPORT = "unsupported tag api";
     private static final String ERR_GET_ACTIVITY_FAIL = "fail to get current activity";
     private static final String ERR_NO_NFC_SUPPORT = "no nfc support";
-    private final NfcManager nfcManager;
     private final NfcAdapter nfcAdapter;
-    private final HceManager hceManager;
 
     static class WriteNdefRequest {
         NdefMessage message;
@@ -92,9 +90,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
         reactContext.addActivityEventListener(this);
         reactContext.addLifecycleEventListener(this);
         Log.d(LOG_TAG, "NfcManager created");
-        this.nfcManager = (NfcManager) reactContext.getSystemService(reactContext.NFC_SERVICE);
         this.nfcAdapter = NfcAdapter.getDefaultAdapter(reactContext);
-        this.hceManager = new HceManager(reactContext);
     }
 
     @NonNull
@@ -1471,52 +1467,77 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     }
 
     @ReactMethod
-    public void isHceSupported(Promise promise) {
+    public void isHceSupported(Callback callback) {
         try {
-            Activity currentActivity = getCurrentActivity();
-            if (currentActivity == null) {
-                promise.reject("ERR_GET_ACTIVITY_FAIL", "Failed to get current activity");
-                return;
-            }
-
-            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(currentActivity);
-            if (nfcAdapter == null) {
-                promise.resolve(false);
-                return;
-            }
-
-            CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
-            ComponentName componentName = new ComponentName(currentActivity, HceService.class);
-            boolean isSupported = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
-            promise.resolve(isSupported);
+            boolean isSupported = nfcAdapter != null && nfcAdapter.isEnabled();
+            callback.invoke(null, isSupported);
         } catch (Exception e) {
-            promise.reject("ERR_HCE_SUPPORT", e.getMessage());
+            callback.invoke("ERR_HCE_SUPPORT");
         }
     }
 
     @ReactMethod
-    public void isHceEnabled(Promise promise) {
-        hceManager.isHceEnabled(promise);
+    public void isHceEnabled(Callback callback) {
+        try {
+            CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
+            ComponentName componentName = new ComponentName(context, HceService.class);
+            boolean isEnabled = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
+            callback.invoke(null, isEnabled);
+        } catch (Exception e) {
+            callback.invoke("ERR_HCE_ENABLED");
+        }
     }
 
     @ReactMethod
-    public void setSimpleUrl(String url, Promise promise) {
-        hceManager.setSimpleUrl(url, promise);
+    public void setSimpleUrl(String url, Callback callback) {
+        try {
+            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            intent.putExtra(HceService.EXTRA_SIMPLE_URL, url);
+            context.sendBroadcast(intent);
+            callback.invoke(null, true);
+        } catch (Exception e) {
+            callback.invoke("ERR_SET_SIMPLE_URL");
+        }
     }
 
     @ReactMethod
-    public void setRichContent(String url, String title, String description, String imageUrl, Promise promise) {
-        hceManager.setRichContent(url, title, description, imageUrl, promise);
+    public void setRichContent(String url, String title, String description, String imageUrl, Callback callback) {
+        try {
+            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            intent.putExtra(HceService.EXTRA_RICH_DATA, String.format(
+                "{\"url\":\"%s\",\"title\":\"%s\",\"description\":\"%s\",\"imageUrl\":\"%s\"}",
+                url, title, description, imageUrl
+            ));
+            context.sendBroadcast(intent);
+            callback.invoke(null, true);
+        } catch (Exception e) {
+            callback.invoke("ERR_SET_RICH_CONTENT");
+        }
     }
 
     @ReactMethod
-    public void clearContent(Promise promise) {
-        hceManager.clearContent(promise);
+    public void clearContent(Callback callback) {
+        try {
+            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            intent.putExtra(HceService.EXTRA_SIMPLE_URL, (String) null);
+            intent.putExtra(HceService.EXTRA_RICH_DATA, (String) null);
+            context.sendBroadcast(intent);
+            callback.invoke(null, true);
+        } catch (Exception e) {
+            callback.invoke("ERR_CLEAR_CONTENT");
+        }
     }
 
     @ReactMethod
-    public void setDefaultService(Promise promise) {
-        hceManager.setDefaultService(promise);
+    public void setDefaultService(Callback callback) {
+        try {
+            CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
+            ComponentName componentName = new ComponentName(context, HceService.class);
+            boolean isEnabled = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
+            callback.invoke(null, isEnabled);
+        } catch (Exception e) {
+            callback.invoke("ERR_SET_DEFAULT_SERVICE");
+        }
     }
 }
 

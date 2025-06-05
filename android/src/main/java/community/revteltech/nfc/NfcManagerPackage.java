@@ -19,7 +19,7 @@ public class NfcManagerPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactApplicationContext) {
         List<NativeModule> modules = new ArrayList<>();
         
-        modules.add(new NfcManagerModule(reactApplicationContext));
+        modules.add(new NfcManager(reactApplicationContext));
         return modules;
     }
 
