@@ -1,3 +1,13 @@
+## 2.1.0-canary.7
+
+* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
+* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
+* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
+* **fix:**  - display of country code ([#9225](https://github.com/AzzappApp/azzapp/pull/9225))
+* **fix:**  - url api staging ([#9224](https://github.com/AzzappApp/azzapp/pull/9224))
+* **fix:**  - **contact:** [#9212](https://github.com/AzzappApp/azzapp/pull/9212) wrong url on contact creation ([#9214](https://github.com/AzzappApp/azzapp/pull/9214))
+* **fix:**  - [#9215](https://github.com/AzzappApp/azzapp/pull/9215) use explicitly process.env for babel plugin on mobile app ([#9216](https://github.com/AzzappApp/azzapp/pull/9216))
+
 ## 2.1.0-canary.6
 
 * **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
