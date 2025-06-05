@@ -1,11 +1,11 @@
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 
 const HomeBottomPanelCreate = () => {
   return (
-    <>
+    <View style={styles.viewContainer}>
       <Text variant="large" style={styles.title}>
         <FormattedMessage
           defaultMessage="Create a new WebCard{azzappA}"
@@ -32,13 +32,18 @@ const HomeBottomPanelCreate = () => {
           }}
         />
       </Text>
-    </>
+    </View>
   );
 };
 
 export default HomeBottomPanelCreate;
 
 const styles = StyleSheet.create({
+  viewContainer: {
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    flex: 1,
+  },
   text: {
     textAlign: 'center',
     color: colors.white,

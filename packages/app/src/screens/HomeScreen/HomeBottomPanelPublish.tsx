@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { colors } from '#theme';
@@ -140,33 +140,35 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
 
   return (
     <>
-      <Icon icon="warning" style={styles.warningIcon} />
-      <Text variant="large" style={styles.message}>
-        <FormattedMessage
-          defaultMessage="This WebCard{azzappA} is not published"
-          description="Home Screen - webcard not published title"
-          values={{
-            azzappA: (
-              <Text style={styles.icon} variant="azzapp">
-                a
-              </Text>
-            ),
-          }}
-        />
-      </Text>
-      <Text variant="medium" style={styles.informationText}>
-        <FormattedMessage
-          defaultMessage="This WebCard{azzappA} has not been published, nobody can see it for the moment."
-          description="Home Screen - webcard not published text"
-          values={{
-            azzappA: (
-              <Text style={styles.icon} variant="azzapp">
-                a
-              </Text>
-            ),
-          }}
-        />
-      </Text>
+      <View style={styles.viewContainer}>
+        <Icon icon="warning" style={styles.warningIcon} />
+        <Text variant="large" style={styles.message}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} is not published"
+            description="Home Screen - webcard not published title"
+            values={{
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} has not been published, nobody can see it for the moment."
+            description="Home Screen - webcard not published text"
+            values={{
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+      </View>
       {profileInfoHasAdminRight(profile) && (
         <Button
           variant="secondary"
@@ -203,10 +205,11 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
 export default HomeBottomPanelPublish;
 
 const styles = StyleSheet.create({
+  viewContainer: { justifyContent: 'flex-start', alignItems: 'center' },
   informationText: {
     textAlign: 'center',
     color: colors.white,
-    marginHorizontal: 50,
+    marginHorizontal: 40,
     marginTop: 10,
   },
   message: {
@@ -217,12 +220,11 @@ const styles = StyleSheet.create({
   },
   warningIcon: {
     tintColor: colors.white,
-    marginBottom: 20,
+    marginBottom: 15,
     width: 20,
     height: 20,
   },
   button: {
-    marginTop: 30,
     minWidth: 250,
   },
 });

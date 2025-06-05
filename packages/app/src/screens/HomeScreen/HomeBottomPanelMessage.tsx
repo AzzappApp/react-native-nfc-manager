@@ -139,21 +139,14 @@ const MessageItemComponent = ({
     return {
       opacity: opacity.value,
       pointerEvents: opacity.value > 0.5 ? 'box-none' : 'none',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flex: 1,
     };
   });
 
   return (
-    <Animated.View
-      style={[
-        StyleSheet.absoluteFillObject,
-        {
-          justifyContent: 'center',
-          alignItems: 'center',
-          flex: 1,
-        },
-        animatedStyle,
-      ]}
-    >
+    <Animated.View style={[StyleSheet.absoluteFillObject, animatedStyle]}>
       {content == null ? null : content.type === 'publish' ? (
         <HomeBottomPanelPublish profile={content.profile} />
       ) : content.type === 'cover' ? (

@@ -50,7 +50,8 @@ export const createContact: MutationResolvers['createContact'] = async (
     notify,
     scanUsed,
     withShareBack,
-    qrCodeKey,
+    publicKey,
+    contactCardAccessId,
   },
   context,
 ) => {
@@ -244,7 +245,8 @@ export const createContact: MutationResolvers['createContact'] = async (
           firstName: input.firstName,
           lastName: input.lastName,
         },
-        qrCodeKey,
+        publicKey,
+        contactCardAccessId,
       },
     );
   }

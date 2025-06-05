@@ -18,7 +18,11 @@ export const schema = z.object({
     .describe('Support email for the application'),
 });
 
-const env = schema.safeParse(process.env);
+const env = schema.safeParse({
+  NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+  NEXT_PUBLIC_AZZAPP_WEBSITE: process.env.NEXT_PUBLIC_AZZAPP_WEBSITE,
+  AZZAPP_SUPPORT_EMAIL: process.env.AZZAPP_SUPPORT_EMAIL,
+});
 
 if (!env.success) {
   console.error(

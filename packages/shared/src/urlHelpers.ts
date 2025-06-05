@@ -105,7 +105,7 @@ export function buildUserUrlWithKey({
   geolocation,
 }: {
   userName: string;
-  contactCardAccessId?: string;
+  contactCardAccessId: string;
   key: string;
   geolocation?: Geolocation | null;
 }) {

@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -20,34 +20,35 @@ const HomeBottomPanelNewCover = ({
 
   return (
     <>
-      <Icon icon="warning" style={styles.warningIcon} />
-      <Text variant="large" style={styles.title}>
-        <FormattedMessage
-          defaultMessage="This WebCard{azzappA} needs a cover"
-          description="Home Screen - Missing cover title"
-          values={{
-            azzappA: (
-              <Text style={styles.icon} variant="azzapp">
-                a
-              </Text>
-            ),
-          }}
-        />
-      </Text>
-      <Text variant="medium" style={styles.text}>
-        <FormattedMessage
-          defaultMessage="This WebCard{azzappA} has no cover and can’t be published."
-          description="Home Screen - Missing cover text"
-          values={{
-            azzappA: (
-              <Text style={styles.icon} variant="azzapp">
-                a
-              </Text>
-            ),
-          }}
-        />
-      </Text>
-
+      <View style={styles.viewContainer}>
+        <Icon icon="warning" style={styles.warningIcon} />
+        <Text variant="large" style={styles.title}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} needs a cover"
+            description="Home Screen - Missing cover title"
+            values={{
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+        <Text variant="medium" style={styles.text}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} has no cover and can’t be published."
+            description="Home Screen - Missing cover text"
+            values={{
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+      </View>
       <Button
         variant="secondary"
         appearance="dark"
@@ -90,6 +91,7 @@ const HomeBottomPanelNewCover = ({
 export default HomeBottomPanelNewCover;
 
 const styles = StyleSheet.create({
+  viewContainer: { justifyContent: 'flex-start', alignItems: 'center' },
   text: {
     textAlign: 'center',
     color: colors.white,
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   button: {
-    marginTop: 30,
     minWidth: 250,
   },
 });
