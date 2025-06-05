@@ -309,39 +309,43 @@ const ContactDetailsBody = ({
         approved: $approved
         input: $input
       ) {
-        contactEnrichment {
+        contact {
           id
-          approved
-          fields {
-            addresses {
-              address
-              label
+          ...useContactAvatar_contact
+          enrichment {
+            id
+            approved
+            fields {
+              addresses {
+                address
+                label
+              }
+              avatar {
+                uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+                id
+              }
+              birthday
+              company
+              title
+              emails {
+                label
+                address
+              }
+              phoneNumbers {
+                label
+                number
+              }
+              socials {
+                label
+                url
+              }
+              urls {
+                url
+              }
             }
-            avatar {
-              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
-              id
+            publicProfile {
+              ...ContactDetailFragmentAI_contact
             }
-            birthday
-            company
-            title
-            emails {
-              label
-              address
-            }
-            phoneNumbers {
-              label
-              number
-            }
-            socials {
-              label
-              url
-            }
-            urls {
-              url
-            }
-          }
-          publicProfile {
-            ...ContactDetailFragmentAI_contact
           }
         }
       }
@@ -357,10 +361,13 @@ const ContactDetailsBody = ({
         contactEnrichmentId: $contactEnrichmentId
         input: $hiddenFields
       ) {
-        contactEnrichment {
+        contact {
           id
-          publicProfile {
-            ...ContactDetailFragmentAI_contact
+          enrichment {
+            id
+            publicProfile {
+              ...ContactDetailFragmentAI_contact
+            }
           }
         }
       }
@@ -659,24 +666,6 @@ const ContactDetailsBody = ({
             profile: true,
           },
         },
-        optimisticUpdater: store => {
-          const contact = store.get(data?.id);
-          if (contact) {
-            const enrichment = contact.getLinkedRecord('enrichment');
-            if (enrichment) {
-              enrichment.setValue(null, 'publicProfile');
-            }
-          }
-        },
-        updater: store => {
-          const contact = store.get(data?.id);
-          if (contact) {
-            const enrichment = contact.getLinkedRecord('enrichment');
-            if (enrichment) {
-              enrichment.setValue(null, 'publicProfile');
-            }
-          }
-        },
       });
     } else {
       setHiddenFields(prev => {
@@ -685,12 +674,7 @@ const ContactDetailsBody = ({
         return newField;
       });
     }
-  }, [
-    commitHiddenFields,
-    data?.enrichment?.approved,
-    data?.enrichment?.id,
-    data?.id,
-  ]);
+  }, [commitHiddenFields, data?.enrichment?.approved, data?.enrichment?.id]);
 
   const { openTooltips, closeTooltips, registerTooltip, unregisterTooltip } =
     useTooltipContext();

@@ -871,3 +871,15 @@ export const getProfileByContactEnrichmentId = async (
 
   return res;
 };
+
+export const getContactByEnrichmentId = async (enrichmentId: string) =>
+  db()
+    .select({ contact: ContactTable })
+    .from(ContactTable)
+    .innerJoin(
+      ContactEnrichmentTable,
+      eq(ContactTable.id, ContactEnrichmentTable.contactId),
+    )
+    .where(eq(ContactEnrichmentTable.id, enrichmentId))
+    .limit(1)
+    .then(rows => rows[0]?.contact ?? null);
