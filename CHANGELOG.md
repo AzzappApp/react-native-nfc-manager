@@ -1,3 +1,8 @@
+## 2.0.0-rc.11
+
+* **fix:**  - **contact:** [#9232](https://github.com/AzzappApp/azzapp/pull/9232) add padding on country ([#9235](https://github.com/AzzappApp/azzapp/pull/9235))
+* **fix:**  - **android:** [#8372](https://github.com/AzzappApp/azzapp/pull/8372) animation may be broken sometimes on android ([#9240](https://github.com/AzzappApp/azzapp/pull/9240))
+
 ## 2.0.0-rc.10
 
 
