@@ -220,40 +220,18 @@ class NfcManagerBase {
   };
 
   isHceSupported = () => {
-    return new Promise((resolve, reject) => {
-      NfcManager.isHceSupported((err, isSupported) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(isSupported);
-        }
-      });
-    });
+    return handleNativeException(callNative('isHceSupported'));
   };
 
   isHceEnabled = () => {
-    return new Promise((resolve, reject) => {
-      NfcManager.isHceEnabled((err, isEnabled) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(isEnabled);
-        }
-      });
-    });
+    return handleNativeException(callNative('isHceEnabled'));
   };
 
-  getHceAidList = () => {
-    return new Promise((resolve, reject) => {
-      NfcManager.getHceAidList((err, aidList) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(aidList);
-        }
-      });
-    });
-  };
+  setSimpleUrl = NotImpl;
+
+  setRichContent = NotImpl;
+
+  clearContent = NotImpl;
 }
 
 export {
