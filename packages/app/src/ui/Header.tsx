@@ -51,7 +51,11 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
-        {leftElement && <View style={styles.element}>{leftElement}</View>}
+        {leftElement ? (
+          <View style={styles.element}>{leftElement}</View>
+        ) : (
+          <View />
+        )}
         <View
           style={[styles.headerMiddle, middleElementStyle]}
           pointerEvents="box-none"
