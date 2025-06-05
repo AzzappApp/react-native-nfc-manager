@@ -72,7 +72,7 @@ type Profile implements Node {
   """
   True when the encrypted profile has been stored for the device
   """
-  contactCardAccessId(deviceId: String!): ID
+  contactCardAccessId(deviceId: String!): ID @deprecated(reason: "Use result of mutation instead")
 
   webCard: WebCard
 

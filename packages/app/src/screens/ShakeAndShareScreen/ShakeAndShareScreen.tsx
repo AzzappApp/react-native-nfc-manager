@@ -31,7 +31,6 @@ import AddToWalletButton from '#components/AddToWalletButton';
 import ContactCardExportVcf from '#components/ContactCardExportVcf';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import Skeleton from '#components/Skeleton';
 import ToastUi from '#components/Toast';
 import downloadQrCode from '#helpers/DownloadQrCode';
 import relayScreen from '#helpers/relayScreen';
@@ -43,6 +42,7 @@ import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import IosAddWidgetPopup from '#screens/ShakeAndShareScreen/IosAddWidgetPopup';
 import SignaturePreview from '#screens/ShakeAndShareScreen/SignaturePreview';
+import AzzappActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -118,7 +118,7 @@ const ShakeAndShareScreen = ({
     }
   }, [profile, router, webCard?.cardIsPublished, webCard?.userName]);
 
-  const { publicKey, contactCardAccessId } = useQRCodeKey(profile);
+  const qrCodeKey = useQRCodeKey();
 
   const [popupIosWidgetVisible, showIosWidgetPopup, hideIosWidgetPopup] =
     useBoolean(false);
@@ -129,11 +129,11 @@ const ShakeAndShareScreen = ({
   ] = useBoolean(false);
 
   const contactCardUrl =
-    webCard?.userName && contactCardAccessId && publicKey
+    webCard?.userName && qrCodeKey?.contactCardAccessId && qrCodeKey?.publicKey
       ? buildUserUrlWithKey({
           userName: webCard?.userName,
-          contactCardAccessId,
-          key: publicKey,
+          contactCardAccessId: qrCodeKey.contactCardAccessId,
+          key: qrCodeKey.publicKey,
         })
       : null;
 
@@ -158,7 +158,7 @@ const ShakeAndShareScreen = ({
 
   const [generateEmailSignature, isGeneratingEmail] = useGenerateEmailSignature(
     profile?.id,
-    publicKey,
+    qrCodeKey?.publicKey,
     currentUser?.email,
   );
 
@@ -191,13 +191,25 @@ const ShakeAndShareScreen = ({
         <ScrollView style={styles.contentContainer}>
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
-              <Suspense fallback={<Skeleton style={styles.canvas} />}>
-                {webCard?.userName && publicKey && contactCardAccessId && (
-                  <QRCode
-                    contactCardAccessId={contactCardAccessId}
-                    publicKey={publicKey}
-                    userName={webCard?.userName}
-                  />
+              <Suspense
+                fallback={
+                  <View style={styles.canvas}>
+                    <AzzappActivityIndicator />
+                  </View>
+                }
+              >
+                {qrCodeKey ? (
+                  webCard?.userName && (
+                    <QRCode
+                      contactCardAccessId={qrCodeKey.contactCardAccessId}
+                      publicKey={qrCodeKey.publicKey}
+                      userName={webCard?.userName}
+                    />
+                  )
+                ) : (
+                  <View style={styles.canvas}>
+                    <AzzappActivityIndicator />
+                  </View>
                 )}
               </Suspense>
             </View>
@@ -208,19 +220,19 @@ const ShakeAndShareScreen = ({
               />
             </Text>
             <View style={styles.buttonContainer}>
-              {publicKey && contactCardAccessId && (
+              {qrCodeKey && (
                 <ContactCardExportVcf
                   profile={profile}
                   appearance="dark"
                   style={styles.button}
-                  publicKey={publicKey}
-                  contactCardAccessId={contactCardAccessId}
+                  publicKey={qrCodeKey.publicKey}
+                  contactCardAccessId={qrCodeKey.contactCardAccessId}
                 />
               )}
-              {contactCardAccessId && publicKey && (
+              {qrCodeKey && (
                 <AddToWalletButton
-                  contactCardAccessId={contactCardAccessId}
-                  publicKey={publicKey}
+                  contactCardAccessId={qrCodeKey.contactCardAccessId}
+                  publicKey={qrCodeKey.publicKey}
                   style={styles.button}
                   appearance="light"
                 />
@@ -446,7 +458,6 @@ const shakeAndShareQuery = graphql`
           ...CoverRenderer_webCard
         }
         ...SignaturePreview_profile
-        ...useQRCodeKey_profile
         ...ContactCardExportVcf_card
       }
     }
@@ -585,7 +596,13 @@ const styles = StyleSheet.create({
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
-  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH, margin: 20 },
+  canvas: {
+    width: QR_CODE_WIDTH,
+    height: QR_CODE_WIDTH,
+    margin: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   linear: {
     height: '100%',
     position: 'absolute',

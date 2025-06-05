@@ -113,7 +113,6 @@ const ContactCardItem = ({
         invited
         promotedAsOwner
         ...ContactCard_profile
-        ...useQRCodeKey_profile
         lastContactCardUpdate
         createdAt
       }

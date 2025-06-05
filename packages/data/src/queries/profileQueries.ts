@@ -189,6 +189,17 @@ export const getUserProfilesWithWebCard = async (
   }));
 };
 
+export const hasProfiles = async (userId: string): Promise<boolean> => {
+  const countResult = await db()
+    .select({ id: ProfileTable.id })
+    .from(ProfileTable)
+    .where(
+      and(eq(ProfileTable.userId, userId), eq(ProfileTable.deleted, false)),
+    )
+    .limit(1);
+  return countResult.length > 0;
+};
+
 /**
  * Retrieves the owner profile by the username
  *

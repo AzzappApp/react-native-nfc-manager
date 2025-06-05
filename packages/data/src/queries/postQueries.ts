@@ -19,7 +19,13 @@ import {
 } from '../schema';
 import { getMediasByIds } from './mediaQueries';
 import { getTopPostsComment } from './postCommentQueries';
-import type { Media, Post, PostComment, WebCard } from '../schema';
+import type {
+  Media,
+  Post,
+  PostComment,
+  PostReaction,
+  WebCard,
+} from '../schema';
 import type { InferInsertModel, SQL } from 'drizzle-orm';
 
 export type NewPost = InferInsertModel<typeof PostTable>;
@@ -439,4 +445,32 @@ export const getPostLikesWebCardCount = async (postId: string) => {
       ),
     )
     .then(res => res[0].count);
+};
+
+export const getPostReactionsWebCard = async (
+  param: Array<{
+    postId: string;
+    webCardId: string;
+  }>,
+  reactionKind: PostReaction['reactionKind'],
+) => {
+  if (param.length === 0) {
+    return [];
+  }
+
+  return db()
+    .select()
+    .from(PostReactionTable)
+    .where(
+      and(
+        inArray(PostReactionTable.postId, [
+          ...new Set(param.map(p => p.postId)),
+        ]),
+        inArray(PostReactionTable.webCardId, [
+          ...new Set(param.map(p => p.webCardId)),
+        ]),
+        eq(PostReactionTable.reactionKind, reactionKind),
+      ),
+    )
+    .then(res => res);
 };

@@ -12,6 +12,7 @@ import {
   getUserContactsCount,
   getUserContactsGroupedByLocation,
   getNbNewContactsForUser,
+  hasProfiles,
 } from '@azzapp/data';
 import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
@@ -77,6 +78,9 @@ export const User: ProtectedResolver<UserResolvers> = {
     return null;
   },
   publishedWebCards: () => [],
+  hasProfiles: async user => {
+    return hasProfiles(user.id);
+  },
   profiles: async user => {
     if (!isSameUser(user)) {
       return [];

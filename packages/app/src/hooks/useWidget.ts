@@ -41,10 +41,7 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
   const [widgetProfile, setWidgetProfile] = useState<WidgetData[]>([]);
   const data = useFragment(
     graphql`
-      fragment useWidget_user on User
-      @argumentDefinitions(
-        deviceId: { type: "String!", provider: "qrCodeDeviceId.relayprovider" }
-      ) {
+      fragment useWidget_user on User {
         profiles {
           id
           webCard {
@@ -61,10 +58,8 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
           contactCard {
             firstName
             lastName
-            title
             company
           }
-          contactCardAccessId(deviceId: $deviceId)
         }
       }
     `,
@@ -82,20 +77,14 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
                 ? webCard.commonInformation?.company || contactCard?.company
                 : contactCard?.company;
 
-              const contactCardAccessId = profile.contactCardAccessId;
-
-              const publicKey = getPublicKeyForProfileId(profile.id);
-              if (
-                contactCardAccessId &&
-                publicKey &&
-                profile.webCard.userName
-              ) {
+              const qrCodeKey = getPublicKeyForProfileId(profile.id);
+              if (qrCodeKey && profile.webCard.userName) {
                 return {
                   userName: profile.webCard.userName,
                   url: buildUserUrlWithKey({
                     userName: profile.webCard.userName,
-                    key: publicKey,
-                    contactCardAccessId,
+                    key: qrCodeKey.publicKey,
+                    contactCardAccessId: qrCodeKey.contactCardAccessId,
                   }),
                   color: profile.webCard.cardColors?.primary ?? colors.white,
                   textColor: getTextColor(

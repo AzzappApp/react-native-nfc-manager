@@ -4,7 +4,7 @@ import { Alert, StyleSheet } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
@@ -12,12 +12,8 @@ import { useCoverUpload } from '#components/CoverEditor/CoverUploadContext';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
-import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { TooltipProvider } from '#helpers/TooltipContext';
-import {
-  MODULE_KIND_WITHOUT_VARIANTS,
-  type ModuleKindWithVariant,
-} from '#helpers/webcardModuleHelpers';
+import { type ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -109,26 +105,6 @@ const WebCardEditScreen = ({
   // #region Routing
   const router = useRouter();
 
-  const prefetchRoute = usePrefetchRoute();
-  const environment = useRelayEnvironment();
-  useEffect(() => {
-    //this is not intereset, gain at all by prefetching the new module(nothing to prefetch)
-
-    const disposables = [
-      prefetchRoute(environment, {
-        route: 'COVER_EDITION',
-      }),
-      ...MODULE_KIND_WITHOUT_VARIANTS.map(moduleKind => {
-        const module = { moduleKind } as ModuleKindWithVariant;
-        const route = getRouteForCardModule(module);
-        if (!route) return undefined;
-        return prefetchRoute(environment, route);
-      }),
-    ].filter(disposable => disposable !== undefined);
-    return () => {
-      disposables?.forEach(disposable => disposable.dispose());
-    };
-  }, [prefetchRoute, environment]);
   // #endregion
 
   // #region New Module

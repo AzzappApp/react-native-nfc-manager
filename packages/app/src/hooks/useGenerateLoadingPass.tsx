@@ -9,26 +9,23 @@ import { logEvent } from '#helpers/analytics';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import Text from '#ui/Text';
 
-export const useGenerateLoadingPass = ({
-  contactCardAccessId,
-  publicKey,
-}: {
-  contactCardAccessId?: string | null;
-  publicKey?: string | null;
+export const useGenerateLoadingPass = (qrCodeKey?: {
+  contactCardAccessId: string;
+  publicKey: string;
 }) => {
   const [loadingPass, setLoadingPass] = useState(false);
 
   const intl = useIntl();
 
   const generateLoadingPass = useCallback(async () => {
-    if (contactCardAccessId && publicKey) {
+    if (qrCodeKey) {
       try {
         setLoadingPass(true);
 
         if (Platform.OS === 'ios') {
           const pass = await getAppleWalletPass({
-            contactCardAccessId,
-            key: publicKey,
+            contactCardAccessId: qrCodeKey.contactCardAccessId,
+            key: qrCodeKey.publicKey,
             locale: intl.locale,
           });
 
@@ -37,8 +34,8 @@ export const useGenerateLoadingPass = ({
           await addPass(base64Pass);
         } else if (Platform.OS === 'android') {
           const pass = await getGoogleWalletPass({
-            contactCardAccessId,
-            key: publicKey,
+            contactCardAccessId: qrCodeKey.contactCardAccessId,
+            key: qrCodeKey.publicKey,
             locale: intl.locale,
           });
 
@@ -77,7 +74,7 @@ export const useGenerateLoadingPass = ({
         setLoadingPass(false);
       }
     }
-  }, [contactCardAccessId, publicKey, intl]);
+  }, [qrCodeKey, intl]);
 
   return [generateLoadingPass, loadingPass] as const;
 };

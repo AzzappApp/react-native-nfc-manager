@@ -19,6 +19,10 @@ type User {
   """
   profiles: [Profile!]
   """
+  Returns true if the user has at least one profile
+  """
+  hasProfiles: Boolean!
+  """
   Returns a list of published WebCards of the user
   """
   publishedWebCards: [WebCard!] @deprecated(reason: "Use profiles instead")
