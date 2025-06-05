@@ -1,3 +1,8 @@
+## 2.0.0-rc.8
+
+* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
+* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
+
 ## 2.0.0-rc.7
 
 * **fix:**  - display of country code ([#9225](https://github.com/AzzappApp/azzapp/pull/9225))
