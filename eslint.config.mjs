@@ -7,6 +7,7 @@ import formatjs from 'eslint-plugin-formatjs';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactNative from 'eslint-plugin-react-native';
+import relay from 'eslint-plugin-relay';
 import globals from 'globals';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -57,6 +58,7 @@ export default [
     plugins: {
       formatjs,
       'react-native': fixupPluginRules(reactNative),
+      relay,
     },
     languageOptions: {
       globals: {
@@ -188,6 +190,13 @@ export default [
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
       'react-compiler/react-compiler': 0,
+      'relay/graphql-syntax': 'error',
+      'relay/graphql-naming': 'error',
+      // 'relay/must-colocate-fragment-spreads': 'warn',
+      // 'relay/no-future-added-value': 'warn',
+      // 'relay/unused-fields': 'warn',
+      'relay/function-required-argument': 'warn',
+      'relay/hook-required-argument': 'warn',
     },
   },
   ...fixupConfigRules(
