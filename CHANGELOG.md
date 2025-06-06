@@ -1,3 +1,7 @@
+## 2.0.0-rc.12
+
+* **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
+
 ## 2.0.0-rc.11
 
 * **fix:**  - **contact:** [#9232](https://github.com/AzzappApp/azzapp/pull/9232) add padding on country ([#9235](https://github.com/AzzappApp/azzapp/pull/9235))
