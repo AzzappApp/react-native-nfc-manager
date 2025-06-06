@@ -22,6 +22,7 @@ export const homeScreenQuery = graphql`
     currentUser {
       id
       isPremium
+      hasProfiles #do not remove, used to update the field in a relay way #fix9258
       profiles {
         id
         ...OfflineVCardScreen_profiles

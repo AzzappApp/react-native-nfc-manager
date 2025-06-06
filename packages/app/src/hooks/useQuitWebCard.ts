@@ -21,6 +21,9 @@ const updater = (
     ),
     'profiles',
   );
+  if (profiles.length <= 1) {
+    user?.setValue(false, 'hasProfiles');
+  }
   root.setLinkedRecord(user, 'currentUser');
 };
 
