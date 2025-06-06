@@ -32,7 +32,7 @@
     "@formatjs/intl-locale": "^4.2.11",
     "@formatjs/intl-pluralrules": "^5.4.4",
     "@formatjs/intl-relativetimeformat": "^11.4.11",
-    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch",
+    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.6-4ab4100df2.patch",
     "@hookform/resolvers": "^5.0.1",
     "@lepirlouit/vcard-parser": "patch:@lepirlouit/vcard-parser@npm%3A1.4.0#~/.yarn/patches/@lepirlouit-vcard-parser-npm-1.4.0-fee601014a.patch",
     "@miblanchard/react-native-slider": "2.6.0",

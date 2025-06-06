@@ -1,0 +1,67 @@
+diff --git a/src/hooks/useKeyboard.ts b/src/hooks/useKeyboard.ts
+index 7447c218a65d222ca85cb1aa52e8bb752a80b7f8..d24336bd197f8ea90816c0ac5921216e80573881 100644
+--- a/src/hooks/useKeyboard.ts
++++ b/src/hooks/useKeyboard.ts
+@@ -13,6 +13,7 @@ import {
+   useWorkletCallback,
+ } from 'react-native-reanimated';
+ import { KEYBOARD_STATE, SCREEN_HEIGHT } from '../constants';
++import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+ 
+ const KEYBOARD_EVENT_MAPPER = {
+   KEYBOARD_SHOW: Platform.select({
+@@ -33,7 +34,7 @@ export const useKeyboard = () => {
+   const keyboardState = useSharedValue<KEYBOARD_STATE>(
+     KEYBOARD_STATE.UNDETERMINED
+   );
+-  const keyboardHeight = useSharedValue(0);
++  const { height: keyboardHeight } = useReanimatedKeyboardAnimation();
+   const keyboardAnimationEasing =
+     useSharedValue<KeyboardEventEasing>('keyboard');
+   const keyboardAnimationDuration = useSharedValue(500);
+@@ -45,7 +46,6 @@ export const useKeyboard = () => {
+   const handleKeyboardEvent = useWorkletCallback(
+     (
+       state: KEYBOARD_STATE,
+-      height: number,
+       duration: number,
+       easing: KeyboardEventEasing,
+       bottomOffset?: number
+@@ -56,11 +56,9 @@ export const useKeyboard = () => {
+          * then we cache the input, and wait till the `shouldHandleKeyboardEvents`
+          * to be updated then fire this function again.
+          */
+-        temporaryCachedKeyboardEvent.value = [state, height, duration, easing];
++        temporaryCachedKeyboardEvent.value = [state, duration, easing];
+         return;
+       }
+-      keyboardHeight.value =
+-        state === KEYBOARD_STATE.SHOWN ? height : keyboardHeight.value;
+ 
+       /**
+        * if keyboard had an bottom offset -android bottom bar-, then
+@@ -84,7 +82,6 @@ export const useKeyboard = () => {
+     const handleOnKeyboardShow = (event: KeyboardEvent) => {
+       runOnUI(handleKeyboardEvent)(
+         KEYBOARD_STATE.SHOWN,
+-        event.endCoordinates.height,
+         event.duration,
+         event.easing,
+         SCREEN_HEIGHT -
+@@ -95,7 +92,6 @@ export const useKeyboard = () => {
+     const handleOnKeyboardHide = (event: KeyboardEvent) => {
+       runOnUI(handleKeyboardEvent)(
+         KEYBOARD_STATE.HIDDEN,
+-        event.endCoordinates.height,
+         event.duration,
+         event.easing
+       );
+@@ -127,7 +123,7 @@ export const useKeyboard = () => {
+     result => {
+       const params = temporaryCachedKeyboardEvent.value;
+       if (result && params.length > 0) {
+-        handleKeyboardEvent(params[0], params[1], params[2], params[3]);
++        handleKeyboardEvent(params[0], params[1], params[2]);
+       }
+     },
+     []
