@@ -38,7 +38,6 @@ import { ContactDetailAvatar } from './ContactDetailAvatar';
 import { ContactDetailEnrichOverlay } from './ContactDetailEnrichOverlay';
 import { ContactDetailFragmentAI } from './ContactDetailFragmentAI';
 import { ContactDetailFragmentContact } from './ContactDetailFragmentContact';
-import type { ContactDetailAvatar_webCard$key } from '#relayArtifacts/ContactDetailAvatar_webCard.graphql';
 import type {
   ContactDetailsBody_contact$data,
   ContactDetailsBody_contact$key,
@@ -58,7 +57,6 @@ export type ContactDetailEnrichState =
 const BLUR_GAP = 20;
 
 type ContactDetailsBodyProps = {
-  webCard: ContactDetailAvatar_webCard$key | null;
   contactKey: ContactDetailsBody_contact$key | null;
   currentUser: ContactDetailsBody_user$key | null;
   onClose: () => void;
@@ -89,7 +87,6 @@ export type HiddenFields = {
 
 const ContactDetailsBody = ({
   contactKey,
-  webCard: webCardKey,
   onSave,
   onClose,
   refreshQuery,
@@ -799,7 +796,7 @@ const ContactDetailsBody = ({
             state={overlayState}
             isHiddenField={hiddenFields.contact.avatarId}
             onRemoveField={() => onRemoveField('avatarId')}
-            webCard={webCardKey}
+            webCard={data?.contactProfile?.webCard}
             contactKey={data}
           />
           <Text variant="large" style={styles.name}>

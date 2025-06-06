@@ -21,22 +21,7 @@ const query = graphql`
       ... on Contact @alias(as: "contact") {
         id
         ...ContactDetailsBody_contact
-        ...contactHelpersShareContactData_contact
         ...useOnInviteContactDataQuery_contact
-        enrichment {
-          publicProfile {
-            ...ContactDetailAIItemLocations_enrichment
-            ...ContactDetailAISummary_enrichment
-            ...ContactDetailAILabels_enrichment
-            ...ContactDetailAIItemProfessionalExperiences_enrichment
-            ...ContactDetailAIItemEducation_enrichment
-          }
-        }
-        contactProfile {
-          webCard {
-            ...ContactDetailAvatar_webCard
-          }
-        }
       }
     }
   }
@@ -52,8 +37,6 @@ const ContactDetailsScreen = ({
     query,
     preloadedQuery,
   );
-
-  const webCard = node?.contact?.contactProfile?.webCard ?? null;
 
   const onInviteContact = useOnInviteContact();
   const onInviteContactInner = useCallback(async () => {
@@ -74,7 +57,6 @@ const ContactDetailsScreen = ({
             refreshQuery={refreshQuery}
             contactKey={node?.contact}
             onClose={router.back}
-            webCard={webCard}
             onSave={onInviteContactInner}
             hasFocus={hasFocus}
             currentUser={currentUser}

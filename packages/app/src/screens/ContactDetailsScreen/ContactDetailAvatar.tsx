@@ -23,7 +23,7 @@ export const ContactDetailAvatar = ({
   state: ContactDetailEnrichState;
   isHiddenField: boolean;
   onRemoveField: () => void;
-  webCard: ContactDetailAvatar_webCard$key | null;
+  webCard?: ContactDetailAvatar_webCard$key | null;
   contactKey?: ContactDetailAvatar_contact$key | null;
 }) => {
   const styles = useStyleSheet(stylesheet);
