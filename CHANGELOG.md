@@ -1,3 +1,7 @@
+## 2.0.0-rc.14
+
+* **fix:**  - change key for deviceId ([#9259](https://github.com/AzzappApp/azzapp/pull/9259))
+
 ## 2.0.0-rc.13
 
 * **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
