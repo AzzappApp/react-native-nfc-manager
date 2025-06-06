@@ -1,3 +1,7 @@
+## 2.0.0-rc.13
+
+* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
+
 ## 2.0.0-rc.12
 
 * **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
