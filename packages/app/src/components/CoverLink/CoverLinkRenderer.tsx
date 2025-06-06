@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import Link from '#components/Link';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
@@ -15,8 +16,18 @@ const CoverLinkRenderer = ({
   onPress,
   onLongPress,
   disabled,
+  webCard: webCardKey,
   ...props
 }: CoverLinkRendererProps) => {
+  const webCard = useFragment(
+    graphql`
+      fragment CoverLinkRenderer_webCard on WebCard {
+        ...CoverRenderer_webCard
+      }
+    `,
+    webCardKey,
+  );
+
   const containerStyle = useMemo(
     () => [
       style,
@@ -39,7 +50,7 @@ const CoverLinkRenderer = ({
       disabled={disabled}
     >
       <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
-        <CoverRenderer {...props} style={coverStyle} />
+        <CoverRenderer {...props} webCard={webCard} style={coverStyle} />
       </PressableScaleHighlight>
     </Link>
   );

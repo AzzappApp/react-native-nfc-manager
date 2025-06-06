@@ -1,7 +1,8 @@
 import type { CoverRendererProps } from '#components/CoverRenderer';
+import type { CoverLinkRenderer_webCard$key } from '#relayArtifacts/CoverLinkRenderer_webCard.graphql';
 import type { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 
-export type CoverLinkRendererProps = CoverRendererProps & {
+export type CoverLinkRendererProps = Omit<CoverRendererProps, 'webCard'> & {
   /**
    * The username of the webCard, used to navigate to the profile
    */
@@ -11,6 +12,10 @@ export type CoverLinkRendererProps = CoverRendererProps & {
    * on iOS
    */
   webCardId: string;
+  /**
+   * The webcardKey
+   */
+  webCard: CoverLinkRenderer_webCard$key;
   /**
    * style of the wrapped CoverRenderer
    */

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
-import { useRelayEnvironment } from 'react-relay';
+import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -26,6 +26,7 @@ const CoverLink = ({
   prefetch = false,
   onPress,
   onLongPress,
+  webCard: webCardKey,
   ...props
 }: CoverLinkRendererProps) => {
   const ref = useRef<View | null>(null);
@@ -34,6 +35,15 @@ const CoverLink = ({
   >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
+
+  const webCard = useFragment(
+    graphql`
+      fragment CoverLinkRendererIos_webCard on WebCard {
+        ...CoverRenderer_webCard
+      }
+    `,
+    webCardKey,
+  );
 
   const onPressInner = (event: GestureResponderEvent) => {
     onPress?.(event);
@@ -109,7 +119,12 @@ const CoverLink = ({
       ]}
       accessibilityRole="link"
     >
-      <CoverRenderer {...props} mediaRef={mediaRef} style={coverStyle} />
+      <CoverRenderer
+        {...props}
+        webCard={webCard}
+        mediaRef={mediaRef}
+        style={coverStyle}
+      />
     </PressableScaleHighlight>
   );
 };

@@ -12,21 +12,29 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverLink from './CoverLink';
 import Link from './Link';
-import type {
-  WebCardList_webCard$data,
-  WebCardList_webCard$key,
-} from '#relayArtifacts/WebCardList_webCard.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { WebCardList_webCard$key } from '#relayArtifacts/WebCardList_webCard.graphql';
+import type { WebCardListItemMemoized_webCard$key } from '#relayArtifacts/WebCardListItemMemoized_webCard.graphql';
 import type { ColorSchemeName, StyleProp, ViewStyle } from 'react-native';
 
 const WebCardListItemMemoized = memo(function ProfileListItem({
-  webCard,
+  webCard: webCardKey,
   onToggleFollow,
 }: {
   onToggleFollow?: (id: string, userName: string) => void;
-  webCard: ArrayItemType<WebCardList_webCard$data>;
+  webCard: WebCardListItemMemoized_webCard$key;
 }) {
   const styles = useStyleSheet(styleSheet);
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardListItemMemoized_webCard on WebCard {
+        id
+        userName
+        cardIsPublished
+        ...CoverLink_webCard
+      }
+    `,
+    webCardKey,
+  );
 
   const toggleFollow =
     webCard.userName && onToggleFollow
@@ -104,15 +112,14 @@ const WebCardList = ({
       fragment WebCardList_webCard on WebCard @relay(plural: true) {
         id
         userName
-        cardIsPublished
-        ...CoverLink_webCard
+        ...WebCardListItemMemoized_webCard
       }
     `,
     usersKey,
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: ArrayItemType<WebCardList_webCard$data> }) => (
+    ({ item }: { item: WebCardListItemMemoized_webCard$key }) => (
       <WebCardListItemMemoized webCard={item} onToggleFollow={onToggleFollow} />
     ),
     [onToggleFollow],

@@ -16,7 +16,8 @@ const CoverLink = ({ webCard: webCardKey, ...props }: CoverLinkProps) => {
       fragment CoverLink_webCard on WebCard {
         id
         userName
-        ...CoverRenderer_webCard
+        ...CoverLinkRenderer_webCard
+        ...CoverLinkRendererIos_webCard
       }
     `,
     webCardKey,
