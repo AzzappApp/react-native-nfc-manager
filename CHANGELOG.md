@@ -1,3 +1,7 @@
+## 2.1.0-canary.11
+
+
+
 ## 2.1.0-canary.10
 
 * **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
