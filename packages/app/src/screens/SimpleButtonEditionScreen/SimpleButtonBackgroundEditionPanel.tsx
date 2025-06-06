@@ -54,13 +54,7 @@ const SimpleButtonBackgroundEditionPanel = ({
   const profile = useFragment(
     graphql`
       fragment SimpleButtonBackgroundEditionPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardBackground_webCard
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
     profileKey,
@@ -95,8 +89,7 @@ const SimpleButtonBackgroundEditionPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        webCard={profile?.webCard ?? null}
-        medias={profile.moduleBackgrounds}
+        profile={profile}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

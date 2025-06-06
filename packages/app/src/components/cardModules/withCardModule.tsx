@@ -153,7 +153,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
           }
           isPremium
           requiresSubscription
-          ...ModuleEditionScreenTitle_webCard
+          ...CardModuleHeader_webCard
         }
       `,
       data?.node?.profile?.webCard as withCardModule_webCard$key,

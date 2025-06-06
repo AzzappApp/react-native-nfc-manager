@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
@@ -9,8 +10,8 @@ import ColorPicker from '#ui/ColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import TabsBar from '#ui/TabsBar';
 import { useWebCardColors } from './WebCardColorPicker';
-import type { ModuleBackgroundList_ModuleBackgrounds$key } from '#relayArtifacts/ModuleBackgroundList_ModuleBackgrounds.graphql';
-import type { WebCardColorsBoundsComponentProps } from './WebCardColorPicker';
+import type { EditorLayerSelectorPanel_ModuleBackground$key } from '#relayArtifacts/EditorLayerSelectorPanel_ModuleBackground.graphql';
+import type { EditorLayerSelectorPanel_profile$key } from '#relayArtifacts/EditorLayerSelectorPanel_profile.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
 
@@ -30,7 +31,7 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
   /**
    * List of available medias.
    */
-  medias: ModuleBackgroundList_ModuleBackgrounds$key;
+  medias: EditorLayerSelectorPanel_ModuleBackground$key;
   /**
    * Currently selected media.
    */
@@ -97,7 +98,7 @@ const EditorLayerSelectorPanel = ({
   title,
   colorPalette,
   colorList: otherColors,
-  medias,
+  medias: mediasKey,
   selectedMedia,
   tintColor,
   backgroundColor,
@@ -111,6 +112,15 @@ const EditorLayerSelectorPanel = ({
   onUpdateColorPalette,
   ...props
 }: EditorLayerSelectorPanelProps) => {
+  const medias = useFragment(
+    graphql`
+      fragment EditorLayerSelectorPanel_ModuleBackground on ModuleBackground
+      @relay(plural: true) {
+        ...ModuleBackgroundList_ModuleBackgrounds
+      }
+    `,
+    mediasKey,
+  );
   const [currentTab, setCurrentTab] = useState<string>('media');
 
   const onCurrentColorChange = useCallback(
@@ -236,16 +246,43 @@ const styles = StyleSheet.create({
   },
 });
 
-export type WebCardColorsBoundEditorLayerSelectorPanel =
-  WebCardColorsBoundsComponentProps<EditorLayerSelectorPanelProps>;
+export type WebCardColorsBoundEditorLayerSelectorPanel = Omit<
+  EditorLayerSelectorPanelProps,
+  | 'colorList'
+  | 'colorPalette'
+  | 'medias'
+  | 'onUpdateColorList'
+  | 'onUpdateColorPalette'
+> & {
+  profile: EditorLayerSelectorPanel_profile$key;
+};
 
 /**
  * EditorLayerSelectorPanel component with the profile colors bound to the one of the current profile.
  */
 export const WebCardBoundEditorLayerSelectorPanel = ({
-  webCard,
+  profile: profileKey,
   ...props
 }: WebCardColorsBoundEditorLayerSelectorPanel) => {
-  const webCardColorsProps = useWebCardColors(webCard);
-  return <EditorLayerSelectorPanel {...webCardColorsProps} {...props} />;
+  const profile = useFragment(
+    graphql`
+      fragment EditorLayerSelectorPanel_profile on Profile {
+        moduleBackgrounds {
+          ...EditorLayerSelectorPanel_ModuleBackground
+        }
+        webCard {
+          ...WebCardColorPicker_webCard
+        }
+      }
+    `,
+    profileKey,
+  );
+  const webCardColorsProps = useWebCardColors(profile.webCard);
+  return (
+    <EditorLayerSelectorPanel
+      {...webCardColorsProps}
+      {...props}
+      medias={profile.moduleBackgrounds}
+    />
+  );
 };

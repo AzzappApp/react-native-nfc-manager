@@ -16,6 +16,8 @@ const addModuleSectionScreenQuery = graphql`
   query AddModuleSectionScreenQuery($webCardId: ID!) {
     node(id: $webCardId) {
       ... on WebCard @alias(as: "webCard") {
+        # ignore for now, can be used latter
+        # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...CardTemplatesList_webCard
       }
     }

@@ -46,6 +46,7 @@ export function useCoverTemplateTypes(
                 order
                 label
                 coverTemplates {
+                  # eslint-disable-next-line relay/must-colocate-fragment-spreads
                   ...CoverTemplateTypePreviews_coverTemplate
                 }
               }

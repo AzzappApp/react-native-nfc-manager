@@ -94,6 +94,7 @@ const WebCardEditScreen = ({
         ...WebCardEditScreenFooter_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
+        # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...WebCardColorPicker_webCard
       }
     `,

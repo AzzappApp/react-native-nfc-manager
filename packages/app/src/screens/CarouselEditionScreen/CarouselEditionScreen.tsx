@@ -129,7 +129,6 @@ const CarouselEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
-          ...WebCardColorPicker_webCard
           ...CarouselEditionBorderPanel_webCard
           ...ModuleEditionScreenTitle_webCard
         }

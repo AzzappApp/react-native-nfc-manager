@@ -11,7 +11,7 @@ import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 type ModuleEditionScreenTitleProps = {
   label: string;
   kind: ModuleKind;
-  webCardKey: ModuleEditionScreenTitle_webCard$key | null;
+  webCardKey?: ModuleEditionScreenTitle_webCard$key | null;
 };
 const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
   const { label, webCardKey } = props;

@@ -54,12 +54,7 @@ const SimpleTextEditionBackgroundPanel = ({
   const profile = useFragment(
     graphql`
       fragment SimpleTextEditionBackgroundPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
     profileKey,
@@ -94,8 +89,7 @@ const SimpleTextEditionBackgroundPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in simple text edition',
         })}
-        webCard={profile?.webCard ?? null}
-        medias={profile.moduleBackgrounds}
+        profile={profile}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

@@ -63,12 +63,7 @@ const BlockTextTextBackgroundEditionPanel = ({
   const profile = useFragment(
     graphql`
       fragment BlockTextTextBackgroundEditionPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
     profileKey,
@@ -120,8 +115,7 @@ const BlockTextTextBackgroundEditionPanel = ({
           description:
             'Label of TextBackground tab in Horizontal photo edition',
         })}
-        webCard={profile?.webCard ?? null}
-        medias={profile.moduleBackgrounds}
+        profile={profile}
         selectedMedia={textBackground}
         tintColor={patternColor}
         backgroundColor={textBackgroundColor}

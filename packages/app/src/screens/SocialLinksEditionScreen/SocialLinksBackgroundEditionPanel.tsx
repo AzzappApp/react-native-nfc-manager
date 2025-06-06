@@ -43,7 +43,7 @@ type SocialLinksBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the Background of the SocialLinks edition screen
  */
 const SocialLinksBackgroundEditionPanel = ({
-  profile,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,18 +51,13 @@ const SocialLinksBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: SocialLinksBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, webCard } = useFragment(
+  const profile = useFragment(
     graphql`
       fragment SocialLinksBackgroundEditionPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
-    profile,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -94,8 +89,7 @@ const SocialLinksBackgroundEditionPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        webCard={webCard}
-        medias={moduleBackgrounds}
+        profile={profile}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

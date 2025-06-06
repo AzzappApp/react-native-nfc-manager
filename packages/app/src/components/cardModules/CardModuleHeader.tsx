@@ -1,5 +1,7 @@
 import { memo } from 'react';
 import { View } from 'react-native';
+import { useFragment } from 'react-relay';
+import { graphql } from 'relay-runtime';
 import { colors } from '#theme';
 import {
   CancelHeaderButton,
@@ -12,13 +14,13 @@ import Header from '#ui/Header';
 import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import Text from '#ui/Text';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
-import type { ModuleEditionScreenTitle_webCard$key } from '#relayArtifacts/ModuleEditionScreenTitle_webCard.graphql';
+import type { CardModuleHeader_webCard$key } from '#relayArtifacts/CardModuleHeader_webCard.graphql';
 
 type CardModuleHeaderProps = {
   module: ModuleKindAndVariant;
   canSave: boolean;
   save: () => void;
-  webCardKey: ModuleEditionScreenTitle_webCard$key | null;
+  webCardKey: CardModuleHeader_webCard$key | null;
   cardModulesCount: number;
 };
 
@@ -34,6 +36,14 @@ const CardModuleHeader = ({
   const variantLabel = useVariantLabel(module);
   const styles = useStyleSheet(stylesheet);
   // #endregion
+  const webCard = useFragment(
+    graphql`
+      fragment CardModuleHeader_webCard on WebCard {
+        ...ModuleEditionScreenTitle_webCard
+      }
+    `,
+    webCardKey,
+  );
 
   return (
     <Header
@@ -43,7 +53,7 @@ const CardModuleHeader = ({
           <ModuleEditionScreenTitle
             label={title}
             kind={module.moduleKind}
-            webCardKey={webCardKey}
+            webCardKey={webCard}
           />
           <Text variant="medium" style={styles.variantLabel}>
             {variantLabel}

@@ -55,12 +55,7 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
   const profile = useFragment(
     graphql`
       fragment PhotoWithTextAndTitleBackgroundEditionPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
     profileKey,
@@ -95,8 +90,7 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        webCard={profile.webCard}
-        medias={profile.moduleBackgrounds}
+        profile={profile}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

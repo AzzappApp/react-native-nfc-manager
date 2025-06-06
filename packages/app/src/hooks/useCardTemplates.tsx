@@ -127,6 +127,7 @@ const useCardTemplates = (profileId: string, search = '') => {
                 }
                 modules {
                   kind
+                  # eslint-disable-next-line relay/must-colocate-fragment-spreads
                   ...ModuleData_cardModules
                 }
               }

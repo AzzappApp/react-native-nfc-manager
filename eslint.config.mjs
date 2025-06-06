@@ -192,7 +192,7 @@ export default [
       'react-compiler/react-compiler': 0,
       'relay/graphql-syntax': 'error',
       'relay/graphql-naming': 'error',
-      // 'relay/must-colocate-fragment-spreads': 'warn',
+      'relay/must-colocate-fragment-spreads': 'warn',
       'relay/no-future-added-value': 'warn',
       // 'relay/unused-fields': 'warn',
       'relay/function-required-argument': 'warn',

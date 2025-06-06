@@ -54,12 +54,7 @@ const CarouselEditionBackgroundPanel = ({
   const profile = useFragment(
     graphql`
       fragment CarouselEditionBackgroundPanel_profile on Profile {
-        moduleBackgrounds {
-          ...ModuleBackgroundList_ModuleBackgrounds
-        }
-        webCard {
-          ...WebCardColorPicker_webCard
-        }
+        ...EditorLayerSelectorPanel_profile
       }
     `,
     profileKey,
@@ -94,8 +89,7 @@ const CarouselEditionBackgroundPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in carousel edition',
         })}
-        webCard={profile?.webCard ?? null}
-        medias={profile.moduleBackgrounds}
+        profile={profile}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

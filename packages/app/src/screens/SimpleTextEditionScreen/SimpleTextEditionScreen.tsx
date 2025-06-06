@@ -138,7 +138,6 @@ const SimpleTextEditionScreen = ({
             light
             dark
           }
-          ...WebCardColorPicker_webCard
           ...SimpleTextStyleEditionPanel_webCard
           ...ModuleEditionScreenTitle_webCard
         }
