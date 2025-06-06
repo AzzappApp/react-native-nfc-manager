@@ -1,3 +1,11 @@
+## 2.1.0-canary.12
+
+* **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
+* **feat:**  - add relai eslint plugin ([#9249](https://github.com/AzzappApp/azzapp/pull/9249))
+* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
+* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
+* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
+
 ## 2.1.0-canary.11
 
 
