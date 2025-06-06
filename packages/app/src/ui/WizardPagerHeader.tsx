@@ -25,14 +25,13 @@ const WizardPagerHeader = ({
   return (
     <View {...props} style={[styles.root, style]}>
       <View style={styles.header}>
-        <View style={styles.headerSegment}>
+        <View style={[styles.headerSegment, { minWidth: rightElementWidth }]}>
           {backIcon && (
             <IconButton
               icon={backIcon}
               onPress={onBack}
               iconSize={28}
               variant="icon"
-              style={[styles.backIcon, { minWidth: rightElementWidth }]}
             />
           )}
         </View>
@@ -75,10 +74,6 @@ const styles = StyleSheet.create({
   headerSegment: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backIcon: {
-    height: 17,
-    width: 10,
   },
   titleTextContainer: {
     alignSelf: 'center',

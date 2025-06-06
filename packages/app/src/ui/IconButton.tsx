@@ -1,4 +1,11 @@
 import {
+  type StyleProp,
+  type ImageStyle,
+  type ViewProps,
+  type ColorSchemeName,
+  View,
+} from 'react-native';
+import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
@@ -6,12 +13,6 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import type { Icons } from './Icon';
 import type { PressableOpacityProps } from './PressableOpacity';
-import type {
-  StyleProp,
-  ImageStyle,
-  ViewProps,
-  ColorSchemeName,
-} from 'react-native';
 
 export type IconButtonProps = Pick<
   PressableOpacityProps,
@@ -75,9 +76,8 @@ const IconButton = ({
         {
           minWidth: variantSize,
           height: variantSize,
-          borderRadius: variantSize / 2,
+          aspectRatio: 1,
         },
-        styles.button,
         style,
       ]}
       android_ripple={{
@@ -85,12 +85,14 @@ const IconButton = ({
       }}
       {...props}
     >
-      <Icon
-        icon={icon}
-        size={iconSize}
-        style={iconStyle}
-        appearance={appearance}
-      />
+      <View style={[styles.button, { borderRadius: variantSize / 2 }]}>
+        <Icon
+          icon={icon}
+          size={iconSize}
+          style={iconStyle}
+          appearance={appearance}
+        />
+      </View>
     </PressableNative>
   );
 };
@@ -103,6 +105,8 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       overflow: 'hidden',
       alignItems: 'center',
       justifyContent: 'center',
+      flex: 1,
+      width: '100%',
     },
   },
   icon: {},

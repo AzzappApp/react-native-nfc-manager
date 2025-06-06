@@ -236,8 +236,8 @@ export const ContactDetailEnrichOverlay = ({
               icon="close"
               size={44}
               iconSize={24}
-              iconStyle={styles.closeIcon}
               style={styles.closeIconContainer}
+              appearance="dark"
               onPress={
                 state === 'loading'
                   ? router.back
@@ -470,9 +470,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignSelf: 'center',
     bottom: 0,
     backgroundColor: colors.black,
-    borderColor: colors.white,
   },
-  closeIcon: { tintColor: colors.white },
   tooltipText: {
     alignSelf: 'center',
     textAlign: 'center',
