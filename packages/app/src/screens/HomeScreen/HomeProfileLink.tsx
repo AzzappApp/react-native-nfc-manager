@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -13,7 +13,6 @@ import { useFragment, graphql } from 'react-relay';
 import { buildWebUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useTooltipContext } from '#helpers/TooltipContext';
-import useLatestCallback from '#hooks/useLatestCallback';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import { useHomeScreenContext } from './HomeScreenContext';
@@ -68,7 +67,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   });
 
   const intl = useIntl();
-  const onPress = () => {
+  const onPress = useCallback(() => {
     Clipboard.setStringAsync(
       buildWebUrl(
         userNames.value[currentIndexProfileSharedValue.value - 1] ?? '',
@@ -86,7 +85,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         });
       })
       .catch(() => void 0);
-  };
+  }, [intl, userNames, currentIndexProfileSharedValue]);
 
   const textDerivedValue = useDerivedValue(() => {
     // index 0 will be hidden, no need to update it
@@ -96,33 +95,38 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   const ref = useRef(null);
 
-  const onPressLatest = useLatestCallback(onPress);
   useEffect(() => {
     registerTooltip('profileLink', {
       ref,
-      onPress: onPressLatest,
+      onPress,
     });
 
     return () => {
       unregisterTooltip('profileLink');
     };
-  }, [onPressLatest, registerTooltip, unregisterTooltip]);
+  }, [onPress, registerTooltip, unregisterTooltip]);
 
   const iconStyles = useAnimatedStyle(() => ({
     tintColor: readableTextColor.value,
   }));
 
   return (
-    <Animated.View ref={ref} style={[styles.container, opacityStyle]}>
+    <View ref={ref} style={styles.container}>
       <PressableNative
-        style={styles.containerText}
         accessibilityRole="button"
         onPress={onPress}
+        android_ripple={{
+          borderless: true,
+          foreground: true,
+        }}
+        style={styles.button}
       >
-        <Icon icon="link" style={[styles.iconLink, iconStyles]} />
-        <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
+        <Animated.View style={[styles.containerText, opacityStyle]}>
+          <Icon icon="link" style={[styles.iconLink, iconStyles]} />
+          <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
+        </Animated.View>
       </PressableNative>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -175,9 +179,8 @@ const styles = StyleSheet.create({
   url: {
     maxWidth: '90%',
     color: `${colors.white}BF`,
-    lineHeight: 14,
+    lineHeight: 16,
     top: Platform.OS === 'ios' ? 1 : 0,
-    height: 16,
   },
   iconLink: {
     tintColor: `${colors.white}BF`,
@@ -186,12 +189,16 @@ const styles = StyleSheet.create({
   },
   containerText: {
     height: PROFILE_LINK_HEIGHT,
-    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
     backgroundColor: `${colors.white}1A`,
     gap: 10,
     paddingHorizontal: 13,
+    overflow: 'hidden',
+  },
+  button: {
+    borderRadius: 14,
+    overflow: 'hidden',
   },
 });
