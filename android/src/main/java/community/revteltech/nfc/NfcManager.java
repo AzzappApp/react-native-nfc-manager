@@ -1469,8 +1469,14 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void isHceSupported(Callback callback) {
         try {
-            boolean isSupported = nfcAdapter != null && nfcAdapter.isEnabled();
-            callback.invoke(null, isSupported);
+            if (nfcAdapter == null) {
+                callback.invoke(null, false);
+                return;
+            }
+            
+            // Check if HCE is supported
+            boolean isSupported = context.getPackageManager().hasSystemFeature("android.hardware.nfc.hce");
+            callback.invoke(null, isSupported && nfcAdapter.isEnabled());
         } catch (Exception e) {
             callback.invoke("ERR_HCE_SUPPORT");
         }
@@ -1479,11 +1485,18 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void isHceEnabled(Callback callback) {
         try {
+            if (nfcAdapter == null) {
+                callback.invoke(null, false);
+                return;
+            }
+            
             CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
             ComponentName componentName = new ComponentName(context, HceService.class);
             boolean isEnabled = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
+            Log.d(LOG_TAG, "HCE Service enabled: " + isEnabled + " for component: " + componentName);
             callback.invoke(null, isEnabled);
         } catch (Exception e) {
+            Log.e(LOG_TAG, "Error checking HCE enabled: " + e.getMessage());
             callback.invoke("ERR_HCE_ENABLED");
         }
     }
@@ -1491,9 +1504,10 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void setSimpleUrl(String url, Callback callback) {
         try {
-            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            Intent intent = new Intent(context, HceService.class);
+            intent.setAction(HceService.ACTION_APDU_RECEIVED);
             intent.putExtra(HceService.EXTRA_SIMPLE_URL, url);
-            context.sendBroadcast(intent);
+            context.startService(intent);
             callback.invoke(null, true);
         } catch (Exception e) {
             callback.invoke("ERR_SET_SIMPLE_URL");
@@ -1503,12 +1517,13 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void setRichContent(String url, String title, String description, String imageUrl, Callback callback) {
         try {
-            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            Intent intent = new Intent(context, HceService.class);
+            intent.setAction(HceService.ACTION_APDU_RECEIVED);
             intent.putExtra(HceService.EXTRA_RICH_DATA, String.format(
                 "{\"url\":\"%s\",\"title\":\"%s\",\"description\":\"%s\",\"imageUrl\":\"%s\"}",
                 url, title, description, imageUrl
             ));
-            context.sendBroadcast(intent);
+            context.startService(intent);
             callback.invoke(null, true);
         } catch (Exception e) {
             callback.invoke("ERR_SET_RICH_CONTENT");
@@ -1518,10 +1533,11 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void clearContent(Callback callback) {
         try {
-            Intent intent = new Intent(HceService.ACTION_APDU_RECEIVED);
+            Intent intent = new Intent(context, HceService.class);
+            intent.setAction(HceService.ACTION_APDU_RECEIVED);
             intent.putExtra(HceService.EXTRA_SIMPLE_URL, (String) null);
             intent.putExtra(HceService.EXTRA_RICH_DATA, (String) null);
-            context.sendBroadcast(intent);
+            context.startService(intent);
             callback.invoke(null, true);
         } catch (Exception e) {
             callback.invoke("ERR_CLEAR_CONTENT");
@@ -1531,12 +1547,30 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void setDefaultService(Callback callback) {
         try {
-            CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
-            ComponentName componentName = new ComponentName(context, HceService.class);
-            boolean isEnabled = cardEmulation.isDefaultServiceForCategory(componentName, CardEmulation.CATEGORY_OTHER);
-            callback.invoke(null, isEnabled);
+            Activity currentActivity = getCurrentActivity();
+            if (currentActivity == null) {
+                callback.invoke("ERR_GET_ACTIVITY_FAIL");
+                return;
+            }
+            
+            // Open NFC settings so user can set default service
+            Intent intent = new Intent("android.settings.NFC_PAYMENT_SETTINGS");
+            currentActivity.startActivity(intent);
+            callback.invoke(null, true);
         } catch (Exception e) {
-            callback.invoke("ERR_SET_DEFAULT_SERVICE");
+            try {
+                // Fallback to general NFC settings
+                Activity currentActivity = getCurrentActivity();
+                if (currentActivity != null) {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_NFC_SETTINGS);
+                    currentActivity.startActivity(intent);
+                    callback.invoke(null, true);
+                } else {
+                    callback.invoke("ERR_SET_DEFAULT_SERVICE");
+                }
+            } catch (Exception ex) {
+                callback.invoke("ERR_SET_DEFAULT_SERVICE");
+            }
         }
     }
 }

@@ -2,11 +2,14 @@ package community.revteltech.nfc;
 
 import android.content.Intent;
 import android.nfc.cardemulation.HostApduService;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.os.Bundle;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.content.ComponentName;
 import android.nfc.cardemulation.CardEmulation;
+import java.nio.charset.StandardCharsets;
 
 public class HceService extends HostApduService {
     private static final String TAG = "HceService";
@@ -31,21 +34,45 @@ public class HceService extends HostApduService {
             return ApduUtil.A_ERROR;
         }
 
+        Log.d(TAG, "Received APDU: " + ApduUtil.bytesToHex(commandApdu));
+
         // Handle SELECT command
         if (ApduUtil.isSelectCommand(commandApdu)) {
+            Log.d(TAG, "SELECT command received");
             return ApduUtil.A_OK;
         }
 
-        // Handle GET DATA command
-        if (ApduUtil.isGetDataCommand(commandApdu)) {
-            if (richData != null) {
-                return ApduUtil.createResponse(richData);
-            } else if (simpleUrl != null) {
-                return ApduUtil.createResponse(simpleUrl);
+        // Handle READ command for NDEF data
+        if (ApduUtil.isReadCommand(commandApdu)) {
+            Log.d(TAG, "READ command received");
+            
+            try {
+                byte[] ndefData = null;
+                
+                if (simpleUrl != null) {
+                    // Create NDEF record for URL
+                    NdefRecord urlRecord = NdefRecord.createUri(simpleUrl);
+                    NdefMessage ndefMessage = new NdefMessage(urlRecord);
+                    ndefData = ndefMessage.toByteArray();
+                } else if (richData != null) {
+                    // Create NDEF record for rich content (as text for now)
+                    NdefRecord textRecord = NdefRecord.createTextRecord("en", richData);
+                    NdefMessage ndefMessage = new NdefMessage(textRecord);
+                    ndefData = ndefMessage.toByteArray();
+                }
+                
+                if (ndefData != null) {
+                    Log.d(TAG, "Returning NDEF data: " + ndefData.length + " bytes");
+                    return ApduUtil.createNdefResponse(ndefData);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error creating NDEF response: " + e.getMessage());
             }
+            
             return ApduUtil.A_ERROR;
         }
 
+        Log.d(TAG, "Unknown command");
         return ApduUtil.A_ERROR;
     }
 
