@@ -61,6 +61,7 @@ const ContactsByLocationList = ({
                   contacts {
                     id
                     ...ContactActionModal_contact
+                    # eslint-disable-next-line relay/must-colocate-fragment-spreads
                     ...ContactsHorizontalList_contacts
                   }
                 }

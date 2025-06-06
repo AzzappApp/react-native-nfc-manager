@@ -24,6 +24,7 @@ export const homeScreenQuery = graphql`
       isPremium
       profiles {
         id
+        # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...OfflineVCardScreen_profiles
       }
       ...HomeScreenContent_user

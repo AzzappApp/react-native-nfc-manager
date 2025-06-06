@@ -59,6 +59,7 @@ const ContactsByDateList = ({
                   nbContacts
                   contacts {
                     id
+                    # eslint-disable-next-line relay/must-colocate-fragment-spreads
                     ...ContactsHorizontalList_contacts
                     ...ContactActionModal_contact
                   }

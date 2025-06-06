@@ -60,7 +60,9 @@ describe('WebCardScreen', () => {
             cardColors {
               otherColors
             }
+            # eslint-disable-next-line relay/must-colocate-fragment-spreads
             ...CoverRenderer_webCard
+            # eslint-disable-next-line relay/must-colocate-fragment-spreads
             ...WebCardPreviewFullScreenOverlay_webCard
           }
         }
