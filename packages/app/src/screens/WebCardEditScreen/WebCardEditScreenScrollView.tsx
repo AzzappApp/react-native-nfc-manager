@@ -61,6 +61,7 @@ const WebCardEditScreenScrollView = (
         variant="icon"
         style={{
           top: editTopGap,
+          alignSelf: 'center',
         }}
         onPress={openHilt}
       />

@@ -91,7 +91,7 @@ type ContactPayload {
 }
 
 type ContactEnrichmentPayload {
-  contactEnrichment: ContactEnrichment!
+  contact: Contact!
 }
 
 enum ContactType {

@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
@@ -42,28 +42,22 @@ const RoundedMenuComponent = ({
     }
   }, [id, onSelect]);
 
-  const flattenStyle = StyleSheet.flatten(style);
-  const flattenSelectedStyle = selected
-    ? StyleSheet.flatten(selectedStyle)
-    : {};
-  const flattenSelectedTextStyle = selected
-    ? StyleSheet.flatten(selectedTextStyle)
-    : {};
-
   return (
     <View
       ref={containerRef}
       style={[
         styles.menu,
         selected && styles.menuSelected,
-        flattenStyle,
-        flattenSelectedStyle,
+        style,
+        selected && selectedStyle,
       ]}
     >
       <PressableNative style={styles.menuPressable} onPress={onPress}>
         <Text
           variant={textVariant}
-          style={[textStyle, flattenSelectedTextStyle]}
+          style={[textStyle, selected && selectedTextStyle]}
+          numberOfLines={1}
+          ellipsizeMode="middle"
         >
           {label}
         </Text>
@@ -88,7 +82,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     borderRadius: 16,
   },
   menuSelected: {

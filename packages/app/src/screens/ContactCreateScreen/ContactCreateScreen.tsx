@@ -618,7 +618,7 @@ const ContactCreateScreen = ({
           <IconButton
             icon="close"
             onPress={router.back}
-            style={styles.leftArrowIcon}
+            variant="icon"
             disabled={showProfilesSelector}
           />
         }
@@ -744,9 +744,6 @@ const stylesheet = createStyleSheet(appearance => ({
     color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 10,
     textAlign: 'center',
-  },
-  leftArrowIcon: {
-    borderWidth: 0,
   },
   scanButton: { marginHorizontal: 20, marginVertical: 10 },
   profilesSelectorContainer: {

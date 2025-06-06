@@ -590,7 +590,7 @@ __metadata:
     "@formatjs/intl-locale": "npm:^4.2.11"
     "@formatjs/intl-pluralrules": "npm:^5.4.4"
     "@formatjs/intl-relativetimeformat": "npm:^11.4.11"
-    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch"
+    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.6-4ab4100df2.patch"
     "@hookform/resolvers": "npm:^5.0.1"
     "@lepirlouit/vcard-parser": "patch:@lepirlouit/vcard-parser@npm%3A1.4.0#~/.yarn/patches/@lepirlouit-vcard-parser-npm-1.4.0-fee601014a.patch"
     "@miblanchard/react-native-slider": "npm:2.6.0"
@@ -7540,9 +7540,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@gorhom/bottom-sheet@npm:5.1.2"
+"@gorhom/bottom-sheet@npm:5.1.6":
+  version: 5.1.6
+  resolution: "@gorhom/bottom-sheet@npm:5.1.6"
   dependencies:
     "@gorhom/portal": "npm:1.0.14"
     invariant: "npm:^2.2.4"
@@ -7558,13 +7558,13 @@ __metadata:
       optional: true
     "@types/react-native":
       optional: true
-  checksum: 10/dee116bdb749643bde163dd88c7fb800988472d58cf38532bc1b034ca1153cb250f2c8c83f2c4b393e39019f6205ca28be018eed47ae4767c75ff4983de8a151
+  checksum: 10/321d85abac24cfab5ce6c77623381c73d95a09d8b1d95c0e7e968540af5c9d1bd3369b669459df483a962f65a363ea929940f006a1b4f3acf8f4b31500c4863f
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch":
-  version: 5.1.2
-  resolution: "@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch::version=5.1.2&hash=2103ef"
+"@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.6-4ab4100df2.patch":
+  version: 5.1.6
+  resolution: "@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.6-4ab4100df2.patch::version=5.1.6&hash=cad8aa"
   dependencies:
     "@gorhom/portal": "npm:1.0.14"
     invariant: "npm:^2.2.4"
@@ -7580,7 +7580,7 @@ __metadata:
       optional: true
     "@types/react-native":
       optional: true
-  checksum: 10/8880d8111fd5ccd9a086b956f9a46a9ffe90c2ed004122f229bbc6975a22286433becd1a752895e4ce52c9d9ef92991689b2f5a0149c23a0313da1f5ab30c03d
+  checksum: 10/51ed72e0cf94d737116ffe18778e93bd3058d0a6aadac1a0c2992f097407b9d3f30ae9eddafced5383e82a2487a4f06fcf210dd06ecefd0a67b40ff56d6ef767
   languageName: node
   linkType: hard
 

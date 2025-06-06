@@ -447,12 +447,12 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   mediaDeleteIcon: {
     tintColor: appearance === 'light' ? colors.black : colors.grey100,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   mediaDeleteButton: {
     position: 'absolute',
     top: -10,
     right: -10,
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
     borderRadius: 12,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey1000,
   },

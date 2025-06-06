@@ -1,12 +1,14 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import Share from 'react-native-share';
+import Toast from 'react-native-toast-message';
 import { usePreloadedQuery } from 'react-relay';
 import { graphql } from 'relay-runtime';
 import env from '#env';
 import { useRouter } from '#components/NativeRouter';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useGenerateEmailSignature } from '#hooks/useGenerateEmailSignature';
@@ -280,9 +282,21 @@ Only {price}/user/month."
                     style={styles.toolButton}
                     variant="primary"
                     onPress={() => {
-                      router.push({
-                        route: 'MULTI_USER',
-                      });
+                      if (profileInfoHasAdminRight(node?.profile)) {
+                        router.push({
+                          route: 'MULTI_USER',
+                        });
+                      } else {
+                        Toast.show({
+                          type: 'error',
+                          text1: intl.formatMessage({
+                            defaultMessage:
+                              'Your role does not permit this action',
+                            description:
+                              'Error message when trying to go to multi-user screen without the right permissions',
+                          }),
+                        });
+                      }
                     }}
                     label={intl.formatMessage({
                       defaultMessage: 'Multi-User',
@@ -353,82 +367,85 @@ Only {price}/user/month."
               />
             </View>
           </View>
-
-          <View style={styles.itemContainer}>
-            <View style={styles.itemContent}>
-              <View style={styles.itemContentContainer}>
-                <View style={styles.itemLeftContainer}>
-                  <View style={styles.titleWithDescription}>
-                    <Text variant="large" appearance="light">
-                      <FormattedMessage
-                        defaultMessage="Lockscreen Widgets"
-                        description="Tools screen - Title for the lockscreen widgets tool"
-                      />
-                    </Text>
-                    <Text variant="small" appearance="light">
-                      <FormattedMessage
-                        defaultMessage="Access your QR-Code or open the scanner directly from your lock-screen."
-                        description="Tools screen - Description for the lockscreen widgets tool"
-                      />
-                    </Text>
+          {Platform.OS === 'ios' && (
+            <View style={styles.itemContainer}>
+              <View style={styles.itemContent}>
+                <View style={styles.itemContentContainer}>
+                  <View style={styles.itemLeftContainer}>
+                    <View style={styles.titleWithDescription}>
+                      <Text variant="large" appearance="light">
+                        <FormattedMessage
+                          defaultMessage="Lockscreen Widgets"
+                          description="Tools screen - Title for the lockscreen widgets tool"
+                        />
+                      </Text>
+                      <Text variant="small" appearance="light">
+                        <FormattedMessage
+                          defaultMessage="Access your QR-Code or open the scanner directly from your lock-screen."
+                          description="Tools screen - Description for the lockscreen widgets tool"
+                        />
+                      </Text>
+                    </View>
+                    <Button
+                      style={styles.toolButton}
+                      variant="primary"
+                      onPress={showIosLockScreenWidgetPopup}
+                      label={intl.formatMessage({
+                        defaultMessage: 'See how',
+                        description:
+                          'Button label to ask for lockscreen widgets in the tools screen',
+                      })}
+                    />
                   </View>
-                  <Button
-                    style={styles.toolButton}
-                    variant="primary"
-                    onPress={showIosLockScreenWidgetPopup}
-                    label={intl.formatMessage({
-                      defaultMessage: 'See how',
-                      description:
-                        'Button label to ask for lockscreen widgets in the tools screen',
-                    })}
-                  />
                 </View>
+                <Image
+                  style={[styles.illustration, { width: '60%' }]}
+                  contentFit="cover"
+                  source={require('#assets/tools/tools_07_lockscreen_widgets.png')}
+                />
               </View>
-              <Image
-                style={[styles.illustration, { width: '60%' }]}
-                contentFit="cover"
-                source={require('#assets/tools/tools_07_lockscreen_widgets.png')}
-              />
             </View>
-          </View>
+          )}
 
-          <View style={styles.itemContainer}>
-            <View style={styles.itemContent}>
-              <View style={styles.itemContentContainer}>
-                <View style={styles.itemLeftContainer}>
-                  <View style={styles.titleWithDescription}>
-                    <Text variant="large" appearance="light">
-                      <FormattedMessage
-                        defaultMessage="Homescreen Widgets"
-                        description="Tools screen - Title for the homescreen widgets tool"
-                      />
-                    </Text>
-                    <Text variant="small" appearance="light">
-                      <FormattedMessage
-                        defaultMessage="Access your QR-Code directly from your Home screen."
-                        description="Tools screen - Description for the homescreen widgets tool"
-                      />
-                    </Text>
+          {Platform.OS === 'ios' && (
+            <View style={styles.itemContainer}>
+              <View style={styles.itemContent}>
+                <View style={styles.itemContentContainer}>
+                  <View style={styles.itemLeftContainer}>
+                    <View style={styles.titleWithDescription}>
+                      <Text variant="large" appearance="light">
+                        <FormattedMessage
+                          defaultMessage="Homescreen Widgets"
+                          description="Tools screen - Title for the homescreen widgets tool"
+                        />
+                      </Text>
+                      <Text variant="small" appearance="light">
+                        <FormattedMessage
+                          defaultMessage="Access your QR-Code directly from your Home screen."
+                          description="Tools screen - Description for the homescreen widgets tool"
+                        />
+                      </Text>
+                    </View>
+                    <Button
+                      style={styles.toolButton}
+                      variant="primary"
+                      onPress={showIosHomeScreenWidgetPopup}
+                      label={intl.formatMessage({
+                        defaultMessage: 'See how',
+                        description:
+                          'Button label to ask for homescreen widgets in the tools screen',
+                      })}
+                    />
                   </View>
-                  <Button
-                    style={styles.toolButton}
-                    variant="primary"
-                    onPress={showIosHomeScreenWidgetPopup}
-                    label={intl.formatMessage({
-                      defaultMessage: 'See how',
-                      description:
-                        'Button label to ask for homescreen widgets in the tools screen',
-                    })}
-                  />
                 </View>
+                <Image
+                  style={[styles.illustration, { width: '60%' }]}
+                  contentFit="cover"
+                  source={require('#assets/tools/tools_08_homescreen_widgets.png')}
+                />
               </View>
-              <Image
-                style={[styles.illustration, { width: '60%' }]}
-                contentFit="cover"
-                source={require('#assets/tools/tools_08_homescreen_widgets.png')}
-              />
             </View>
-          </View>
+          )}
 
           <View style={styles.itemContainer}>
             <View style={styles.itemContent}>
@@ -625,9 +642,21 @@ Only {price}/user/month."
                     style={styles.toolButton}
                     variant="primary"
                     onPress={() => {
-                      router.push({
-                        route: 'COVER_EDITION',
-                      });
+                      if (profileInfoHasAdminRight(node?.profile)) {
+                        router.push({
+                          route: 'COVER_EDITION',
+                        });
+                      } else {
+                        Toast.show({
+                          type: 'error',
+                          text1: intl.formatMessage({
+                            defaultMessage:
+                              'Your role does not permit this action',
+                            description:
+                              'Error message when trying to create a cover without the right permissions',
+                          }),
+                        });
+                      }
                     }}
                     label={intl.formatMessage({
                       defaultMessage: 'Edit cover',
@@ -667,6 +696,7 @@ const toolsQuery = graphql`
         webCard {
           id
         }
+        profileRole
       }
     }
     currentUser {

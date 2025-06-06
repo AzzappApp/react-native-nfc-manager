@@ -155,38 +155,40 @@ const ContactEditScreen = ({
         contactEnrichmentId: $contactEnrichmentId
         input: $hiddenFields
       ) {
-        contactEnrichment {
-          id
-          fields {
-            birthday
-            company
-            title
-            avatar {
-              uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
-              id
-            }
-            addresses {
-              address
-              label
-            }
-            logo {
-              uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
-              id
-            }
-            phoneNumbers {
-              number
-              label
-            }
-            emails {
-              address
-              label
-            }
-            urls {
-              url
-            }
-            socials {
-              url
-              label
+        contact {
+          enrichment {
+            id
+            fields {
+              birthday
+              company
+              title
+              avatar {
+                uri: uri(width: 112, pixelRatio: $pixelRatio, format: png)
+                id
+              }
+              addresses {
+                address
+                label
+              }
+              logo {
+                uri: uri(width: 180, pixelRatio: $pixelRatio, format: png)
+                id
+              }
+              phoneNumbers {
+                number
+                label
+              }
+              emails {
+                address
+                label
+              }
+              urls {
+                url
+              }
+              socials {
+                url
+                label
+              }
             }
           }
         }

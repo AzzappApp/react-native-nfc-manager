@@ -28,8 +28,8 @@ const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [
   `${env.APP_SCHEME}://`,
-  buildWebUrl(),
   buildWebUrl('share'),
+  buildWebUrl(),
   ANDROID_CONTENT_PREFIX,
   FILE_PREFIX,
 ];

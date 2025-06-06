@@ -17,12 +17,14 @@ const encryptedQrCodeStorage = new MMKV({
   encryptionKey: '@azzapp-qrcode-encryption-key',
 });
 
+const DEVICE_ID_STORAGE_KEY = 'deviceId-v2';
+
 export const getQRCodeDeviceId = () => {
-  let deviceId = encryptedQrCodeStorage.getString('deviceId');
+  let deviceId = encryptedQrCodeStorage.getString(DEVICE_ID_STORAGE_KEY);
 
   if (!deviceId) {
     deviceId = Crypto.randomUUID();
-    encryptedQrCodeStorage.set('deviceId', deviceId);
+    encryptedQrCodeStorage.set(DEVICE_ID_STORAGE_KEY, deviceId);
   }
   return deviceId;
 };

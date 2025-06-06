@@ -36,16 +36,9 @@ exports[`BottomSheetTextEditorButton component disabled state 1`] = `
     [
       [
         {
-          "borderRadius": 25,
+          "aspectRatio": 1,
           "height": 50,
           "minWidth": 50,
-        },
-        {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
         },
         [
           {
@@ -64,28 +57,47 @@ exports[`BottomSheetTextEditorButton component disabled state 1`] = `
     ]
   }
 >
-  <Image
-    source={
-      {
-        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-      }
-    }
+  <View
     style={
       [
         {
-          "height": 12,
-          "resizeMode": "contain",
-          "width": 12,
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "flex": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+          "width": "100%",
         },
         {
-          "tintColor": "#0E1216",
-        },
-        {
-          "tintColor": "#C8C7CA",
+          "borderRadius": 25,
         },
       ]
     }
-  />
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 12,
+            "resizeMode": "contain",
+            "width": 12,
+          },
+          {
+            "tintColor": "#0E1216",
+          },
+          {
+            "tintColor": "#C8C7CA",
+          },
+        ]
+      }
+    />
+  </View>
 </View>
 `;
 
@@ -125,16 +137,9 @@ exports[`BottomSheetTextEditorButton component selected state 1`] = `
     [
       [
         {
-          "borderRadius": 25,
+          "aspectRatio": 1,
           "height": 50,
           "minWidth": 50,
-        },
-        {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
         },
         [
           {
@@ -155,28 +160,47 @@ exports[`BottomSheetTextEditorButton component selected state 1`] = `
     ]
   }
 >
-  <Image
-    source={
-      {
-        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-      }
-    }
+  <View
     style={
       [
         {
-          "height": 12,
-          "resizeMode": "contain",
-          "width": 12,
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "flex": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+          "width": "100%",
         },
         {
-          "tintColor": "#0E1216",
-        },
-        {
-          "tintColor": "#C8C7CA",
+          "borderRadius": 25,
         },
       ]
     }
-  />
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 12,
+            "resizeMode": "contain",
+            "width": 12,
+          },
+          {
+            "tintColor": "#0E1216",
+          },
+          {
+            "tintColor": "#C8C7CA",
+          },
+        ]
+      }
+    />
+  </View>
 </View>
 `;
 
@@ -216,16 +240,9 @@ exports[`BottomSheetTextEditorButton component unselected state 1`] = `
     [
       [
         {
-          "borderRadius": 25,
+          "aspectRatio": 1,
           "height": 50,
           "minWidth": 50,
-        },
-        {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
         },
         [
           {
@@ -244,27 +261,46 @@ exports[`BottomSheetTextEditorButton component unselected state 1`] = `
     ]
   }
 >
-  <Image
-    source={
-      {
-        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-      }
-    }
+  <View
     style={
       [
         {
-          "height": 12,
-          "resizeMode": "contain",
-          "width": 12,
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "flex": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+          "width": "100%",
         },
         {
-          "tintColor": "#0E1216",
-        },
-        {
-          "tintColor": "#C8C7CA",
+          "borderRadius": 25,
         },
       ]
     }
-  />
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 12,
+            "resizeMode": "contain",
+            "width": 12,
+          },
+          {
+            "tintColor": "#0E1216",
+          },
+          {
+            "tintColor": "#C8C7CA",
+          },
+        ]
+      }
+    />
+  </View>
 </View>
 `;

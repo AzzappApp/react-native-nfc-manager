@@ -9,6 +9,7 @@ const esModules = [
   '@expo-.*',
   '@shopify/react-native-skia',
   '@noble/ed25519',
+  '@gorhom/bottom-sheet',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */

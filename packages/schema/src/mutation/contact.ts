@@ -19,6 +19,7 @@ import {
   updateContactEnrichment,
   getProfileByContactEnrichmentId,
   incrementNbEnrichments,
+  getContactByEnrichmentId,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
@@ -515,7 +516,7 @@ export const updateContactEnrichmentHiddenFields: MutationResolvers['updateConta
     });
 
     return {
-      contactEnrichment: existingContactEnrichment,
+      contact: existingContact,
     };
   };
 
@@ -542,10 +543,9 @@ export const approveContactEnrichment: MutationResolvers['approveContactEnrichme
       approved,
     });
 
-    const existingContactEnrichment =
-      await getContactEnrichmentById(contactEnrichmentId);
+    const existingContact = await getContactByEnrichmentId(contactEnrichmentId);
 
     return {
-      contactEnrichment: existingContactEnrichment,
+      contact: existingContact,
     };
   };
