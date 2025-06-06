@@ -1,17 +1,26 @@
 import { useIntl } from 'react-intl';
+import { graphql, useFragment } from 'react-relay';
 import AccountHeader from '#components/AccountHeader';
 import Text from '#ui/Text';
-import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
+import type { WebCardParametersHeader_webCard$key } from '#relayArtifacts/WebCardParametersHeader_webCard.graphql';
 
 const WebcardParametersHeader = ({
-  webCard,
+  webCard: webCardKey,
 }: {
-  webCard: AccountHeader_webCard$key | null;
+  webCard: WebCardParametersHeader_webCard$key | null;
 }) => {
   const intl = useIntl();
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardParametersHeader_webCard on WebCard {
+        ...AccountHeader_webCard
+      }
+    `,
+    webCardKey,
+  );
   return (
     <AccountHeader
-      webCard={webCard}
+      webCard={webCard || null}
       title={intl.formatMessage(
         {
           defaultMessage: 'WebCard{azzappA} parameters',

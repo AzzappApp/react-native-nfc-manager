@@ -13,7 +13,6 @@ const WebCardBackground = ({
       fragment WebCardBackground_webCard on WebCard {
         cardColors {
           dark
-          light
           primary
         }
       }

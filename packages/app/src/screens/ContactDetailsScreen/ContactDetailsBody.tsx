@@ -111,6 +111,12 @@ const ContactDetailsBody = ({
         }
         screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
+        ...contactHelpersShareContactData_contact
+        contactProfile {
+          webCard {
+            ...ContactDetailAvatar_webCard
+          }
+        }
         id
         ...ContactDetailFragmentContact_contact
         ...ContactDetailAvatar_contact

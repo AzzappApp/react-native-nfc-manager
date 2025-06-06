@@ -17,7 +17,7 @@ const AccountHeader = ({
   title,
   leftIcon = 'arrow_left',
 }: {
-  webCard: AccountHeader_webCard$key | null;
+  webCard?: AccountHeader_webCard$key | null;
   title?: React.ReactNode;
   leftIcon?: IconButtonProps['icon'] | null;
 }) => {

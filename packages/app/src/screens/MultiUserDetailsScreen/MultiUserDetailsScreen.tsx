@@ -99,7 +99,7 @@ const MultiUserDetailsScreen = ({
       profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
     return {
-      role: profile?.profileRole,
+      role: convertProfileRole(profile?.profileRole),
       firstName: contactCard?.firstName,
       lastName: contactCard?.lastName,
       //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
@@ -115,12 +115,12 @@ const MultiUserDetailsScreen = ({
       avatar,
       selectedContact: profile?.user?.email
         ? {
-            countryCodeOrEmail: 'email' as const,
+            countryCodeOrEmail: 'email',
             value: profile.user.email,
           }
         : phoneNumber && phoneNumber?.isValid()
           ? {
-              countryCodeOrEmail: phoneNumber.country,
+              countryCodeOrEmail: phoneNumber.country || '',
               value: phoneNumber.formatInternational()!,
             }
           : null,
@@ -656,6 +656,20 @@ const MultiUserDetailsScreen = ({
       ) : null}
     </Container>
   );
+};
+
+// Converts the ProfileRole from the backend to a more user-friendly string and supports unknown values
+const convertProfileRole = (
+  role?: ProfileRole | null,
+): 'admin' | 'editor' | 'owner' | 'user' => {
+  if (role === 'owner') {
+    return 'owner';
+  } else if (role === 'admin') {
+    return 'admin';
+  } else if (role === 'editor') {
+    return 'editor';
+  }
+  return 'user'; // default to user if role is null or not recognized
 };
 
 const roles: Array<{ id: ProfileRole; label: ReactNode }> = [

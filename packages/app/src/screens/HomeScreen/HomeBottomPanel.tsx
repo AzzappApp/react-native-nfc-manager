@@ -11,6 +11,7 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
+import { graphql, useFragment } from 'react-relay';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useTooltipContext } from '#helpers/TooltipContext';
 
@@ -18,16 +19,15 @@ import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 
 import { useHomeScreenContext } from './HomeScreenContext';
-import type { HomeBottomPanelMessage_user$key } from '#relayArtifacts/HomeBottomPanelMessage_user.graphql';
-import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
+import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 
 type HomeBottomPanelProps = {
-  user: HomeBottomPanelMessage_user$key & HomeContactCard_user$key;
+  user: HomeBottomPanel_user$key;
 };
 
 // TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
 
-const HomeBottomPanel = ({ user }: HomeBottomPanelProps) => {
+const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#region Layout
   const { width: windowWidth } = useWindowDimensions();
   const panelHeight = PixelRatio.roundToNearestPixel(
@@ -35,6 +35,15 @@ const HomeBottomPanel = ({ user }: HomeBottomPanelProps) => {
   );
   //#endregion
 
+  const user = useFragment(
+    graphql`
+      fragment HomeBottomPanel_user on User {
+        ...HomeContactCard_user
+        ...HomeBottomPanelMessage_user
+      }
+    `,
+    userKey,
+  );
   // #region MainTabBar visibility
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
   const { bottomContentOpacity } = useHomeScreenContext();

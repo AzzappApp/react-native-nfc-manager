@@ -35,7 +35,6 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
   const webCard = useFragment(
     graphql`
       fragment CardTemplatesList_webCard on WebCard {
-        ...CoverRenderer_webCard
         isPremium
         userName
         cardModules {

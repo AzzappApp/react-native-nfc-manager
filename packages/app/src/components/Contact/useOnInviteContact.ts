@@ -12,7 +12,7 @@ import { usePermissionContext } from '#helpers/PermissionContext';
 import { usePhoneContactBookPermission } from '#hooks/usePhoneContactBookPermission';
 import type { useOnInviteContactDataQuery_contact$key } from '#relayArtifacts/useOnInviteContactDataQuery_contact.graphql';
 
-export const inviteContactFragment_contact = graphql`
+const inviteContactFragment_contact = graphql`
   fragment useOnInviteContactDataQuery_contact on Contact
   @argumentDefinitions(
     pixelRatio: { type: "Float!", provider: "CappedPixelRatio.relayprovider" }

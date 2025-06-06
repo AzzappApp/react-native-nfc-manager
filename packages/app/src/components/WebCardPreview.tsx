@@ -82,7 +82,6 @@ const WebCardPreview = ({
       fragment WebCardPreview_webCard on WebCard {
         coverBackgroundColor
         ...CoverRenderer_webCard
-        ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         coverBackgroundColor
         ...WebCardPreviewFullScreenOverlay_webCard

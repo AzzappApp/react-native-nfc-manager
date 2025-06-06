@@ -94,7 +94,7 @@ const WebCardParametersScreen = ({
         firstName
         lastName
         companyName
-        ...AccountHeader_webCard
+        ...WebCardParametersHeader_webCard
       }
     `,
     webCardNode?.webCard as WebCardParametersScreen_webCard$key | null,

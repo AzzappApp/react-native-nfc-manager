@@ -28,7 +28,6 @@ export const confirmChangeContactQuery = graphql`
       id
       email
       phoneNumber
-      ...HomeScreenContent_user
     }
   }
 `;

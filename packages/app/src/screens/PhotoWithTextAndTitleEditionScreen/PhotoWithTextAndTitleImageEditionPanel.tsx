@@ -33,7 +33,7 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The vertical arrangement currently set on the module
    */
-  verticalArrangement: Omit<VerticalArrangement, '%future added value'>;
+  verticalArrangement: VerticalArrangement;
   /**
    * A callback called when the user update the vertical arrangement
    */
@@ -41,7 +41,7 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The horizontal arrangement currently set on the module
    */
-  horizontalArrangement: Omit<HorizontalArrangement, '%future added value'>;
+  horizontalArrangement: HorizontalArrangement;
   /**
    * A callback called when the user update the horizontal arrangement
    */
