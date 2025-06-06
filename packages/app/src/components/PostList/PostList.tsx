@@ -13,11 +13,11 @@ import { HEADER_HEIGHT } from '#ui/Header';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import { PostListContext } from './PostListsContext';
 import type { ScrollableToOffset } from '#helpers/types';
+import type { PostList_author$key } from '#relayArtifacts/PostList_author.graphql';
 import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
-import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { MutableRefObject } from 'react';
@@ -30,7 +30,7 @@ import type {
 
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
-  author?: PostRendererFragment_author$key;
+  author?: PostList_author$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -91,8 +91,10 @@ const PostList = ({
         ...PostRendererFragment_post
           @arguments(viewerWebCardId: $viewerWebCardId)
         webCard @include(if: $includeAuthor) {
-          ...PostRendererFragment_author
           ...PostList_author
+        }
+        webCard {
+          ...PostRendererFragment_author
         }
       }
     `,
@@ -105,6 +107,7 @@ const PostList = ({
     graphql`
       fragment PostList_author on WebCard {
         id
+        ...PostRendererFragment_author
       }
     `,
     authorKey,

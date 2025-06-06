@@ -18,9 +18,6 @@ const postCommentsMobileScreenQuery = graphql`
     profileNode: node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         ...PostCommentsList_myProfile
-        webCard {
-          ...AuthorCartoucheFragment_webCard
-        }
       }
     }
   }

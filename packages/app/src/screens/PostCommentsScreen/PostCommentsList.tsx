@@ -97,6 +97,8 @@ const PostCommentsList = ({
                 webCard {
                   id
                 }
+                # used in flatList renderItem
+                # eslint-disable-next-line relay/must-colocate-fragment-spreads
                 ...CommentItemFragment_comment
                 ...DeletableCommentItemFragment_comment
                 ...ReportableCommentItemFragment_comment

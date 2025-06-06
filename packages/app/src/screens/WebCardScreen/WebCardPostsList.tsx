@@ -38,8 +38,7 @@ const WebCardPostsList = ({
           ... on WebCard @alias(as: "webCard") {
             ...WebCardPostsList_webCard
               @arguments(viewerWebCardId: $viewerWebCardId)
-            ...PostRendererFragment_author
-            ...PostList_author
+            ...WebCardPostsList_author
           }
         }
       }
@@ -84,7 +83,8 @@ const WebCardPostsList = ({
       />
       {webCard && (
         <PostList
-          webCard={webCard}
+          webCard={node.webCard}
+          author={node.webCard}
           canPlay={hasFocus}
           onPressAuthor={toggleFlip}
         />

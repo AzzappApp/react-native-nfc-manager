@@ -62,8 +62,9 @@ const postCreationScreenQuery = graphql`
     node(id: $webCardId) {
       ... on WebCard @alias(as: "webCard") {
         id
-
         userName
+        # used in picker step
+        # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...AuthorCartoucheFragment_webCard
       }
     }

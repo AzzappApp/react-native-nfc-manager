@@ -25,7 +25,6 @@ import TextAreaModal from '#ui/TextAreaModal';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
-import type { PostRendererActionBar_post$key } from '#relayArtifacts/PostRendererActionBar_post.graphql';
 import type { PostRendererBottomPanelDeletePostMutation } from '#relayArtifacts/PostRendererBottomPanelDeletePostMutation.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '#relayArtifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
@@ -49,10 +48,9 @@ type PostRendererBottomPanelProps = {
   /**
    * The post to display
    *
-   * @type { PostRendererActionBar_post$key & PostRendererBottomPanelFragment_post$key}
+   * @type PostRendererBottomPanelFragment_post$key
    */
-  post: PostRendererActionBar_post$key &
-    PostRendererBottomPanelFragment_post$key;
+  post: PostRendererBottomPanelFragment_post$key;
   /**
    * Allow actions
    *
@@ -78,7 +76,7 @@ const PostRendererBottomPanel = ({
   const post = useFragment(
     graphql`
       fragment PostRendererBottomPanelFragment_post on Post
-      @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
+      @argumentDefinitions(viewerWebCardId: { type: "ID!" }) {
         id
         content
         counterComments
@@ -97,9 +95,11 @@ const PostRendererBottomPanel = ({
           isFollowing(webCardId: $viewerWebCardId)
         }
         createdAt
+        ...PostRendererActionBar_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
       }
     `,
-    postKey as PostRendererBottomPanelFragment_post$key,
+    postKey,
   );
 
   const intl = useIntl();
@@ -464,7 +464,7 @@ const PostRendererBottomPanel = ({
       <View style={styles.bottomContainerPost}>
         <PostRendererActionBar
           style={{ marginTop: 10 }}
-          postKey={postKey}
+          postKey={post}
           actionEnabled={actionEnabled}
           onActionDisabled={onActionDisabled}
         />

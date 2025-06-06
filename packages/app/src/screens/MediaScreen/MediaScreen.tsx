@@ -58,7 +58,6 @@ const mediaScreenQuery = graphql`
       ... on Profile @alias(as: "profile") {
         invited
         ...MediaSuggestionsScreen_profile
-        ...MediaSuggestionsWebCards_profile
         webCard {
           id
           userName
@@ -66,8 +65,7 @@ const mediaScreenQuery = graphql`
           coverIsPredefined
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
-          ...PostRendererFragment_author
-          ...PostList_author
+          ...WebCardPostsList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
           ...WebCardStatHeader_webCard
@@ -251,6 +249,7 @@ const MediaScreen = ({
           <Suspense>
             <ProfilePostsList
               webCard={profile.webCard}
+              author={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
               onScroll={onScroll}
               ListHeaderComponent={

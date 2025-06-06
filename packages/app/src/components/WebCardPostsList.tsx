@@ -1,22 +1,24 @@
-import { useState, useCallback, useMemo, memo } from 'react';
+import { useState, useCallback, memo, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import { usePaginationFragment, graphql } from 'react-relay';
+import { usePaginationFragment, graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostList from './PostList';
 import type { ScrollableToOffset } from '#helpers/types';
-import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
+import type { WebCardPostsList_author$key } from '#relayArtifacts/WebCardPostsList_author.graphql';
 import type { WebCardPostsList_webCard$key } from '#relayArtifacts/WebCardPostsList_webCard.graphql';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 const WebCardPostsList = ({
   webCard,
+  author: authorKey,
   canPlay,
   onPressAuthor,
   onScroll,
   ListHeaderComponent,
   scrollableRef,
 }: {
-  webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
+  webCard: WebCardPostsList_webCard$key;
+  author: WebCardPostsList_author$key;
   canPlay: boolean;
   onPressAuthor?: () => void;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
@@ -52,8 +54,17 @@ const WebCardPostsList = ({
           }
         }
       `,
-      webCard as WebCardPostsList_webCard$key,
+      webCard,
     );
+
+  const author = useFragment(
+    graphql`
+      fragment WebCardPostsList_author on WebCard {
+        ...PostList_author
+      }
+    `,
+    authorKey,
+  );
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -92,7 +103,7 @@ const WebCardPostsList = ({
     <PostList
       posts={posts}
       onPressAuthor={onPressAuthor}
-      author={webCard}
+      author={author}
       canPlay={canPlay}
       refreshing={refreshing}
       onEndReached={onEndReached}
