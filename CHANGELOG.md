@@ -1,3 +1,10 @@
+## 2.0.0-rc.16
+
+* **fix:**  - **android:** [#8372](https://github.com/AzzappApp/azzapp/pull/8372) keyboard opening may close modal ([#9275](https://github.com/AzzappApp/azzapp/pull/9275))
+* **fix:**  - **tools:** [#9268](https://github.com/AzzappApp/azzapp/pull/9268) check roles on sensitive actions ([#9269](https://github.com/AzzappApp/azzapp/pull/9269))
+* **fix:**  - **android:** [#9239](https://github.com/AzzappApp/azzapp/pull/9239) use view to set border ([#9273](https://github.com/AzzappApp/azzapp/pull/9273))
+* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) webcard module case ([#9271](https://github.com/AzzappApp/azzapp/pull/9271))
+
 ## 2.0.0-rc.15
 
 
