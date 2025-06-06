@@ -724,7 +724,13 @@ struct ContentView: View {
       return nil
     }
 
-    return String(data: data, encoding: .utf8)
+    // Try UTF-8 first, fallback to Latin-1 if that fails
+     if let utf8String = String(data: data, encoding: .utf8) {
+       return utf8String
+     } else if let latin1String = String(data: data, encoding: .isoLatin1) {
+       return latin1String
+     }
+     return nil
   }
 
   struct ContentView_Previews: PreviewProvider {
