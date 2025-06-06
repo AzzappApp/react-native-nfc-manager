@@ -1,3 +1,7 @@
+## 2.1.0-canary.9
+
+* **feat:**  - add relai eslint plugin ([#9249](https://github.com/AzzappApp/azzapp/pull/9249))
+
 ## 2.1.0-canary.8
 
 * **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
