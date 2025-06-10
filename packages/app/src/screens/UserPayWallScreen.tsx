@@ -482,7 +482,6 @@ const UserPayWallScreen = ({
         icon="arrow_down"
         style={styles.icon}
         iconStyle={styles.iconStyle}
-        variant="icon"
         onPress={router.back}
         size={50}
       />
@@ -863,10 +862,10 @@ const styles = StyleSheet.create({
   descriptionText: { color: colors.grey400 },
   subTitleText: { textAlign: 'center', color: colors.black },
   icon: {
-    backgroundColor: colors.black,
     position: 'absolute',
     top: 50,
     right: 15,
+    backgroundColor: colors.black,
   },
   iconStyle: { tintColor: colors.white },
   buttonSubscribe: { width: '100%', marginTop: 5 },

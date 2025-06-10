@@ -2,7 +2,6 @@
 
 exports[`BottomSheetTextEditorButton component disabled state 1`] = `
 <View
-  accessibilityRole="button"
   accessibilityState={
     {
       "busy": undefined,
@@ -36,20 +35,15 @@ exports[`BottomSheetTextEditorButton component disabled state 1`] = `
     [
       [
         {
-          "aspectRatio": 1,
-          "height": 50,
-          "minWidth": 50,
+          "alignItems": "center",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 33,
+          "borderWidth": 1,
+          "height": "100%",
+          "justifyContent": "center",
+          "width": 54,
         },
-        [
-          {
-            "borderColor": "#F5F5F6",
-            "borderRadius": 33,
-            "borderWidth": 1,
-            "height": "100%",
-            "width": 54,
-          },
-          undefined,
-        ],
+        undefined,
       ],
       {
         "opacity": 1,
@@ -57,53 +51,33 @@ exports[`BottomSheetTextEditorButton component disabled state 1`] = `
     ]
   }
 >
-  <View
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
     style={
       [
         {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "flex": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
-          "width": "100%",
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
         },
         {
-          "borderRadius": 25,
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
         },
       ]
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-        }
-      }
-      style={
-        [
-          {
-            "height": 12,
-            "resizeMode": "contain",
-            "width": 12,
-          },
-          {
-            "tintColor": "#0E1216",
-          },
-          {
-            "tintColor": "#C8C7CA",
-          },
-        ]
-      }
-    />
-  </View>
+  />
 </View>
 `;
 
 exports[`BottomSheetTextEditorButton component selected state 1`] = `
 <View
-  accessibilityRole="button"
   accessibilityState={
     {
       "busy": undefined,
@@ -137,22 +111,17 @@ exports[`BottomSheetTextEditorButton component selected state 1`] = `
     [
       [
         {
-          "aspectRatio": 1,
-          "height": 50,
-          "minWidth": 50,
+          "alignItems": "center",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 33,
+          "borderWidth": 1,
+          "height": "100%",
+          "justifyContent": "center",
+          "width": 54,
         },
-        [
-          {
-            "borderColor": "#F5F5F6",
-            "borderRadius": 33,
-            "borderWidth": 1,
-            "height": "100%",
-            "width": 54,
-          },
-          {
-            "backgroundColor": "#F5F5F6",
-          },
-        ],
+        {
+          "backgroundColor": "#F5F5F6",
+        },
       ],
       {
         "opacity": 1,
@@ -160,53 +129,33 @@ exports[`BottomSheetTextEditorButton component selected state 1`] = `
     ]
   }
 >
-  <View
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
     style={
       [
         {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "flex": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
-          "width": "100%",
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
         },
         {
-          "borderRadius": 25,
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
         },
       ]
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-        }
-      }
-      style={
-        [
-          {
-            "height": 12,
-            "resizeMode": "contain",
-            "width": 12,
-          },
-          {
-            "tintColor": "#0E1216",
-          },
-          {
-            "tintColor": "#C8C7CA",
-          },
-        ]
-      }
-    />
-  </View>
+  />
 </View>
 `;
 
 exports[`BottomSheetTextEditorButton component unselected state 1`] = `
 <View
-  accessibilityRole="button"
   accessibilityState={
     {
       "busy": undefined,
@@ -240,20 +189,15 @@ exports[`BottomSheetTextEditorButton component unselected state 1`] = `
     [
       [
         {
-          "aspectRatio": 1,
-          "height": 50,
-          "minWidth": 50,
+          "alignItems": "center",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 33,
+          "borderWidth": 1,
+          "height": "100%",
+          "justifyContent": "center",
+          "width": 54,
         },
-        [
-          {
-            "borderColor": "#F5F5F6",
-            "borderRadius": 33,
-            "borderWidth": 1,
-            "height": "100%",
-            "width": 54,
-          },
-          undefined,
-        ],
+        undefined,
       ],
       {
         "opacity": 1,
@@ -261,46 +205,27 @@ exports[`BottomSheetTextEditorButton component unselected state 1`] = `
     ]
   }
 >
-  <View
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
     style={
       [
         {
-          "alignItems": "center",
-          "borderColor": "#000000",
-          "borderWidth": 1,
-          "flex": 1,
-          "justifyContent": "center",
-          "overflow": "hidden",
-          "width": "100%",
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
         },
         {
-          "borderRadius": 25,
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
         },
       ]
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
-        }
-      }
-      style={
-        [
-          {
-            "height": 12,
-            "resizeMode": "contain",
-            "width": 12,
-          },
-          {
-            "tintColor": "#0E1216",
-          },
-          {
-            "tintColor": "#C8C7CA",
-          },
-        ]
-      }
-    />
-  </View>
+  />
 </View>
 `;

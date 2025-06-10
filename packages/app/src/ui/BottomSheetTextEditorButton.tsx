@@ -1,7 +1,8 @@
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 
-import IconButton from './IconButton';
+import Icon from './Icon';
+import PressableNative from './PressableNative';
 import type { TextAndSelection } from './BottomSheetTextEditorTypes';
 import type { Icons } from './Icon';
 import type { RichTextASTTags } from '@azzapp/shared/richText/richTextTypes';
@@ -36,22 +37,26 @@ export const BottomSheetTextEditorButton = ({
     !isFocused ||
     textAndSelection.selection?.start === textAndSelection.selection?.end;
 
+  const onPressIcon = () => onPress(tag);
+
   return (
-    <IconButton
-      icon={icon}
-      iconSize={iconSize}
-      variant="border"
-      onPress={() => onPress(tag)}
-      iconStyle={isDisableInner ? styles.buttonDisable : undefined}
+    <PressableNative
       style={[
         styles.button,
         textAndSelection.selectedTag.find(t => t === tag) === undefined
           ? undefined
           : styles.buttonSelected,
       ]}
+      onPress={onPressIcon}
       disabled={isDisableInner}
       disabledOpacity={1}
-    />
+    >
+      <Icon
+        icon={icon}
+        size={iconSize}
+        style={isDisableInner ? styles.buttonDisable : undefined}
+      />
+    </PressableNative>
   );
 };
 
@@ -62,6 +67,8 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'dark' ? colors.grey900 : colors.grey50,
     borderWidth: 1,
     height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonDisable: {
     tintColor: appearance === 'dark' ? colors.grey800 : colors.grey200,

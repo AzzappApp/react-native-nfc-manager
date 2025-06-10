@@ -1,10 +1,9 @@
 import {
   BottomSheetBackdrop,
   BottomSheetModal as BottomSheetModalG,
-  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import Animated, {
   Easing,
   Extrapolation,
@@ -217,7 +216,7 @@ const BottomSheetModal = ({
       {nestedScroll ? (
         children
       ) : (
-        <BottomSheetView
+        <View
           style={[
             styles.container,
             {
@@ -233,7 +232,7 @@ const BottomSheetModal = ({
           <Animated.View style={[styles.container, keyboardAvoidAnimatedStyle]}>
             {children}
           </Animated.View>
-        </BottomSheetView>
+        </View>
       )}
     </BottomSheetModalG>
   );

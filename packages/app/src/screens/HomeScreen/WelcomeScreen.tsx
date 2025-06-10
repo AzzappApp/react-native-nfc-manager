@@ -13,6 +13,7 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
 import Text from '#ui/Text';
@@ -62,18 +63,21 @@ export const WelcomeScreen = ({
     <LoadingView />
   ) : (
     <View style={[styles.container, { paddingTop: top }]}>
-      <View style={styles.header}>
-        <Image
-          source={require('#assets/welcome/welcome_logo.png')}
-          style={styles.logo}
-        />
-        <IconButton
-          icon="menu"
-          style={styles.menu}
-          iconStyle={{ tintColor: colors.black }}
-          onPress={open}
-        />
-      </View>
+      <Header
+        middleElement={
+          <Image source={require('#assets/welcome/welcome_logo.png')} />
+        }
+        rightElement={
+          <IconButton
+            icon="menu"
+            style={styles.menu}
+            iconStyle={{ tintColor: colors.black }}
+            onPress={open}
+            variant="icon"
+          />
+        }
+      />
+
       <Video
         source={require('../../assets/welcome/home_welcome.mp4')}
         isLooping
@@ -170,11 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.white,
   },
-  logo: {
-    marginHorizontal: 120,
 
-    position: 'absolute',
-  },
   imageContainer: {
     marginTop: 70,
     height: '60%',
@@ -201,12 +201,10 @@ const styles = StyleSheet.create({
   },
   menu: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 25,
-    borderWidth: 0,
   },
   icon: {
     color: colors.white,
   },
-  header: { backgroundColor: colors.white, height: 50 },
 });
