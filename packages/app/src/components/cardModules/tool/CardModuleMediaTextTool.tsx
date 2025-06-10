@@ -174,6 +174,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         lazy
         height={600}
         enableContentPanningGesture={false}
+        enableDynamicSizing={false}
         keyboardBehavior={
           module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
         }
