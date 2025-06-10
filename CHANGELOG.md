@@ -1,3 +1,9 @@
+## 2.0.0-rc.21
+
+* **fix:**  - **posts:** [#9301](https://github.com/AzzappApp/azzapp/pull/9301) wrong iconButton on header ([#9304](https://github.com/AzzappApp/azzapp/pull/9304))
+* **fix:**  - **contact:** [#9299](https://github.com/AzzappApp/azzapp/pull/9299) dynamic sizing requires BottomSheetView ([#9303](https://github.com/AzzappApp/azzapp/pull/9303))
+* **fix:**  - **analytics:** [#9297](https://github.com/AzzappApp/azzapp/pull/9297) wrong use of iconButton ([#9298](https://github.com/AzzappApp/azzapp/pull/9298))
+
 ## 2.0.0-rc.20
 
 * **fix:**  - **contact:** [#9292](https://github.com/AzzappApp/azzapp/pull/9292) count all unapproved enrichments ([#9294](https://github.com/AzzappApp/azzapp/pull/9294))
