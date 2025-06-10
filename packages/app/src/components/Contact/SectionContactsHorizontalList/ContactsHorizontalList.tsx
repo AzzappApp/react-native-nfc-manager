@@ -6,7 +6,6 @@ import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
-import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
@@ -41,12 +40,7 @@ const ContactsScreenSection = ({
     graphql`
       fragment ContactsHorizontalList_contacts on Contact @relay(plural: true) {
         id
-        meetingPlace {
-          city
-          country
-          region
-          subregion
-        }
+        meetingPlaceFriendlyName
         ...ContactHorizontalItem_contact
       }
     `,
@@ -72,9 +66,7 @@ const ContactsScreenSection = ({
   const locations = showLocationInSubtitle
     ? Array.from(
         new Set(
-          contacts
-            .map(x => getFriendlyNameFromLocation(x.meetingPlace))
-            .filter(isDefined),
+          contacts.map(x => x.meetingPlaceFriendlyName).filter(isDefined),
         ),
       )
         .sort((x, y) => (x > y ? 1 : -1))

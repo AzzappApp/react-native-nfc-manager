@@ -4,7 +4,6 @@ import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -39,12 +38,7 @@ const ContactsListItem = ({
           label
         }
         meetingDate
-        meetingPlace {
-          city
-          country
-          region
-          subregion
-        }
+        meetingPlaceFriendlyName
         enrichmentStatus
         enrichment {
           approved
@@ -98,7 +92,6 @@ const ContactsListItem = ({
     contact.enrichmentStatus === 'completed' &&
     contact.enrichment?.approved === null;
 
-  const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
     <View key={contact.id}>
       <PressableNative
@@ -151,7 +144,9 @@ const ContactsListItem = ({
             {contact.meetingDate
               ? new Date(contact.meetingDate).toLocaleDateString()
               : null}
-            {location ? ` - ${location}` : ''}
+            {contact.meetingPlaceFriendlyName
+              ? ` - ${contact.meetingPlaceFriendlyName}`
+              : ''}
           </Text>
         </View>
         <View style={styles.actions}>

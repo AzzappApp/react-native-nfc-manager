@@ -206,4 +206,14 @@ export const Contact: ContactResolvers = {
     }
     return null;
   },
+  meetingPlaceFriendlyName: contact => {
+    if (!contact.meetingPlace) return null;
+    return (
+      contact.meetingPlace.city ||
+      contact.meetingPlace.subregion ||
+      contact.meetingPlace.region ||
+      contact.meetingPlace.country ||
+      null
+    );
+  },
 };

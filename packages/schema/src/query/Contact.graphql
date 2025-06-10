@@ -22,6 +22,7 @@ type Contact implements Node {
   deleted: Boolean
   logo: Media
   meetingPlace: Address
+  meetingPlaceFriendlyName: String
   meetingDate: DateTime
   note: String
   enrichment: ContactEnrichment

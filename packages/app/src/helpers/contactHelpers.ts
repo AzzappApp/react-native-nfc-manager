@@ -552,17 +552,6 @@ export const useShareContact = () => {
   };
 };
 
-export const getFriendlyNameFromLocation = (
-  meetingPlace?: ContactMeetingPlaceType | null,
-) => {
-  return (
-    meetingPlace?.city ||
-    meetingPlace?.subregion ||
-    meetingPlace?.region ||
-    meetingPlace?.country
-  );
-};
-
 export const contactSchema = z
   .object({
     firstName: z.string().nullable().optional(),
@@ -870,13 +859,7 @@ export const addContactUpdater = (
       }
     }
     if (variables?.location) {
-      const meetingPlace = newContact.getLinkedRecord('meetingPlace');
-      const location = getFriendlyNameFromLocation({
-        city: meetingPlace?.getValue('city') as string | null,
-        region: meetingPlace?.getValue('region') as string | null,
-        subregion: meetingPlace?.getValue('subregion') as string | null,
-        country: meetingPlace?.getValue('country') as string | null,
-      });
+      const location = newContact.getValue('meetingPlaceFriendlyName');
       if (location !== variables.location) {
         return;
       }
@@ -944,15 +927,7 @@ export const addContactUpdater = (
     ) {
       return;
     }
-    const meetingPlace = newContact.getLinkedRecord('meetingPlace');
-    const location: string | null = meetingPlace
-      ? (getFriendlyNameFromLocation({
-          city: meetingPlace?.getValue('city') as string | null,
-          region: meetingPlace?.getValue('region') as string | null,
-          subregion: meetingPlace?.getValue('subregion') as string | null,
-          country: meetingPlace?.getValue('country') as string | null,
-        }) ?? null)
-      : null;
+    const location = newContact.getValue('meetingPlaceFriendlyName');
 
     const locationEdge = userByLocationsConnection
       .getLinkedRecords('edges')

@@ -9,7 +9,6 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
-import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import Button from '#ui/Button';
 import Icon, { SocialIcon } from '#ui/Icon';
@@ -55,12 +54,7 @@ export const ContactDetailFragmentContact = ({
       fragment ContactDetailFragmentContact_contact on Contact {
         ...NoteItem_contact
         meetingDate
-        meetingPlace {
-          city
-          country
-          region
-          subregion
-        }
+        meetingPlaceFriendlyName
         birthday
         phoneNumbers {
           label
@@ -117,10 +111,6 @@ export const ContactDetailFragmentContact = ({
         day: 'numeric',
         year: 'numeric',
       })
-    : undefined;
-
-  const meetingPlace = data?.meetingPlace
-    ? getFriendlyNameFromLocation(data.meetingPlace)
     : undefined;
 
   const displayedBirthday = !hiddenFields.contact.birthday
@@ -217,7 +207,7 @@ export const ContactDetailFragmentContact = ({
       </View>
       {meetingDate && (
         <Text variant="small" style={styles.meetingDate}>
-          {meetingPlace
+          {data?.meetingPlaceFriendlyName
             ? intl.formatMessage(
                 {
                   defaultMessage: 'Connected in {location} on {date}',
@@ -225,7 +215,7 @@ export const ContactDetailFragmentContact = ({
                     'ContactDetailsModal - Connected label with location and date',
                 },
                 {
-                  location: meetingPlace,
+                  location: data?.meetingPlaceFriendlyName,
                   date: meetingDate,
                 },
               )
