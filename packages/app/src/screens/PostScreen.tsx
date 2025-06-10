@@ -109,13 +109,7 @@ const PostScreen = ({
           description: 'Post screen header title',
         })}
         leftElement={
-          <IconButton
-            icon="arrow_down"
-            onPress={onClose}
-            iconSize={30}
-            size={47}
-            style={styles.noBorder}
-          />
+          <IconButton icon="arrow_down" onPress={onClose} variant="icon" />
         }
       />
       {!post ? (
@@ -275,5 +269,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
   },
-  noBorder: { borderWidth: 0 },
 });
