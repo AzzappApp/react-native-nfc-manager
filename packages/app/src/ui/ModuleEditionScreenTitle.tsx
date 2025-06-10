@@ -1,7 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
 import Text from './Text';
@@ -20,8 +19,7 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
     graphql`
       fragment ModuleEditionScreenTitle_webCard on WebCard {
         isPremium
-        isMultiUser
-        webCardKind
+        requiresSubscription
       }
     `,
     webCardKey,
@@ -31,7 +29,7 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
     <View style={styles.container}>
       <Text variant="large">{label}</Text>
       {!webCard?.isPremium ? (
-        webCard && webCardRequiresSubscription(webCard) ? (
+        webCard && webCard.requiresSubscription ? (
           <View style={styles.pro}>
             <Text variant="medium" style={styles.proText}>
               <FormattedMessage

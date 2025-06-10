@@ -34,9 +34,8 @@ const query = graphql`
         webCard {
           id
           userName
-          webCardKind
-          isMultiUser
           isPremium
+          requiresSubscription
         }
       }
     }
@@ -148,8 +147,9 @@ const WebCardTemplateSelectionScreen = ({
               {selectedTemplate &&
                 profile?.webCard &&
                 !profile?.webCard.isPremium &&
-                !currentUser?.isPremium && (
-                  <WebCardBuilderSubtitle webCard={profile.webCard} />
+                !currentUser?.isPremium &&
+                profile.webCard.requiresSubscription && (
+                  <WebCardBuilderSubtitle />
                 )}
             </View>
           }

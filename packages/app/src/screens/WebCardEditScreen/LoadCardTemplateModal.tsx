@@ -46,10 +46,9 @@ const LoadCardTemplateModal = ({
     graphql`
       fragment LoadCardTemplateModal_webCard on WebCard {
         id
-        webCardKind
         isPremium
-        isMultiUser
         cardModulesCount
+        requiresSubscription
       }
     `,
     webCardKey,
@@ -156,9 +155,9 @@ const LoadCardTemplateModal = ({
                     description="WebCard creation screen title"
                   />
                 </Text>
-                {selectedTemplate && !webCard.isPremium && (
-                  <WebCardBuilderSubtitle webCard={webCard} />
-                )}
+                {selectedTemplate &&
+                  !webCard.isPremium &&
+                  webCard.requiresSubscription && <WebCardBuilderSubtitle />}
               </View>
             }
             rightElement={

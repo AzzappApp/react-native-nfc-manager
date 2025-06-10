@@ -83,9 +83,8 @@ const WebCardEditScreenHeader = ({
     graphql`
       fragment WebCardEditScreenHeader_webCard on WebCard {
         isPremium
-        webCardKind
-        isMultiUser
         cardModulesCount
+        requiresSubscription
       }
     `,
     webCardKey,
@@ -142,9 +141,9 @@ const WebCardEditScreenHeader = ({
                   />
                 )}
               </Text>
-              {webCard && !webCard.isPremium && (
-                <WebCardBuilderSubtitle webCard={webCard} />
-              )}
+              {webCard &&
+                !webCard.isPremium &&
+                webCard.requiresSubscription && <WebCardBuilderSubtitle />}
             </View>
           }
           leftElement={
