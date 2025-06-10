@@ -1,3 +1,7 @@
+## 2.0.0-rc.20
+
+* **fix:**  - **contact:** [#9292](https://github.com/AzzappApp/azzapp/pull/9292) count all unapproved enrichments ([#9294](https://github.com/AzzappApp/azzapp/pull/9294))
+
 ## 2.0.0-rc.19
 
 * **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) don’t display hidden avatar ([#9293](https://github.com/AzzappApp/azzapp/pull/9293))
