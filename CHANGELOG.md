@@ -1,3 +1,7 @@
+## 2.0.0-rc.19
+
+* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) don’t display hidden avatar ([#9293](https://github.com/AzzappApp/azzapp/pull/9293))
+
 ## 2.0.0-rc.18
 
 * **fix:**  - IconButton display + bottom sheet behavior ([#9289](https://github.com/AzzappApp/azzapp/pull/9289))
