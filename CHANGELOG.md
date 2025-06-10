@@ -1,3 +1,7 @@
+## 2.0.0-rc.18
+
+* **fix:**  - IconButton display + bottom sheet behavior ([#9289](https://github.com/AzzappApp/azzapp/pull/9289))
+
 ## 2.0.0-rc.17
 
 * **fix:**  - **tools:** [#9286](https://github.com/AzzappApp/azzapp/pull/9286) editor can access to cover edition ([#9287](https://github.com/AzzappApp/azzapp/pull/9287))
