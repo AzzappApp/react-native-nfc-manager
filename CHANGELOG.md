@@ -1,3 +1,7 @@
+## 2.0.0-rc.22
+
+* **fix:**  - **imagePicker:** [#9307](https://github.com/AzzappApp/azzapp/pull/9307) wrong back button ([#9309](https://github.com/AzzappApp/azzapp/pull/9309))
+
 ## 2.0.0-rc.21
 
 * **fix:**  - **posts:** [#9301](https://github.com/AzzappApp/azzapp/pull/9301) wrong iconButton on header ([#9304](https://github.com/AzzappApp/azzapp/pull/9304))
