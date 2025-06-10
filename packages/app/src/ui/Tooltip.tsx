@@ -24,6 +24,7 @@ const Tooltip = ({
   }) => {
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
+
   return (
     <Popover
       mode={PopoverMode.JS_MODAL}
@@ -80,7 +81,7 @@ const Tooltip = ({
 export default Tooltip;
 
 const styles = StyleSheet.create({
-  contentContainer: { padding: 10, gap: 5 },
+  contentContainer: { padding: 10, gap: 5, pointerEvents: 'box-none' },
   contentHeader: {
     textAlign: 'center',
   },

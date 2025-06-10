@@ -1,4 +1,10 @@
-import { forwardRef, type ForwardedRef, type ReactNode } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  type ForwardedRef,
+  type ReactNode,
+} from 'react';
 import { View, type ScrollViewProps } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTooltipContext } from '#helpers/TooltipContext';
@@ -52,8 +58,19 @@ const WebCardEditScreenScrollView = (
     toggleTooltips(['cover', 'editFooter', 'section']);
   };
 
+  const contentRef = useRef<View>(null);
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
+  useEffect(() => {
+    registerTooltip('section', {
+      ref: contentRef,
+    });
+    return () => {
+      unregisterTooltip('section');
+    };
+  }, [registerTooltip, unregisterTooltip, contentRef]);
+
   return (
-    <>
+    <View ref={contentRef}>
       <IconButton
         icon="information"
         iconSize={26}
@@ -121,7 +138,7 @@ const WebCardEditScreenScrollView = (
           </View>
         </ChildPositionAwareScrollView>
       </View>
-    </>
+    </View>
   );
 };
 

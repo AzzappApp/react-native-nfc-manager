@@ -65,9 +65,6 @@ const Tooltips = () => {
   return (
     <>
       <Tooltip
-        mode={
-          Platform.OS === 'ios' ? PopoverMode.RN_MODAL : PopoverMode.JS_MODAL
-        }
         offset={Platform.OS === 'ios' ? -10 : 30}
         from={tooltips['profileLink']?.ref as RefObject<Component>}
         placement={Placement.TOP}
@@ -133,6 +130,9 @@ Get your QR code scanned to share both contact details and digital profile."
         />
       )}
       <Tooltip
+        // The RN_MODAL mode is used to ensure background
+        // is not clickable during popup opening on ios
+        mode={PopoverMode.RN_MODAL}
         from={tooltips['profileEdit']?.ref as RefObject<Component>}
         placement={Placement.TOP}
         offset={Platform.OS === 'ios' ? -10 : 30}

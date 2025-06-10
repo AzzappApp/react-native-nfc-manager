@@ -115,7 +115,6 @@ const WebCardEditScreenHeader = ({
           left: 0,
           height: HEADER_HEIGHT + 4,
           width: '100%',
-          zIndex: 1,
         },
         animatedStyle,
       ]}

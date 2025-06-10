@@ -480,7 +480,7 @@ const WebCardEditScreen = ({
           />
         </Suspense>
       </Container>
-      <Tooltips />
+      <Tooltips scrollViewRef={scrollViewRef} />
     </TooltipProvider>
   );
 };
