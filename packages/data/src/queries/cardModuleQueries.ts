@@ -1,4 +1,4 @@
-import { inArray, eq, asc, and, sql } from 'drizzle-orm';
+import { inArray, eq, asc, and, sql, count } from 'drizzle-orm';
 import { db } from '../database';
 import { CardModuleTable } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -66,6 +66,15 @@ export const getCardModulesByWebCards = async (
     {} as Record<string, CardModule[]>,
   );
 };
+
+export const getCardModulesCountByWebCard = async (
+  webCardIds: string,
+): Promise<number> =>
+  db()
+    .select({ count: count() })
+    .from(CardModuleTable)
+    .where(eq(CardModuleTable.webCardId, webCardIds))
+    .then(result => result[0].count);
 
 /**
  * Find the next position for a card module in a given web card

@@ -118,6 +118,7 @@ const TitleTextModuleWebCardEditionScreen = (
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

@@ -159,10 +159,6 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
       data?.node?.profile?.webCard as withCardModule_webCard$key,
     );
 
-    const cardModulesCount = useMemo(
-      () => webCard?.cardModules?.length ?? 0,
-      [webCard?.cardModules?.length],
-    );
     // #endregion
 
     // #region save data
@@ -239,7 +235,6 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
           canSave={canSave}
           save={save}
           webCardKey={webCard}
-          cardModulesCount={cardModulesCount}
         />
         <CardModuleTabView viewMode={viewMode} onChange={setViewMode} />
         <Suspense>

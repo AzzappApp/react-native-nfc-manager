@@ -199,6 +199,7 @@ const BlockTextEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

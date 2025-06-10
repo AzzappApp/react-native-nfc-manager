@@ -10,6 +10,7 @@ import {
   transaction,
   getCardModuleNextPosition,
   updateWebCard,
+  getCardModulesCountByWebCard,
 } from '@azzapp/data';
 import { checkMedias } from '@azzapp/service/mediaServices/mediaServices';
 import {
@@ -120,7 +121,8 @@ const createModuleSavingMutation =
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);
     }
-    return { webCard };
+    const cardModulesCount = await getCardModulesCountByWebCard(webCardId);
+    return { webCard: { ...webCard, cardModulesCount } };
   };
 
 export const MODULES_SAVE_RULES: {

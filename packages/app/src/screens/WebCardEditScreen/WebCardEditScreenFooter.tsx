@@ -89,9 +89,7 @@ const WebCardEditScreenFooter = ({
   const webCard = useFragment(
     graphql`
       fragment WebCardEditScreenFooter_webCard on WebCard {
-        cardModules {
-          id
-        }
+        cardModulesCount
         ...WebCardColorPicker_webCard
       }
     `,
@@ -203,7 +201,7 @@ const WebCardEditScreenFooter = ({
     };
   }, [registerTooltip, unregisterTooltip]);
 
-  if (webCard.cardModules.length === 0) {
+  if (webCard.cardModulesCount === 0) {
     return null;
   }
 

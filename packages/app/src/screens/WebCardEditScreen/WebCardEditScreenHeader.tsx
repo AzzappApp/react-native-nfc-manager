@@ -86,10 +86,7 @@ const WebCardEditScreenHeader = ({
         isPremium
         webCardKind
         isMultiUser
-        cardModules {
-          id
-          kind
-        }
+        cardModulesCount
       }
     `,
     webCardKey,
@@ -164,7 +161,7 @@ const WebCardEditScreenHeader = ({
                 })}
               />
             )) ||
-            (webCard.cardModules?.length > 0 && (
+            (webCard.cardModulesCount > 0 && (
               <HeaderButton
                 disabled={disabledButtons}
                 variant="secondary"

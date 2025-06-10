@@ -247,6 +247,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

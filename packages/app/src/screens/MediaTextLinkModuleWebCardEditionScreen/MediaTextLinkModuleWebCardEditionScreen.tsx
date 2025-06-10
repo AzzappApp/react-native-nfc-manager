@@ -155,6 +155,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

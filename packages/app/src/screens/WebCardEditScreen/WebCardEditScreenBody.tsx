@@ -226,6 +226,7 @@ const WebCardEditScreenBody = (
           webCard {
             id
             requiresSubscription
+            cardModulesCount
           }
         }
       }
@@ -245,6 +246,7 @@ const WebCardEditScreenBody = (
           webCard {
             id
             requiresSubscription
+            cardModulesCount
           }
         }
       }

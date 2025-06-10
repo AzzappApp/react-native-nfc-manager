@@ -50,10 +50,7 @@ const LoadCardTemplateModal = ({
         cardIsPublished
         isPremium
         isMultiUser
-        cardModules {
-          id
-          kind
-        }
+        cardModulesCount
       }
     `,
     webCardKey,
@@ -102,7 +99,7 @@ const LoadCardTemplateModal = ({
     commitCardTemplate(cardTemplate.id);
   }, [cardTemplate, commitCardTemplate]);
 
-  const showWarning = Boolean(webCard.cardModules?.length);
+  const showWarning = !!webCard.cardModulesCount;
 
   const applyTemplate = useCallback(
     (template: CardTemplateItem) => {

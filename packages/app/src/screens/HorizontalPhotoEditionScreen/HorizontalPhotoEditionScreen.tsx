@@ -194,6 +194,7 @@ const HorizontalPhotoEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

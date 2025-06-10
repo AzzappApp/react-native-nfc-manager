@@ -220,6 +220,7 @@ const SimpleTextEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

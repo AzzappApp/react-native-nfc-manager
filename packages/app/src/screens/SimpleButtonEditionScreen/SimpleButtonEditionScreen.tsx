@@ -223,6 +223,7 @@ const SimpleButtonEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

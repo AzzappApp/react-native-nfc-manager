@@ -217,6 +217,7 @@ const SocialLinksEditionScreen = ({
           webCard {
             id
             requiresSubscription
+            cardModulesCount
             cardModules {
               id
               kind

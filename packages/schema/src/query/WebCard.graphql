@@ -97,6 +97,10 @@ type WebCard implements Node {
   """
   cardModules: [CardModule!]!
   """
+  the number of WebCard modules
+  """
+  cardModulesCount: Int!
+  """
   Is the webCard published
   """
   cardIsPublished: Boolean!

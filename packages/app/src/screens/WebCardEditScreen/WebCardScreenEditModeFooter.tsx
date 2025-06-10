@@ -46,9 +46,7 @@ const WebCardScreenEditModeFooter = ({
           dark
           light
         }
-        cardModules {
-          id
-        }
+        cardModulesCount
       }
     `,
     webCardKey,
@@ -107,7 +105,7 @@ const WebCardScreenEditModeFooter = ({
     <View
       style={[styles.root, styles.creation, { paddingBottom: bottom + 30 }]}
     >
-      {webCard.cardModules.length === 0 && (
+      {webCard.cardModulesCount === 0 && (
         <View style={styles.lottieContainer}>
           <View style={styles.lottie}>
             <LottieView
@@ -121,7 +119,7 @@ const WebCardScreenEditModeFooter = ({
           </View>
         </View>
       )}
-      {webCard.cardModules.length === 0 && (
+      {webCard.cardModulesCount === 0 && (
         <Button
           variant="little_round"
           label={intl.formatMessage({
@@ -131,7 +129,7 @@ const WebCardScreenEditModeFooter = ({
           onPress={onAddContent}
         />
       )}
-      {fromCreation && webCard.cardModules.length === 0 && (
+      {fromCreation && webCard.cardModulesCount === 0 && (
         <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
           <Text style={styles.skip}>
             {intl.formatMessage({

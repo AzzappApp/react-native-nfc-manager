@@ -18,6 +18,7 @@ import {
   searchContactsByWebcardId,
   getContactCountWithWebcardId,
   getAllOwnerProfilesByWebcardId,
+  getCardModulesCountByWebCard,
 } from '@azzapp/data';
 import {
   buildCoverAvatarUrl,
@@ -52,6 +53,7 @@ import fromGlobalIdWithType, {
 } from '#helpers/relayIdHelpers';
 import { isWebcardPremium } from '#helpers/subscriptionHelpers';
 import type { WebCardResolvers } from '#/__generated__/types';
+import type { WebCard as WebCardData } from '@azzapp/data';
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
   id: idResolver('WebCard'),
@@ -174,7 +176,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       : null;
   },
   hasCover: webCard => !!webCard.coverMediaId,
-  cardModules: async webCard => {
+  cardModules: async (webCard: WebCardData) => {
     const { userId } = getSessionInfos();
     const profile = userId
       ? await profileByWebCardIdAndUserIdLoader.load({
@@ -189,6 +191,9 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
 
     const modules = await cardModuleByWebCardLoader.load(webCard.id);
     return modules.filter(module => module.visible || profile !== null);
+  },
+  cardModulesCount: webCard => {
+    return getCardModulesCountByWebCard(webCard.id);
   },
   requiresSubscription: async (webCard, { newWebCardKind }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {

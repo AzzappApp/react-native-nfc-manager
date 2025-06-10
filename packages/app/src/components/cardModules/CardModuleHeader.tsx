@@ -21,7 +21,6 @@ type CardModuleHeaderProps = {
   canSave: boolean;
   save: () => void;
   webCardKey: CardModuleHeader_webCard$key | null;
-  cardModulesCount: number;
 };
 
 const CardModuleHeader = ({
