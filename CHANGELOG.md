@@ -1,3 +1,8 @@
+## 2.1.0-canary.14
+
+* **fix:**  - ensure we don't allow validatation empty code ([#9305](https://github.com/AzzappApp/azzapp/pull/9305))
+* **build:**  - upgrade native deps ([#9291](https://github.com/AzzappApp/azzapp/pull/9291))
+
 ## 2.1.0-canary.13
 
 * **fix:**  - refactor meetingPlace management ([#9288](https://github.com/AzzappApp/azzapp/pull/9288))
