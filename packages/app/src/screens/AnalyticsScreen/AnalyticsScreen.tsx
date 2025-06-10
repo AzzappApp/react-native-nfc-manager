@@ -94,12 +94,7 @@ const AnalyticsScreen = ({
       </View>
       {/* using alignItems on the parent container just screw up HomeStatistics .... */}
       <View style={styles.viewIcon}>
-        <IconButton
-          icon="close"
-          onPress={router.back}
-          iconStyle={styles.iconStyle}
-          style={styles.iconContainerStyle}
-        />
+        <IconButton icon="close" onPress={router.back} appearance="dark" />
       </View>
     </View>
   );
@@ -123,13 +118,6 @@ const styles = StyleSheet.create({
     marginTop: CONTAINER_STATS_TOP_MARGIN,
     marginHorizontal: 20,
     height: CONTAINER_STATS_HEIGHT,
-  },
-  iconContainerStyle: {
-    borderColor: 'white',
-    width: 24,
-  },
-  iconStyle: {
-    tintColor: colors.white,
   },
   coverStyle: {
     marginBottom: 0,
