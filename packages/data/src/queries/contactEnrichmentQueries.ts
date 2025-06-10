@@ -82,3 +82,15 @@ export const getContactEnrichmentById = async (id: string) => {
     .where(eq(ContactEnrichmentTable.id, id))
     .then(res => res[0]);
 };
+
+export const updatePendingContactEnrichments = async (contactId: string) => {
+  return db()
+    .update(ContactEnrichmentTable)
+    .set({ approved: false })
+    .where(
+      and(
+        eq(ContactEnrichmentTable.contactId, contactId),
+        isNull(ContactEnrichmentTable.approved),
+      ),
+    );
+};

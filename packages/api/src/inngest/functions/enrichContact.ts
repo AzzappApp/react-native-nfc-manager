@@ -2,6 +2,7 @@ import {
   decrementNbEnrichments,
   transaction,
   updateContact,
+  updatePendingContactEnrichments,
 } from '@azzapp/data';
 import { enrichContact as enrichContactData } from '@azzapp/enrichment';
 import { inngest } from '../client';
@@ -64,7 +65,8 @@ export const enrichContact = inngest.createFunction(
 export const cancelEnrichContact = inngest.createFunction(
   { id: 'cancelEnrichContact' },
   { event: 'cancel/enrichContact' },
-  async () => {
-    //nothing to do here, just a placeholder for cancellation
+  async ({ event }) => {
+    const contactId: string = event.data.contactId;
+    await updatePendingContactEnrichments(contactId);
   },
 );
