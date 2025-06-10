@@ -200,7 +200,6 @@ const stockImageFragment = graphql`
           url
           width
           height
-          author
           thumbnail
         }
       }
@@ -225,7 +224,6 @@ const stockVideoFragment = graphql`
           url
           width
           height
-          author
           thumbnail
           duration
         }
@@ -298,7 +296,6 @@ const StockMediaListGridRenderer = ({
 
 type StockPhoto = {
   readonly __typename: 'StockImage';
-  readonly author: string | null;
   readonly height: number;
   readonly id: string;
   readonly url: string;
@@ -308,7 +305,6 @@ type StockPhoto = {
 
 type StockVideo = {
   readonly __typename: 'StockVideo';
-  readonly author: string | null;
   readonly duration: number;
   readonly height: number;
   readonly id: string;

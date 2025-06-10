@@ -61,7 +61,6 @@ const SimpleTextQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...SimpleTextEditionScreen_module @alias(as: "simpleTextModule")
           }
         }

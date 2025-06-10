@@ -49,7 +49,6 @@ const SimpleButtonQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...SimpleButtonEditionScreen_module @alias(as: "simpleButtonModule")
           }
         }

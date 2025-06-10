@@ -39,7 +39,6 @@ const SimpleButtonRendererFragment = graphql`
     width
     height
     background {
-      id
       uri
       resizeMode
     }

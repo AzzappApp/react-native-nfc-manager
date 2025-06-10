@@ -37,7 +37,6 @@ const postScreenQuery = graphql`
   query PostScreenQuery($postId: ID!, $webCardId: ID!) {
     node(id: $postId) {
       ... on Post @alias(as: "post") {
-        id
         ...PostList_posts
           @arguments(includeAuthor: true, viewerWebCardId: $webCardId)
         ...PostScreenFragment_relatedPosts

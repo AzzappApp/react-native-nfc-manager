@@ -104,17 +104,11 @@ const ContactCardItem = ({
       fragment HomeContactCard_profile on Profile {
         id
         webCard {
-          userName
           cardIsPublished
-          cardColors {
-            primary
-          }
         }
         invited
         promotedAsOwner
         ...ContactCard_profile
-        lastContactCardUpdate
-        createdAt
       }
     `,
     item,

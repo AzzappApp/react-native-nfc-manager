@@ -93,11 +93,6 @@ const SimpleTextStyleEditionPanel = ({
     graphql`
       fragment SimpleTextStyleEditionPanel_webCard on WebCard {
         ...WebCardColorPicker_webCard
-        cardColors {
-          primary
-          dark
-          light
-        }
       }
     `,
     webCardKey,

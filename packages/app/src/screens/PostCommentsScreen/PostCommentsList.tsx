@@ -115,7 +115,6 @@ const PostCommentsList = ({
       fragment PostCommentsList_myProfile on Profile {
         webCard {
           id
-          cardIsPublished
           ...AuthorCartoucheFragment_webCard
         }
         invited

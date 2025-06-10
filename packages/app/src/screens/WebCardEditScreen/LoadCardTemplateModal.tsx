@@ -47,7 +47,6 @@ const LoadCardTemplateModal = ({
       fragment LoadCardTemplateModal_webCard on WebCard {
         id
         webCardKind
-        cardIsPublished
         isPremium
         isMultiUser
         cardModulesCount

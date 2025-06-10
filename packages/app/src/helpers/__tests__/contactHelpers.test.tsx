@@ -31,7 +31,6 @@ const contactMock: contactHelpersShareContactData_contact$data = {
   logo: null,
   birthday: null,
   company: '',
-  meetingDate: '2012-12-21',
   emails: [],
   firstName: '',
   id: '',
@@ -85,7 +84,6 @@ describe('contactHelpers', () => {
       logo: null,
       birthday: '2012-12-21',
       company: 'azzapp',
-      meetingDate: '2012-12-21',
       emails: [
         { address: 'mail@azzap.com', label: 'Home' },
         { address: 'mailWork@azzap.com', label: 'Work' },
@@ -120,7 +118,6 @@ describe('contactHelpers', () => {
       logo: null,
       birthday: '2012-12-21',
       company: 'azzapp',
-      meetingDate: '2012-12-21',
       emails: [
         { address: 'mail@azzap.com', label: 'Home' },
         { address: 'mailWork@azzap.com', label: 'Work' },

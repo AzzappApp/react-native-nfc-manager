@@ -30,7 +30,6 @@ export const HomeBottomBar = ({ user: userKey }: HomeBottomBarProps) => {
   const user = useFragment(
     graphql`
       fragment HomeBottomBar_user on User {
-        id
         nbNewContacts
       }
     `,
@@ -306,7 +305,6 @@ const ShareButton = ({
       fragment HomeBottomBar_shareButton_user on User {
         profiles {
           webCard {
-            id
             cardColors {
               primary
             }

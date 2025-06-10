@@ -30,26 +30,8 @@ export const ContactDetailAvatar = ({
 
   const webCard = useFragment(
     graphql`
-      fragment ContactDetailAvatar_webCard on WebCard
-      @argumentDefinitions(
-        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
-        cappedPixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
-      ) {
-        id
+      fragment ContactDetailAvatar_webCard on WebCard {
         ...CoverRenderer_webCard
-        coverMedia {
-          id
-          __typename
-          ... on MediaVideo {
-            uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
-          }
-        }
       }
     `,
     webCardKey,
@@ -58,17 +40,9 @@ export const ContactDetailAvatar = ({
   const data = useFragment(
     graphql`
       fragment ContactDetailAvatar_contact on Contact {
-        id
         firstName
         lastName
         company
-        enrichment {
-          fields {
-            avatar {
-              id
-            }
-          }
-        }
         displayedAvatar {
           isEnrichment
         }

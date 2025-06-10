@@ -461,7 +461,6 @@ export const shareContactFragment_contact = graphql`
       address
     }
     birthday
-    meetingDate
     socials {
       url
       label

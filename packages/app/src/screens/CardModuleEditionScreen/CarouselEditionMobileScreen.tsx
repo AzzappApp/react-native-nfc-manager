@@ -50,7 +50,6 @@ const CarouselQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...CarouselEditionScreen_module @alias(as: "carouselModule")
           }
         }

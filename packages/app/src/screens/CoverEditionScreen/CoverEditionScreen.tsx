@@ -240,7 +240,6 @@ const query = graphql`
         webCard {
           id
           coverBackgroundColor
-          webCardKind
           coverId
           requiresSubscription
           isPremium

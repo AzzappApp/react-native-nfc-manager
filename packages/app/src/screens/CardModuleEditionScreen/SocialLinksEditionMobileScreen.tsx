@@ -50,7 +50,6 @@ const SocialLinksQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...SocialLinksEditionScreen_module @alias(as: "socialLinksModule")
           }
         }

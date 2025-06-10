@@ -125,7 +125,6 @@ const WebCardEditScreenBody = (
     cardModules,
     cardColors,
     cardStyle,
-
     coverBackgroundColor,
   } = useFragment(
     graphql`

@@ -59,8 +59,6 @@ const mediaScreenQuery = graphql`
         invited
         ...MediaSuggestionsScreen_profile
         webCard {
-          id
-          userName
           cardIsPublished
           coverIsPredefined
           ...WebCardPostsList_webCard

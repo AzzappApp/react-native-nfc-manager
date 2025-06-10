@@ -20,11 +20,9 @@ import type { HomeRoute } from '#routes';
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
     currentUser {
-      id
       isPremium
       hasProfiles #do not remove, used to update the field in a relay way #fix9258
       profiles {
-        id
         # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...OfflineVCardScreen_profiles
       }

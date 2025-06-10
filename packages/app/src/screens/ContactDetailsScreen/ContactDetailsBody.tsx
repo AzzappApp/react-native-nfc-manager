@@ -170,9 +170,6 @@ const ContactDetailsBody = ({
           id
           webCard {
             id
-            cardIsPublished
-            userName
-            hasCover
             coverMedia {
               id
               ... on MediaVideo {

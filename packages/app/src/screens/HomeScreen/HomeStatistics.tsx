@@ -38,11 +38,8 @@ const HomeStatistics = ({
   const profile = useFragment(
     graphql`
       fragment HomeStatistics_profile on Profile {
-        id
         webCard {
-          id
           nbWebCardViews
-          userName
           statsSummary {
             day
             webCardViews

@@ -28,7 +28,6 @@ const MultiUserPendingProfileOwner = ({
         id
         profilePendingOwner {
           id
-          promotedAsOwner
           user {
             email
             phoneNumber

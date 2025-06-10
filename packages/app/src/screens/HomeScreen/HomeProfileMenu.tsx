@@ -23,7 +23,6 @@ const HomeProfileMenu = ({
   const profile = useFragment(
     graphql`
       fragment HomeProfileMenu_profile on Profile {
-        id
         invited
         profileRole
       }

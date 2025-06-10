@@ -20,7 +20,6 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
       fragment HomeBackground_user on User {
         profiles {
           webCard {
-            id
             cardColors {
               dark
               primary

@@ -64,7 +64,6 @@ const AuthorCartouche = ({
   const author = useFragment(
     graphql`
       fragment AuthorCartoucheFragment_webCard on WebCard {
-        id
         userName
         cardIsPublished
         ...CoverLink_webCard

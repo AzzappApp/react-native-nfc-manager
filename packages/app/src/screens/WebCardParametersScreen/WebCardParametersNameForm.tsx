@@ -75,7 +75,6 @@ const WebcardParametersNameForm = ({
               graphql`
                 query WebCardParametersNameFormQuery($userName: String!) {
                   isUserNameAvailable(userName: $userName) {
-                    available
                     userName
                   }
                 }

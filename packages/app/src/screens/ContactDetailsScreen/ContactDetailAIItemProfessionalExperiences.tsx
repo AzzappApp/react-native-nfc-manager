@@ -34,7 +34,6 @@ export const ContactDetailAIItemProfessionalExperiences = ({
           endDate
           logo {
             uri: uri(width: 180, pixelRatio: $pixelRatio)
-            id
           }
           summary
         }

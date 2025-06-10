@@ -76,7 +76,6 @@ export const ContactDetailFragmentContact = ({
           address
         }
         enrichment {
-          approved
           fields {
             birthday
             phoneNumbers {

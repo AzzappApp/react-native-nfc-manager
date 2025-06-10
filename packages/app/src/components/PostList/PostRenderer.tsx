@@ -157,9 +157,6 @@ const PostRenderer = (
         ...PostRendererBottomPanelFragment_post
           @arguments(viewerWebCardId: $viewerWebCardId)
         ...PostRendererMediaFragment_post
-        webCard {
-          id
-        }
       }
     `,
     postKey,

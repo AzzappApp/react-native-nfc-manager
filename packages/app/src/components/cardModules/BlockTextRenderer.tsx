@@ -35,7 +35,6 @@ const BlockTextRendererFragment = graphql`
     marginHorizontal
     marginVertical
     textBackground {
-      id
       uri
       resizeMode
     }
@@ -45,7 +44,6 @@ const BlockTextRendererFragment = graphql`
       opacity
     }
     background {
-      id
       uri
       resizeMode
     }

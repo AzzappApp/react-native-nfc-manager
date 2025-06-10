@@ -34,7 +34,6 @@ const renderPost = (props?: Partial<PostRendererMediaProps>) => {
         query PostRendererMediaTestQuery @relay_test_operation {
           node(id: "test-post") {
             ... on Post @alias(as: "post") {
-              id
               ...PostRendererMediaFragment_post
             }
           }

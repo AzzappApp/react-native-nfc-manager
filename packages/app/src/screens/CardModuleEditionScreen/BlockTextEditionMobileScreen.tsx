@@ -50,7 +50,6 @@ const BlockTextQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...BlockTextEditionScreen_module @alias(as: "blockTextModule")
           }
         }

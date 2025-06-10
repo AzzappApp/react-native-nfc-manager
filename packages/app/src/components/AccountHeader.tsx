@@ -24,9 +24,6 @@ const AccountHeader = ({
   const webCard = useFragment(
     graphql`
       fragment AccountHeader_webCard on WebCard {
-        cardColors {
-          primary
-        }
         ...CoverRenderer_webCard
       }
     `,

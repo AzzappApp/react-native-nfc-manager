@@ -78,7 +78,6 @@ const SearchResultGlobal = ({
           ) @connection(key: "Viewer_searchPosts") {
             edges {
               node {
-                id
                 ...PostsGrid_posts
               }
             }

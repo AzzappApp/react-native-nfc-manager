@@ -19,7 +19,6 @@ const query = graphql`
     }
     node(id: $contactId) {
       ... on Contact @alias(as: "contact") {
-        id
         ...ContactDetailsBody_contact
         ...useOnInviteContactDataQuery_contact
       }

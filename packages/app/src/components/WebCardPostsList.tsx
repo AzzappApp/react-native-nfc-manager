@@ -43,7 +43,6 @@ const WebCardPostsList = ({
             @connection(key: "WebCardPostsList_webCard_connection_posts") {
             edges {
               node {
-                id
                 ...PostList_posts
                   @arguments(
                     includeAuthor: false

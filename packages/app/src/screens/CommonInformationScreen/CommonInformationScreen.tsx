@@ -70,12 +70,9 @@ const commonInformationScreenQuery = graphql`
         banner {
           id
           uri(width: 220, pixelRatio: $pixelRatio)
-          width
-          height
         }
         isPremium
         commonInformation {
-          company
           emails {
             label
             address

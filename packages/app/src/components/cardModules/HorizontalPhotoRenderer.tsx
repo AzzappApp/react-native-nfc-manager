@@ -35,7 +35,6 @@ const HorizontalPhotoRendererFragment = graphql`
     marginVertical
     imageHeight
     background {
-      id
       uri
       resizeMode
     }
@@ -44,7 +43,6 @@ const HorizontalPhotoRendererFragment = graphql`
       patternColor
     }
     image {
-      id
       uri(width: $screenWidth, pixelRatio: $pixelRatio)
     }
   }

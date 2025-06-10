@@ -18,7 +18,6 @@ describe('AccountDetailsPasswordForm', () => {
       graphql`
         query AccountDetailsPasswordFormQuery @relay_test_operation {
           currentUser {
-            id
             ...AccountDetailsPasswordForm_currentUser
           }
         }

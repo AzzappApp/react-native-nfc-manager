@@ -54,7 +54,6 @@ const LineDividerQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...LineDividerEditionScreen_module @alias(as: "lineDividerModule")
           }
           ...LineDividerEditionScreen_webCard

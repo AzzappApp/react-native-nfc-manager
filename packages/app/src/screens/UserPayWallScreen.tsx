@@ -59,9 +59,7 @@ const width = Dimensions.get('screen').width;
 const userPayWallScreenQuery = graphql`
   query UserPayWallScreenQuery {
     currentUser {
-      id
       userSubscription {
-        id
         subscriptionId
         issuer
         status

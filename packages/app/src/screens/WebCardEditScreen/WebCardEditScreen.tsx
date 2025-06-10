@@ -76,7 +76,6 @@ const WebCardEditScreen = ({
     graphql`
       fragment WebCardEditScreen_webCard on WebCard {
         id
-        userName
         coverBackgroundColor
         cardIsPublished
         cardColors {

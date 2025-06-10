@@ -44,7 +44,6 @@ const MultiUserAddScreen = ({
   const webCardData = useFragment(
     graphql`
       fragment MultiUserAddScreen_webCard on WebCard {
-        id
         subscription {
           issuer
           availableSeats

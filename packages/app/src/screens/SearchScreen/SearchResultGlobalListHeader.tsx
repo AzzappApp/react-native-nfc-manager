@@ -35,7 +35,6 @@ export const SearchResultGlobalListHeaderFragment = graphql`
     ) @connection(key: "ViewerGlobal_searchWebCards") {
       edges {
         node {
-          id
           ...CoverList_users
         }
       }

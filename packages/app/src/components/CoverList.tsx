@@ -68,7 +68,6 @@ const CoverList = ({
     graphql`
       fragment CoverList_users on WebCard @relay(plural: true) {
         id
-        userName
         ...CoverLink_webCard
       }
     `,

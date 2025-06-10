@@ -36,7 +36,6 @@ const PreviewModal = ({
   const webCard = useFragment(
     graphql`
       fragment PreviewModal_webCard on WebCard {
-        id
         ...WebCardPreview_webCard
         cardStyle {
           borderColor
@@ -51,7 +50,6 @@ const PreviewModal = ({
           titleFontSize
         }
         cardModules {
-          id
           visible
           ...ModuleData_cardModules
         }

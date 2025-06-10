@@ -23,13 +23,7 @@ const analyticsScreenQuery = graphql`
       ... on Profile @alias(as: "profile") {
         ...HomeStatistics_profile
         webCard {
-          id
           ...CoverRenderer_webCard
-        }
-        nbContactCardScans
-        statsSummary {
-          day
-          contactCardScans
         }
       }
     }

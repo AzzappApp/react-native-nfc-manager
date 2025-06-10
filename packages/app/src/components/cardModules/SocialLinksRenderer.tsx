@@ -48,7 +48,6 @@ const SocialLinksRendererFragment = graphql`
     marginBottom
     marginHorizontal
     background {
-      id
       uri
       resizeMode
     }

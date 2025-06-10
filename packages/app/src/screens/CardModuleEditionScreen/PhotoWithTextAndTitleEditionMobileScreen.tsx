@@ -55,7 +55,6 @@ const PhotoWithTextAndTitleQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...PhotoWithTextAndTitleEditionScreen_module
               @alias(as: "photoWithTextAndTitleModule")
           }

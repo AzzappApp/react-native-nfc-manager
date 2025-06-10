@@ -34,7 +34,6 @@ const PhotoWithTextAndTitleRendererFragment = graphql`
     pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     image {
-      id
       uri(width: $screenWidth, pixelRatio: $pixelRatio)
     }
     contentFontFamily
@@ -59,7 +58,6 @@ const PhotoWithTextAndTitleRendererFragment = graphql`
     marginHorizontal
     marginVertical
     background {
-      id
       uri
       resizeMode
     }

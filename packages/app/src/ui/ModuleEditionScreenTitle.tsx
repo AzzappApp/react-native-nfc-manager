@@ -19,7 +19,6 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
   const webCard = useFragment(
     graphql`
       fragment ModuleEditionScreenTitle_webCard on WebCard {
-        id
         isPremium
         isMultiUser
         webCardKind

@@ -50,7 +50,6 @@ const HorizontalPhotoQuery = graphql`
         webCard {
           cardModules {
             id
-            kind
             ...HorizontalPhotoEditionScreen_module
               @alias(as: "horizontalPhotoModule")
           }

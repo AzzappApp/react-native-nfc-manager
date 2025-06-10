@@ -82,7 +82,6 @@ const WebCardEditScreenHeader = ({
   const webCard = useFragment(
     graphql`
       fragment WebCardEditScreenHeader_webCard on WebCard {
-        id
         isPremium
         webCardKind
         isMultiUser

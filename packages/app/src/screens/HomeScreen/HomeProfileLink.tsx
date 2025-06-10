@@ -29,7 +29,6 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
       fragment HomeProfileLink_user on User {
         profiles {
           webCard {
-            id
             userName
           }
         }

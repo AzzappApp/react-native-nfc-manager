@@ -86,7 +86,6 @@ const MultiUserScreenUserList = ({
         banner {
           id
         }
-        isPremium
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
       }

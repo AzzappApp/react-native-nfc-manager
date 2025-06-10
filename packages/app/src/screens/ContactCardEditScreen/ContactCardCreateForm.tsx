@@ -63,7 +63,6 @@ const ContactCardCreateForm = ({
   const user = useFragment(
     graphql`
       fragment ContactCardCreateForm_user on User {
-        id
         isPremium
       }
     `,

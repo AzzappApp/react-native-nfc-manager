@@ -61,7 +61,6 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
         query PostRendererActionBarTestQuery @relay_test_operation {
           node(id: "test-post") {
             ... on Post @alias(as: "post") {
-              id
               ...PostRendererActionBar_post
                 @arguments(viewerWebCardId: "test-webCard")
             }

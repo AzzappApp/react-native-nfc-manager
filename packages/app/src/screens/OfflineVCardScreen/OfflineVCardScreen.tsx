@@ -79,7 +79,6 @@ export const OfflineVCardScreenProfilesFragment = graphql`
       cardColors {
         dark
         primary
-        light
       }
     }
     contactCard {

@@ -51,11 +51,9 @@ const PostRendererActionBar = ({
         allowComments
         allowLikes
         counterReactions
-        content
         webCard {
           id
           userName
-          cardIsPublished
         }
       }
     `,

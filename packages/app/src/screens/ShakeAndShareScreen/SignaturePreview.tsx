@@ -30,7 +30,6 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
       ) {
         webCard {
           id
-          userName
           isMultiUser
           cardColors {
             primary
