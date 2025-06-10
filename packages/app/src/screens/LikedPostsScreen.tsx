@@ -111,7 +111,7 @@ const LikedPostsScreen = ({
             onPress={onClose}
             iconSize={30}
             size={47}
-            style={{ borderWidth: 0 }}
+            variant="icon"
           />
         }
       />
