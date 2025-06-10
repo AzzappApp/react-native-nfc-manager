@@ -931,7 +931,11 @@ export const getNbNewContactEnrichmentsForUser = async (
     .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
     .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
     .where(
-      and(eq(UserTable.id, userId), isNull(ContactEnrichmentTable.approved)),
+      and(
+        eq(UserTable.id, userId),
+        isNull(ContactEnrichmentTable.approved),
+        eq(ContactTable.enrichmentStatus, 'completed'),
+      ),
     )
     .then(rows => rows[0].count);
 
