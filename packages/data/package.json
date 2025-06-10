@@ -29,7 +29,7 @@
     "@types/lodash": "^4.17.10",
     "@types/node-fetch": "2.6.11",
     "drizzle-kit": "patch:drizzle-kit@npm%3A0.30.5#~/.yarn/patches/drizzle-kit-npm-0.30.5-a6f8537ef2.patch",
-    "eslint": "^9.24.0",
+    "eslint": "^9.28.0",
     "mysql2": "^3.14.0",
     "node-fetch": "2",
     "typescript": "^5.8.3"

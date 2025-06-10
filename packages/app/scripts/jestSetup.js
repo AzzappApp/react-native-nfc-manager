@@ -157,6 +157,15 @@ jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'mock://redirect'),
 }));
 
+jest.mock('expo-av', () => ({
+  ResizeMode: {
+    CONTAIN: 'contain',
+    COVER: 'cover',
+    STRETCH: 'stretch',
+  },
+  Video: jest.fn(() => null),
+}));
+
 jest.mock('react-native-compressor', () => ({
   Image: {
     compress: jest.fn(() => Promise.resolve('mocked_compressed_image')),
