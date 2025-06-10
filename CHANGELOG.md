@@ -1,3 +1,10 @@
+## 2.0.0-rc.25
+
+* **fix:**  - **ui:** [#9321](https://github.com/AzzappApp/azzapp/pull/9321) missing IconButton borders ([#9324](https://github.com/AzzappApp/azzapp/pull/9324))
+* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) desapprove canceled enrichments ([#9323](https://github.com/AzzappApp/azzapp/pull/9323))
+* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) hide avatar before submit ([#9317](https://github.com/AzzappApp/azzapp/pull/9317))
+* **fix:**  - **ContactScan:** allows any user of a multiuser WebCard unlimited scans ([#9318](https://github.com/AzzappApp/azzapp/pull/9318))
+
 ## 2.0.0-rc.24
 
 * **fix:**  - **CoverEditorLink:** fix panel height
