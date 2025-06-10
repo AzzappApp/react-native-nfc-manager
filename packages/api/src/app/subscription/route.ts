@@ -4,7 +4,7 @@ import {
   createSubscription,
   getIAPSubscriptions,
   getTotalMultiUser,
-  getWebCardByUserId,
+  getWebCardsByUserId,
   transaction,
   updateActiveInAppUserSubscription,
 } from '@azzapp/data';
@@ -261,7 +261,7 @@ const subscriptionWebHook = async (req: Request) => {
       //we are transfering only when the user sub is over, no work is required here
     }
 
-    const webcards = await getWebCardByUserId(userId);
+    const webcards = await getWebCardsByUserId(userId);
     revalidateWebcardsAndPosts(
       webcards
         .map(({ userName }) => userName)

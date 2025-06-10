@@ -363,16 +363,21 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
     });
 };
 
-export const getWebCardByUserId = (userId: string): Promise<WebCard[]> => {
+export const getWebCardsByUserId = (
+  userId: string,
+  ownerOnly = true,
+): Promise<WebCard[]> => {
   return db()
     .select({ WebCard: WebCardTable })
     .from(ProfileTable)
     .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(
-      and(
-        eq(ProfileTable.userId, userId),
-        eq(ProfileTable.profileRole, 'owner'),
-      ),
+      ownerOnly
+        ? and(
+            eq(ProfileTable.userId, userId),
+            eq(ProfileTable.profileRole, 'owner'),
+          )
+        : eq(ProfileTable.userId, userId),
     )
     .then(results => results.map(w => w.WebCard));
 };
