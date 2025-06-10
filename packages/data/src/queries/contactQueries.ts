@@ -931,11 +931,7 @@ export const getNbNewContactEnrichmentsForUser = async (
     .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
     .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
     .where(
-      and(
-        eq(UserTable.id, userId),
-        isNull(ContactEnrichmentTable.approved),
-        gt(ContactEnrichmentTable.enrichedAt, UserTable.lastContactViewAt), // Compare enrichedAt with user's last view date
-      ),
+      and(eq(UserTable.id, userId), isNull(ContactEnrichmentTable.approved)),
     )
     .then(rows => rows[0].count);
 
