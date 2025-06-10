@@ -117,28 +117,30 @@ export const Contact: ContactResolvers = {
       webCard = await webCardLoader.load(profile.webCardId);
     }
 
-    if (
-      profile?.avatarId ||
-      contact?.avatarId ||
-      enrichment?.fields?.avatarId
-    ) {
+    const enrichmentAvatarId = enrichment?.hiddenFields?.contact?.avatarId
+      ? null
+      : enrichment?.fields?.avatarId;
+
+    if (profile?.avatarId || contact?.avatarId || enrichmentAvatarId) {
       return {
         source: {
           media:
-            profile?.avatarId ||
-            contact?.avatarId ||
-            enrichment?.fields?.avatarId ||
-            '',
+            profile?.avatarId || contact?.avatarId || enrichmentAvatarId || '',
           assetKind: 'avatar',
         },
         isEnrichment: !profile?.avatarId && !contact?.avatarId,
       };
     }
+
+    const enrichmentLogoId = enrichment?.hiddenFields?.contact?.logoId
+      ? null
+      : enrichment?.fields?.logoId;
+
     if (
       profile?.logoId ||
       webCard?.logoId ||
       contact?.logoId ||
-      enrichment?.fields?.logoId
+      enrichmentLogoId
     ) {
       return {
         source: {
@@ -146,7 +148,7 @@ export const Contact: ContactResolvers = {
             profile?.logoId ||
             webCard?.logoId ||
             contact?.logoId ||
-            enrichment?.fields?.logoId ||
+            enrichmentLogoId ||
             '',
           assetKind: 'logo',
         },
