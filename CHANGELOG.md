@@ -1,3 +1,7 @@
+## 2.0.0-rc.24
+
+* **fix:**  - **CoverEditorLink:** fix panel height
+
 ## 2.0.0-rc.23
 
 * **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) only count completed enrichments ([#9311](https://github.com/AzzappApp/azzapp/pull/9311))
