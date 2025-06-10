@@ -31,7 +31,7 @@ export const HomeBottomBar = ({ user: userKey }: HomeBottomBarProps) => {
     graphql`
       fragment HomeBottomBar_user on User {
         id
-        nbNewContacts
+        nbContactNotifications
       }
     `,
     userKey as HomeBottomBar_user$key,
@@ -178,13 +178,13 @@ export const HomeBottomBar = ({ user: userKey }: HomeBottomBarProps) => {
         >
           <View style={styles.contactButtonContainer}>
             <Icon icon="contact" size={24} style={styles.iconWhite} />
-            {user.nbNewContacts > 0 && (
+            {user.nbContactNotifications > 0 && (
               <View style={styles.newContactsBadge}>
                 <Text
                   variant="xxsmallextrabold"
                   style={styles.notificationText}
                 >
-                  {user.nbNewContacts}
+                  {user.nbContactNotifications}
                 </Text>
               </View>
             )}

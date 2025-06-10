@@ -78,11 +78,10 @@ type User {
   nbEnrichments: EnrichmentData!
 
   nbContacts: Int!
-  
   """
-  the number of new contact unread since last contact view open
+  Returns the number of contact notifications for the user
   """
-  nbNewContacts: Int!
+  nbContactNotifications: Int!
 
   """
   Returns the list of contacts of the user profiles

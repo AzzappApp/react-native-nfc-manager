@@ -10,6 +10,7 @@ import {
   gte,
   lte,
   gt,
+  isNull,
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
@@ -883,3 +884,60 @@ export const getContactByEnrichmentId = async (enrichmentId: string) =>
     .where(eq(ContactEnrichmentTable.id, enrichmentId))
     .limit(1)
     .then(rows => rows[0]?.contact ?? null);
+
+/**
+ * Get the total number of new contacts for a user since their last view
+ *
+ * @param userId - The user's ID
+ * @returns The total number of new contacts
+ */
+export const getNbNewContactsForUser = async (
+  userId: string,
+): Promise<number> => {
+  const res = await db()
+    .select({ count: count() })
+    .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
+    .where(
+      and(
+        eq(UserTable.id, userId),
+        eq(ContactTable.type, 'shareback'),
+        eq(ContactTable.deleted, false),
+        gt(ContactTable.createdAt, UserTable.lastContactViewAt), // Compare createdAt with user's last view date
+      ),
+    )
+    .then(rows => rows[0].count);
+
+  return res;
+};
+
+/**
+ * Get the total number of new enrichments for a user since their last view
+ *
+ * @param userId - The user's ID
+ * @returns The total number of new enrichments
+ */
+export const getNbNewContactEnrichmentsForUser = async (
+  userId: string,
+): Promise<number> => {
+  const res = await db()
+    .select({ count: count() })
+    .from(ContactEnrichmentTable)
+    .innerJoin(
+      ContactTable,
+      eq(ContactEnrichmentTable.contactId, ContactTable.id),
+    )
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
+    .where(
+      and(
+        eq(UserTable.id, userId),
+        isNull(ContactEnrichmentTable.approved),
+        gt(ContactEnrichmentTable.enrichedAt, UserTable.lastContactViewAt), // Compare enrichedAt with user's last view date
+      ),
+    )
+    .then(rows => rows[0].count);
+
+  return res;
+};
