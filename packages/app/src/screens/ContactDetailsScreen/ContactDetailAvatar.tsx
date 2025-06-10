@@ -80,6 +80,9 @@ export const ContactDetailAvatar = ({
 
   const avatarSource = useContactAvatar(data);
 
+  const shouldDisplayAvatar =
+    !data?.displayedAvatar?.isEnrichment || !isHiddenField;
+
   const isAiAvatar =
     state === 'waitingApproval' &&
     !isHiddenField &&
@@ -103,9 +106,9 @@ export const ContactDetailAvatar = ({
         </MaskedView>
       )}
       <View style={[styles.avatar, styles.avatarWrapper]}>
-        {avatarSource?.uri ? (
+        {avatarSource?.uri && shouldDisplayAvatar ? (
           <Image source={avatarSource?.uri} style={styles.avatar} />
-        ) : webCard ? (
+        ) : webCard && shouldDisplayAvatar ? (
           <CoverRenderer width={AVATAR_WIDTH} webCard={webCard} />
         ) : (
           <Text style={styles.initials}>
