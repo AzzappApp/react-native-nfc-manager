@@ -586,7 +586,51 @@ __metadata:
     "@azzapp/react-native-skia-video": "npm:0.8.3"
     "@azzapp/react-native-snapshot-view": "npm:^0.1.4"
     "@azzapp/shared": "workspace:^"
+    "@expo-google-fonts/amatic-sc": "npm:^0.4.1"
+    "@expo-google-fonts/anton": "npm:^0.4.1"
+    "@expo-google-fonts/archivo": "npm:^0.4.1"
+    "@expo-google-fonts/bebas-neue": "npm:^0.4.0"
+    "@expo-google-fonts/cardo": "npm:^0.4.0"
+    "@expo-google-fonts/cinzel": "npm:^0.4.1"
+    "@expo-google-fonts/cormorant-garamond": "npm:^0.4.0"
+    "@expo-google-fonts/courier-prime": "npm:^0.4.0"
+    "@expo-google-fonts/dm-serif-display": "npm:^0.4.1"
+    "@expo-google-fonts/fauna-one": "npm:^0.4.0"
+    "@expo-google-fonts/fraunces": "npm:^0.4.0"
+    "@expo-google-fonts/gilda-display": "npm:^0.4.1"
+    "@expo-google-fonts/gloock": "npm:^0.4.1"
+    "@expo-google-fonts/great-vibes": "npm:^0.4.0"
+    "@expo-google-fonts/inter": "npm:^0.4.1"
+    "@expo-google-fonts/josefin-sans": "npm:^0.4.1"
+    "@expo-google-fonts/jost": "npm:^0.4.1"
+    "@expo-google-fonts/kaushan-script": "npm:^0.4.0"
+    "@expo-google-fonts/koulen": "npm:^0.4.0"
+    "@expo-google-fonts/lexend": "npm:^0.4.0"
+    "@expo-google-fonts/libre-baskerville": "npm:^0.4.0"
+    "@expo-google-fonts/libre-caslon-display": "npm:^0.4.0"
+    "@expo-google-fonts/libre-caslon-text": "npm:^0.4.0"
+    "@expo-google-fonts/limelight": "npm:^0.4.0"
+    "@expo-google-fonts/lora": "npm:^0.4.1"
+    "@expo-google-fonts/manrope": "npm:^0.4.1"
+    "@expo-google-fonts/monoton": "npm:^0.4.0"
+    "@expo-google-fonts/montserrat": "npm:^0.4.1"
+    "@expo-google-fonts/mr-dafoe": "npm:^0.4.0"
+    "@expo-google-fonts/open-sans": "npm:^0.4.1"
+    "@expo-google-fonts/outfit": "npm:^0.4.2"
+    "@expo-google-fonts/playfair-display": "npm:^0.4.1"
+    "@expo-google-fonts/plus-jakarta-sans": "npm:^0.4.1"
+    "@expo-google-fonts/poppins": "npm:^0.4.0"
+    "@expo-google-fonts/raleway": "npm:^0.4.1"
+    "@expo-google-fonts/righteous": "npm:^0.4.1"
+    "@expo-google-fonts/rubik": "npm:^0.4.1"
+    "@expo-google-fonts/rye": "npm:^0.4.0"
+    "@expo-google-fonts/seaweed-script": "npm:^0.4.0"
+    "@expo-google-fonts/six-caps": "npm:^0.4.0"
+    "@expo-google-fonts/source-sans-3": "npm:^0.4.0"
     "@expo-google-fonts/source-sans-pro": "npm:^0.2.3"
+    "@expo-google-fonts/ultra": "npm:^0.4.0"
+    "@expo-google-fonts/water-brush": "npm:^0.4.1"
+    "@expo-google-fonts/yeseva-one": "npm:^0.4.0"
     "@formatjs/intl-locale": "npm:^4.2.11"
     "@formatjs/intl-pluralrules": "npm:^5.4.4"
     "@formatjs/intl-relativetimeformat": "npm:^11.4.11"
@@ -637,50 +681,6 @@ __metadata:
     expo-contacts: "npm:~14.2.5"
     expo-file-system: "npm:~18.1.10"
     expo-font: "npm:~13.3.1"
-    expo-google-fonts-amatic-sc: "npm:^0.3.0"
-    expo-google-fonts-anton: "npm:^0.3.0"
-    expo-google-fonts-archivo: "npm:^0.3.0"
-    expo-google-fonts-bebas-neue: "npm:^0.3.0"
-    expo-google-fonts-cardo: "npm:^0.3.0"
-    expo-google-fonts-cinzel: "npm:^0.3.0"
-    expo-google-fonts-cormorant-garamond: "npm:^0.3.0"
-    expo-google-fonts-courier-prime: "npm:^0.3.0"
-    expo-google-fonts-dm-serif-display: "npm:^0.3.0"
-    expo-google-fonts-fauna-one: "npm:^0.3.0"
-    expo-google-fonts-fraunces: "npm:^0.3.0"
-    expo-google-fonts-gilda-display: "npm:^0.3.0"
-    expo-google-fonts-gloock: "npm:^0.3.0"
-    expo-google-fonts-great-vibes: "npm:^0.3.0"
-    expo-google-fonts-inter: "npm:^0.3.0"
-    expo-google-fonts-josefin-sans: "npm:^0.3.0"
-    expo-google-fonts-jost: "npm:^0.3.0"
-    expo-google-fonts-kaushan-script: "npm:^0.3.0"
-    expo-google-fonts-koulen: "npm:^0.3.0"
-    expo-google-fonts-lexend: "npm:^0.3.0"
-    expo-google-fonts-libre-baskerville: "npm:^0.3.0"
-    expo-google-fonts-libre-caslon-display: "npm:^0.3.0"
-    expo-google-fonts-libre-caslon-text: "npm:^0.3.0"
-    expo-google-fonts-limelight: "npm:^0.3.0"
-    expo-google-fonts-lora: "npm:^0.3.0"
-    expo-google-fonts-manrope: "npm:^0.3.0"
-    expo-google-fonts-monoton: "npm:^0.3.0"
-    expo-google-fonts-montserrat: "npm:^0.3.0"
-    expo-google-fonts-mr-dafoe: "npm:^0.3.0"
-    expo-google-fonts-open-sans: "npm:^0.3.0"
-    expo-google-fonts-outfit: "npm:^0.3.0"
-    expo-google-fonts-playfair-display: "npm:^0.3.0"
-    expo-google-fonts-plus-jakarta-sans: "npm:^0.3.0"
-    expo-google-fonts-poppins: "npm:^0.3.0"
-    expo-google-fonts-raleway: "npm:^0.3.0"
-    expo-google-fonts-righteous: "npm:^0.3.0"
-    expo-google-fonts-rubik: "npm:^0.3.0"
-    expo-google-fonts-rye: "npm:^0.3.0"
-    expo-google-fonts-seaweed-script: "npm:^0.3.0"
-    expo-google-fonts-six-caps: "npm:^0.3.0"
-    expo-google-fonts-source-sans-3: "npm:^0.3.0"
-    expo-google-fonts-ultra: "npm:^0.3.0"
-    expo-google-fonts-water-brush: "npm:^0.3.0"
-    expo-google-fonts-yeseva-one: "npm:^0.3.0"
     expo-image: "npm:~2.2.0"
     expo-image-manipulator: "npm:~13.1.7"
     expo-keep-awake: "npm:~14.1.4"
@@ -6223,10 +6223,318 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo-google-fonts/amatic-sc@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/amatic-sc@npm:0.4.1"
+  checksum: 10/b039bb2d112275c9f9385059fe89c8085b8df544859deec29a848efa86925bd69a07951433f9f34863fdbc2d60cd3f4b0b974476cd39c1cade6fa8ead4902222
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/anton@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/anton@npm:0.4.1"
+  checksum: 10/5ef7952ee3e0341419ed29fc148294e6c21519c50fd63d30c6e61796fd2daf0cb300db057d56928ed81f35be8d4c9b1c12c1951a2ad11b17d38388b40ef2be54
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/archivo@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/archivo@npm:0.4.1"
+  checksum: 10/337c4c8e660fd1f5eddc02db100cfd201d008244d258761a8cadead21a7c5f5ef43b783fd97b828936bbf5412ab051ff46b2dc53555d4ada2d5b5a6fdd6dc1f3
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/bebas-neue@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/bebas-neue@npm:0.4.0"
+  checksum: 10/39fc145d3888b2e3c263b26982467ce9998e3ee38e8fb04d593ce5c157b6ef318b5073359b76618164060ede80458f142552c100abd4de3a87291a2720e80b02
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/cardo@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/cardo@npm:0.4.0"
+  checksum: 10/b00421c5fad77c45940e7a60bc40c8c600e964253ef6045f68f4484540b7d3c79861b2175daf583f0db4880ea9f1606cc0122436c524fd5af65a3b1349c17888
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/cinzel@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/cinzel@npm:0.4.1"
+  checksum: 10/55578e70ce640f4e4abf0f274a2342c19bbf8c4c0a60e7fccd4a5caf7ee9cb4124c14ae9bbd558e362209e9232228b19be85b716815c3ce4643861b0fc05c17c
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/cormorant-garamond@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/cormorant-garamond@npm:0.4.0"
+  checksum: 10/d256ecf559473f5d88d42dba06a9a6669f702b1c296f4320caf1f05d4fa8b9a1e216c0502bc988d1ddcee66d3c4dae188093ec317ebcc765dbe2ef202ff1d853
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/courier-prime@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/courier-prime@npm:0.4.0"
+  checksum: 10/8c77d37f30221ad72bda1b258fb90d3906773243e922d67dbd90a91e6623fcd89e49f4ce1065e43c891d7c81fdde4847b9767a81dd9212f6cbc72439fa908b23
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/dm-serif-display@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/dm-serif-display@npm:0.4.1"
+  checksum: 10/6d7d453190a6268155186417ba9f9e968ccc6edc9ad0a356e6fa2d8b0c6d47d35e26cae6d2ae2ab5d14c8f372552b810d0cbfd42b2d524e0d77e1b9427757ee8
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/fauna-one@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/fauna-one@npm:0.4.0"
+  checksum: 10/7a3498aadca1baa6c2b6d5673960908843142aac53c49a1b30595cb0a265b82a161f09d33e09b8c143884396dd08f4de00d50199539ce4876f6418405178d33a
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/fraunces@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/fraunces@npm:0.4.0"
+  checksum: 10/87ffb080429db10d5779e07eacffad57c32efc631f1a8d0511be7f94563a51f6dbb0526ee64a086834187aaeb907a11439b1fb0ca2dc6a324ad489de874b3dc4
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/gilda-display@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/gilda-display@npm:0.4.1"
+  checksum: 10/7af09eb1a29141fad2786c7c8a1ba675c92d00173f2f612231dcefaf3df09135b0dbec98efd0bcb28fdbbb52f46305770021917a5d826eaf906e653d838897b3
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/gloock@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/gloock@npm:0.4.1"
+  checksum: 10/21fae124afc64c5e37928271b7c883bbde8a2c52f8a2c929daf3f3e6fa1b3d0cefc79bf1c61d8b534b8b758ebdfe8a57ce755893c1fdae62055b5ba08bc3c930
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/great-vibes@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/great-vibes@npm:0.4.0"
+  checksum: 10/8b8b9489f3c2ba2c5e173377faadb8db31762abe9933ef0b232e32829846c910f77ec1d8968ba0372ae7e5bb56af0ed95149661ebdb0e028030e62d08544774e
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/inter@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/inter@npm:0.4.1"
+  checksum: 10/cb242f2a1f47c350fb792b6205405dc63782f6bdf38e154f16cff7ed9cee086626d75ee234b9621b3c2dbf960596c81e5b4205dd2e33058e8b93cf9f4df71bce
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/josefin-sans@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/josefin-sans@npm:0.4.1"
+  checksum: 10/6b616a1233b5c3d3cda955d9cffd7e43ff4f4a6e1f9f2aae5bba09538b1a7a5e8ee9ac78d69b413c540979f724004ba9ade049d745f7a44c7577a2eec670a471
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/jost@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/jost@npm:0.4.1"
+  checksum: 10/010bc2031e9f4fdcf4d8484306085002776cfabaf7234593dbc06b612812eba72c1f0b307d7240a2d1714d07826fdced29ea0d7fcc198b250ee50b4130037000
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/kaushan-script@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/kaushan-script@npm:0.4.0"
+  checksum: 10/14a6be4df5f1f8f9c36eee5c9c8ece8560774a39e3c78ab0d166db7167f0ae89257a0bcdd1ad24e500a988af2f87292aacece292d3b8714d801af1901476e6c2
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/koulen@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/koulen@npm:0.4.0"
+  checksum: 10/91ea53097216f08f84809abe3b10b41bf86c68e9cd7a61934a178e08758e5468f948c074e0d163dfdb5cbda81853d9d3e3ca4f5d72c0cea967e94043639fb615
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/lexend@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/lexend@npm:0.4.0"
+  checksum: 10/5d4368523166150ec8d33bdf3bd50d746ff18417696cf76b400f3d3c1b00035897c283e739e3ef2feba52bb2966c55411187fbd311a6199d93b78f477dc0849e
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/libre-baskerville@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/libre-baskerville@npm:0.4.0"
+  checksum: 10/9ccd5a2d0e1069ff9297d8ed0f2d1920f557292b58f021b8eb6dade090403851a9aeb09b8d2c426ea2a6bb7828054b7fc872b9a3fec294d58679c8bca70244d2
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/libre-caslon-display@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/libre-caslon-display@npm:0.4.0"
+  checksum: 10/0fb77377a96cb053cf3ca51a9e8a5a24673508777e2d87911096f92ec8813df33a4ec68a4fdd46bdd94706a3ce4f312ba579ec7658bd0ea9a2555e59d484f983
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/libre-caslon-text@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/libre-caslon-text@npm:0.4.0"
+  checksum: 10/94766e5bc9a800f898a65436e1d5703676cc356266873d50999de83794ca21cd1e6d2afb1e6ca1ff1035c9a65103382000eb5ffbd5141412c8cf4ebf14fb7fc7
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/limelight@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/limelight@npm:0.4.0"
+  checksum: 10/8e091aceb5cfc3bdce4712e318a336fdddad0b72aa247da21595143613a11e1263abc29abf557dbc93ac0faf2c87026e9d423628149b7099d5c2e578ae6d5bed
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/lora@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/lora@npm:0.4.1"
+  checksum: 10/72e3c8b3a8d48d7d0ea9a3b1f21087bca43c991187661e14f83453f9dad85e960971475bd9d240e834f88ac2c2b505894c82a1a2c6b58c69fa0f3f6bd8f28164
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/manrope@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/manrope@npm:0.4.1"
+  checksum: 10/5e75b84c61c30ebed9364eec5f686a06634e30798a23ba92c4a67b317f647ca85dd32e9af371bf031368f49c873b0fa46975a4a92eddf203e5b24ca84bb282d6
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/monoton@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/monoton@npm:0.4.0"
+  checksum: 10/a5948639c1711105452c6528581aa2e0360f79d618bf2cdbd3e819240c40b523206816ba58bfab4daad7bd32a6924165c9049c66c2a8a7265e774b18b69fb01a
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/montserrat@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/montserrat@npm:0.4.1"
+  checksum: 10/40f53453b9568d5d6d568b8ecc817d65113a200070c0f1e2e887eff415e898e99e470b6a566fcabc1256c98f3a1f28a670b51bd356d5f3cc6134a0a27d7f8c87
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/mr-dafoe@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/mr-dafoe@npm:0.4.0"
+  checksum: 10/2efd45c76f037d8515a1901659fdd58ce35dc1bc6583b3e6e80a17f3cfff5157940893e533a123e9351fa9f7e204b33c05e6a52e7c0f125fe9900c7a99443602
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/open-sans@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/open-sans@npm:0.4.1"
+  checksum: 10/1736741a89400f92f9fff5343cd32c370c832f22ebc00ccce6ec3cc5cd9ce941f91f5b5bb29f5d2275b8e1fad2fc9c2e654263327941fa3df7af3e7116284df3
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/outfit@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@expo-google-fonts/outfit@npm:0.4.2"
+  checksum: 10/fd450a57987ffcf1035332996dc8d71275d54bb28ad9aea2aabfa9a7a109850a72c684918b9d38c4f3a1f1853878a2173ea9220c8dd79c5fc226e43b59916afc
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/playfair-display@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/playfair-display@npm:0.4.1"
+  checksum: 10/d7d1aae03739bcd46e8a90a8ec6b0fe0c00bed9b042fe0d65eae7d6fb68a8371f5594985e38f7fb0df7fc1c855613f0ac69fc6f3ba945075b7f42a83604b975f
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/plus-jakarta-sans@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/plus-jakarta-sans@npm:0.4.1"
+  checksum: 10/1ce1679af0e0c94d77837c4a0f4dfe109b91987d270bde4965ad898f21ff6d39d2a985fc5cd5e66d397421ef3c6c80b49be6352282be40cb9bae84354d6a9c03
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/poppins@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/poppins@npm:0.4.0"
+  checksum: 10/ca1f4be0924afd7eee93f50c35a8224333794c16cdd363a4b850b07fca9bc16304bea442ead804497d7a6944568c1698453181aaada95ad8a8b9617bd3e914d4
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/raleway@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/raleway@npm:0.4.1"
+  checksum: 10/dd6b996e9db9b059a987e497254f4ef0f2fbc38909564620314436fef0dffffbaf74420538676857354ab0d5c16da2f57e994b7f7fc5ff88b231fa7a42e36fde
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/righteous@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/righteous@npm:0.4.1"
+  checksum: 10/d6c45dbd8c0ce79cdcaac97c6cf3c5a5b9bcc33ee85d54cee49fb437c49673d8a998afd4bb4aab698e9c5653ee93abaffc88ee908f1395f7c2154065420b722b
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/rubik@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/rubik@npm:0.4.1"
+  checksum: 10/4ae47dbb649c02a11d3582285609f64f8bc6a7f675a3ecf2680dc82f75cc74011152940364b43da347b4cbed9642ff77c665c9dd8ac6a6b3549313ecb26ec8a3
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/rye@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/rye@npm:0.4.0"
+  checksum: 10/82d7f25836bc6b2511568f72cd0073bc2e6362462dd60f93563d61025c54b31258f1d2a390d04686fd7c05b19876af15090a9637af6710cd9814500512134946
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/seaweed-script@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/seaweed-script@npm:0.4.0"
+  checksum: 10/f4adada137a0f5f5e2e3254ce8d5ab8f1f57d163908494feb9b6ba02c5e740f327f3786d1fc2364d6a168723c27002d26b5f4cb6f4f60eb339e76761c12b5083
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/six-caps@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/six-caps@npm:0.4.0"
+  checksum: 10/ea5b6a8a008731d21ab92edd6f0998aff1853d42273a59ea7b4ab0587460de4e390c81869052a1a55eef331fb80d2d1f8b80a4483636a9024dede0f411e8ce53
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/source-sans-3@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/source-sans-3@npm:0.4.0"
+  checksum: 10/461cf7078895522d4e69ff5fa4768d797854712b63d47178acd6e8f03cf33dc3798abb9fb7e6f5f7cac2c7e3cea164cc79db4e25a71d31d031b9d4157844e0b2
+  languageName: node
+  linkType: hard
+
 "@expo-google-fonts/source-sans-pro@npm:^0.2.3":
   version: 0.2.3
   resolution: "@expo-google-fonts/source-sans-pro@npm:0.2.3"
   checksum: 10/1ad23d8a2681c8977258f62d976c29c152c7c8f91f0ad8e2365efae09cae898a9abaafa556d6a0a679e091e7e2aa47f04cf4dd7bfad4fa82bcc2bb811e9476df
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/ultra@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/ultra@npm:0.4.0"
+  checksum: 10/d6e9392a96b7027af70e7e5f96b1805e15420728ed9fe1f64e202372e1840b6afc56e6a8f32230b1727f2b4739bd10eeb905c549fe0b53c862c8d7c817d9b559
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/water-brush@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/water-brush@npm:0.4.1"
+  checksum: 10/9a0157c9e6d2fc6ed29b43aec2b8bae965f13f84ca4cfa9aa5816536d587c149970bc4c4cade44e0e5aa69404346a8bbccc46e60e8f5b395d16cbdbbeb6807bf
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/yeseva-one@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@expo-google-fonts/yeseva-one@npm:0.4.0"
+  checksum: 10/5607e9305ee1ff390513135105937cdeec39df858c95667536911f743b388df73144f135a555e76feec94ea92b16002ff10595f184997f7d415524e281982e7d
   languageName: node
   linkType: hard
 
@@ -19694,314 +20002,6 @@ __metadata:
     expo: "*"
     react: "*"
   checksum: 10/47121c96a9d7fccc178f19fd6e6085c32eae2341c4e385cb3d21669d2bd8c9dfd0f9a0538058a2260ad6a2b3c6032946cfe3ddf8ee005228a452b4efbc61494e
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-amatic-sc@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-amatic-sc@npm:0.3.0"
-  checksum: 10/8c027e13d77ed7a083b090bdf0acbc137b7a1d6784da403b9c279f18a22513b84c32f7928e51be66098306430d1759db1b8c1b955e7347ff73ba5466c973cd58
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-anton@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-anton@npm:0.3.0"
-  checksum: 10/8471981006a28a2c0616b9d31d29daa69895df373ee1ad94d0502c1ffa41e22b265625878132ca4954cda7f43b46c9984578582505edc0ada0c10b1b96664524
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-archivo@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-archivo@npm:0.3.0"
-  checksum: 10/5bb197d0fedc376360ccfda5df47e32fd43d9cb4a33a61413fbff0dd877cea8dab91938ea78429d49dfd884c93cd41de2791bd0698ca600d17b8f7a84bfdea6f
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-bebas-neue@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-bebas-neue@npm:0.3.0"
-  checksum: 10/ec3625c8bea99490d3f8d3c9324d62899c2d4e4bf086be116749f5b7549267605c2da4c147daf515ebab26382e54cb76fe73da70186b157d7b02f9f0d5e6729a
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-cardo@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-cardo@npm:0.3.0"
-  checksum: 10/c7c0b41a6f545b75a2c0f5476a6e8aabd4c8aa62f005a58a45247ad89fd25a9f63900809ebed6b08e7680365c6c38f54e163e1c0fcebe099f1bc1fe58e07dbb4
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-cinzel@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-cinzel@npm:0.3.0"
-  checksum: 10/241a68139cc979a4cd70b95d4eb3de51b005d95786748d0ddb14eb7d643d32eaeb6a2a5bb8d369a5a9c64f0bcb7b1d33c17d9fefea193a705f8e27bc34345aa3
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-cormorant-garamond@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-cormorant-garamond@npm:0.3.0"
-  checksum: 10/cf9e983e6e2826b160ce69caeff81a588eae6b3998838b4da01f6982eba6fc51e1712ba0510c6d3c451d9333166ecd8c3e5aa5684cc689fa573e4ef11a3d7229
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-courier-prime@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-courier-prime@npm:0.3.0"
-  checksum: 10/243a01c8113b6fd3401ffba1c9f67cfc8e303ed56d1232361fd97c6ac798b5fb38c0c12fb844feeb1cfd1fb6319cc42d919a00c9eea3f3112e3070ed3fd3fae5
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-dm-serif-display@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-dm-serif-display@npm:0.3.0"
-  checksum: 10/7d009b5be0cc89fbbdb2e82cd88431c37095239b31c425655158ef1f7ebb7e6171e39343b5ecb26c8b7b15e05bc11284e9a875c173cab7cabfc676488a16b3a6
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-fauna-one@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-fauna-one@npm:0.3.0"
-  checksum: 10/12c39bcd29e29eef224a9494322bbcfd0fc29fcf64ee3e43c9b18ac029b620e8dcf3deb2c9f566d20a57c5802b89e0c17c18a1c01ca5101bc0d675a65f1b7b6d
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-fraunces@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-fraunces@npm:0.3.0"
-  checksum: 10/a51cf07cbe53fb9c1f29ccda0bfeba64e15f2d44fc5ab51a30dda3846b46fb339d7ec05e31f5717a3aa190c10212aa419cd8fad89d5e417c605249c80aa94137
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-gilda-display@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-gilda-display@npm:0.3.0"
-  checksum: 10/2b4b16df1aea302e421c823181068518f25e799b411d929b96744131b63e3347102c7f038cede86728c7817291462be69316887bd999390cfbad9f86a762bb00
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-gloock@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-gloock@npm:0.3.0"
-  checksum: 10/792d00eebf5590e22b6efb50614ac8afc6ae31e4a73f588aa0a486f0b38215703bfc62f431c2a71374f976e69181628ff1bc37b848e6e3c0ed6102cacdaabe8a
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-great-vibes@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-great-vibes@npm:0.3.0"
-  checksum: 10/0a7fb93f5e9b6c2792ecb88dc7e668807e8577dd4fb5298645bea280e4ce8f9351ab34453c84cef3d0c0183f982b3b39e99627b5a3b87505e06af8c2561552a2
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-inter@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-inter@npm:0.3.0"
-  checksum: 10/cf2096d34c5a4b3c3cd73b497fd05af356442dcc24546edf02e9e6bd425346c9eb37d605c0d3ab81ccae5002d5980f08209ad582ce32f2a4bd8715c98aed3937
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-josefin-sans@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-josefin-sans@npm:0.3.0"
-  checksum: 10/d30f0639c9caa617859a7412456edd5568b2fdd74920992aa950f4cbe7212951aff0b4f3b46dcb07ffce68d00562095fe7d7846d64057455c7f8dada20e4312c
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-jost@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-jost@npm:0.3.0"
-  checksum: 10/03d12fbbc15df74c25fea62612e838157d9d6607ce801a723b11a5a539baf0622df94358b1ba2bf47c42a1972409fbe30ff93f9d618278f9854c634e61380679
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-kaushan-script@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-kaushan-script@npm:0.3.0"
-  checksum: 10/abd1c35f101b0661f53633363641037ffa40e6f2bf0b2cb61d72d3d52dc8d886c521a7dd869a1553396284a2f0749d7e19b218d9fe46e444307bda73779267c4
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-koulen@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-koulen@npm:0.3.0"
-  checksum: 10/f40173c222ffab008c4ee91153812066ca74cfe059e92f5618d8580ee45d0397d85e2bc4fe6289a4ae55e6f12ca1b475d07b2494571acf9d7652438364cdc151
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-lexend@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-lexend@npm:0.3.0"
-  checksum: 10/c6be5159f001f692d696a99a878f870ee3206187b33e08516175fdc24e6258cbd7c54c0e68aecf1e15969eb3c05985fd155d9fca63be27abd6f4af30069cb0bd
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-libre-baskerville@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-libre-baskerville@npm:0.3.0"
-  checksum: 10/f6aff997d27db9852061f06d8876b365ac9bf81eb9ceb9defa2a53bd16160738e9cb2e4f72566a9882c3a738682b783ed1d1d81399448cf89b71ae6665a31e12
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-libre-caslon-display@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-libre-caslon-display@npm:0.3.0"
-  checksum: 10/d262b913c58b1c41256c01b39b75b2c97be0cb45f3f57eec76e34ab24c8070538e9d5add1b4a656c5561304cd872467ecba9b85448c69b1b741e16ee040a9240
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-libre-caslon-text@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-libre-caslon-text@npm:0.3.0"
-  checksum: 10/7e0bc1199717baf8fb40d4aed4541e20506617c2e21bdb19401fc01467426e1d30076d24a90663878e2a4baedc0aec8a3b344aec278f8458102a6f7887e30ce9
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-limelight@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-limelight@npm:0.3.0"
-  checksum: 10/07c5a453f1b71bb1fc335a3e6d748cb042c97ce16ab8c12ee52b47ab0098a7ec89c9870aad49c64c94bcb6f0d56a64760ef6fec07a73bd04d8381e4b80336a3c
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-lora@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-lora@npm:0.3.0"
-  checksum: 10/23a809f07ad7bb2f61ae94514b63f16836ea9891a53ac8a5d64df84e383fb203704b0ad757163d0bc80c47f0af7fc90339ecea832c776b72ea6ab3ca159c456b
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-manrope@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-manrope@npm:0.3.0"
-  checksum: 10/043e27d643efba31e0a619b7a08c38f18d4a79a0ea7bfda246f2afa97c2ad2d7af83e32ac03b8f5475e9ab797b5fb3a13880f3b6458ee52049446dffe67460ea
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-monoton@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-monoton@npm:0.3.0"
-  checksum: 10/860ee6831fd0756195697312f1682919c3d3dcf4981688e9818f6d68920e477355741781ce5a80cd3637d207f3490c989d0c3432c7a7706030fbdb5d551c38ea
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-montserrat@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-montserrat@npm:0.3.0"
-  checksum: 10/7579c13dbe284b258d1336802578e411a95d77ad4ef4a9c8ddbf10b8f67b663029b617e212e9e810e1eabb24a5f37f0be722d9bb6cdfded5090f88babca34869
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-mr-dafoe@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-mr-dafoe@npm:0.3.0"
-  checksum: 10/4bdb7378e89e85d208cb03817be15760330189a5b242eeb8e776d298b5fdd410053fc3f9d3513a21c716902c5040ef36c5c2b1f3bc555225c8e4d0500d995a9b
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-open-sans@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-open-sans@npm:0.3.0"
-  checksum: 10/e393dca9d09ef253374367836d4413c977ebf2cb3961bb8d40bba948bdfc749107156987696dd2a2da539ad01370c3937a6a5608407cf56db7a4c05d8ab06d69
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-outfit@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-outfit@npm:0.3.0"
-  checksum: 10/37f7f9d5d1937ee623f28691dedb8097ca417267496215e203bae334e5666daf33a4ed62822d10a607d9cf17163763847fe626c1080aed7f43b16b4f6fa322de
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-playfair-display@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-playfair-display@npm:0.3.0"
-  checksum: 10/0239ead8f7bdc0d1fc1ed65490e000d0450a05058fc0cab1a97ba7fb7102f80bb162bb32764b75584cf55e17a491bb0fae5bc17510833bdef6f1d55c02bf7c17
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-plus-jakarta-sans@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-plus-jakarta-sans@npm:0.3.0"
-  checksum: 10/a054b3c4ae78a95c020b45053c15039360c059fa62a79a9e19bf5455042f28cbf31e319e62949a3f21ba5823a3126e5d6ddcf032e0fe68c543d036ddb554b23f
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-poppins@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-poppins@npm:0.3.0"
-  checksum: 10/38a84f863bbd2c29052efb975c66d05b09c51d79cd1c62df865fa14263601fee7a5354b555e3f74b096223fc624262c261859d698d5a21038a56eb1b01b29b38
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-raleway@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-raleway@npm:0.3.0"
-  checksum: 10/0e62494ddd8e0664eda279a2ca7ad6dd95cb628dd546f8236f4566b7c7686e4e1ddf145bdf5191558ec2c69ca05ae9255222407d91e9ed73d426ab52ef682e98
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-righteous@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-righteous@npm:0.3.0"
-  checksum: 10/fbc78ab5f51bff36818ef8078975041ad996bfdcd0d37a46500674dcc6982f7df72946d322bbb5dedbc531c0ec5fa28c575709a5798de69da9d7367abfc30b31
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-rubik@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-rubik@npm:0.3.0"
-  checksum: 10/05980e9a9d28ae14991303d89fad59e2dafbbe5e21708f866234a2a59364e0237dfccf3695c8bde2c47dd34b402e7916751b1888ad8d19bdbcb047c9d4e38462
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-rye@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-rye@npm:0.3.0"
-  checksum: 10/d6237610ab209b2999942a12297a8164b010480c9c6ab69f8b3e04b8d2ff7e209f64a4a862ed93de1e946ef08bac707ea19b1a38a2aac04c854b6e8a7066a102
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-seaweed-script@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-seaweed-script@npm:0.3.0"
-  checksum: 10/e78ce10eae4b764802fc89c601bdf35285be6cde775cf68de64b1f389e7e64caa6dfdf4651577aa28db49f6aee74d7fb2aa692ffb80675bedb756f77cf7ea2a4
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-six-caps@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-six-caps@npm:0.3.0"
-  checksum: 10/fb2eca76f262340fb59b1c3ef1a12b097ad88e6fc6fbefb6ec8d8fd1d9a9e552c4a8ff5e049ea9bbb89b678787bd2f84fd1f055bd2356fed5c5a173ac21b7c33
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-source-sans-3@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-source-sans-3@npm:0.3.0"
-  checksum: 10/d13925f1e493ea24b80a7182c3fc1fad3ead602b5abcf5a6f794c66f74fc6d0b33ff8792bb31de7eb3016f63d8627d4b1d2b66c91995b9bb82a303633f06b06b
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-ultra@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-ultra@npm:0.3.0"
-  checksum: 10/cf1aeb3ace74bd96664002dea990ddc1d335539c7c280f0cb91c58488699de7465acfdbb6ab01566b47dd76ffe72706fd75c93650638322c3b13e7949ddc5da8
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-water-brush@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-water-brush@npm:0.3.0"
-  checksum: 10/f9c1f152d4dfecdfdc64259e4e74e1f5110178d7179299ff546459ad4f9b508e466340877c518653669400e1c950d6bbf118daaaf75e7767735e8577590910db
-  languageName: node
-  linkType: hard
-
-"expo-google-fonts-yeseva-one@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "expo-google-fonts-yeseva-one@npm:0.3.0"
-  checksum: 10/b794242f9b3e6151d3adaf3fead90ab8f91601ddce4de316624b5f0f5669d9e73b2d7394db18a3cd0edcbb76c8288dcb3b258d5bb683cd6fce598e281bd17217
   languageName: node
   linkType: hard
 
