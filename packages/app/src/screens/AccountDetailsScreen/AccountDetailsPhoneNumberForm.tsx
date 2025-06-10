@@ -166,6 +166,7 @@ const AccountDetailsPhoneNumberForm = ({
             id: currentUser?.id,
             email: currentUser?.email,
             phoneNumber: null,
+            hasPassword: true,
           },
         },
       },

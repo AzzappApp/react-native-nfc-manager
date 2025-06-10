@@ -125,6 +125,7 @@ const AccountDetailsEmailForm = ({
             id: currentUser?.id,
             email: null,
             phoneNumber: currentUser?.phoneNumber,
+            hasPassword: true,
           },
         },
       },

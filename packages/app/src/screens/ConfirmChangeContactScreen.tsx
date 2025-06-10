@@ -61,6 +61,18 @@ const ConfirmRegistrationScreen = ({
       ? { email: params.issuer }
       : { phoneNumber: params.issuer };
 
+    if (!code.length) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Please enter your confirmation code',
+          description:
+            'ConfirmChangeContactScreen - Error message when email or phone number is empty',
+        }),
+        visibilityTime: 5000,
+      });
+      return;
+    }
     commitMutation({
       variables: {
         input: {
@@ -74,6 +86,7 @@ const ConfirmRegistrationScreen = ({
             id: currentUser?.id,
             email: currentUser?.email,
             phoneNumber: currentUser?.phoneNumber,
+            hasPassword: true,
             ...input,
           },
         },
@@ -208,7 +221,7 @@ const ConfirmRegistrationScreen = ({
               default: 'one-time-code' as const,
             })}
             style={styles.textInputStyle}
-            returnKeyType="send"
+            returnKeyType={code ? 'send' : 'none'}
             onSubmitEditing={onSubmit}
             autoFocus
           />
