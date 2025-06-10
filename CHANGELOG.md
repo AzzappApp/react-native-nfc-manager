@@ -1,3 +1,7 @@
+## 2.0.0-rc.23
+
+* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) only count completed enrichments ([#9311](https://github.com/AzzappApp/azzapp/pull/9311))
+
 ## 2.0.0-rc.22
 
 * **fix:**  - **imagePicker:** [#9307](https://github.com/AzzappApp/azzapp/pull/9307) wrong back button ([#9309](https://github.com/AzzappApp/azzapp/pull/9309))
