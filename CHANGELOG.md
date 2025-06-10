@@ -1,3 +1,8 @@
+## 2.0.0-rc.17
+
+* **fix:**  - **tools:** [#9286](https://github.com/AzzappApp/azzapp/pull/9286) editor can access to cover edition ([#9287](https://github.com/AzzappApp/azzapp/pull/9287))
+* **feat:**  - **contact:** [#9272](https://github.com/AzzappApp/azzapp/pull/9272) notification of finished enrichments ([#9279](https://github.com/AzzappApp/azzapp/pull/9279))
+
 ## 2.0.0-rc.16
 
 * **fix:**  - **android:** [#8372](https://github.com/AzzappApp/azzapp/pull/8372) keyboard opening may close modal ([#9275](https://github.com/AzzappApp/azzapp/pull/9275))
