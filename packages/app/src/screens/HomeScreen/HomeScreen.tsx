@@ -13,6 +13,7 @@ import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
 import HomeScreenPrefetcher from './HomeScreenPrefetcher';
+import { HomeScreenUpgradePopup } from './HomeScreenUpgradePopup';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
@@ -71,6 +72,7 @@ const HomeScreen = ({
     <Suspense>
       <HomeScreenProvider userKey={currentUser}>
         <TooltipProvider>
+          <HomeScreenUpgradePopup />
           <HomeScreenContent user={currentUser} refreshQuery={refreshQuery} />
           <HomeScreenPrefetcher user={currentUser} />
         </TooltipProvider>

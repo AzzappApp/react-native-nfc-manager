@@ -1996,6 +1996,8 @@ PODS:
     - React
     - React-Core
     - react-native-skia
+  - react-native-version-check (3.5.0):
+    - React-Core
   - react-native-webview (13.15.0):
     - DoubleConversion
     - glog
@@ -2959,6 +2961,7 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
   - react-native-skottie-template-player (from `../../../node_modules/react-native-skottie-template-player`)
+  - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../../../node_modules/react-native/ReactCommon/oscompat`)
@@ -3208,6 +3211,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@shopify/react-native-skia"
   react-native-skottie-template-player:
     :path: "../../../node_modules/react-native-skottie-template-player"
+  react-native-version-check:
+    :path: "../../../node_modules/react-native-version-check"
   react-native-webview:
     :path: "../../../node_modules/react-native-webview"
   React-NativeModulesApple:
@@ -3418,6 +3423,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 5594ec631ede9c311c5c0efa244228eff845ce88
   react-native-skia: 2f725d0747756d57f0a51417c91e33bc42272c56
   react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
+  react-native-version-check: 842a3b0e7221798cbe8c6abaf24aab3ed0b485ce
   react-native-webview: 85c8fc8ca09f4e67b68afbc86207a1442af5dc80
   React-NativeModulesApple: 65b2735133d6ce8a3cb5f23215ef85e427b0139c
   React-oscompat: f26aa2a4adc84c34212ab12c07988fe19e9cf16a
