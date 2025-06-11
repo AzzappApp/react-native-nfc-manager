@@ -106,15 +106,7 @@ const HomeBottomSheetPopupPanel = ({
     undefined,
   );
 
-  const [visible, setVisible] = useState(
-    profile?.webCard && !profile.webCard.userName,
-  );
-
-  useEffect(() => {
-    if (profile?.webCard && !profile.webCard.userName) {
-      setVisible(true);
-    }
-  }, [profile?.webCard]);
+  const visible = profile?.webCard && !profile.webCard.userName;
 
   const { openTooltips } = useTooltipContext();
 
@@ -213,7 +205,6 @@ const HomeBottomSheetPopupPanel = ({
             },
           },
           onCompleted: () => {
-            setVisible(false);
             onChangeWebCard({ webCardUserName: newUserName });
           },
           optimisticUpdater: updater,
