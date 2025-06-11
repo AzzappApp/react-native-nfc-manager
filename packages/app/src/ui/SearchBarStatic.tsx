@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { View, TextInput, useColorScheme } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -34,12 +34,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
 
   const [isFocused, setIsFocused] = useState(false);
 
-  const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    setSearchValue(value);
-  }, [value]);
 
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true);
@@ -52,12 +47,11 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
   };
 
   const onSetValueText = (text: string) => {
-    setSearchValue(text);
     onChangeText(text);
   };
 
   const onSubmitEditingLocal = () => {
-    onSubmitEditing?.(searchValue);
+    onSubmitEditing?.(value);
   };
 
   const onInnerFocus = (event: GestureResponderEvent) => {
@@ -66,7 +60,6 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
   };
 
   const onClose = () => {
-    setSearchValue(undefined);
     onChangeText(undefined);
     textInputRef.current?.blur();
   };
@@ -92,7 +85,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
         onFocus={onInputFocus}
         onBlur={onInputBlur}
         style={styles.input}
-        value={searchValue}
+        value={value}
         onChangeText={onSetValueText}
         selectionColor={appearance === 'dark' ? colors.white : colors.black}
         returnKeyType="search"
@@ -100,7 +93,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
         autoFocus={autoFocus}
         placeholderTextColor={styles.placeHolder.color}
       />
-      {searchValue && (
+      {value && (
         <IconButton
           icon="closeFull"
           style={styles.close}
