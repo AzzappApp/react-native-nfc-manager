@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { clamp, runOnJS } from 'react-native-reanimated';
+import { colors } from '#theme';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type SaturationValuePickerProps = {
@@ -120,6 +121,6 @@ const styles = StyleSheet.create({
     top: -12,
     left: -12,
     position: 'absolute',
-    borderColor: '#fff',
+    borderColor: colors.white,
   },
 });

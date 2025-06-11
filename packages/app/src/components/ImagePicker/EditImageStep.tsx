@@ -388,6 +388,7 @@ EditImageStep.STEP_ID = 'EDIT_IMAGE';
 export default EditImageStep;
 
 const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-color-literals
   durationView: {
     paddingHorizontal: 8,
     paddingVertical: 2,

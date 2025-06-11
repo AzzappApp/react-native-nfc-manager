@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   notificationText: { color: colors.white },
-  textWhite: { color: 'white' },
-  iconBlack: { tintColor: 'black' },
-  iconWhite: { tintColor: 'white', marginTop: 5 },
+  textWhite: { color: colors.white },
+  iconBlack: { tintColor: colors.black },
+  iconWhite: { tintColor: colors.white, marginTop: 5 },
   scanbutton: {
     position: 'absolute',
     height: BAR_HEIGHT - 20,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   circleShadow2: {
-    shadowColor: '#000',
+    shadowColor: colors.fullBlack,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 20,
@@ -360,14 +360,14 @@ const ShareButton = ({
         ]}
       >
         <LinearGradient
-          colors={['#F5F5F6', '#FFF']}
+          colors={[colors.grey50, colors.white]}
           locations={[0.5192, 1]}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.externalGradient}
         >
           <LinearGradient
-            colors={['#FFF', '#E2E1E3']}
+            colors={[colors.white, colors.grey100]}
             locations={[0.5192, 1]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}

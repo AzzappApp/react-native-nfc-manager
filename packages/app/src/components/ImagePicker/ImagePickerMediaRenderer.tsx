@@ -73,7 +73,7 @@ const ImagePickerMediaRenderer = ({
   );
 
   const cropperStyle = useMemo(() => {
-    return { ...imageDimensions, backgroundColor: 'black' };
+    return { ...imageDimensions, backgroundColor: colors.black };
   }, [imageDimensions]);
 
   const { width: windowWidth } = useWindowDimensions();

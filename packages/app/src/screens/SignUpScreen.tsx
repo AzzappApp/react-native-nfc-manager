@@ -409,7 +409,7 @@ SignUpScreen.options = {
 
 const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },
-  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
+  background: [StyleSheet.absoluteFill, { backgroundColor: colors.black }],
   content: {
     flex: 1,
   },

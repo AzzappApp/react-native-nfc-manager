@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     width: '100%',
     objectFit: 'cover',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   imageDeleteButton: {
     width: 42,
     height: 42,

@@ -22,6 +22,7 @@ import {
   useCameraDevices,
   useCameraFormat,
 } from 'react-native-vision-camera';
+import { colors } from '#theme';
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
   focusRing: {
     position: 'absolute',
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: colors.white,
     borderRadius: FOCUS_RING_SIZE / 2,
     width: FOCUS_RING_SIZE,
     height: FOCUS_RING_SIZE,

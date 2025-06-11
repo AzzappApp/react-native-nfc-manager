@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     padding: 5,
   },
+  // eslint-disable-next-line react-native/no-color-literals
   containerText: {
     alignSelf: 'center',
     borderWidth: 1,

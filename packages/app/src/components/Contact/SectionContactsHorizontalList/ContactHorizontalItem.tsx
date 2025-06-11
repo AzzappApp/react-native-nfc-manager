@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     overflow: 'visible',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   invite: {
     position: 'absolute',
     top: 5,

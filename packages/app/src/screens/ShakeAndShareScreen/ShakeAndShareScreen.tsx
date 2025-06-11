@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     marginBottom: 200,
   },
   qrCodeContainer: {
-    backgroundColor: '#FFF',
+    backgroundColor: colors.white,
     borderRadius: 23,
     borderCurve: 'continuous',
     width: QR_CODE_WIDTH + 40,
@@ -587,13 +587,13 @@ const styles = StyleSheet.create({
   },
   signaturePreview: {
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     padding: 15,
     borderRadius: 16,
     transform: [{ scale: 0.85 }, { translateY: -20 }],
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
-  viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
+  viewShotBackgroundColor: { backgroundColor: colors.white, paddingBottom: 5 },
   canvas: {
     width: QR_CODE_WIDTH,
     height: QR_CODE_WIDTH,

@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
+import { colors } from '#theme';
 import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
 import { MAX_ALLOWED_VIDEOS_BY_COVER } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
@@ -78,14 +79,14 @@ const CoverEditorMediaPickerFloatingTool = ({
 };
 const styles = StyleSheet.create({
   icon: {
-    tintColor: 'white',
+    tintColor: colors.white,
   },
   iconContainer: {
     position: 'absolute',
     right: 20,
     top: 15,
     padding: 0,
-    backgroundColor: 'black',
+    backgroundColor: colors.black,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',

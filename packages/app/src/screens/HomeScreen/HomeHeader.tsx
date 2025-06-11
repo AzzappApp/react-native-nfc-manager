@@ -9,6 +9,7 @@ import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import Header from '#ui/Header';
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     columnGap: 10,
   },
   header: {
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
     height: 30,
   },
   premiumIndicator: {

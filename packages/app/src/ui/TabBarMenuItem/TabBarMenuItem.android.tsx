@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   pressable: {
     flexDirection: 'row',
     alignItems: 'center',

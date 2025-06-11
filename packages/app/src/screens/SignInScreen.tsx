@@ -389,7 +389,7 @@ const stylesheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
-  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
+  background: [StyleSheet.absoluteFill, { backgroundColor: colors.black }],
   logoContainer: {
     flex: 1,
     alignItems: 'center',

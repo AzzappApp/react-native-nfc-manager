@@ -57,6 +57,7 @@ const TabBarMenuItem = ({
 export const TAB_BAR_MENU_ITEM_HEIGHT = 32;
 
 const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-color-literals
   pressable: {
     flexDirection: 'row',
     alignItems: 'center',

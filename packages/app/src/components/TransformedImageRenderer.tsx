@@ -1,6 +1,7 @@
 import { Canvas, Image, Skia } from '@shopify/react-native-skia';
 import { StyleSheet } from 'react-native';
 import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
+import { colors } from '#theme';
 import {
   transformImage,
   useLutTexture,
@@ -82,7 +83,7 @@ const TransformedImageRenderer = ({
 
 const styles = StyleSheet.create({
   picture: {
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
   },
 });
 

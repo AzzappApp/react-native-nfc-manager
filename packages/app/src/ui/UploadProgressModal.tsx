@@ -128,6 +128,7 @@ const ObservableBoundProgressBar = ({
 };
 
 const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-color-literals
   container: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.9)',

@@ -5,6 +5,7 @@ import Animated, {
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { colors } from '#theme';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import type { ReactNode } from 'react';
@@ -73,7 +74,7 @@ const BottomSheetPopup = ({
   );
 };
 const styles = StyleSheet.create({
-  background: { backgroundColor: 'transparent' },
+  background: { backgroundColor: colors.transparent },
   container: {
     boxShadow: 'none',
   },

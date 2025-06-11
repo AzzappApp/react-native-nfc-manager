@@ -6,6 +6,7 @@ import { useMMKVBoolean } from 'react-native-mmkv';
 import Animated, { FadeOut, useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
@@ -203,8 +204,8 @@ const CONTAINER_HEIGHT = 80;
 const INSIDE_CONTAINER_HEIGHT = 168;
 const MARGIN_BOTTOM = 15;
 const styles = StyleSheet.create({
-  iconStyle: { tintColor: 'white' },
-  buttonText: { color: 'white' },
+  iconStyle: { tintColor: colors.white },
+  buttonText: { color: colors.white },
   mainContainer: {
     height: CONTAINER_HEIGHT,
     overflow: 'visible',
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   toolsNotificationContainer: {
-    backgroundColor: 'red',
+    backgroundColor: colors.red400,
     width: 18,
     height: 18,
     borderRadius: 9,

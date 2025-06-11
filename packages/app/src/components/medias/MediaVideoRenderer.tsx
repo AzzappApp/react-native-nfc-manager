@@ -15,6 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
+import { colors } from '#theme';
 import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent', // without background color, the activity indicator is large
+    backgroundColor: colors.transparent, // without background color, the activity indicator is large
     flex: 1,
   },
 });

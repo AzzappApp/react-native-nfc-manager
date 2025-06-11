@@ -94,7 +94,7 @@ const TextInputWithEllipsizeMode = ({
         inputStyle={[
           textStyles.textField,
           style,
-          !isFocused ? { color: 'transparent' } : undefined,
+          !isFocused ? { color: colors.transparent } : undefined,
         ]}
         prefix={prefix}
       />
@@ -116,7 +116,7 @@ const TextInputWithEllipsizeMode = ({
                 height: 'auto',
                 opacity: !isFocused ? 1 : 0,
                 borderWidth: 1,
-                borderColor: 'transparent',
+                borderColor: colors.transparent,
                 color: props.value ? undefined : colors.grey400,
               },
             ]}

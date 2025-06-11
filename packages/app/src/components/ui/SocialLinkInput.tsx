@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   inputStyleSocial: {
     paddingLeft: 0,
     // workaround to make numberOfLines working fine
-    borderColor: 'transparent',
+    borderColor: colors.transparent,
     borderWidth: 1,
   },
   inputContainer: {

@@ -50,7 +50,7 @@ export const ContactDetailItem = ({
           styles.itemContainer,
           {
             backgroundColor: isEnrichmentOngoing
-              ? 'transparent'
+              ? colors.transparent
               : appearance === 'dark'
                 ? colors.grey900
                 : colors.white,

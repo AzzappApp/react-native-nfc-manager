@@ -23,11 +23,11 @@ describe('Text component', () => {
 
   test('props `style`should apply correcty', () => {
     const { getByText } = render(
-      <Text style={{ fontSize: 20, color: 'red' }}>{label}</Text>,
+      <Text style={{ fontSize: 20, color: colors.red400 }}>{label}</Text>,
     );
     const textElement = getByText(label);
     expect(textElement).toHaveStyle({ fontSize: 20 });
-    expect(textElement).toHaveStyle({ color: 'red' });
+    expect(textElement).toHaveStyle({ color: colors.red400 });
   });
 
   test('props `variant` should apply correcty', () => {

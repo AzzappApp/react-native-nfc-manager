@@ -815,6 +815,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 10,
     marginLeft: 12,
-    color: 'white',
+    color: colors.white,
   },
 });

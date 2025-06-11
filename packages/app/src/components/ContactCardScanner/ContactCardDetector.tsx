@@ -493,7 +493,7 @@ const ContactCardDetector = ({
             style={[
               styles.whiteText,
               {
-                color: 'white',
+                color: colors.white,
                 top: boxDimension.y - 40,
                 width,
                 textAlign: 'center',
@@ -520,7 +520,7 @@ const ContactCardDetector = ({
               icon="close"
               variant="icon"
               style={{ position: 'absolute', left: 20 }}
-              iconStyle={{ tintColor: 'white' }}
+              iconStyle={{ tintColor: colors.white }}
               size={30}
               onPress={closeContainer ?? close}
             />
@@ -667,6 +667,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   iconButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderWidth: 0,
@@ -688,8 +689,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  whiteText: { color: 'white' },
-  container: { backgroundColor: 'black' },
+  whiteText: { color: colors.white },
+  container: { backgroundColor: colors.black },
   icon: { width: 30, height: 30 },
   button: {
     width: 44,
@@ -698,6 +699,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   selected: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
@@ -708,9 +710,9 @@ const styles = StyleSheet.create({
     borderRadius: 37,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     borderWidth: 5,
-    borderColor: 'black',
+    borderColor: colors.black,
   },
 });
 

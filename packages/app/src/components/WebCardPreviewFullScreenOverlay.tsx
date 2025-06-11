@@ -91,6 +91,7 @@ const FullScreenMediaOverlay = ({
   if (!media) return undefined;
   return (
     <Animated.View
+      // eslint-disable-next-line react-native/no-color-literals
       style={{
         flex: 1,
         position: 'absolute',

@@ -595,9 +595,12 @@ const WebCardEditBlockContainer = ({
                 icon="check"
                 size={buttonSize}
                 iconSize={iconSize}
-                iconStyle={{ tintColor: 'white', opacity: selected ? 1 : 0 }}
+                iconStyle={{
+                  tintColor: colors.white,
+                  opacity: selected ? 1 : 0,
+                }}
                 style={{
-                  backgroundColor: selected ? colors.black : 'white',
+                  backgroundColor: selected ? colors.black : colors.white,
                 }}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: selected }}

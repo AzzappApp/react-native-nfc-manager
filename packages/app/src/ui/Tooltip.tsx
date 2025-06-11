@@ -86,5 +86,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   contentDescription: { textAlign: 'center' },
-  backgroundStyle: { backgroundColor: 'transparent' },
+  backgroundStyle: { backgroundColor: colors.transparent },
 });

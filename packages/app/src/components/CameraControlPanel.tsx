@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     borderColor: colors.grey100,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: colors.white,
   },
   photoButtonDisabled: {
     opacity: 0.5,

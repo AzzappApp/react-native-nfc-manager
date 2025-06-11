@@ -277,7 +277,13 @@ export const MediaGridListFallback = memo(function MediaGridListFallback({
 });
 
 const styles = StyleSheet.create({
-  textDuration: { position: 'absolute', bottom: 10, right: 10, color: 'white' },
+  textDuration: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    color: colors.white,
+  },
+  // eslint-disable-next-line react-native/no-color-literals
   loader: {
     position: 'absolute',
     top: 0,

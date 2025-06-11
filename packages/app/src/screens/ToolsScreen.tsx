@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { usePreloadedQuery } from 'react-relay';
 import { graphql } from 'relay-runtime';
 import env from '#env';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import {
   profileInfoHasAdminRight,
@@ -721,7 +722,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   itemContainer: {
-    backgroundColor: '#F5F5F6',
+    backgroundColor: colors.grey50,
     marginBottom: 30,
     borderRadius: 18,
     overflow: 'hidden',
@@ -755,5 +756,5 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  price: { color: 'red', fontWeight: 'bold' },
+  price: { color: colors.red400, fontWeight: 'bold' },
 });

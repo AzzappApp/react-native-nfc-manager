@@ -27,7 +27,7 @@ export const ContactDetailAIItemLabels = ({
           <RemixIcon
             name={(item.icon as IconName) || null}
             size="15"
-            color={appearance === 'dark' ? 'white' : 'black'}
+            color={appearance === 'dark' ? colors.white : colors.black}
             fallback={null}
           />
           <Text variant="button">{item.name}</Text>

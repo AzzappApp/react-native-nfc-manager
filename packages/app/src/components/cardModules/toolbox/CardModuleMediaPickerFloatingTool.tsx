@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
+import { colors } from '#theme';
 import { ScreenModal } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
 import IconButton from '#ui/IconButton';
@@ -61,14 +62,14 @@ export default CardModuleMediaPickerFloatingTool;
 
 const styles = StyleSheet.create({
   iconTint: {
-    tintColor: 'white',
+    tintColor: colors.white,
   },
   iconButton: {
     position: 'absolute',
     right: 20,
     top: 15,
     padding: 0,
-    backgroundColor: 'black',
+    backgroundColor: colors.black,
     borderRadius: 10,
   },
 });

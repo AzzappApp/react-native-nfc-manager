@@ -4,6 +4,7 @@ import {
   type CardModuleColor,
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
+import { colors } from '#theme';
 import {
   defaultTextFontSize,
   defaultTitleFontSize,
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
   },
   textStyle: {
     textAlign: 'center',

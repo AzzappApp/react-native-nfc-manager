@@ -40,6 +40,9 @@ export const colors = {
 
   // enrichment colors
   tropicalAquaTone: '#23CFCC',
+
+  fullBlack: '#000000',
+  transparent: 'transparent',
 };
 export const fontFamilies = {
   extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold' },

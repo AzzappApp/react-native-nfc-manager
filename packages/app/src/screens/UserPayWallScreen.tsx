@@ -786,6 +786,7 @@ const OfferItem = ({
 
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = 450;
+
 const styles = StyleSheet.create({
   textOtherDevice: { textAlign: 'center', color: colors.black },
   viewCantSubscribe: {
@@ -822,7 +823,7 @@ const styles = StyleSheet.create({
   containerLogo: { flexDirection: 'row', height: 34, marginBottom: 15 },
   plusImage: { height: 34 },
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
-  container: { flex: 1, backgroundColor: 'transparent' },
+  container: { flex: 1, backgroundColor: colors.transparent },
   priceItem: {
     flexDirection: 'row',
     height: 54,
@@ -837,7 +838,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginHorizontal: 10,
     borderRadius: 18,
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     ...shadow({ appearance: 'light', direction: 'center' }),
   },
   contentContainerStyle: {
@@ -849,7 +850,7 @@ const styles = StyleSheet.create({
   content: {
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     borderTopRightRadius: 24,
     borderTopLeftRadius: 24,
     overflow: 'visible',
@@ -878,6 +879,7 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'visible',
   },
+  // eslint-disable-next-line react-native/no-color-literals
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.9)',

@@ -239,7 +239,7 @@ const BottomMenuItemRenderer = ({
       >
         <View
           style={[
-            { backgroundColor: 'transparent' },
+            { backgroundColor: colors.transparent },
             showCircle && isSelected && styles.selectedMenu,
             showCircle && showLabel && styles.circleWithLabel,
           ]}

@@ -180,7 +180,7 @@ const BottomSheetModal = ({
         return (
           <BottomSheetBackdrop
             {...props}
-            style={[props.style, { backgroundColor: 'transparent' }]}
+            style={[props.style, { backgroundColor: colors.transparent }]}
             disappearsOnIndex={-1}
             appearsOnIndex={0}
             opacity={1}

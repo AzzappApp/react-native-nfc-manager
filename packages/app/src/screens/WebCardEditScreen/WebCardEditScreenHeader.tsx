@@ -2,6 +2,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -209,7 +210,7 @@ const WebCardEditScreenHeader = ({
               />
             )
           }
-          style={{ backgroundColor: 'transparent', paddingBottom: 6 }}
+          style={{ backgroundColor: colors.transparent, paddingBottom: 6 }}
         />
       </Container>
     </Animated.View>

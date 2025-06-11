@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     marginBottom: 5 * SCALE_RATIO,
   },
   textCompany: {
-    color: '#87878E',
+    color: colors.grey500,
     fontSize: 12 * SCALE_RATIO,
     fontFamily: 'Helvetica Neue',
     marginBottom: 5 * SCALE_RATIO,

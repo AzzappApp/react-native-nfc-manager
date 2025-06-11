@@ -318,7 +318,7 @@ const ContactCardCreateScreen = ({
                 overlayLayers: [
                   {
                     animation: null,
-                    borderColor: '#0E1216',
+                    borderColor: colors.black,
                     borderRadius: 0,
                     borderWidth: 0,
                     bounds: {
@@ -348,8 +348,8 @@ const ContactCardCreateScreen = ({
                 ],
                 cardColors: {
                   primary: data.primaryColor ?? colors.grey400,
-                  light: '#FFFFFF',
-                  dark: '#0E1216',
+                  light: colors.white,
+                  dark: colors.black,
                   otherColors: [],
                 },
               },

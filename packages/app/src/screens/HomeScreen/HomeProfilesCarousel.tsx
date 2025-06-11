@@ -634,6 +634,7 @@ const styles = StyleSheet.create({
     default: shadow({ appearance: 'light', direction: 'bottom' }),
     android: {},
   }),
+  // eslint-disable-next-line react-native/no-color-literals
   newCover: {
     aspectRatio: COVER_RATIO,
     alignItems: 'center',
@@ -654,6 +655,7 @@ const styles = StyleSheet.create({
     // trick to have the shadow on the cover
   },
   coverLinkWrapper: { position: 'relative' },
+  // eslint-disable-next-line react-native/no-color-literals
   editUserContainer: {
     position: 'absolute',
     bottom: 8,
@@ -663,6 +665,7 @@ const styles = StyleSheet.create({
     left: 8,
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
+  // eslint-disable-next-line react-native/no-color-literals
   multiUserContainer: {
     position: 'absolute',
     bottom: 8,
@@ -672,6 +675,7 @@ const styles = StyleSheet.create({
     right: 8,
     ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
+  // eslint-disable-next-line react-native/no-color-literals
   multiUserIconContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -692,7 +696,7 @@ const styles = StyleSheet.create({
     top: 0,
     width: 10,
     height: 10,
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
     pointerEvents: 'none',
   },
 });

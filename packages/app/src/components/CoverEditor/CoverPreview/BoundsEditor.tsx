@@ -114,6 +114,7 @@ export const BoundsEditorGestureHandler = ({
         style={[
           animatedStyle,
           { transformOrigin: 'center' },
+          // eslint-disable-next-line react-native/no-color-literals
           DEBUG && { backgroundColor: '#00FFFF33' },
         ]}
         {...props}
@@ -166,6 +167,7 @@ const ResizeHandleGestureHandler = ({
           styles.resizeHandle,
           styles[`resizeHandle_${axis}`],
           styles[`resizeHandle_${position}`],
+          // eslint-disable-next-line react-native/no-color-literals
           DEBUG && { backgroundColor: '#FF000033' },
         ]}
       />

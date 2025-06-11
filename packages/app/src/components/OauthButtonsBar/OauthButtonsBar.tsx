@@ -223,7 +223,7 @@ const OauthButtonsBar = ({
       <View style={styles.buttonsContainer}>
         {Platform.OS === 'ios' && (
           <PressableNative onPress={onAppleSignUp}>
-            <View style={[styles.button, { backgroundColor: '#000' }]}>
+            <View style={[styles.button, { backgroundColor: colors.black }]}>
               <Image
                 source={require('./assets/apple.png')}
                 style={styles.oauthLogoApple}

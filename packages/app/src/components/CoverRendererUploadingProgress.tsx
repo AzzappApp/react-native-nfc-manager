@@ -10,6 +10,7 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
+import { colors } from '#theme';
 import Text from '#ui/Text';
 import AnimatedText from './AnimatedText';
 import { useCoverUpload } from './CoverEditor/CoverUploadContext';
@@ -51,6 +52,7 @@ const CoverRendererUploadingProgress = () => {
       style={[
         { width: SIZE, height: SIZE, borderRadius: SIZE / 2 },
 
+        // eslint-disable-next-line react-native/no-color-literals
         {
           boxSizing: 'content-box',
           overflow: 'hidden',
@@ -97,7 +99,7 @@ const CoverRendererUploadingProgress = () => {
           height: SIZE,
         }}
       >
-        <Text style={{ color: '#FFFFFF', fontSize: 7 }}>
+        <Text style={{ color: colors.white, fontSize: 7 }}>
           <FormattedMessage
             defaultMessage="Uploading"
             description="Cover Upload progress message"
@@ -106,7 +108,7 @@ const CoverRendererUploadingProgress = () => {
         <AnimatedText
           variant="xlarge"
           style={{
-            color: '#FFFFFF',
+            color: colors.white,
             fontSize: 16,
             fontWeight: 'bold',
           }}

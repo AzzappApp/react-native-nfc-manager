@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { clamp, runOnJS } from 'react-native-reanimated';
+import { colors } from '#theme';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type HuePickerProps = {
@@ -116,6 +117,6 @@ const styles = StyleSheet.create({
     top: -4,
     left: -8,
     position: 'absolute',
-    borderColor: '#fff',
+    borderColor: colors.white,
   },
 });

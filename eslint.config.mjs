@@ -189,6 +189,7 @@ export default [
       'react/jsx-curly-brace-presence': 'warn',
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
+      'react-native/no-color-literals': 2,
       'react-compiler/react-compiler': 0,
       'relay/graphql-syntax': 'error',
       'relay/graphql-naming': 'error',
