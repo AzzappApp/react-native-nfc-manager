@@ -1,3 +1,7 @@
+## 2.1.0-canary.23
+
+* **fix:**  - replace state by memo in sortable links ([#9349](https://github.com/AzzappApp/azzapp/pull/9349))
+
 ## 2.1.0-canary.22
 
 * **fix:**  - search header color in dark mode ([#9339](https://github.com/AzzappApp/azzapp/pull/9339))
