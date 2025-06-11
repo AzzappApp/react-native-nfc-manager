@@ -1,3 +1,7 @@
+## 2.1.0-canary.21
+
+* **fix:**  - remove setState in useEffect in Search ([#9344](https://github.com/AzzappApp/azzapp/pull/9344))
+
 ## 2.1.0-canary.20
 
 * **fix:**  - enable no no-color-literals eslint rule ([#9337](https://github.com/AzzappApp/azzapp/pull/9337))
