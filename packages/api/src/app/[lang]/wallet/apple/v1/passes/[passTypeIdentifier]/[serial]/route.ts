@@ -7,8 +7,9 @@ import { getApiEndpoint } from '#helpers/request';
 
 const updatePass = async (
   req: Request,
-  { params }: { params: { serial: string; lang: string } },
+  { params: _params }: { params: { serial: string; lang: string } },
 ) => {
+  const params = await _params;
   let data;
   try {
     data = await checkAuthorization(req, params.serial);

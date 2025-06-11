@@ -30,11 +30,13 @@ export const maxDuration = 30; //30 seconds
 const getGoogleWalletPass = async (
   req: Request,
   {
-    params: { lang },
+    params: _params,
   }: {
     params: { lang: string };
   },
 ) => {
+  const params = await _params;
+  const lang = params.lang;
   const searchParams = new URL(req.url).searchParams;
 
   const contactCardAccessId = searchParams.get('contactCardAccessId');

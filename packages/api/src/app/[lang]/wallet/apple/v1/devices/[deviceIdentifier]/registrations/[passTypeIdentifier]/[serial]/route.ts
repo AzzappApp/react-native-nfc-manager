@@ -10,7 +10,7 @@ import { withPluginsRoute } from '#helpers/queries';
 const registerDevice = async (
   req: Request,
   {
-    params,
+    params: _params,
   }: {
     params: {
       serial: string;
@@ -20,6 +20,7 @@ const registerDevice = async (
     };
   },
 ) => {
+  const params = await _params;
   try {
     await checkAuthorization(req, params.serial);
   } catch {

@@ -9,7 +9,7 @@ import type { NextRequest } from 'next/server';
 const getUpdatedPasses = async (
   req: NextRequest,
   {
-    params,
+    params: _params,
   }: {
     params: {
       deviceIdentifier: string;
@@ -17,6 +17,7 @@ const getUpdatedPasses = async (
     };
   },
 ) => {
+  const params = await _params;
   const passes = await getSerialsForDevice(
     params.deviceIdentifier,
     params.passTypeIdentifier,

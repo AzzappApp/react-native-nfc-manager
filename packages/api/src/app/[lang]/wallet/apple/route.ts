@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import {
   getContactCardAccessById,
@@ -14,11 +15,12 @@ import { getSessionData } from '#helpers/tokens';
 const createPass = async (
   req: Request,
   {
-    params,
+    params: _params,
   }: {
     params: { lang: string };
   },
 ) => {
+  const params = await _params;
   const searchParams = new URL(req.url).searchParams;
 
   const webCardId = searchParams.get('webCardId');
@@ -81,6 +83,8 @@ const createPass = async (
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json({ message: e.message }, { status: 401 });
+    } else {
+      Sentry.captureException(e);
     }
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },

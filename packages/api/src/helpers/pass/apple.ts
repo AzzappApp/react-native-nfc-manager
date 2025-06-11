@@ -1,8 +1,4 @@
 import { PKPass } from 'passkit-generator';
-import icon from '@azzapp/api/public/pass/ICON_PADDING_15.png';
-import icon2x from '@azzapp/api/public/pass/ICON_PADDING_15@2x.png';
-import logo from '@azzapp/api/public/pass/LOGO_PADDING_0-40.png';
-import logo2x from '@azzapp/api/public/pass/LOGO_PADDING_0-40@2x.png';
 import {
   getMediasByIds,
   buildDefaultContactCard,
@@ -10,7 +6,7 @@ import {
 } from '@azzapp/data';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
-import { buildWebUrl, buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
+import { buildUserUrlWithKey } from '@azzapp/shared/urlHelpers';
 import env from '#env';
 import type { Profile, WebCard } from '@azzapp/data';
 
@@ -108,10 +104,18 @@ export const buildApplePass = async ({
 
     const [iconContent, icon2xContent, logoContent, logo2xContent] =
       await Promise.all([
-        fetch(buildWebUrl(icon.src)).then(res => res.arrayBuffer()),
-        fetch(buildWebUrl(icon2x.src)).then(res => res.arrayBuffer()),
-        fetch(buildWebUrl(logo.src)).then(res => res.arrayBuffer()),
-        fetch(buildWebUrl(logo2x.src)).then(res => res.arrayBuffer()),
+        fetch(`${apiEndpoint}/pass/ICON_PADDING_15.png`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${apiEndpoint}/pass/ICON_PADDING_15@2x.png`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${apiEndpoint}/pass/LOGO_PADDING_0-40.png`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${apiEndpoint}/pass/LOGO_PADDING_0-40@2x.png`).then(res =>
+          res.arrayBuffer(),
+        ),
       ]);
 
     const primary = webCard.cardColors?.primary;
