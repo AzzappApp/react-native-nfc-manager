@@ -1,3 +1,22 @@
+## 2.1.0-canary.19
+
+* **fix:**  - **wallet:** [#9328](https://github.com/AzzappApp/azzapp/pull/9328) update route after next 15 upgrade ([#9331](https://github.com/AzzappApp/azzapp/pull/9331))
+* **fix:**  - **ui:** [#9321](https://github.com/AzzappApp/azzapp/pull/9321) missing IconButton borders ([#9324](https://github.com/AzzappApp/azzapp/pull/9324))
+* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) desapprove canceled enrichments ([#9323](https://github.com/AzzappApp/azzapp/pull/9323))
+* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) hide avatar before submit ([#9317](https://github.com/AzzappApp/azzapp/pull/9317))
+* **fix:**  - **ContactScan:** allows any user of a multiuser WebCard unlimited scans ([#9318](https://github.com/AzzappApp/azzapp/pull/9318))
+* **fix:**  - **CoverEditorLink:** fix panel height
+* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) only count completed enrichments ([#9311](https://github.com/AzzappApp/azzapp/pull/9311))
+* **fix:**  - **imagePicker:** [#9307](https://github.com/AzzappApp/azzapp/pull/9307) wrong back button ([#9309](https://github.com/AzzappApp/azzapp/pull/9309))
+* **fix:**  - **posts:** [#9301](https://github.com/AzzappApp/azzapp/pull/9301) wrong iconButton on header ([#9304](https://github.com/AzzappApp/azzapp/pull/9304))
+* **fix:**  - **contact:** [#9299](https://github.com/AzzappApp/azzapp/pull/9299) dynamic sizing requires BottomSheetView ([#9303](https://github.com/AzzappApp/azzapp/pull/9303))
+* **fix:**  - **analytics:** [#9297](https://github.com/AzzappApp/azzapp/pull/9297) wrong use of iconButton ([#9298](https://github.com/AzzappApp/azzapp/pull/9298))
+* **fix:**  - **contact:** [#9292](https://github.com/AzzappApp/azzapp/pull/9292) count all unapproved enrichments ([#9294](https://github.com/AzzappApp/azzapp/pull/9294))
+* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) don’t display hidden avatar ([#9293](https://github.com/AzzappApp/azzapp/pull/9293))
+* **fix:**  - IconButton display + bottom sheet behavior ([#9289](https://github.com/AzzappApp/azzapp/pull/9289))
+* **fix:**  - **tools:** [#9286](https://github.com/AzzappApp/azzapp/pull/9286) editor can access to cover edition ([#9287](https://github.com/AzzappApp/azzapp/pull/9287))
+* **feat:**  - **contact:** [#9272](https://github.com/AzzappApp/azzapp/pull/9272) notification of finished enrichments ([#9279](https://github.com/AzzappApp/azzapp/pull/9279))
+
 ## 2.1.0-canary.18
 
 * **fix:**  - remove last remaining companyActivityId and webcardCategories apis ([#8270](https://github.com/AzzappApp/azzapp/pull/8270))
