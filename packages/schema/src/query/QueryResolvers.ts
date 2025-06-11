@@ -26,9 +26,6 @@ export const Query: QueryResolvers = {
   node: (_, { id }) => fetchNode(id),
   nodes: (_, { ids }) => Promise.all(ids.map(id => fetchNode(id))),
 
-  // FIXME shall be removed
-  webCardCategories: () => [],
-
   webCardParameters: () => ({
     //use a single source of truth for settings. Those settings can also be dependant on vip/premium status
     userNameChangeFrequencyDay: USERNAME_CHANGE_FREQUENCY_DAY,

@@ -26,8 +26,6 @@ const postCommentSymbol = Symbol('PostComment');
 const profileSymbol = Symbol('Profile');
 const webCardSymbol = Symbol('WebCard');
 const contactSymbol = Symbol('Contact');
-const webCardCategorySymbol = Symbol('WebCardCategory');
-const companyActivitySymbol = Symbol('CompanyActivity');
 
 // TODO - Add more security checks here
 export const fetchNode = async (gqlId: string): Promise<any> => {
@@ -130,12 +128,6 @@ const resolveNode = (value: any) => {
   }
   if (value[webCardSymbol]) {
     return 'WebCard';
-  }
-  if (value[webCardCategorySymbol]) {
-    return 'WebCardCategory';
-  }
-  if (value[companyActivitySymbol]) {
-    return 'CompanyActivity';
   }
   if (value[contactSymbol]) {
     return 'Contact';

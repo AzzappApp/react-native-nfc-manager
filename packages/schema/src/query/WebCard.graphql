@@ -23,11 +23,6 @@ type WebCard implements Node {
   """
   webCardKind: WebCardKind!
   """
-  The webCard category
-  """
-  webCardCategory: WebCardCategory
-    @deprecated(reason: "use companyActivityLabel")
-  """
   The first name of the webCard, will only be set for personal webCard
   """
   firstName: String
@@ -39,12 +34,6 @@ type WebCard implements Node {
   The company name of the webCard, will only be set for business webCard
   """
   companyName: String
-  """
-  The company activity of the webCard, will only be set for business webCard
-  """
-  companyActivity: CompanyActivity
-    @deprecated(reason: "use directly companyActivityLabel")
-
   """
   The company activity Label of the webCard, will only be set for business webCard
   """
@@ -475,29 +464,6 @@ type WebCardCategory implements Node {
   webCardKind: WebCardKind!
   label: String
   medias: [MediaImage!]
-  companyActivities: [CompanyActivity!]!
-}
-
-"""
-Represent a Company Activity
-@deprecated(reason: "no category anymore")
-"""
-type CompanyActivity implements Node {
-  """
-  The ID of an object
-  """
-  id: ID!
-  label: String
-
-  companyActivityType: CompanyActivityType
-}
-
-type CompanyActivityType implements Node {
-  """
-  The ID of an object
-  """
-  id: ID!
-  label: String
 }
 
 """

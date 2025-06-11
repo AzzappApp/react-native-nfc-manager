@@ -158,14 +158,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   userName: webCard => webCard.userName || '',
   // TODO: should it be protected?
   webCardKind: webCard => webCard.webCardKind,
-  // TODO: should it be protected?
-  // deprecated, shall be removed
-  webCardCategory: () => null,
-  // TODO: should it be protected?
-  companyActivity: () => {
-    // deprecated, shall be removed
-    return null;
-  },
   coverMedia: async (webCard, _) => {
     return webCard.coverMediaId
       ? {

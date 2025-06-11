@@ -54,7 +54,6 @@ describe('updateWebCardMutation', () => {
   const mockWebCard = {
     id: 'webcard-123',
     userName: 'oldUser',
-    companyActivityId: 'activity-001',
   };
 
   beforeEach(() => {

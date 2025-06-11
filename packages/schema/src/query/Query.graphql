@@ -66,10 +66,6 @@ type Query {
   ): isUserNameAvailableResult!
 
   """
-  Return a list of profile categories
-  """
-  webCardCategories: [WebCardCategory!]!
-  """
   Return the webCard parameters
   """
   webCardParameters: WebCardParameters!
