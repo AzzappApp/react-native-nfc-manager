@@ -1,5 +1,12 @@
-import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  Suspense,
+  useCallback,
+  useMemo,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { useColorScheme } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
 import { colors } from '#theme';
@@ -48,8 +55,10 @@ const SearchTabContainer = ({
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
-  const routes = useMemo(
-    () => [
+  const scheme = useColorScheme();
+
+  const routes = useMemo(() => {
+    return [
       {
         key: 'searchGlobal',
         label: intl.formatMessage({
@@ -60,18 +69,19 @@ const SearchTabContainer = ({
       },
       {
         key: 'searchProfiles',
-        label: (
-          <Text>
-            {intl.formatMessage(
-              {
-                defaultMessage: 'Webcards{azzappA}',
-                description: 'Search screen tab label : webcard',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            )}
-          </Text>
+        label: intl.formatMessage(
+          {
+            defaultMessage: 'Webcards{azzappA}',
+            description: 'Search screen tab label : webcard',
+          },
+          {
+            azzappA: (
+              // Must keep undefined color to avoid the Text component to use the default color
+              <Text style={{ color: undefined }} variant="azzapp">
+                a
+              </Text>
+            ),
+          },
         ),
         query: searchResultProfilesQuery,
       },
@@ -83,9 +93,9 @@ const SearchTabContainer = ({
         }),
         query: searchResultPostsQuery,
       },
-    ],
-    [intl],
-  );
+    ];
+  }, [intl]);
+
   const profileInfos = useProfileInfos();
   useEffect(() => {
     if (searchValue && environnement) {
@@ -204,12 +214,21 @@ const SearchTabContainer = ({
       onIndexChange={onIndexTabChange}
       style={styles.tabViewstyle}
       commonOptions={{
-        label: ({ route }) =>
-          typeof route.label === 'string' ? (
-            <Text>{route.label}</Text>
-          ) : (
-            route.label
-          ),
+        label: ({ route, focused }) => {
+          const selectedTextColor =
+            scheme === 'dark' ? colors.black : colors.black;
+          const unselectedTextColor =
+            scheme === 'dark' ? colors.white : colors.black;
+          return (
+            <Text
+              style={{
+                color: focused ? selectedTextColor : unselectedTextColor,
+              }}
+            >
+              {route.label}
+            </Text>
+          );
+        },
       }}
     />
   );
@@ -284,9 +303,6 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     paddingTop: 20,
     textAlign: 'center',
-  },
-  transparent: {
-    color: colors.transparent,
   },
 }));
 
