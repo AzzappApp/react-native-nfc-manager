@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Dimensions, View, StyleSheet } from 'react-native';
 import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
@@ -93,11 +93,11 @@ const SearchResultPosts = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [sowLoadingIndicator, setShowLoadingIndicator] = useState(false);
-  const [showLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
-  useEffect(() => {
-    setShowLoadingIndicator(!refreshing && isLoadingNext);
-  }, [isLoadingNext, refreshing]);
+  const showLoadingIndicator = !refreshing && isLoadingNext;
+  const [showLoadingIndicatorDebounced] = useDebounce(
+    showLoadingIndicator,
+    150,
+  );
 
   const posts: PostsGrid_posts$key = useMemo(() => {
     return convertToNonNullArray(

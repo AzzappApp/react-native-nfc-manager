@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { usePaginationFragment, graphql, usePreloadedQuery } from 'react-relay';
@@ -118,11 +118,11 @@ const SearchResultGlobal = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [sowLoadingIndicator, setShowLoadingIndicator] = useState(false);
-  const [showLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
-  useEffect(() => {
-    setShowLoadingIndicator(!refreshing && isLoadingNext);
-  }, [isLoadingNext, refreshing]);
+  const showLoadingIndicator = !refreshing && isLoadingNext;
+  const [showLoadingIndicatorDebounced] = useDebounce(
+    showLoadingIndicator,
+    150,
+  );
 
   const ListFooterComponent = useMemo(
     () => <ListLoadingFooter loading={showLoadingIndicatorDebounced} />,
