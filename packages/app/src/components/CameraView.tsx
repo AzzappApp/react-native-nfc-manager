@@ -3,7 +3,6 @@ import {
   useState,
   useMemo,
   useCallback,
-  useEffect,
   forwardRef,
   useImperativeHandle,
 } from 'react';
@@ -119,12 +118,12 @@ const CameraView = (
   const supportsFlash = device?.hasFlash ?? false;
 
   const isActive = useIsForeground();
-  const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
 
-  useEffect(() => {
+  const hasMicrophonePermission = useMemo(() => {
     const status = Camera.getMicrophonePermissionStatus();
-    setHasMicrophonePermission(status === 'granted');
+    return status === 'granted';
   }, []);
+
   // #endregion
 
   // #region Camera ref
