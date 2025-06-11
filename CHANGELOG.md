@@ -1,3 +1,10 @@
+## 2.1.0-canary.24
+
+* **fix:**  - remove state from recent search ([#9348](https://github.com/AzzappApp/azzapp/pull/9348))
+* **fix:**  - remove unnecessary State in bottom Panel ([#9352](https://github.com/AzzappApp/azzapp/pull/9352))
+* **fix:**  - replace setState by memo in camera View ([#9345](https://github.com/AzzappApp/azzapp/pull/9345))
+* **fix:**  - simplify like counter management ([#9353](https://github.com/AzzappApp/azzapp/pull/9353))
+
 ## 2.1.0-canary.23
 
 * **fix:**  - replace state by memo in sortable links ([#9349](https://github.com/AzzappApp/azzapp/pull/9349))
