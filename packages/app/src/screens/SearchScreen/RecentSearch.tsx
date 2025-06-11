@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
@@ -21,20 +21,18 @@ const RecentSearch = ({
   recentSearch,
   search,
 }: RecentSearchProps) => {
-  const [data, setData] = useState<string[]>([]);
   const styles = useStyleSheet(styleSheet);
-  useEffect(() => {
+
+  const data = useMemo(() => {
     if (isNotFalsyString(searchValue)) {
       const filteredSearch = searchValue!.toLocaleLowerCase().trim();
-      setData(
-        recentSearch.filter((s: string) =>
-          s.toLocaleLowerCase().trim().includes(filteredSearch),
-        ),
+      return recentSearch.filter((s: string) =>
+        s.toLocaleLowerCase().trim().includes(filteredSearch),
       );
     } else {
-      setData(recentSearch);
+      return recentSearch;
     }
-  }, [recentSearch, search, searchValue]);
+  }, [recentSearch, searchValue]);
 
   const renderRecentSearchItem = ({
     item,
