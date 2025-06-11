@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, {
@@ -81,17 +81,10 @@ const SocialLinksLinksEditionPanel = ({
     [onChangeOrder],
   );
 
-  const [sortableLinks, setSortableLinks] = useState(
-    initialLinks.sort((a, b) => a.position - b.position),
+  const sortableLinks = useMemo(
+    () => initialLinks.sort((a, b) => a.position - b.position),
+    [initialLinks],
   );
-
-  useEffect(() => {
-    if (initialLinks.length !== sortableLinks.length) {
-      // refresh links locally only when number of link has changed
-      // to avoid re-rendering the list when the order is changed
-      setSortableLinks(initialLinks.sort((a, b) => a.position - b.position));
-    }
-  }, [initialLinks, sortableLinks.length]);
 
   const { bottom } = useScreenInsets();
   const { width: windowWidth } = useScreenDimensions();
