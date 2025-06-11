@@ -1,3 +1,7 @@
+## 2.1.0-canary.22
+
+* **fix:**  - search header color in dark mode ([#9339](https://github.com/AzzappApp/azzapp/pull/9339))
+
 ## 2.1.0-canary.21
 
 * **fix:**  - remove setState in useEffect in Search ([#9344](https://github.com/AzzappApp/azzapp/pull/9344))
