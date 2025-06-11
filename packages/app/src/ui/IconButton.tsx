@@ -77,6 +77,7 @@ const IconButton = ({
           minWidth: variantSize,
           height: variantSize,
           aspectRatio: 1,
+          borderRadius: variantSize / 2,
         },
         style,
       ]}

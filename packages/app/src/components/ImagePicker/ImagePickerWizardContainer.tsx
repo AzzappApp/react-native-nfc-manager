@@ -188,7 +188,7 @@ const ImagePickerWizardRenderer = ({
           onPress={onBack}
           iconSize={30}
           icon="arrow_left"
-          style={{ borderWidth: 0 }}
+          variant="icon"
         />
       );
     }

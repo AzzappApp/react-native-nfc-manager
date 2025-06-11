@@ -13,6 +13,7 @@ import {
   getUserContactsGroupedByLocation,
   getNbNewContactsForUser,
   hasProfiles,
+  getNbNewContactEnrichmentsForUser,
 } from '@azzapp/data';
 import env from '#env';
 import { getSessionInfos } from '#GraphQLContext';
@@ -108,8 +109,13 @@ export const User: ProtectedResolver<UserResolvers> = {
 
     return subscriptions[0] ?? null;
   },
-  nbNewContacts: async user => {
-    return getNbNewContactsForUser(user.id);
+  nbContactNotifications: async user => {
+    const [newUser, newEnrichments] = await Promise.all([
+      getNbNewContactsForUser(user.id),
+      getNbNewContactEnrichmentsForUser(user.id),
+    ]);
+
+    return newUser + newEnrichments;
   },
   isPremium: async user => {
     if (!isSameUser(user)) {

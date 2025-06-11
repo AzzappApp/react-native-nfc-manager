@@ -58,7 +58,7 @@ const PostLikesScreen = ({
             onPress={router.back}
             iconSize={30}
             size={47}
-            style={{ borderWidth: 0 }}
+            variant="icon"
           />
         }
       />

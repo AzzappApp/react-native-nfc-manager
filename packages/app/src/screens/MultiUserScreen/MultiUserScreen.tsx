@@ -294,9 +294,9 @@ const MultiUserScreen = ({
               <PremiumIndicator isRequired={!profile?.webCard?.isPremium} />
               {profile.webCard?.isMultiUser && (
                 <IconButton
-                  style={styles.informationIcon}
                   icon="information"
                   onPress={openMultiUserInfo}
+                  variant="icon"
                 />
               )}
             </View>
@@ -327,7 +327,6 @@ const MultiUserScreen = ({
     profile?.webCard?.isMultiUser,
     profile?.webCard?.isPremium,
     styles.description,
-    styles.informationIcon,
     styles.popupContainer,
     styles.proContainer,
     styles.sharedIcon,
@@ -558,9 +557,6 @@ const styleSheet = createStyleSheet(appearance => ({
     alignSelf: 'center',
     paddingBottom: 20,
     height: 550,
-  },
-  informationIcon: {
-    borderWidth: 0,
   },
 }));
 

@@ -3,6 +3,7 @@ import {
   getTotalMultiUser,
   getUserById,
   getUserSubscriptions,
+  getWebCardsByUserId,
   updateNbFreeScans,
 } from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
@@ -112,6 +113,11 @@ const checkSubscription = async (
   return result;
 };
 
+const hasMultiUserWebCard = async (userId: string) => {
+  const webCards = await getWebCardsByUserId(userId, false);
+  return webCards.some(webCard => webCard.isMultiUser);
+};
+
 type FeatureParams =
   | {
       action: 'ADD_CONTACT_WITH_SCAN';
@@ -187,7 +193,10 @@ export const validateCurrentSubscription = async (
         `${apiEndpoint}/webhook/subscription`,
       );
       if (!hasActiveSubscription) {
-        await updateNbFreeScans(userId);
+        const hasMultiUser = await hasMultiUserWebCard(userId);
+        if (!hasMultiUser) {
+          await updateNbFreeScans(userId);
+        }
       }
       break;
     }
@@ -199,7 +208,8 @@ export const validateCurrentSubscription = async (
       );
       if (!hasActiveSubscription) {
         const user = await getUserById(userId);
-        if (user && user.nbFreeScans >= MAX_FREE_SCANS) {
+        const hasMultiUser = await hasMultiUserWebCard(userId);
+        if (!user || (!hasMultiUser && user.nbFreeScans >= MAX_FREE_SCANS)) {
           throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
         }
       }

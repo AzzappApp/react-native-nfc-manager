@@ -3,7 +3,6 @@ import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import {
   ContactCardAccessTable,
-  ContactTable,
   MediaTable,
   ProfileTable,
   UserTable,
@@ -568,33 +567,6 @@ export const getSharedWebCardRelation = async (
   }
 
   return result;
-};
-
-/**
- * Get the total number of new contacts for a user since their last view
- *
- * @param userId - The user's ID
- * @returns The total number of new contacts
- */
-export const getNbNewContactsForUser = async (
-  userId: string,
-): Promise<number> => {
-  const res = await db()
-    .select({ count: count() })
-    .from(ContactTable)
-    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
-    .innerJoin(UserTable, eq(ProfileTable.userId, UserTable.id))
-    .where(
-      and(
-        eq(UserTable.id, userId),
-        eq(ContactTable.type, 'shareback'),
-        eq(ContactTable.deleted, false),
-        gt(ContactTable.createdAt, UserTable.lastContactViewAt), // Compare createdAt with user's last view date
-      ),
-    )
-    .then(rows => rows[0].count);
-
-  return res;
 };
 
 export const getProfilesWhereUserBIsOwner = async (

@@ -1,4 +1,5 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
+import * as Sentry from '@sentry/react-native';
 import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform } from 'react-native';
@@ -42,7 +43,8 @@ export const useGenerateLoadingPass = (qrCodeKey?: {
           await addPassJWT(pass.token);
         }
         logEvent('add_pass_wallet');
-      } catch {
+      } catch (e) {
+        Sentry.captureException(e);
         Toast.show({
           text1: intl.formatMessage({
             defaultMessage: 'Error',

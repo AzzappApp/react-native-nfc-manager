@@ -19,6 +19,7 @@ jest.mock('@azzapp/data', () => ({
   getUserSubscriptions: jest.fn(),
   getTotalMultiUser: jest.fn(),
   getUserById: jest.fn(),
+  getWebCardsByUserId: jest.fn().mockResolvedValue([]), // Mocking to return an empty array
   updateNbFreeScans: jest.fn(),
   getCardModulesByWebCard: jest.fn(),
 }));
@@ -75,33 +76,45 @@ describe('Subscription Helpers', () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          webCardIsPublished: true,
-          action: 'UPDATE_WEBCARD_KIND',
-          webCardKind: 'business',
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            webCardIsPublished: true,
+            action: 'UPDATE_WEBCARD_KIND',
+            webCardKind: 'business',
+          },
+          '/api/endpoint',
+        ),
       ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
     });
 
     test('should allow CREATE_CONTACT_CARD without a subscription if webCard is unpublished', async () => {
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'CREATE_CONTACT_CARD',
-          alreadyPublished: 0,
-          webCardKind: 'personal',
-          webCardIsPublished: false,
-          contactCardHasCompanyName: false,
-          contactCardHasUrl: false,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'CREATE_CONTACT_CARD',
+            alreadyPublished: 0,
+            webCardKind: 'personal',
+            webCardIsPublished: false,
+            contactCardHasCompanyName: false,
+            contactCardHasUrl: false,
+          },
+          '/api/endpoint',
+        ),
       ).resolves.toBeUndefined();
     });
 
     test('should update free scans if ADD_CONTACT_WITH_SCAN is used without a subscription', async () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
-      await validateCurrentSubscription('user-1', {
-        action: 'ADD_CONTACT_WITH_SCAN',
-      });
+      await validateCurrentSubscription(
+        'user-1',
+        {
+          action: 'ADD_CONTACT_WITH_SCAN',
+        },
+        '/api/endpoint',
+      );
 
       expect(updateNbFreeScans).toHaveBeenCalledWith('user-1');
     });
@@ -114,7 +127,11 @@ describe('Subscription Helpers', () => {
       });
 
       await expect(
-        validateCurrentSubscription('user-1', { action: 'USE_SCAN' }),
+        validateCurrentSubscription(
+          'user-1',
+          { action: 'USE_SCAN' },
+          '/api/endpoint',
+        ),
       ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
     });
 
@@ -126,7 +143,11 @@ describe('Subscription Helpers', () => {
       });
 
       await expect(
-        validateCurrentSubscription('user-1', { action: 'USE_SCAN' }),
+        validateCurrentSubscription(
+          'user-1',
+          { action: 'USE_SCAN' },
+          '/api/endpoint',
+        ),
       ).resolves.not.toThrow();
     });
 
@@ -136,11 +157,15 @@ describe('Subscription Helpers', () => {
       ]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          webCardIsPublished: true,
-          action: 'UPDATE_MULTI_USER',
-          addedSeats: 5,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            webCardIsPublished: true,
+            action: 'UPDATE_MULTI_USER',
+            addedSeats: 5,
+          },
+          '/api/endpoint',
+        ),
       ).resolves.not.toThrow();
     });
 
@@ -156,21 +181,29 @@ describe('Subscription Helpers', () => {
       (getTotalMultiUser as jest.Mock).mockResolvedValue(3);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          webCardIsPublished: true,
-          action: 'UPDATE_MULTI_USER',
-          addedSeats: 1,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            webCardIsPublished: true,
+            action: 'UPDATE_MULTI_USER',
+            addedSeats: 1,
+          },
+          '/api/endpoint',
+        ),
       ).resolves.not.toThrow();
     });
 
     test('should do nothing if the webCard is not published', async () => {
       await expect(
-        validateCurrentSubscription('user-1', {
-          webCardIsPublished: false,
-          action: 'UPDATE_WEBCARD_KIND',
-          webCardKind: 'business',
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            webCardIsPublished: false,
+            action: 'UPDATE_WEBCARD_KIND',
+            webCardKind: 'business',
+          },
+          '/api/endpoint',
+        ),
       ).resolves.toBeUndefined();
     });
   });
@@ -182,13 +215,14 @@ describe('Subscription Helpers', () => {
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
 
-      await updateMonthlySubscription('user-1');
+      await updateMonthlySubscription('user-1', '/api/endpoint');
 
       expect(updateExistingSubscription).toHaveBeenCalledWith({
         userSubscription: expect.objectContaining({
           subscriptionPlan: 'web.monthly',
         }),
         totalSeats: 4,
+        subscriptionCallBackUrl: '/api/endpoint',
       });
     });
 
@@ -202,7 +236,7 @@ describe('Subscription Helpers', () => {
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
 
-      await updateMonthlySubscription('user-1');
+      await updateMonthlySubscription('user-1', '/api/endpoint');
 
       expect(updateExistingSubscription).not.toHaveBeenCalled();
     });
@@ -210,7 +244,7 @@ describe('Subscription Helpers', () => {
     test('should not update if no active monthly subscription is found', async () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
-      await updateMonthlySubscription('user-1');
+      await updateMonthlySubscription('user-1', '/api/endpoint');
 
       expect(updateExistingSubscription).not.toHaveBeenCalled();
     });
@@ -221,13 +255,14 @@ describe('Subscription Helpers', () => {
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(0);
 
-      await updateMonthlySubscription('user-1');
+      await updateMonthlySubscription('user-1', '/api/endpoint');
 
       expect(updateExistingSubscription).toHaveBeenCalledWith({
         userSubscription: expect.objectContaining({
           subscriptionPlan: 'web.monthly',
         }),
         totalSeats: 1, // Minimum 1 seat enforced
+        subscriptionCallBackUrl: '/api/endpoint',
       });
     });
   });
@@ -237,13 +272,17 @@ describe('Subscription Helpers', () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: true,
-          contactCardHasUrl: false,
-          contactCardHasLogo: false,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'UPDATE_CONTACT_CARD',
+            webCardIsPublished: true,
+            contactCardHasCompanyName: true,
+            contactCardHasUrl: false,
+            contactCardHasLogo: false,
+          },
+          '/api/endpoint',
+        ),
       ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
     });
 
@@ -251,13 +290,17 @@ describe('Subscription Helpers', () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: false,
-          contactCardHasUrl: true,
-          contactCardHasLogo: false,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'UPDATE_CONTACT_CARD',
+            webCardIsPublished: true,
+            contactCardHasCompanyName: false,
+            contactCardHasUrl: true,
+            contactCardHasLogo: false,
+          },
+          '/api/endpoint',
+        ),
       ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
     });
 
@@ -265,25 +308,33 @@ describe('Subscription Helpers', () => {
       (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: false,
-          contactCardHasUrl: false,
-          contactCardHasLogo: true,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'UPDATE_CONTACT_CARD',
+            webCardIsPublished: true,
+            contactCardHasCompanyName: false,
+            contactCardHasUrl: false,
+            contactCardHasLogo: true,
+          },
+          '/api/endpoint',
+        ),
       ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
     });
 
     test('should allow UPDATE_CONTACT_CARD without a subscription if contact card has no company name, URL, or logo', async () => {
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: false,
-          contactCardHasUrl: false,
-          contactCardHasLogo: false,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'UPDATE_CONTACT_CARD',
+            webCardIsPublished: true,
+            contactCardHasCompanyName: false,
+            contactCardHasUrl: false,
+            contactCardHasLogo: false,
+          },
+          '/api/endpoint',
+        ),
       ).resolves.toBeUndefined();
     });
 
@@ -293,13 +344,17 @@ describe('Subscription Helpers', () => {
       ]);
 
       await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: true,
-          contactCardHasUrl: true,
-          contactCardHasLogo: true,
-        }),
+        validateCurrentSubscription(
+          'user-1',
+          {
+            action: 'UPDATE_CONTACT_CARD',
+            webCardIsPublished: true,
+            contactCardHasCompanyName: true,
+            contactCardHasUrl: true,
+            contactCardHasLogo: true,
+          },
+          '/api/endpoint',
+        ),
       ).resolves.not.toThrow();
     });
   });

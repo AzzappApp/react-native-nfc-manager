@@ -8,7 +8,10 @@ import { usePreloadedQuery } from 'react-relay';
 import { graphql } from 'relay-runtime';
 import env from '#env';
 import { useRouter } from '#components/NativeRouter';
-import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
+import {
+  profileInfoHasAdminRight,
+  profileInfoHasEditorRight,
+} from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import { useGenerateEmailSignature } from '#hooks/useGenerateEmailSignature';
@@ -642,7 +645,7 @@ Only {price}/user/month."
                     style={styles.toolButton}
                     variant="primary"
                     onPress={() => {
-                      if (profileInfoHasAdminRight(node?.profile)) {
+                      if (profileInfoHasEditorRight(node?.profile)) {
                         router.push({
                           route: 'COVER_EDITION',
                         });

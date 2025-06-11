@@ -179,6 +179,7 @@ const styleSheet = createStyleSheet(appearance => ({
   editionPanel: {
     minHeight: 200,
     flex: 1,
+    marginTop: 20,
   },
 }));
 
