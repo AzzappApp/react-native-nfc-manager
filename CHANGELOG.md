@@ -1,3 +1,7 @@
+## 2.1.0-canary.18
+
+* **fix:**  - remove last remaining companyActivityId and webcardCategories apis ([#8270](https://github.com/AzzappApp/azzapp/pull/8270))
+
 ## 2.1.0-canary.17
 
 * **feat:**  - add new version available on store popup ([#9316](https://github.com/AzzappApp/azzapp/pull/9316))
