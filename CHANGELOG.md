@@ -1,3 +1,7 @@
+## 2.0.0-rc.26
+
+* **fix:**  - **wallet:** [#9328](https://github.com/AzzappApp/azzapp/pull/9328) update route after next 15 upgrade ([#9331](https://github.com/AzzappApp/azzapp/pull/9331))
+
 ## 2.0.0-rc.25
 
 * **fix:**  - **ui:** [#9321](https://github.com/AzzappApp/azzapp/pull/9321) missing IconButton borders ([#9324](https://github.com/AzzappApp/azzapp/pull/9324))
