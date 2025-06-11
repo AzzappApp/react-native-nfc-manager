@@ -1,3 +1,7 @@
+## 2.1.0-canary.20
+
+* **fix:**  - enable no no-color-literals eslint rule ([#9337](https://github.com/AzzappApp/azzapp/pull/9337))
+
 ## 2.1.0-canary.19
 
 * **fix:**  - **wallet:** [#9328](https://github.com/AzzappApp/azzapp/pull/9328) update route after next 15 upgrade ([#9331](https://github.com/AzzappApp/azzapp/pull/9331))
