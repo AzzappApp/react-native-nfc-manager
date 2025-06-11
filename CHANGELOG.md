@@ -1,3 +1,8 @@
+## 2.1.0-canary.25
+
+* **fix:**  - remove state in mediaSuggestionScreen ([#9351](https://github.com/AzzappApp/azzapp/pull/9351))
+* **fix:**  - remove unnecessary state in search bar ([#9354](https://github.com/AzzappApp/azzapp/pull/9354))
+
 ## 2.1.0-canary.24
 
 * **fix:**  - remove state from recent search ([#9348](https://github.com/AzzappApp/azzapp/pull/9348))
