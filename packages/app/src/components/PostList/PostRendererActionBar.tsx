@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -60,23 +60,15 @@ const PostRendererActionBar = ({
     postKey,
   );
 
-  const [reaction, setReaction] = useState<ReactionKind | null>(
-    viewerPostReaction,
-  );
-
-  useEffect(() => {
-    setReaction(viewerPostReaction);
-  }, [viewerPostReaction]);
-
-  const [countReactions, setCountReactions] =
-    useState<number>(counterReactions);
-
-  useEffect(() => {
-    setCountReactions(counterReactions);
-  }, [counterReactions]);
+  const [reaction, setReaction] = useState<{
+    kind: ReactionKind | null;
+    count: number;
+  }>({
+    kind: viewerPostReaction,
+    count: counterReactions,
+  });
 
   const profileInfos = useProfileInfos();
-  const add = viewerPostReaction !== reaction;
 
   const toggleLikePost = useToggleLikePost(
     {
@@ -84,8 +76,10 @@ const PostRendererActionBar = ({
         togglePostReaction: {
           post: {
             id: postId,
-            postReaction: add ? reaction : null,
-            counterReactions: Math.max(0, countReactions),
+            postReaction: viewerPostReaction === null ? 'like' : null,
+            counterReactions:
+              Math.max(0, counterReactions) +
+              (viewerPostReaction === null ? 1 : -1),
           },
         },
       },
@@ -118,7 +112,7 @@ const PostRendererActionBar = ({
         }
       },
     },
-    () => viewerPostReaction !== reaction,
+    () => viewerPostReaction !== reaction.kind,
     700,
   );
 
@@ -126,18 +120,15 @@ const PostRendererActionBar = ({
   const toggleReaction = useCallback(() => {
     if (!actionEnabled) {
       onActionDisabled?.();
-
       return;
     }
 
     if (profileInfoHasEditorRight(profileInfos)) {
-      if (reaction) {
-        setCountReactions(countReactions - 1);
-        setReaction(null);
-      } else {
-        setCountReactions(countReactions + 1);
-        setReaction('like');
-      }
+      setReaction(prevReaction =>
+        prevReaction.kind === 'like'
+          ? { kind: null, count: prevReaction.count - 1 }
+          : { kind: 'like', count: prevReaction.count + 1 },
+      );
       toggleLikePost(postId);
     } else {
       Toast.show({
@@ -151,12 +142,10 @@ const PostRendererActionBar = ({
     }
   }, [
     actionEnabled,
-    countReactions,
     intl,
     onActionDisabled,
     postId,
     profileInfos,
-    reaction,
     toggleLikePost,
   ]);
 
@@ -223,7 +212,7 @@ const PostRendererActionBar = ({
           {allowLikes && (
             <IconButton
               //TODO create an animation for the like button later ? design team
-              icon={reaction ? 'like_filled' : 'like'}
+              icon={reaction.kind ? 'like_filled' : 'like'}
               style={styles.icon}
               onPress={toggleReaction}
               variant="icon"
@@ -278,7 +267,7 @@ const PostRendererActionBar = ({
                                     other {# likes}
                                 }"
                 description="PostRendererActionBar - Like Counter"
-                values={{ countReactions }}
+                values={{ countReactions: reaction.count }}
               />
             </Text>
           </PressableNative>
