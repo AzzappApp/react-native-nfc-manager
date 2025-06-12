@@ -1,3 +1,7 @@
+## 2.1.0-canary.28
+
+* **fix:**  - avoid unnecessary setLogo(null) call ([#9364](https://github.com/AzzappApp/azzapp/pull/9364))
+
 ## 2.1.0-canary.27
 
 
