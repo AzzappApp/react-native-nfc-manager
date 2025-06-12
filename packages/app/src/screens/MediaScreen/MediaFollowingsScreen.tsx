@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { View, useWindowDimensions } from 'react-native';
 import {
@@ -81,11 +81,11 @@ const MediaFollowingsScreen = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
-  const [sowLoadingIndicator, setShowLoadingIndicator] = useState(false);
-  const [showLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
-  useEffect(() => {
-    setShowLoadingIndicator(!refreshing && isLoadingNext);
-  }, [isLoadingNext, refreshing]);
+  const showLoadingIndicator = !refreshing && isLoadingNext;
+  const [showLoadingIndicatorDebounced] = useDebounce(
+    showLoadingIndicator,
+    150,
+  );
 
   const posts: PostsGrid_posts$key = useMemo(
     () =>
