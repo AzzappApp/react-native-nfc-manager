@@ -24,7 +24,7 @@ export const HomeScreenUpgradePopup = () => {
       // keep this line commented for easier testing
       //currentVersion: '1.0.0',
     }).then(needUpdate => {
-      if (needUpdate.isNeeded) {
+      if (needUpdate?.isNeeded) {
         setNeedUpdate(needUpdate);
       }
     });
