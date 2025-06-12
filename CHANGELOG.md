@@ -1,3 +1,7 @@
+## 2.1.0-canary.27
+
+
+
 ## 2.1.0-canary.26
 
 * **fix:**  - avoid bad data access ([#9358](https://github.com/AzzappApp/azzapp/pull/9358))
