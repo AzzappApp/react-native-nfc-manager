@@ -1,3 +1,8 @@
+## 2.1.0-canary.29
+
+* **fix:**  - avoid setStateInPhoneInput ([#9365](https://github.com/AzzappApp/azzapp/pull/9365))
+* **fix:**  - avoid setState in Screen Dimension management ([#9366](https://github.com/AzzappApp/azzapp/pull/9366))
+
 ## 2.1.0-canary.28
 
 * **fix:**  - avoid unnecessary setLogo(null) call ([#9364](https://github.com/AzzappApp/azzapp/pull/9364))
