@@ -83,16 +83,15 @@ export const ContactDetailEnrichOverlay = ({
   } = useTooltipContext();
 
   useEffect(() => {
-    if (!enrichButtonRef.current) {
-      return;
+    if (state === 'tooltipVisible') {
+      registerTooltip(ENRICH_TOOLTIP, {
+        ref: enrichButtonRef,
+      });
+      return () => {
+        unregisterTooltip(ENRICH_TOOLTIP);
+      };
     }
-    registerTooltip(ENRICH_TOOLTIP, {
-      ref: enrichButtonRef,
-    });
-    return () => {
-      unregisterTooltip(ENRICH_TOOLTIP);
-    };
-  }, [registerTooltip, unregisterTooltip]);
+  }, [registerTooltip, state, unregisterTooltip]);
 
   const onCloseToolTipEnrich = useCallback(() => {
     closeTooltips([ENRICH_TOOLTIP]);

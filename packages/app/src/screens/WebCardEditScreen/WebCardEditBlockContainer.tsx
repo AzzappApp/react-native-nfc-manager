@@ -334,12 +334,10 @@ const WebCardEditBlockContainer = ({
       registerTooltip('cover', {
         ref,
       });
-    }
-    return () => {
-      if (id === 'cover') {
+      return () => {
         unregisterTooltip('cover');
-      }
-    };
+      };
+    }
   }, [id, registerTooltip, unregisterTooltip, visible]);
 
   const confirmDelete = () => {

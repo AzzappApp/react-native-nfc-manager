@@ -416,23 +416,39 @@ const ItemRenderComponent = ({
   const refMulti = useRef(null);
 
   useEffect(() => {
-    if (isCurrent) {
+    if (
+      (isCurrent && profile.webCard?.coverIsPredefined) ||
+      profile.webCard?.coverIsLogoPredefined
+    ) {
       registerTooltip('profileEdit', {
         ref: refEdit,
       });
+      return () => {
+        unregisterTooltip('profileEdit');
+      };
+    }
+  }, [
+    isCurrent,
+    profile.webCard?.coverIsLogoPredefined,
+    profile.webCard?.coverIsPredefined,
+    registerTooltip,
+    unregisterTooltip,
+  ]);
+
+  const isMultiUser =
+    profile.webCard?.isMultiUser || profile.webCard?.webCardKind === 'business';
+
+  useEffect(() => {
+    if (isCurrent && isMultiUser) {
       registerTooltip('profileMulti', {
         ref: refMulti,
       });
 
       return () => {
-        unregisterTooltip('profileEdit');
         unregisterTooltip('profileMulti');
       };
     }
-  }, [isCurrent, registerTooltip, unregisterTooltip]);
-
-  const isMultiUser =
-    profile.webCard?.isMultiUser || profile.webCard?.webCardKind === 'business';
+  }, [isCurrent, isMultiUser, registerTooltip, unregisterTooltip]);
 
   const { coverUploadingData } = useCoverUpload();
 
