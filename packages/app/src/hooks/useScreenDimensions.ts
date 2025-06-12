@@ -1,28 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Dimensions } from 'react-native';
 import type { ScaledSize } from 'react-native';
 
 export default function useScreenDimensions(): ScaledSize {
-  const [dimensions, setDimensions] = useState(() => Dimensions.get('screen'));
-  useEffect(() => {
-    function handleChange({ screen }: { screen: ScaledSize }) {
-      if (
-        dimensions.width !== screen.width ||
-        dimensions.height !== screen.height ||
-        dimensions.scale !== screen.scale ||
-        dimensions.fontScale !== screen.fontScale
-      ) {
-        setDimensions(screen);
-      }
-    }
-    const subscription = Dimensions.addEventListener('change', handleChange);
-    // We might have missed an update between calling `get` in render and
-    // `addEventListener` in this handler, so we set it here. If there was
-    // no change, React will filter out this update as a no-op.
-    handleChange({ screen: Dimensions.get('screen') });
-    return () => {
-      subscription.remove();
-    };
-  }, [dimensions]);
-  return dimensions;
+  return useSyncExternalStore(
+    // Subscribe to screen dimension changes
+    callback => {
+      const subscription = Dimensions.addEventListener('change', callback);
+      return subscription.remove;
+    },
+    // Get current dimensions
+    () => Dimensions.get('screen'),
+  );
 }
