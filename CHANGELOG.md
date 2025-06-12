@@ -1,3 +1,8 @@
+## 2.1.0-canary.30
+
+* **fix:**  - review tooltips registration, no need to register tooltips ref when the component is not mounted ([#9373](https://github.com/AzzappApp/azzapp/pull/9373))
+* **fix:**  - add one way share subtitle in offline screen ([#9374](https://github.com/AzzappApp/azzapp/pull/9374))
+
 ## 2.1.0-canary.29
 
 * **fix:**  - avoid setStateInPhoneInput ([#9365](https://github.com/AzzappApp/azzapp/pull/9365))
