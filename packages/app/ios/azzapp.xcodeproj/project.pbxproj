@@ -953,6 +953,7 @@
 				9642B1A12D11E514008E236B /* Embed Widget Extension */,
 				474AD885A631282CFAA8823D /* [CP] Embed Pods Frameworks */,
 				886BE19D5CC9EAC9C4496DA7 /* [CP] Copy Pods Resources */,
+				BCF59B8A2DFAB33000236370 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -981,6 +982,7 @@
 				9631A3612D2EBD56008C156F /* Embed Widget Extension */,
 				88D5BF7996D48261F83C1188 /* [CP] Embed Pods Frameworks */,
 				49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */,
+				BCF59B8B2DFAB3BC00236370 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -1194,9 +1196,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1234,7 +1240,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh";
+			shellScript = "/bin/sh ../../../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh\n";
 		};
 		355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1244,9 +1250,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1261,9 +1271,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1297,9 +1311,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1336,9 +1354,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1353,9 +1375,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1424,6 +1450,42 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		BCF59B8A2DFAB33000236370 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh ../../../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh\n";
+		};
+		BCF59B8B2DFAB3BC00236370 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh ../../../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh\n";
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
