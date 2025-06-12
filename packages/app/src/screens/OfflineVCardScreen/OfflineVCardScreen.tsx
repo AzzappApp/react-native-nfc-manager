@@ -44,6 +44,7 @@ import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
+import Text from '#ui/Text';
 import OfflineHeader from './OfflineHeader';
 
 export const OfflineVCardScreenProfilesFragment = graphql`
@@ -459,6 +460,14 @@ export const OfflineVCardScreenRenderer = ({
             animatedTextColor={colorValue}
             text={offlineModeText}
           />
+          {vCardList.length > 0 && (
+            <Text variant="small" style={styles.subtitleOneWay}>
+              <FormattedMessage
+                defaultMessage="One way share - no contact will be returned"
+                description="Offline Screen: one way share description"
+              />
+            </Text>
+          )}
         </View>
         <View style={styles.separator} />
         <View
@@ -625,5 +634,10 @@ const stylesheet = createStyleSheet(() => ({
     alignContent: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  subtitleOneWay: {
+    paddingTop: 5,
+    color: colors.white,
+    opacity: 0.5,
   },
 }));
