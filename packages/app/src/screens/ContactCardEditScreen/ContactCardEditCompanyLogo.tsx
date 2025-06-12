@@ -75,8 +75,6 @@ const ContactCardEditCompanyLogo = ({
         },
         onError: () => {},
       });
-    } else {
-      setLogos(null);
     }
   }, [canEditLogo, commit, searchCompany]);
   const [showImagePicker, openImagePicker, closeImagePicker] =
@@ -265,22 +263,24 @@ const ContactCardEditCompanyLogo = ({
                   height={fixedLogo.height}
                 />
               )}
-              {logos?.map(logo => {
-                if (logo) {
-                  return (
-                    <LogoComponentItem
-                      key={logo.id}
-                      item={logo}
-                      selected={value?.id && value?.id === logo.id}
-                      onSelect={onSelectFetchedLogo}
-                      width={1280} //size requested in request api
-                      height={1280}
-                      testID={`logoItem-${logo.id}`}
-                    />
-                  );
-                }
-                return null;
-              })}
+              {canEditLogo &&
+                searchCompany &&
+                logos?.map(logo => {
+                  if (logo) {
+                    return (
+                      <LogoComponentItem
+                        key={logo.id}
+                        item={logo}
+                        selected={value?.id && value?.id === logo.id}
+                        onSelect={onSelectFetchedLogo}
+                        width={1280} //size requested in request api
+                        height={1280}
+                        testID={`logoItem-${logo.id}`}
+                      />
+                    );
+                  }
+                  return null;
+                })}
             </ScrollView>
             <ScreenModal
               visible={showImagePicker}
