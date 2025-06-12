@@ -64,8 +64,6 @@ const LogosMediaList = ({
           setLogos(data.extractCompanyLogo as LogoImage[]);
         },
       });
-    } else {
-      setLogos([]);
     }
   }, [commit, debouncedSearch]);
 
@@ -109,7 +107,7 @@ const LogosMediaList = ({
         style={styles.searchBar}
       />
       <MediaGridList
-        medias={logos}
+        medias={debouncedSearch ? logos : []}
         selectedMediaIds={selectedMediasIds}
         filesDownloading={null}
         refreshing={false}
