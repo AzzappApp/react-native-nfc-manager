@@ -1,3 +1,9 @@
+## 2.1.0-canary.26
+
+* **fix:**  - avoid bad data access ([#9358](https://github.com/AzzappApp/azzapp/pull/9358))
+* **fix:**  - remove useless state in following screen ([#9359](https://github.com/AzzappApp/azzapp/pull/9359))
+* **fix:**  - remove set state and menage logos list directly from debouncedSearch value ([#9360](https://github.com/AzzappApp/azzapp/pull/9360))
+
 ## 2.1.0-canary.25
 
 * **fix:**  - remove state in mediaSuggestionScreen ([#9351](https://github.com/AzzappApp/azzapp/pull/9351))
