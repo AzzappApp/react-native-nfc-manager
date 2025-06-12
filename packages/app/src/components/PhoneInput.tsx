@@ -1,5 +1,5 @@
 import { AsYouType } from 'libphonenumber-js';
-import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import TextInput from '#ui/TextInput';
 import type { TextInputProps } from '#ui/TextInput';
@@ -18,19 +18,21 @@ const PhoneInput = (
   { value, onChangeText, countryCode, ...props }: PhoneInputProps,
   ref: ForwardedRef<NativeTextInput>,
 ) => {
-  const [formattedValue, setFormattedValue] = useState(value);
-  useEffect(() => {
+  const initFormattedValue = (value?: string) => {
     if (countryCode && value) {
       const parsedInput = parsePhoneNumber(value, countryCode);
       if (parsedInput) {
-        setFormattedValue(parsedInput.formatNational());
+        return parsedInput.formatNational();
       } else {
-        setFormattedValue(value);
+        return value;
       }
     } else {
-      setFormattedValue(value);
+      return value;
     }
-  }, [countryCode, value]);
+  };
+  const [formattedValue, setFormattedValue] = useState(
+    initFormattedValue(value),
+  );
 
   const formatOnChange = useCallback(
     (value: string) => {
