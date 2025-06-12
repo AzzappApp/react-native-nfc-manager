@@ -419,22 +419,19 @@ const CardTemplateList = (
   );
 
   useEffect(() => {
-    if (!selectedCardTemplateType && templates?.length > 0) {
+    if (templates?.length > 0) {
+      const selectedTemplate = templates[0];
+      onSelectTemplate?.(selectedTemplate);
+
       setSelectedCardTemplateType({
-        id: templates[0].cardTemplateType?.id ?? '-',
-        title: templates[0].cardTemplateType?.label ?? '-',
+        id: selectedTemplate.cardTemplateType?.id ?? '-',
+        title: selectedTemplate.cardTemplateType?.label ?? '-',
       });
     }
-  }, [selectedCardTemplateType, templates]);
+  }, [onSelectTemplate, templates]);
   // #endregion
 
   const { height: windowHeight } = useWindowDimensions();
-
-  useEffect(() => {
-    if (templates.length > 0) {
-      onSelectTemplate?.(templates[0]);
-    }
-  }, [onSelectTemplate, templates]);
 
   return (
     <>
