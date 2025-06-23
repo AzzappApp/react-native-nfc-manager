@@ -296,6 +296,7 @@ declare module 'react-native-nfc-manager' {
     isHceSupported(): Promise<boolean>;
     isHceRunning(): Promise<boolean>;
     startHCE(): Promise<string>;
+    stopHCE(): Promise<string>;
     setSimpleUrl(url: string): Promise<void>;
     clearContent(): Promise<void>;
     /**

@@ -115,6 +115,17 @@ class NfcManagerAndroid extends NfcManagerBase {
       const result = await handleNativeException(callNative('startHCE'));
       return result;
     } catch (error) {
+      console.error('Error starting HCE:', error);
+      throw error;
+    }
+  };
+
+  stopHCE = async () => {
+    try {
+      const result = await handleNativeException(callNative('stopHCE'));
+      return result;
+    } catch (error) {
+      console.error('Error stopping HCE:', error);
       throw error;
     }
   };

@@ -1530,6 +1530,26 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     }
 
     @ReactMethod
+    public void stopHCE(Callback callback) {
+        try {
+            if (!HceService.isRunning()) {
+                callback.invoke(null, "HCE_NOT_RUNNING");
+                return;
+            }
+
+            Intent serviceIntent = new Intent(context, HceService.class);
+            context.stopService(serviceIntent);
+            
+            Log.d(LOG_TAG, "HCE Service stopped");
+            callback.invoke(null, "HCE_STOPPED");
+            
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Error stopping HCE: " + e.getMessage(), e);
+            callback.invoke("ERR_STOP_HCE");
+        }
+    }
+
+    @ReactMethod
     public void setSimpleUrl(String url, Callback callback) {
         try {
             if (url == null || url.isEmpty()) {
