@@ -1557,14 +1557,13 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void clearContent(Callback callback) {
         try {
-            // Force clear static data immediately
-            HceService.forceClearNdefData();
+            // Force clear all static data immediately
+            HceService.clearAllData();
             
-            // Then send intent to service
-            Intent intent = new Intent(context, HceService.class);
-            intent.putExtra(HceService.EXTRA_SIMPLE_URL, (String) null);
-            intent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
-            context.startService(intent);
+            // Stop the service completely to ensure no data persists
+            Intent serviceIntent = new Intent(context, HceService.class);
+            context.stopService(serviceIntent);
+            
             callback.invoke(null, true);
         } catch (Exception e) {
             callback.invoke("ERR_CLEAR_CONTENT");
