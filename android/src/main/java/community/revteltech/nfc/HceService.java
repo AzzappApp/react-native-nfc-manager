@@ -96,7 +96,32 @@ public class HceService extends HostApduService {
             }
 
             Log.d(TAG, "Preparing NDEF with URL: " + simpleUrl);
-            NdefRecord uriRecord = NdefRecord.createUri(simpleUrl);
+            
+            // Create URI record with explicit type and payload
+            byte[] uriBytes = simpleUrl.getBytes(StandardCharsets.UTF_8);
+            byte[] payload;
+            
+            if (simpleUrl.startsWith("https://")) {
+                payload = new byte[uriBytes.length - 8 + 1];
+                payload[0] = 0x02; // https:// prefix code
+                System.arraycopy(uriBytes, 8, payload, 1, uriBytes.length - 8);
+            } else if (simpleUrl.startsWith("http://")) {
+                payload = new byte[uriBytes.length - 7 + 1];
+                payload[0] = 0x01; // http:// prefix code
+                System.arraycopy(uriBytes, 7, payload, 1, uriBytes.length - 7);
+            } else {
+                // Fallback to full URL without prefix code
+                payload = new byte[uriBytes.length];
+                System.arraycopy(uriBytes, 0, payload, 0, uriBytes.length);
+            }
+            
+            NdefRecord uriRecord = new NdefRecord(
+                NdefRecord.TNF_WELL_KNOWN,
+                NdefRecord.RTD_URI,
+                new byte[0], // No ID
+                payload
+            );
+            
             NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{uriRecord});
             byte[] ndefBytes = ndefMessage.toByteArray();
             currentNdefData = new byte[2 + ndefBytes.length];
@@ -104,11 +129,21 @@ public class HceService extends HostApduService {
             currentNdefData[1] = (byte) (ndefBytes.length & 0xFF);
             System.arraycopy(ndefBytes, 0, currentNdefData, 2, ndefBytes.length);
             Log.d(TAG, "NDEF prepared with URL, size: " + currentNdefData.length);
+            Log.d(TAG, "NDEF data hex: " + bytesToHex(currentNdefData));
 
         } catch (Exception e) {
             Log.e(TAG, "Error preparing NDEF data: " + e.getMessage(), e);
             currentNdefData = null;
         }
+    }
+
+    // Helper method to convert bytes to hex string for debugging
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString();
     }
 
     @Override

@@ -1546,7 +1546,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             }
 
             Intent intent = new Intent(context, HceService.class);
-            intent.putExtra(HceService.EXTRA_SIMPLE_URL, url);
+            intent.putExtra(HceService.EXTRA_SIMPLE_URL, normalizedUrl);
             context.startService(intent);
             callback.invoke(null, true);
         } catch (Exception e) {
