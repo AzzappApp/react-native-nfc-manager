@@ -61,10 +61,6 @@ public class HceService extends HostApduService {
         super.onDestroy();
         isServiceActive = false;
         
-        // Clear static data when service is destroyed
-        staticSimpleUrl = null;
-        staticContactVcf = null;
-        
         // Broadcast service stopped
         if (broadcastManager != null) {
             broadcastManager.sendBroadcast(new Intent(ACTION_HCE_STOPPED));
