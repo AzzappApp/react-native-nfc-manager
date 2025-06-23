@@ -100,9 +100,6 @@ class NfcManagerAndroid extends NfcManagerBase {
   isHceSupported = () =>
     handleNativeException(callNative('isHceSupported'));
 
-  isHceRunning = () =>
-    handleNativeException(callNative('isHceRunning'));
-
   startHCE = async () => {
     try {
       // First check if HCE is supported

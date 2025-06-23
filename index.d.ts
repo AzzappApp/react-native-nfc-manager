@@ -294,7 +294,6 @@ declare module 'react-native-nfc-manager' {
      * Android HCE (Host Card Emulation) API
      */
     isHceSupported(): Promise<boolean>;
-    isHceRunning(): Promise<boolean>;
     startHCE(): Promise<string>;
     stopHCE(): Promise<string>;
     setSimpleUrl(url: string): Promise<void>;

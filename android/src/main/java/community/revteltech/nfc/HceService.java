@@ -61,6 +61,10 @@ public class HceService extends HostApduService {
         super.onDestroy();
         isServiceActive = false;
         
+        // Clear static data when service is destroyed
+        staticSimpleUrl = null;
+        staticContactVcf = null;
+        
         // Broadcast service stopped
         if (broadcastManager != null) {
             broadcastManager.sendBroadcast(new Intent(ACTION_HCE_STOPPED));
@@ -70,6 +74,7 @@ public class HceService extends HostApduService {
     private void prepareNdefData() {
         try {
             if (contactVcf != null && !contactVcf.isEmpty()) {
+                Log.d(TAG, "Preparing NDEF with VCF: " + contactVcf);
                 
                 NdefRecord vcfRecord = NdefRecord.createMime(
                     "text/x-vcard",
@@ -81,13 +86,16 @@ public class HceService extends HostApduService {
                 currentNdefData[0] = (byte) ((ndefBytes.length >> 8) & 0xFF);
                 currentNdefData[1] = (byte) (ndefBytes.length & 0xFF);
                 System.arraycopy(ndefBytes, 0, currentNdefData, 2, ndefBytes.length);
+                Log.d(TAG, "NDEF prepared with VCF, size: " + currentNdefData.length);
                 return;
             }
             if (simpleUrl == null || simpleUrl.isEmpty()) {
+                Log.d(TAG, "No URL or VCF, clearing NDEF data");
                 currentNdefData = null;
                 return;
             }
 
+            Log.d(TAG, "Preparing NDEF with URL: " + simpleUrl);
             NdefRecord uriRecord = NdefRecord.createUri(simpleUrl);
             NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{uriRecord});
             byte[] ndefBytes = ndefMessage.toByteArray();
@@ -95,6 +103,7 @@ public class HceService extends HostApduService {
             currentNdefData[0] = (byte) ((ndefBytes.length >> 8) & 0xFF);
             currentNdefData[1] = (byte) (ndefBytes.length & 0xFF);
             System.arraycopy(ndefBytes, 0, currentNdefData, 2, ndefBytes.length);
+            Log.d(TAG, "NDEF prepared with URL, size: " + currentNdefData.length);
 
         } catch (Exception e) {
             Log.e(TAG, "Error preparing NDEF data: " + e.getMessage(), e);
@@ -107,6 +116,8 @@ public class HceService extends HostApduService {
         if (intent != null) {
             String url = intent.getStringExtra(EXTRA_SIMPLE_URL);
             String vcf = intent.getStringExtra(EXTRA_CONTACT_VCF);
+            
+            Log.d(TAG, "onStartCommand - URL: " + url + ", VCF: " + vcf);
 
             if (vcf != null) {
                 contactVcf = vcf;
@@ -120,6 +131,14 @@ public class HceService extends HostApduService {
                 contactVcf = null;
                 staticContactVcf = null;
                 prepareNdefData();
+            } else {
+                // Both are null - clear all content
+                Log.d(TAG, "Clearing all content");
+                contactVcf = null;
+                staticContactVcf = null;
+                simpleUrl = null;
+                staticSimpleUrl = null;
+                currentNdefData = null;
             }
         }
         return super.onStartCommand(intent, flags, startId);
@@ -194,6 +213,19 @@ public class HceService extends HostApduService {
     }
 
     public static boolean isRunning() {
-        return isServiceActive && staticSimpleUrl != null;
+        return isServiceActive && (staticSimpleUrl != null || staticContactVcf != null);
+    }
+
+    // Static method to clear all data
+    public static void clearAllData() {
+        staticSimpleUrl = null;
+        staticContactVcf = null;
+        isServiceActive = false;
+    }
+
+    // Static method to force clear current NDEF data
+    public static void forceClearNdefData() {
+        staticSimpleUrl = null;
+        staticContactVcf = null;
     }
 } 

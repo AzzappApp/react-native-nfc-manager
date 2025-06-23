@@ -1482,17 +1482,6 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     }
 
     @ReactMethod
-    public void isHceRunning(Callback callback) {
-        try {
-            boolean isRunning = HceService.isRunning();
-            callback.invoke(null, isRunning);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Error checking HCE running: " + e.getMessage(), e);
-            callback.invoke("ERR_HCE_RUNNING");
-        }
-    }
-
-    @ReactMethod
     public void startHCE(Callback callback) {
         try {
             if (nfcAdapter == null) {
@@ -1532,15 +1521,14 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void stopHCE(Callback callback) {
         try {
-            if (!HceService.isRunning()) {
-                callback.invoke(null, "HCE_NOT_RUNNING");
-                return;
-            }
-
-            Intent serviceIntent = new Intent(context, HceService.class);
-            context.stopService(serviceIntent);
+            // Force clear all static data first
+            HceService.clearAllData();
             
-            Log.d(LOG_TAG, "HCE Service stopped");
+            // Stop the service completely
+            Intent serviceIntent = new Intent(context, HceService.class);
+            boolean stopped = context.stopService(serviceIntent);
+            
+            Log.d(LOG_TAG, "HCE Service stopped: " + stopped);
             callback.invoke(null, "HCE_STOPPED");
             
         } catch (Exception e) {
@@ -1569,8 +1557,13 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     @ReactMethod
     public void clearContent(Callback callback) {
         try {
+            // Force clear static data immediately
+            HceService.forceClearNdefData();
+            
+            // Then send intent to service
             Intent intent = new Intent(context, HceService.class);
             intent.putExtra(HceService.EXTRA_SIMPLE_URL, (String) null);
+            intent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
             context.startService(intent);
             callback.invoke(null, true);
         } catch (Exception e) {
