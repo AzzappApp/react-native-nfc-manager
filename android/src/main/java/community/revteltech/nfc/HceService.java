@@ -26,12 +26,11 @@ public class HceService extends HostApduService {
     public static final String EXTRA_SIMPLE_URL = "simple_url";
     public static final String EXTRA_CONTACT_VCF = "contact_vcf";
 
-    // Static variables to maintain state across service lifecycle
-    private static String staticSimpleUrl = null;
+        // Static variables to maintain state across service lifecycle
+    private static List<String> staticSimpleUrls = new ArrayList<>();
     private static boolean isServiceActive = false;
     private static String staticContactVcf = null;
-    
-    private String simpleUrl;
+
     private String contactVcf;
     private LocalBroadcastManager broadcastManager;
 
@@ -47,13 +46,12 @@ public class HceService extends HostApduService {
         broadcastManager = LocalBroadcastManager.getInstance(this);
         
         // Restore static state
-        simpleUrl = staticSimpleUrl;
         contactVcf = staticContactVcf;
         
         // Service is active if there's any content
-        isServiceActive = (staticSimpleUrl != null || staticContactVcf != null);
+        isServiceActive = (!staticSimpleUrls.isEmpty() || staticContactVcf != null);
         
-        Log.d(TAG, "Service created - isActive: " + isServiceActive + ", hasUrl: " + (staticSimpleUrl != null) + ", hasVcf: " + (staticContactVcf != null));
+        Log.d(TAG, "Service created - isActive: " + isServiceActive + ", hasUrls: " + staticSimpleUrls.size() + ", hasVcf: " + (staticContactVcf != null));
         
         // Broadcast service started
         broadcastManager.sendBroadcast(new Intent(ACTION_HCE_STARTED));
@@ -84,27 +82,56 @@ public class HceService extends HostApduService {
                 Log.d(TAG, "NDEF prepared with VCF, size: " + currentNdefData.length);
                 return;
             }
-            if (simpleUrl == null || simpleUrl.isEmpty()) {
-                Log.d(TAG, "No URL or VCF, clearing NDEF data");
+            
+            if (staticSimpleUrls.isEmpty()) {
+                Log.d(TAG, "No URLs or VCF, clearing NDEF data");
                 currentNdefData = null;
                 return;
             }
 
-            Log.d(TAG, "Preparing NDEF with URL: " + simpleUrl);
+            Log.d(TAG, "Preparing NDEF with " + staticSimpleUrls.size() + " URLs: " + staticSimpleUrls);
             
-            // Use standard NDEF URI record for best iOS compatibility
-            // iOS Core NFC is designed for well-known NDEF types like URI records
-            NdefRecord uriRecord = NdefRecord.createUri(simpleUrl);
+            List<NdefRecord> allRecords = new ArrayList<>();
+            for (String url : staticSimpleUrls) {
+                if (url != null && !url.isEmpty()) {
+                    List<NdefRecord> records = createUriRecords(url);
+                    allRecords.addAll(records);
+                }
+            }
             
-            NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{uriRecord});
+            if (allRecords.isEmpty()) {
+                Log.d(TAG, "No valid URLs found, clearing NDEF data");
+                currentNdefData = null;
+                return;
+            }
+            
+            NdefMessage ndefMessage = new NdefMessage(allRecords.toArray(new NdefRecord[0]));
             currentNdefData = createNdefFile(ndefMessage);
-            Log.d(TAG, "NDEF prepared with URI record, size: " + currentNdefData.length);
+            Log.d(TAG, "NDEF prepared with " + allRecords.size() + " records from " + staticSimpleUrls.size() + " URLs, size: " + currentNdefData.length);
             Log.d(TAG, "NDEF data hex: " + bytesToHex(currentNdefData));
 
         } catch (Exception e) {
             Log.e(TAG, "Error preparing NDEF data: " + e.getMessage(), e);
             currentNdefData = null;
         }
+    }
+    
+    /**
+     * Create NDEF URI records based on the input URL
+     * Creates only the exact URL provided,
+     */
+    private List<NdefRecord> createUriRecords(String url) {
+        List<NdefRecord> records = new ArrayList<>();
+        
+        if (url == null || url.isEmpty()) {
+            return records;
+        }
+
+        NdefRecord primaryRecord = NdefRecord.createUri(url);
+        records.add(primaryRecord);
+        Log.d(TAG, "Added URI record: " + url);
+        
+        return records;
     }
     
     private byte[] createNdefFile(NdefMessage ndefMessage) {
@@ -159,34 +186,35 @@ public class HceService extends HostApduService {
                 if (vcf != null && !vcf.isEmpty()) {
                     contactVcf = vcf;
                     staticContactVcf = vcf;
-                    simpleUrl = null;
-                    staticSimpleUrl = null;
+                    staticSimpleUrls.clear();
                     isServiceActive = true; // Activate service when setting content
                     prepareNdefData();
-                } else {
+                } else {fear:
                     // Explicit clear VCF
                     Log.d(TAG, "Clearing VCF content");
                     contactVcf = null;
                     staticContactVcf = null;
                     currentNdefData = null;
                     // Don't deactivate if URL content might still exist
-                    if (staticSimpleUrl == null) {
+                    if (staticSimpleUrls.isEmpty()) {
                         isServiceActive = false;
                     }
                 }
             } else if (hasUrlExtra) {
                 if (url != null && !url.isEmpty()) {
-                    simpleUrl = url;
-                    staticSimpleUrl = url;
+                    // Add URL to the list (accumulate)
+                    if (!staticSimpleUrls.contains(url)) {
+                        staticSimpleUrls.add(url);
+                    }
                     contactVcf = null;
                     staticContactVcf = null;
                     isServiceActive = true; // Activate service when setting content
                     prepareNdefData();
+                    Log.d(TAG, "Added URL to collection. Total URLs: " + staticSimpleUrls.size());
                 } else {
-                    // Explicit clear URL
+                    // Explicit clear URLs
                     Log.d(TAG, "Clearing URL content");
-                    simpleUrl = null;
-                    staticSimpleUrl = null;
+                    staticSimpleUrls.clear();
                     currentNdefData = null;
                     // Don't deactivate if VCF content might still exist
                     if (staticContactVcf == null) {
@@ -198,8 +226,7 @@ public class HceService extends HostApduService {
                 Log.d(TAG, "Clearing all content and deactivating service");
                 contactVcf = null;
                 staticContactVcf = null;
-                simpleUrl = null;
-                staticSimpleUrl = null;
+                staticSimpleUrls.clear();
                 currentNdefData = null;
                 isServiceActive = false;
             }
@@ -217,7 +244,7 @@ public class HceService extends HostApduService {
         Log.d(TAG, "Processing APDU: " + ApduUtil.bytesToHex(commandApdu));
 
         // Check if HCE is actually active and has content
-        if (!isServiceActive || (staticSimpleUrl == null && staticContactVcf == null)) {
+        if (!isServiceActive || (staticSimpleUrls.isEmpty() && staticContactVcf == null)) {
             Log.d(TAG, "HCE service inactive or no content, rejecting all commands");
             byte[] response = ApduUtil.A_FILE_NOT_FOUND;
             Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
@@ -314,12 +341,12 @@ public class HceService extends HostApduService {
     }
 
     public static boolean isRunning() {
-        return isServiceActive && (staticSimpleUrl != null || staticContactVcf != null);
+        return isServiceActive && (!staticSimpleUrls.isEmpty() || staticContactVcf != null);
     }
 
     // Static method to clear all data and deactivate service
     public static void clearAllData() {
-        staticSimpleUrl = null;
+        staticSimpleUrls.clear();
         staticContactVcf = null;
         isServiceActive = false;
         Log.d(TAG, "All static data cleared and service deactivated");
@@ -327,7 +354,7 @@ public class HceService extends HostApduService {
 
     // Static method to force clear current NDEF data
     public static void forceClearNdefData() {
-        staticSimpleUrl = null;
+        staticSimpleUrls.clear();
         staticContactVcf = null;
     }
 } 

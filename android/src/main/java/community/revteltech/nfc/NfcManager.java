@@ -1563,18 +1563,22 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
 
             // Disable NFC reading to prevent interference when sharing via HCE
             if (isForegroundEnabled) {
-                Log.d(LOG_TAG, "Temporarily disabling NFC reading for HCE URL sharing");
+                Log.d(LOG_TAG, "Temporarily disabling NFC reading for HCE sharing");
                 enableDisableForegroundDispatch(false);
             }
 
             Intent intent = new Intent(context, HceService.class);
             intent.putExtra(HceService.EXTRA_SIMPLE_URL, url);
             context.startService(intent);
+            Log.d(LOG_TAG, "URL/Deep link set for HCE: " + url);
             callback.invoke(null, true);
         } catch (Exception e) {
+            Log.e(LOG_TAG, "Error setting URL: " + e.getMessage(), e);
             callback.invoke("ERR_SET_SIMPLE_URL");
         }
     }
+
+
 
     @ReactMethod
     public void clearContent(Callback callback) {
@@ -1588,7 +1592,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             serviceIntent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
             context.startService(serviceIntent);
             
-            Log.d(LOG_TAG, "HCE content cleared");
+            Log.d(LOG_TAG, "HCE content cleared (all URLs and VCF)");
             callback.invoke(null, true);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error clearing content: " + e.getMessage(), e);
