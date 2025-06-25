@@ -91,13 +91,11 @@ public class HceService extends HostApduService {
 
             Log.d(TAG, "Preparing NDEF with " + staticSimpleUrls.size() + " URLs: " + staticSimpleUrls);
             
-            List<NdefRecord> allRecords = new ArrayList<>();
-            for (String url : staticSimpleUrls) {
-                if (url != null && !url.isEmpty()) {
-                    List<NdefRecord> records = createUriRecords(url);
-                    allRecords.addAll(records);
-                }
-            }
+            // Manual NDEF URI record creation for better cross-device compatibility(had issue with ndefRecord.createUri)
+            byte[] uriBytes = simpleUrl.getBytes(StandardCharsets.UTF_8);
+            byte[] payload = new byte[uriBytes.length + 1];
+            payload[0] = 0x00; // No URI prefix identifier - full URI
+            System.arraycopy(uriBytes, 0, payload, 1, uriBytes.length);
             
             if (allRecords.isEmpty()) {
                 Log.d(TAG, "No valid URLs found, clearing NDEF data");
@@ -186,47 +184,37 @@ public class HceService extends HostApduService {
                 if (vcf != null && !vcf.isEmpty()) {
                     contactVcf = vcf;
                     staticContactVcf = vcf;
-                    staticSimpleUrls.clear();
-                    isServiceActive = true; // Activate service when setting content
+                    simpleUrl = null;
+                    staticSimpleUrl = null;
                     prepareNdefData();
-                } else {fear:
+                } else {
                     // Explicit clear VCF
                     Log.d(TAG, "Clearing VCF content");
                     contactVcf = null;
                     staticContactVcf = null;
                     currentNdefData = null;
-                    // Don't deactivate if URL content might still exist
-                    if (staticSimpleUrls.isEmpty()) {
-                        isServiceActive = false;
-                    }
                 }
             } else if (hasUrlExtra) {
                 if (url != null && !url.isEmpty()) {
-                    // Add URL to the list (accumulate)
-                    if (!staticSimpleUrls.contains(url)) {
-                        staticSimpleUrls.add(url);
-                    }
+                    simpleUrl = url;
+                    staticSimpleUrl = url;
                     contactVcf = null;
                     staticContactVcf = null;
-                    isServiceActive = true; // Activate service when setting content
                     prepareNdefData();
-                    Log.d(TAG, "Added URL to collection. Total URLs: " + staticSimpleUrls.size());
                 } else {
-                    // Explicit clear URLs
+                    // Explicit clear URL
                     Log.d(TAG, "Clearing URL content");
-                    staticSimpleUrls.clear();
+                    simpleUrl = null;
+                    staticSimpleUrl = null;
                     currentNdefData = null;
-                    // Don't deactivate if VCF content might still exist
-                    if (staticContactVcf == null) {
-                        isServiceActive = false;
-                    }
                 }
             } else if (hasUrlExtra && hasVcfExtra && url == null && vcf == null) {
                 // Both are explicitly null - clear all content and deactivate
                 Log.d(TAG, "Clearing all content and deactivating service");
                 contactVcf = null;
                 staticContactVcf = null;
-                staticSimpleUrls.clear();
+                simpleUrl = null;
+                staticSimpleUrl = null;
                 currentNdefData = null;
                 isServiceActive = false;
             }
@@ -244,11 +232,9 @@ public class HceService extends HostApduService {
         Log.d(TAG, "Processing APDU: " + ApduUtil.bytesToHex(commandApdu));
 
         // Check if HCE is actually active and has content
-        if (!isServiceActive || (staticSimpleUrls.isEmpty() && staticContactVcf == null)) {
+        if (!isServiceActive || (staticSimpleUrl == null && staticContactVcf == null)) {
             Log.d(TAG, "HCE service inactive or no content, rejecting all commands");
-            byte[] response = ApduUtil.A_FILE_NOT_FOUND;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_FILE_NOT_FOUND;
         }
 
         // Handle SELECT NDEF application

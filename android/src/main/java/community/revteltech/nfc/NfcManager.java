@@ -1591,8 +1591,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             serviceIntent.putExtra(HceService.EXTRA_SIMPLE_URL, (String) null);
             serviceIntent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
             context.startService(serviceIntent);
-            
-            Log.d(LOG_TAG, "HCE content cleared (all URLs and VCF)");
+
             callback.invoke(null, true);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error clearing content: " + e.getMessage(), e);
