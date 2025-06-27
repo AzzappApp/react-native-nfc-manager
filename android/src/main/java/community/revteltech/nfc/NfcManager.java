@@ -1536,12 +1536,10 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             serviceIntent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
             context.startService(serviceIntent);
             
-            // Re-enable NFC reading after a delay to avoid immediate interference
+            // Re-enable NFC reading if it was previously enabled
             if (isForegroundEnabled && isResumed) {
-                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    Log.d(LOG_TAG, "Auto re-enabling NFC reading after HCE stop");
-                    enableDisableForegroundDispatch(true);
-                }, 3000); // 3 second delay to ensure devices are separated
+                Log.d(LOG_TAG, "Re-enabling NFC reading after HCE stop");
+                enableDisableForegroundDispatch(true);
             }
             
             Log.d(LOG_TAG, "HCE Service content cleared and deactivated");
@@ -1563,7 +1561,7 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
 
             // Disable NFC reading to prevent interference when sharing via HCE
             if (isForegroundEnabled) {
-                Log.d(LOG_TAG, "Temporarily disabling NFC reading for HCE sharing");
+                Log.d(LOG_TAG, "Temporarily disabling NFC reading for HCE URL sharing");
                 enableDisableForegroundDispatch(false);
             }
 
@@ -1592,7 +1590,13 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             serviceIntent.putExtra(HceService.EXTRA_CONTACT_VCF, (String) null);
             context.startService(serviceIntent);
             
-            Log.d(LOG_TAG, "HCE content cleared (all URLs and VCF)");
+            // Re-enable NFC reading if it was previously enabled
+            if (isForegroundEnabled && isResumed) {
+                Log.d(LOG_TAG, "Re-enabling NFC reading after clearing content");
+                enableDisableForegroundDispatch(true);
+            }
+            
+            Log.d(LOG_TAG, "HCE content cleared");
             callback.invoke(null, true);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error clearing content: " + e.getMessage(), e);
@@ -1610,7 +1614,6 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             
             // Disable NFC reading to prevent interference when sharing via HCE
             if (isForegroundEnabled) {
-                Log.d(LOG_TAG, "Temporarily disabling NFC reading for HCE  sharing");
                 enableDisableForegroundDispatch(false);
             }
             
