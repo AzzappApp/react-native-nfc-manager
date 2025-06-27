@@ -194,56 +194,43 @@ public class HceService extends HostApduService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            // Check if this is an explicit clear command
             boolean hasUrlExtra = intent.hasExtra(EXTRA_SIMPLE_URL);
             boolean hasVcfExtra = intent.hasExtra(EXTRA_CONTACT_VCF);
             String url = intent.getStringExtra(EXTRA_SIMPLE_URL);
             String vcf = intent.getStringExtra(EXTRA_CONTACT_VCF);
-            
-            Log.d(TAG, "onStartCommand - URL: " + url + ", VCF: " + vcf + ", hasUrlExtra: " + hasUrlExtra + ", hasVcfExtra: " + hasVcfExtra);
 
             if (hasVcfExtra) {
                 if (vcf != null && !vcf.isEmpty()) {
                     contactVcf = vcf;
                     staticContactVcf = vcf;
                     staticSimpleUrls.clear();
-                    isServiceActive = true; // Activate service when setting content
+                    isServiceActive = true;
                     prepareNdefData();
-                } else {fear:
-                    // Explicit clear VCF
-                    Log.d(TAG, "Clearing VCF content");
+                } else {
                     contactVcf = null;
                     staticContactVcf = null;
                     currentNdefData = null;
-                    // Don't deactivate if URL content might still exist
                     if (staticSimpleUrls.isEmpty()) {
                         isServiceActive = false;
                     }
                 }
             } else if (hasUrlExtra) {
                 if (url != null && !url.isEmpty()) {
-                    // Add URL to the list (accumulate)
                     if (!staticSimpleUrls.contains(url)) {
                         staticSimpleUrls.add(url);
                     }
                     contactVcf = null;
                     staticContactVcf = null;
-                    isServiceActive = true; // Activate service when setting content
+                    isServiceActive = true;
                     prepareNdefData();
-                    Log.d(TAG, "Added URL to collection. Total URLs: " + staticSimpleUrls.size());
                 } else {
-                    // Explicit clear URLs
-                    Log.d(TAG, "Clearing URL content");
                     staticSimpleUrls.clear();
                     currentNdefData = null;
-                    // Don't deactivate if VCF content might still exist
                     if (staticContactVcf == null) {
                         isServiceActive = false;
                     }
                 }
             } else if (hasUrlExtra && hasVcfExtra && url == null && vcf == null) {
-                // Both are explicitly null - clear all content and deactivate
-                Log.d(TAG, "Clearing all content and deactivating service");
                 contactVcf = null;
                 staticContactVcf = null;
                 staticSimpleUrls.clear();
@@ -257,96 +244,64 @@ public class HceService extends HostApduService {
     @Override
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
         if (commandApdu == null || commandApdu.length < 4) {
-            Log.w(TAG, "Invalid APDU command received");
             return ApduUtil.A_ERROR;
         }
 
-        Log.d(TAG, "Processing APDU: " + ApduUtil.bytesToHex(commandApdu));
-
         // Check if HCE is actually active and has content
         if (!isServiceActive || (staticSimpleUrls.isEmpty() && staticContactVcf == null)) {
-            Log.d(TAG, "HCE service inactive or no content, rejecting all commands");
-            byte[] response = ApduUtil.A_FILE_NOT_FOUND;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_FILE_NOT_FOUND;
         }
 
         // Handle SELECT NDEF application
         if (ApduUtil.isSelectNdefApp(commandApdu)) {
-            Log.d(TAG, "NDEF application selected");
             ndefAppSelected = true;
             capabilityContainerSelected = false;
             ndefFileSelected = false;
             prepareNdefData();
-            byte[] response = ApduUtil.A_OK;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_OK;
         }
 
         // Only process further commands if NDEF app is selected
         if (!ndefAppSelected) {
-            Log.w(TAG, "NDEF app not selected, rejecting command");
-            byte[] response = ApduUtil.A_FILE_NOT_FOUND;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_FILE_NOT_FOUND;
         }
 
         // Handle SELECT Capability Container
         if (ApduUtil.isSelectCapabilityContainer(commandApdu)) {
-            Log.d(TAG, "Capability Container selected");
             capabilityContainerSelected = true;
             ndefFileSelected = false;
-            byte[] response = ApduUtil.A_OK;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_OK;
         }
 
         // Handle SELECT NDEF file
         if (ApduUtil.isSelectNdefFile(commandApdu)) {
-            Log.d(TAG, "NDEF file selected");
             capabilityContainerSelected = false;
             ndefFileSelected = true;
-            byte[] response = ApduUtil.A_OK;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_OK;
         }
 
         // Handle READ BINARY commands
         if (ApduUtil.isReadCommand(commandApdu)) {
             if (capabilityContainerSelected) {
-                Log.d(TAG, "Reading Capability Container");
                 byte[] ccData = ApduUtil.getCapabilityContainer();
                 byte[] ccDataOnly = new byte[ccData.length - 2];
                 System.arraycopy(ccData, 0, ccDataOnly, 0, ccDataOnly.length);
-                byte[] response = ApduUtil.handleReadBinary(commandApdu, ccDataOnly);
-                Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-                return response;
+                return ApduUtil.handleReadBinary(commandApdu, ccDataOnly);
             }
             
             if (ndefFileSelected) {
-                Log.d(TAG, "Reading NDEF file");
-                byte[] response;
                 if (currentNdefData != null) {
-                    response = ApduUtil.handleReadBinary(commandApdu, currentNdefData);
+                    return ApduUtil.handleReadBinary(commandApdu, currentNdefData);
                 } else {
-                    // Return empty NDEF file
                     byte[] emptyNdef = {0x00, 0x00};
-                    response = ApduUtil.handleReadBinary(commandApdu, emptyNdef);
+                    return ApduUtil.handleReadBinary(commandApdu, emptyNdef);
                 }
-                Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-                return response;
             }
             
-            Log.w(TAG, "READ command but no file selected");
-            byte[] response = ApduUtil.A_FILE_NOT_FOUND;
-            Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-            return response;
+            return ApduUtil.A_FILE_NOT_FOUND;
         }
 
-        Log.w(TAG, "Unknown APDU command: " + ApduUtil.bytesToHex(commandApdu));
-        byte[] response = ApduUtil.A_ERROR;
-        Log.d(TAG, "Response APDU: " + ApduUtil.bytesToHex(response));
-        return response;
+        return ApduUtil.A_ERROR;
     }
 
     @Override
@@ -369,7 +324,6 @@ public class HceService extends HostApduService {
         staticSimpleUrls.clear();
         staticContactVcf = null;
         isServiceActive = false;
-        Log.d(TAG, "All static data cleared and service deactivated");
     }
 
     // Static method to force clear current NDEF data
